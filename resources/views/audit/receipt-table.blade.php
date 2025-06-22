@@ -81,7 +81,7 @@
                     @endif
                 </td> --}}
                 <td class="text-center">
-                    รูปภาพ
+                    <a href="{{url("upload/asset/387453_0678446325.jpg")}}" target="_blank">ดูรูปภาพ</a>
                 </td>
             </tr>
             @empty
