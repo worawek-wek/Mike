@@ -112,7 +112,8 @@
                                                                 class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
-                                                                aria-expanded="false">
+                                                                aria-expanded="false"  
+                                                                onclick="window.open('{{$page_url}}/export/excel', '_blank')">>
                                                                 <span>
                                                                     <i class="ti ti-upload"></i> 
                                                                     ดาวน์โหลด Excel
@@ -321,7 +322,7 @@
         </div>
     </div>
     <!--set rent Modal -->
-    
+    <iframe id="print-iframe" style="display: none;"></iframe>    
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
@@ -566,7 +567,29 @@
             todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
         });
         $('#select2Position1').select2();
+        function printPdfBill() {
+            $.ajax({
+                url: '/pdf/user/1',
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
 
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
     </script>
 </body>
 

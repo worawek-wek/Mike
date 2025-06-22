@@ -246,6 +246,7 @@ Route::middleware('auth')->group(function() {
         Route::get('user/{id}', 'edit')->name('user');    //////////////////////////
         Route::post('user', 'store')->name('user.insert');    //////////////////////////
         Route::post('user/{id}', 'update')->name('user.update');    //////////////////////////
+        Route::get('user/export/excel', 'exportExcel')->name('pdf.userPdf'); 
     });
     Route::controller(AuditController::class)->group(function() {                   //////////////////////////
         Route::get('audit', 'index')->name('audit');    //////////////////////////

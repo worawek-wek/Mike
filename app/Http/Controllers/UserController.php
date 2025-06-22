@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
 use Mpdf\Mpdf;
 
@@ -359,7 +361,62 @@ class UserController extends Controller
         }
         //
     }
+
+    public function exportExcel()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = User::orderBy('id','DESC')->get();
+        $data = 
+        [
+            ['ข้อมูลผู้ใช้งาน'],
+            [
+                'รายงานผู้ใช้งาน วันที่ '.date('d/m/Y')
+            ],
+            [
+                "ลำดับ",
+                "ชื่อพนักงาน",
+                "ชื่อผู้ใช้งาน",
+                "อีเมล",
+                "เบอร์โทรศัพท์",
+                "เงินเดือน",
+                "วันที่เริ่มทำงาน"
+            ]
+        ];
+        // return $data;
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $key+1,
+                        $row->name,
+                        $row->username,
+                        $row->email,
+                        $row->phone,
+                        $row->salary,
+                        $row->work_start_date,
+
+                        
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+    }
+
+    
 }
+
+
 
 // $targetPath = $request->file('image_name')->getClientOriginalName();
 // $request->file('image_name')->move('upload/excel/', $targetPath);
