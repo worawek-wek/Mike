@@ -81,7 +81,19 @@
                     @endif
                 </td> --}}
                 <td class="text-center">
-                    <a href="{{url("upload/asset/387453_0678446325.jpg")}}" target="_blank">ดูรูปภาพ</a>
+                    <a href="javascript:void(0)" data-bs-toggle="modal"
+                        data-bs-target="#imageShow_{{ @$key }}">ดูรูปภาพ</a>
+
+                    <div class="modal fade" id="imageShow_{{@$key}}" tabindex="-1" aria-labelledby="imageShow_{{@$key}}Label"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-body text-center">
+                                    <img src="{{ url('upload/asset/387453_0678446325.jpg') }}" class="img-fluid rounded" alt="รูปภาพ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </tr>
             @empty
