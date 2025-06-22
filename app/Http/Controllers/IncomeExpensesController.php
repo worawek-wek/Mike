@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
 
 DB::beginTransaction();
@@ -166,5 +168,55 @@ class IncomeExpensesController extends Controller
         $data['total'] = $income-$expenses;
 
         return view('income-expenses/summary', $data);
+    }
+
+
+    public function exportExcel()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = IncomeExpenses::orderBy('id','DESC')->get();
+        $data = 
+        [
+            ['รายรับ-รายจ่าย'],
+            [
+                'รายงานรายรับ - รายจ่ายประจำ วันที่ '.date('d/m/Y')
+            ],
+            [
+                "ลำดับ",
+                "เลขที่ใบเสร็จ",
+                "รายละเอียด",
+                "ห้อง",
+                "หมวดหมู่",
+                "จำนวนเงิน",
+                "โดย"
+            ]
+        ];
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $key+1,
+                        date('d/m/Y',strtotime($row->date)),
+                        @$row->label,
+                        @$row->room->name,
+                        @$row->category->name,
+                        number_format($row->amount,2),
+                        $row->user->name,
+
+                        
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
     }
 }

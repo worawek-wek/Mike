@@ -295,6 +295,7 @@ Route::middleware('auth')->group(function() {
         Route::post('income-expenses', 'store')->name('income-expenses.insert');    //////////////////////////
         Route::get('income-expenses/datatable', 'datatable')->name('income-expenses.datatable');    //////////////////////////
         Route::get('income-expenses/{id}', 'show')->name('income-expenses.show');    //////////////////////////
+        Route::get('income-expenses/export/excel', 'exportExcel'); 
     });
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
