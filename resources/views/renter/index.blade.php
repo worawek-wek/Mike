@@ -128,7 +128,8 @@
                                         <div class="col-lg-4">
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
-                                                <select name="" class="form-select ms-2 me-2" style="width:100px">
+                                                <select onchange='loadCurrentData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_current_search" style="width:100px">
+                                                    <option value="3">3</option>
                                                     <option value="10">10</option>
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>
@@ -192,428 +193,10 @@
                                         
                                     </div>
                                     <div class="card-body px-0 pt-0">
-                                        <div class="tab-content p-0" id="pills-tabContent">
-                                            <div class="tab-pane fade show" id="pills-home" role="tabpanel"
-                                                aria-labelledby="pills-home-tab" tabindex="0">
-                                                <div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
-                                                    <div class="row g-3 new_box" style="padding: 0px 30px;">
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A101</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A102</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A103</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-success card-check shadow-sm">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A104</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-success card-check shadow-sm">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A105</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane fade show active" id="pills-profile" role="tabpanel"
-                                                aria-labelledby="pills-profile-tab" tabindex="0">
-                                                <table class="datatables-basic table dataTable no-footer dtr-column"
-                                                        id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
-                                                        <thead class="border-top">
-                                                            <tr class=" table-info">
-                                                                <th class="text-center" tabindex="0" style="width: 40px;">
-                                                                    ลำดับ
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    ชื่อผู้เช่า
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    ห้อง</th>
-                                                                <th class="text-center">
-                                                                    เบอร์ติดต่อ</th>
-                                                                <th class="text-center">
-                                                                    ยานพาหนะ
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    วันที่เข้าพัก
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    วันสิ้นสุดสัญญาเช่า
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    อายุสัญญา
-                                                                </th>
-                                                                {{-- <th class="text-center">
-                                                                    
-                                                                </th> --}}
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="odd">
-                                                                <td class="text-center">1</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A201
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            <tr class="odd">
-                                                                <td class="text-center">2</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">B102
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            <tr class="odd">
-                                                                <td class="text-center">3</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">B101
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ข 5678
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            
-                                                            <tr class="odd">
-                                                                <td class="text-center">4</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A102
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ค 7894
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            
-                                                            <tr class="odd">
-                                                                <td class="text-center">5</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A101
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                <div class="row">
-                                                    <div class="col-sm-12 col-md-6 ps-4">
-                                                        <div class="dataTables_info" id="DataTables_Table_1_info"
-                                                            role="status" aria-live="polite">Showing 1 to 10 of 100
-                                                            entries</div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-6 pe-4">
-                                                        <div class="dataTables_paginate paging_simple_numbers"
-                                                            id="DataTables_Table_1_paginate">
-                                                            <ul class="pagination justify-content-end">
-                                                                <li class="paginate_button page-item previous disabled"
-                                                                    id="DataTables_Table_1_previous"><a
-                                                                        aria-controls="DataTables_Table_1"
-                                                                        aria-disabled="true" role="link"
-                                                                        data-dt-idx="previous" tabindex="-1"
-                                                                        class="page-link"><i
-                                                                            class="ti ti-chevron-left ti-sm"></i></a>
-                                                                </li>
-                                                                <li class="paginate_button page-item active"><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                        class="page-link">1</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="1" tabindex="0"
-                                                                        class="page-link">2</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="2" tabindex="0"
-                                                                        class="page-link">3</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="3" tabindex="0"
-                                                                        class="page-link">4</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="4" tabindex="0"
-                                                                        class="page-link">5</a></li>
-                                                                <li class="paginate_button page-item disabled"
-                                                                    id="DataTables_Table_1_ellipsis"><a
-                                                                        aria-controls="DataTables_Table_1"
-                                                                        aria-disabled="true" role="link"
-                                                                        data-dt-idx="ellipsis" tabindex="-1"
-                                                                        class="page-link">…</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="14" tabindex="0"
-                                                                        class="page-link">15</a></li>
-                                                                <li class="paginate_button page-item next"
-                                                                    id="DataTables_Table_1_next"><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="next" tabindex="0"
-                                                                        class="page-link"><i
-                                                                            class="ti ti-chevron-right ti-sm"></i></a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="tab-content p-0" id="pills-tabContent_current">
+                                            {{-- @include('renter/current-table') --}}
                                         </div>
                                     </div>
-                                    ฝฝฝฝฝ
                                 </div>
                                             <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
                                                <div class="row border-bottom border-light p-3">
@@ -684,425 +267,8 @@
                                         
                                     </div>
                                     <div class="card-body px-0 pt-0">
-                                        <div class="tab-content p-0" id="pills-tabContent">
-                                            <div class="tab-pane fade show" id="pills-home" role="tabpanel"
-                                                aria-labelledby="pills-home-tab" tabindex="0">
-                                                <div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
-                                                    <div class="row g-3 new_box" style="padding: 0px 30px;">
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A101</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A102</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div
-                                                                class="card bg-label-success card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A103</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-success card-check shadow-sm">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A104</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-success card-check shadow-sm">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A105</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ชำระเงินแล้ว
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-lightGray card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                                                                        <p>ไม่มีผู้เช่า</p>
-                                                                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ห้องว่าง
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-lg5">
-                                                            <div class="card bg-label-danger card-check shadow-sm h-100">
-                                                                <div class="card-body text-center">
-                                                                    <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                                                                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                                                                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                                                        ค้างชำระ
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane fade show active" id="pills-profile" role="tabpanel"
-                                                aria-labelledby="pills-profile-tab" tabindex="0">
-                                                <table class="datatables-basic table dataTable no-footer dtr-column"
-                                                        id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
-                                                        <thead class="border-top">
-                                                            <tr class=" table-info">
-                                                                <th class="text-center" tabindex="0" style="width: 40px;">
-                                                                    ลำดับ
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    ชื่อผู้เช่า
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    ห้อง</th>
-                                                                <th class="text-center">
-                                                                    เบอร์ติดต่อ</th>
-                                                                <th class="text-center">
-                                                                    ยานพาหนะ
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    วันที่เข้าพัก
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    วันสิ้นสุดสัญญาเช่า
-                                                                </th>
-                                                                <th class="text-center">
-                                                                    อายุสัญญา
-                                                                </th>
-                                                                {{-- <th class="text-center">
-                                                                    
-                                                                </th> --}}
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="odd">
-                                                                <td class="text-center">1</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A201
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            <tr class="odd">
-                                                                <td class="text-center">2</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">B102
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            <tr class="odd">
-                                                                <td class="text-center">3</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">B101
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ข 5678
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            
-                                                            <tr class="odd">
-                                                                <td class="text-center">4</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A102
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ค 7894
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                            
-                                                            <tr class="odd">
-                                                                <td class="text-center">5</td>
-                                                                <td class="text-center">
-                                                                    บริษัท Kittinakorn
-                                                                </td>
-                                                                <td class="text-center">A101
-                                                                </td>
-                                                                <td class="text-center">0909090909
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    รถยนต์ ก 1234
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/12/2024
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    19/06/2025
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    6 เดือน
-                                                                </td>
-                                                                {{-- <td class="text-center">
-                                                                    <div class="d-inline-block text-nowrap">
-                                                                        <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light me-2">
-                                                                            <i class="ti ti-eye ti-md" style="color:#6f6b7d !important;"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td> --}}
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                <div class="row">
-                                                    <div class="col-sm-12 col-md-6 ps-4">
-                                                        <div class="dataTables_info" id="DataTables_Table_1_info"
-                                                            role="status" aria-live="polite">Showing 1 to 10 of 100
-                                                            entries</div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-6 pe-4">
-                                                        <div class="dataTables_paginate paging_simple_numbers"
-                                                            id="DataTables_Table_1_paginate">
-                                                            <ul class="pagination justify-content-end">
-                                                                <li class="paginate_button page-item previous disabled"
-                                                                    id="DataTables_Table_1_previous"><a
-                                                                        aria-controls="DataTables_Table_1"
-                                                                        aria-disabled="true" role="link"
-                                                                        data-dt-idx="previous" tabindex="-1"
-                                                                        class="page-link"><i
-                                                                            class="ti ti-chevron-left ti-sm"></i></a>
-                                                                </li>
-                                                                <li class="paginate_button page-item active"><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                        class="page-link">1</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="1" tabindex="0"
-                                                                        class="page-link">2</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="2" tabindex="0"
-                                                                        class="page-link">3</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="3" tabindex="0"
-                                                                        class="page-link">4</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="4" tabindex="0"
-                                                                        class="page-link">5</a></li>
-                                                                <li class="paginate_button page-item disabled"
-                                                                    id="DataTables_Table_1_ellipsis"><a
-                                                                        aria-controls="DataTables_Table_1"
-                                                                        aria-disabled="true" role="link"
-                                                                        data-dt-idx="ellipsis" tabindex="-1"
-                                                                        class="page-link">…</a></li>
-                                                                <li class="paginate_button page-item "><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="14" tabindex="0"
-                                                                        class="page-link">15</a></li>
-                                                                <li class="paginate_button page-item next"
-                                                                    id="DataTables_Table_1_next"><a href="#"
-                                                                        aria-controls="DataTables_Table_1" role="link"
-                                                                        data-dt-idx="next" tabindex="0"
-                                                                        class="page-link"><i
-                                                                            class="ti ti-chevron-right ti-sm"></i></a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="tab-content p-0" id="pills-tabContent_old">
+
                                         </div>
                                     </div>
                                             </div>
@@ -2089,3 +1255,166 @@
 </body>
 
 </html>
+<script>
+    var current_page = "{{$page_url}}/current/datatable";
+    var old_page = "{{$page_url}}/old/datatable";
+    var searchCurrentData = {};
+    var searchOldData = {};
+
+
+    loadCurrentData(current_page);
+    loadOldData(old_page);
+    
+    function printPdfOld(id) {
+        $.ajax({
+            url: '/pdf/old/'+id,
+            type: 'GET',
+            success: function(html) {
+                const iframe = document.getElementById('print-iframe');
+                const doc = iframe.contentWindow.document;
+                doc.open();
+                doc.write(html);
+                doc.close();
+
+                // รอโหลดก่อนค่อยพิมพ์
+                iframe.onload = function () {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                };
+            },
+            error: function(xhr) {
+                alert('เกิดข้อผิดพลาด');
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    function loadCurrentData(pages){
+        
+        $('.p_current_search').each(function() {
+            var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+            var inputValue = $(this).val(); // ดึงค่า value ของ input
+            
+            searchCurrentData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchCurrentData
+        });
+
+        current_page = pages;
+
+        $.ajax({
+            type: "GET",
+            url: current_page,
+            data: searchCurrentData,
+            success: function(data) {
+                $("#pills-tabContent_current").html(data);
+            }
+        });
+
+    }
+
+    function loadOldData(pages){
+        
+        $('.p_old_search').each(function() {
+            var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+            var inputValue = $(this).val(); // ดึงค่า value ของ input
+            
+            searchOldData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchOldData
+        });
+
+        old_page = pages;
+
+        $.ajax({
+            type: "GET",
+            url: old_page,
+            data: searchOldData,
+            success: function(data) {
+                $("#pills-tabContent_old").html(data);
+            }
+        });
+        // alert(page);
+    }
+    function current_export_excel(){
+        var searchCurrentData = {};
+
+        $('.p_current_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchCurrentData[inputName] = inputValue;
+        });
+
+        // แปลงเป็น query string
+        var queryString = Object.keys(searchCurrentData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(searchCurrentData[key]))
+            .join('&');
+
+        var fullUrl = '{{$page_url}}/current/export/excel' + '?' + queryString;
+
+        window.open(fullUrl, '_blank');
+    }
+
+    function old_export_excel(){
+        var searchOldData = {};
+
+        $('.p_old_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchOldData[inputName] = inputValue;
+        });
+
+        // แปลงเป็น query string
+        var queryString = Object.keys(searchOldData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(searchOldData[key]))
+            .join('&');
+
+        var fullUrl = '{{$page_url}}/old/export/excel' + '?' + queryString;
+
+        window.open(fullUrl, '_blank');
+    }
+
+            $('#selectpickerBuilding').change(function() {
+                var building = $(this).val();
+                
+                // เคลียร์ dropdown สำหรับตำบล
+                $('#selectpickerFloor').empty().append('<option value="all">ทุกชั้น</option>');
+
+                if(building == 'all'){
+                    $('#selectpickerFloor').prop('disabled', true);
+                    return;
+                }
+                if (building) {
+                    $.ajax({
+                        url: '/get-floors/' + building,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#selectpickerFloor').prop('disabled', false);
+                            data.forEach(function(floor) {
+                                $('#selectpickerFloor').append('<option value="' + floor.id + '">' + floor.name + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+            $('#selectpickerBuilding_2').change(function() {
+                var building = $(this).val();
+                
+                // เคลียร์ dropdown สำหรับตำบล
+                $('#selectpickerFloor_2').empty().append('<option value="all">ทุกชั้น</option>');
+
+                if(building == 'all'){
+                    $('#selectpickerFloor_2').prop('disabled', true);
+                    return;
+                }
+                if (building) {
+                    $.ajax({
+                        url: '/get-floors/' + building,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#selectpickerFloor_2').prop('disabled', false);
+                            data.forEach(function(floor) {
+                                $('#selectpickerFloor_2').append('<option value="' + floor.id + '">' + floor.name + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+            
+</script>

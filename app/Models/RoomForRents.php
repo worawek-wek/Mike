@@ -21,6 +21,11 @@ class RoomForRents extends Model
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
     }
 
+    public function room_3()
+    {
+        return $this->hasOne('App\Models\Room', 'id', 'ref_room_id')->where('status',3);
+    }
+
     public function rent_bills()
     {
         return $this->hasOne('App\Models\RentBill', 'ref_room_for_rent_id', 'id');

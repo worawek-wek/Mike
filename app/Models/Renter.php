@@ -31,6 +31,11 @@ class Renter extends Model
         return $this->belongsTo(\App\Models\Subdistrict::class, 'ref_subdistrict_id');
     }
 
+    public function room_for_rent()
+    {
+        return $this->hasOne('App\Models\RoomForRents', 'ref_renter_id', 'id');
+    }
+
     public function fullThaiAddress()
     {
         $subdistrict = $this->subdistrict?->name_in_thai ?? '';
