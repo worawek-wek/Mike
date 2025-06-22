@@ -164,7 +164,9 @@
                                                     class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2"
                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                     type="button" aria-haspopup="dialog"
-                                                    aria-expanded="false">
+                                                    aria-expanded="false"
+                                                    onclick="printPdfBill()"
+                                                    >
                                                 <span>
                                                 <i class="ti ti-file-upload"></i> พิมพ์ใบสรุปรายรับรายจ่าย</span>
                                             </button>
@@ -251,6 +253,7 @@
         </div>
 
         <!-- Overlay -->
+        <iframe id="print-iframe" style="display: none;"></iframe>        
         <div class="layout-overlay layout-menu-toggle"></div>
 
         <!-- Drag Target Area To SlideIn Menu On Small Screens -->
@@ -708,6 +711,28 @@
 
             // อัปเดตค่า total ใน span#total-price
             // document.getElementById('total-price').innerText = total.toLocaleString();
+        }
+
+        function printPdfBill() {
+            $.ajax({
+                url: '/pdf/income-expenses-all/1',
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
         }
         </script>
     {{-- <script src="assets/vendor/libs/select2/select2.js"></script>

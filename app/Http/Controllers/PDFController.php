@@ -16,6 +16,7 @@ use App\Models\Branch;
 use App\Models\Renter;
 use App\Models\Province;
 use App\Models\District;
+use App\Models\IncomeExpenses;
 use App\Models\Subdistrict;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -118,6 +119,13 @@ class PDFController extends Controller
 
         return view('pdf/invoice-all', $data);
     }
+    public function income_expenses_all($invoice_id)
+    {
+        $results = IncomeExpenses::orderBy('id','DESC')->get();                
+        $data['list_data'] = $results;
+        return view('pdf/income-expenses-all', $data);
+    }
+    
     // public function receipt()
     // {
 
