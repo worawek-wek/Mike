@@ -173,7 +173,6 @@ class IncomeExpensesController extends Controller
 
     public function exportExcel()
     {
-        dd();
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
