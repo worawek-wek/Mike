@@ -190,6 +190,11 @@ class UserController extends Controller
         
         try{
             $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
+            $ref_user_id = $request->ref_user_id;
+            if($ref_user_id == null){
+                $ref_user_id = 0;
+            }
+
             $user = new User;
             $user->name  =  $request->name;
             $user->username  =  $request->username;
@@ -198,7 +203,7 @@ class UserController extends Controller
             $user->email  =  $request->email;
             $user->work_start_date  =  $work_start_date;
             $user->ref_position_id  =  $request->ref_position_id;
-            $user->ref_user_id  =  $request->ref_user_id ?? 0;
+            $user->ref_user_id  =  $ref_user_id;
             $user->remark  =  $request->remark;
             // $user->ref_branch_id  =  session("branch_id");
             $user->password = Hash::make($request->password);
