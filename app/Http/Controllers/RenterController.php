@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
 
 DB::beginTransaction();
@@ -164,5 +166,58 @@ class RenterController extends Controller
 
 
         return view('renter/old-table', $data);
+    }
+
+    public function exportExcel()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = Renter::whereHas('room_for_rent.room', function ($query) {
+            $query->whereIn('status', [2,3]);
+        })->distinct('renters.id')->get();
+        $data = 
+        [
+            ['ข้อมูลผู้เช่าปัจจุบัน'],
+            [
+                'ข้อมูลผู้เช่าปัจจุบัน วันที่ '.date('d/m/Y')
+            ],
+            [
+                "ลำดับ",
+                "ชื่อผู้เช่า",
+                "ห้อง",
+                "เบอร์ติดต่อ",
+                "ยานพาหนะ",
+                "วันที่เข้าพัก",
+                "วันสิ้นสุดสัญญาเช่า",
+                "อายุสัญญา"
+            ]
+        ];
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $key+1,
+                        $row->prefix.' '.$row->name.' '.$row->surname,
+                        $row->room_for_rent->room->name,
+                        $row->phone,
+                        "รถยนต์ ก 1234",
+                        date('d/m/Y', strtotime($row->room_for_rent->date_stay)),
+                        date('d/m/Y', strtotime("+6 months", strtotime($row->room_for_rent->date_stay))),
+                        6,
+
+                        
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
     }
 }

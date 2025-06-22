@@ -232,6 +232,7 @@ Route::middleware('auth')->group(function() {
         Route::get('renter', 'index')->name('renter');    //////////////////////////
         Route::get('renter/current/datatable', 'current_datatable')->name('renter.current-datatable');    //////////////////////////
         Route::get('renter/old/datatable', 'old_datatable')->name('renter.old-datatable');    //////////////////////////
+        Route::get('renter/export/excel', 'exportExcel'); 
     });
     Route::controller(VehicleController::class)->group(function() {                   //////////////////////////
         Route::get('vehicle', 'index')->name('vehicle');    //////////////////////////

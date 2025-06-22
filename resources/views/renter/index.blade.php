@@ -176,7 +176,9 @@
                                                         class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false">
+                                                        aria-expanded="false"
+                                                        onclick="window.open('{{$page_url}}/export/excel', '_blank')"
+                                                        >
                                                         <span>
                                                             <i class="ti ti-upload"></i> 
                                                             ดาวน์โหลด Excel
