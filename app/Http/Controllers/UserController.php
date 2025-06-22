@@ -130,15 +130,14 @@ class UserController extends Controller
                                 );
         
         if(@$request->search){
-            $results = $results->orWhere(function ($query) use ($request) {
-                                    $query->where('name','LIKE','%'.$request->search.'%')
-                                        ->orWhere('email','LIKE','%'.$request->search.'%')
-                                        ->orWhere('salary','LIKE','%'.$request->search.'%')
-                                        ->orWhere('phone','LIKE','%'.$request->search.'%')
-                                        ->orWhere('remark','LIKE','%'.$request->search.'%');
+            $results = $results->where(function ($query) use ($request) {
+                                    $query->where('users.name','LIKE','%'.$request->search.'%')
+                                        ->orWhere('users.email','LIKE','%'.$request->search.'%')
+                                        ->orWhere('users.salary','LIKE','%'.$request->search.'%')
+                                        ->orWhere('users.phone','LIKE','%'.$request->search.'%')
+                                        ->orWhere('users.remark','LIKE','%'.$request->search.'%');
                                 });
         }
-
         $limit = 15;
         if(@$request['limit']){
             $limit = $request['limit'];

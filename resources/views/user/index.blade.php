@@ -82,7 +82,7 @@
                                                             class="form-control p_search"
                                                             placeholder="ค้นหาคีเวิร์ดที่ต้องการ"
                                                             aria-label="ค้นหาคีเวิร์ดที่ต้องการ"
-                                                            aria-describedby="basic-addon-search31" />
+                                                            aria-describedby="basic-addon-search31" oninput="loadData('{{$page_url}}/datatable')" />
                                                         </div>
                                                 </div>
                                             </div>

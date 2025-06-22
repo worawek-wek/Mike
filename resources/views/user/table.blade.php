@@ -32,7 +32,7 @@
         <tbody>
             @foreach ($list_data as $key => $row)
             <tr class="odd"
-                @if ($row->user_has_branch->ref_position_id == 1)
+                @if (@$row->user_has_branch->ref_position_id == 1)
                     style="background-color: #d2ffd2;"
                 @else
                     style="background-color: #fefced;"
