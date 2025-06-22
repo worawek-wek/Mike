@@ -197,7 +197,7 @@ class UserController extends Controller
             $user->email  =  $request->email;
             $user->work_start_date  =  $work_start_date;
             $user->ref_position_id  =  $request->ref_position_id;
-            $user->ref_user_id  =  $request->ref_user_id;
+            $user->ref_user_id  =  $request->ref_user_id ?? 0;
             $user->remark  =  $request->remark;
             // $user->ref_branch_id  =  session("branch_id");
             $user->password = Hash::make($request->password);
