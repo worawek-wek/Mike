@@ -25,6 +25,7 @@ class RenterController extends Controller
     public function index(Request $request)
     {
         $data['page_url'] = 'renter';
+        $data['page_url2'] = 'renter/current';
         return view('renter/index', $data);
     }
     public function current_datatable(Request $request)
@@ -34,6 +35,14 @@ class RenterController extends Controller
                                                 })
                                 // ->with('room_for_rent.room')
                                 ->distinct('renters.id');
+        if(@$request->search){
+            $results = $results->where(function ($query) use ($request) {
+                $query->where('renters.prefix','LIKE','%'.$request->search.'%')
+                    ->orWhere('renters.name','LIKE','%'.$request->search.'%')
+                    ->orWhere('renters.surname','LIKE','%'.$request->search.'%')
+                    ->orWhere('renters.phone','LIKE','%'.$request->search.'%');
+            });
+        }
         // $results = RentBill::orderBy('rent_bills.id','DESC')
         //                         ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
         //                         ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
@@ -69,6 +78,8 @@ class RenterController extends Controller
 
         //     $results = $results->whereBetween('rent_bills.created_at', [$startDate, $endDate]);
         // }
+
+      
         
         $limit = 15;
         if(@$request['limit']){

@@ -108,11 +108,12 @@
                                                         <div class="input-group input-group-merge">
                                                             <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
                                                             <input
+                                                            name="search"
                                                             type="text"
-                                                            class="form-control"
+                                                            class="form-control p_current_search"
                                                             placeholder="ค้นหาคีย์เวิร์ดที่ต้องการ"
                                                             aria-label="ค้นหาคีย์เวิร์ดที่ต้องการ"
-                                                            aria-describedby="basic-addon-search31" />
+                                                            aria-describedby="basic-addon-search31" oninput="loadCurrentData('{{$page_url2}}/datatable')" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1290,7 +1291,7 @@
     }
 
     function loadCurrentData(pages){
-        
+
         $('.p_current_search').each(function() {
             var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
             var inputValue = $(this).val(); // ดึงค่า value ของ input
