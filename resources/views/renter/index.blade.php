@@ -129,12 +129,9 @@
                                         <div class="col-lg-4">
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
-                                                <select onchange='loadCurrentData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_current_search" style="width:100px">
-                                                    <option value="3">3</option>
-                                                    <option value="10">10</option>
+                                                <select onchange='loadCurrentData("{{$page_url2}}/datatable")' name="limit" class="form-select ms-2 me-2 p_current_search" style="width:100px">
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>
-                                                    <option value="75">75</option>
                                                     <option value="100">100</option>
                                                 </select>
                                                 <ul class="nav nav-pills" id="pills-tablayout" role="tablist">

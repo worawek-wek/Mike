@@ -79,7 +79,7 @@
             @foreach ($list_data as $key => $row)
                 <tr class="odd">
                     <td>ขพ 8472</td>
-                    <td>A208</td>
+                    <td>{{ @$row->room_for_rent->room->name }}</td>
                     <td></td>
                     <td></td>
                     <td></td>

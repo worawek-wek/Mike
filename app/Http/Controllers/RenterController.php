@@ -33,10 +33,9 @@ class RenterController extends Controller
     public function current_datatable(Request $request)
     {
         $results = Renter::whereHas('room_for_rent.room', function ($query) {
-                                                    $query->whereIn('status', [2,3]);
-                                                })
-                                // ->with('room_for_rent.room')
-                                ->distinct('renters.id');
+            $query->whereIn('status', [2,3]);
+        })
+        ->distinct('renters.id');
         if(@$request->search){
             $results = $results->where(function ($query) use ($request) {
                 $query->where('renters.prefix','LIKE','%'.$request->search.'%')
@@ -45,62 +44,15 @@ class RenterController extends Controller
                     ->orWhere('renters.phone','LIKE','%'.$request->search.'%');
             });
         }
-        // $results = RentBill::orderBy('rent_bills.id','DESC')
-        //                         ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-        //                         ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
-        //                         ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-        //                         ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-        //                         ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-        //                         ->where('buildings.ref_branch_id', session("branch_id"))
-        //                         // ->where('rent_bills.ref_status_id', '!=', 3)
-        //                         ->distinct('rent_bills.id')
-        //                         ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
-        
-        // if(@$request->search){
-        //     $results = $results->Where(function ($query) use ($request) {
-        //                             $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
-        //                                 ->orWhere('rooms.name','LIKE','%'.$request->search.'%')
-        //                                 ->orWhere('rent_bills.current_number','LIKE','%'.$request->search.'%');
-        //                         });
-        // }
-        // if(@$request->ref_status_id != "all"){
-        //     $results = $results->Where('rent_bills.ref_status_id', $request->ref_status_id);
-        // }
-        // if(@$request->ref_type_id != "all"){
-        //     $results = $results->Where('rent_bills.ref_type_id', $request->ref_type_id);
-        // }
-        // if(@$request->month_from){
-
-        //     $monthFrom = $request->month_from; // format: YYYY-MM
-        //     $monthTo = $request->month_to;     // format: YYYY-MM
-
-        //     // สร้างช่วงวันที่เต็ม (เริ่มต้นเดือน ถึง สิ้นเดือน)
-        //     $startDate = Carbon::parse($monthFrom)->startOfMonth()->toDateString(); // 2025-06-01
-        //     $endDate = Carbon::parse($monthTo)->endOfMonth()->toDateString();       // 2025-06-30
-
-        //     $results = $results->whereBetween('rent_bills.created_at', [$startDate, $endDate]);
-        // }
-
-      
-        
         $limit = 15;
         if(@$request['limit']){
             $limit = $request['limit'];
         }
-
         $results = $results->paginate($limit);
-
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();
         $data['query']['limit'] = $limit;
-
         $data['list_data'] = $results;
-        
-        // if(@$request->re){
-        //     return $data['list_data'];
-        // }
-
-
         return view('renter/current-table', $data);
     }
     public function old_datatable(Request $request)
