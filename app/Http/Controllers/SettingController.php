@@ -435,6 +435,7 @@ class SettingController extends Controller
             $user = new Room;
             $user->name  =  $request->name;
             $user->ref_floor_id  =  $request->ref_floor_id;
+            $user->minimum_water_bill = 0;
             $user->save();
             
             DB::commit();
