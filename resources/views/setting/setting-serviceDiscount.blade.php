@@ -789,14 +789,15 @@
                         type: 'DELETE',
                         data: formData + '&' + $.param({ id: update_ids_service }), // รวมข้อมูล form + ID checkbox
                         success: function(response) {
-                            if (response == 1) {
-                                Swal.fire('ลบค่าบริการเรียบร้อยแล้ว', '', 'success');
-                                $('#deleteServiceModal').modal('hide');
-                                loadData(page);
-                                getService();
-                            } else {
-                                Swal.fire('ไม่สามารถลบค่าบริการได้', '', 'error');
-                            }
+                            // if (response == 1) {
+                            //     Swal.fire('ลบค่าบริการเรียบร้อยแล้ว', '', 'success');
+                            //     $('#deleteServiceModal').modal('hide');
+                            //     loadData(page);
+                            //     getService();
+                            // } else {
+                            //     Swal.fire('ไม่สามารถลบค่าบริการได้', '', 'error');
+                            // }
+                            location.reload();
                         },
                         error: function(error) {
                             Swal.fire('เกิดข้อผิดพลาด', '', 'error');
