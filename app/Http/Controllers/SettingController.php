@@ -1018,9 +1018,10 @@ class SettingController extends Controller
     {
         try{
             $work_start_date = null;
-            if($work_start_date){
+            if($request->work_start_date){
                 $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
             }
+
             $ref_user_id = $request->ref_user_id;
             if($ref_user_id == null){
                 $ref_user_id = 0;
