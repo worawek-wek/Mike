@@ -96,8 +96,7 @@
                     <input name="email" type="email" class="form-control" id="" placeholder="อีเมลติดต่อสาขา" />
                 </div>
                 <div class="col-sm-6">
-                    <label>สาขาของคุณทำบิลทุกวันที่เท่าไหร่
-                        ?</label>
+                    <label>สาขาของคุณทำบิลทุกวันที่เท่าไหร่?</label>
                     <select name="billing_date" id="select2Billing_date" class="select2 form-select form-select-lg">
                         @for ($i = 1; $i < 32; $i++)
                             <option value="{{$i}}">วันที่ {{$i}} ของทุกเดือน</option>

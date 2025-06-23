@@ -352,8 +352,8 @@
                             <input name="amount" type="text" class="form-control" id="exampleFormControlInput1" placeholder="จำนวนเงิน" />
                         </div>
                         <div class="col-sm-6">
-                            <label for="exampleFormControlInput1" class="form-label">วันที่ <span class="text-danger">*</span></label>
-                            <input name="date" type="text" class="form-control" id="exampleFormControlInput1" placeholder="วันที่" />
+                            <label for="bs-datepicker-format-2" class="form-label">วันที่ <span class="text-danger">*</span></label>
+                            <input name="date" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="วันที่" autocomplete="off"/>
                         </div>
                         <div class="col-sm-6">
                             <label for="C" class="form-label">หมวดหมู่ <span class="text-danger">*</span></label>
@@ -625,6 +625,11 @@
         });
         
         $('#bs-datepicker-format').datepicker({
+            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        });
+        $('#bs-datepicker-format-2').datepicker({
             format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
             autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
             todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน

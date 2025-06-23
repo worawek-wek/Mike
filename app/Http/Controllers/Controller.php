@@ -22,9 +22,17 @@ class Controller extends BaseController
                             ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                             ->where('rent_bills.ref_status_id', 2)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
 
-        $confirm_by_ceo = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->where('rent_bills.ref_status_id', 5)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
+        $confirm_by_ceo = RentBill::with('payment_list')->where('ref_status_id', 5)->where('ref_type_id', 1)->get()->sum('total_amount');
+
+        $confirm_by_ceo_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
+                                                ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])->where('ref_status_id', 5)
+                                                ->where('ref_type_id', 1)->get()->sum('total_amount');
+
+        $overdue_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
+                                                ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])->where('ref_status_id', 7)
+                                                ->where('ref_type_id', 1)->get()->sum('total_amount');
+                            // ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
+                            // ->where('rent_bills.ref_status_id', 5)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
 
         $cash = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                             ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
@@ -83,6 +91,8 @@ class Controller extends BaseController
         }
         $data['confirm_by_employee'] = number_format($confirm_by_employee,2).' บาท'; // ชำระเงินโดยพนักงาน
         $data['confirm_by_ceo'] = number_format($confirm_by_ceo,2).' บาท'; // ชำระเงินโดยผู้บริหาร
+        $data['confirm_by_ceo_this_month'] = number_format($confirm_by_ceo_this_month); // ชำระเงินโดยผู้บริหาร
+        $data['overdue_this_month'] = number_format($overdue_this_month); // ชำระเงินโดยผู้บริหาร
         $data['confirm_by_employee_confirm_by_ceo'] = number_format($confirm_by_employee + $confirm_by_ceo,2).' บาท'; // ชำระเงินหลังคอนเฟิร์ม
         $data['transfer'] = number_format($transfer,2).' บาท'; // เงินโอน
         $data['cash'] = number_format($cash,2).' บาท'; // เงินสด

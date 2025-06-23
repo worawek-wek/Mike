@@ -169,17 +169,17 @@
                                         </ul>
                                         <div class="border-2 border-light border-top my-3"></div>
                                         <h2 class="text-center fw-semibold mb-0"><span class="h5">รวม
-                                            </span>933,584<span class="h5"> บาท</span></h2>
+                                            </span>{{ $summary['confirm_by_ceo_this_month'] }}<span class="h5"> บาท</span></h2>
                                         <div class="border-2 border-light border-bottom my-3"></div>
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <h5>ผู้เช่าค้างชำระค่าเช่า</h5>
-                                            <h6 class="text-danger text-end">รวมเป็นเงิน 910,312 บาท</h6>
+                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] }} บาท</h6>
                                         </div>
                                         <div class="card card-body bg-light-primary border-0 shadow-none py-5">
                                             <h2 class="text-center fw-semibold mb-0 text-white"><span
                                                     class="h5 text-white">รวมสุทธิ
-                                                </span>933,584<span class="h5 text-white"> บาท</span></h2>
+                                                </span>{{ $summary['confirm_by_ceo_this_month'] }}<span class="h5 text-white"> บาท</span></h2>
                                         </div>
                                     </div>
                                 </div>
