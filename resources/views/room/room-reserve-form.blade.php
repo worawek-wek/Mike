@@ -35,7 +35,7 @@
                                 <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="12/34"/>
                             </div>
                             <div class="col-sm-4">
-                                <label>เลือกจังหวัด45</label>
+                                <label>เลือกจังหวัด</label>
                                 <select name="ref_province_id" id="select2Basic" class="select2 form-select form-select-lg" required>
                                     <option selected disabled hidden value="">เลือกจังหวัด</option>
                                     @foreach ($province as $pro)
