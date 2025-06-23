@@ -240,6 +240,12 @@ aria-labelledby="pills-profile-tab" tabindex="0">
         
     });
     checkNoChecked();
+    function floorChecked() {
+        $('.dt-checkboxes-select-all input[type="checkbox"]').prop('checked', true);
+            $('td.dt-checkboxes-cell input[type="checkbox"]').prop('checked', true);
+            checkNoChecked();
+        // });
+    }
     function checkNoChecked() {
         if ($('td.dt-checkboxes-cell input[type="checkbox"]:checked').length === 0) {
         // ทำให้ปุ่มถูก disabled

@@ -224,9 +224,9 @@
                                                     <div class="col-md-3">
                                                         <select onchange="loadReceiptData('{{$page_url}}/receipt/datatable')" id="selectpickerBasic" class="form-select me-2 p_receipt_search" name="ref_type_id" data-style="btn-default">
                                                                 <option value="all">ประเภท</option>
-                                                                <option value="1">ค่าจองห้อง</option>
+                                                                <option value="3">ค่าจองห้อง</option>
                                                                 <option value="2">ค่าเงินประกันห้อง</option>
-                                                                <option value="3">ค่าเช่ารายเดือน</option>
+                                                                <option value="1">ค่าเช่ารายเดือน</option>
                                                                 {{-- <option value="3">3</option>
                                                                 <option value="4">4</option>
                                                                 <option value="5">5</option> --}}

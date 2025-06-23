@@ -73,7 +73,7 @@ class Controller extends BaseController
                                 ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', $branch_id)
-                                ->where('rent_bills.ref_status_id', 3)
+                                ->where('rent_bills.ref_status_id', 7)
                                 ->distinct('rooms.id')
                                 ->count();
 

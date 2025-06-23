@@ -2,39 +2,94 @@
     aria-labelledby="pills-home-tab" tabindex="0">
     <div class="card card-body shadow-none">
         <div class="row g-3">
+            @foreach ($list_data as $row)
             <div class="col-md-6 col-lg5">
                 <div
                     class="card bg-lightGray card-check card-selected shadow-sm h-100">
                     <div class="card-body text-center">
-                        <h5 class="card-title">A101</h5>
-                        <div
-                            class="badge bg-label-secondary rounded-pill mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        class="ti-xs ti ti-droplet me-1"></span>
-                                </div>
-                                <div
-                                    class="flex-grow-1 ms-2 lh-base text-wrap">
-                                    ยังไม่ได้กำหนดค่าน้ำ
-                                </div>
-                            </div>
-                        </div>
-                        <div class="badge bg-label-secondary rounded-pill">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        class="ti-xs ti ti-plug me-1"></span>
-                                </div>
-                                <div
-                                    class="flex-grow-1 ms-2 lh-base text-wrap">
-                                    ยังไม่ได้กำหนดค่าไฟ
+                        <h5 class="card-title">{{ $row->name }}</h5>
+                        
+                        @if (!in_array($row->how_to_cal_water, [null,0]))
+                            <div class="badge bg-label-info rounded-pill mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            class="ti-xs ti ti-droplet me-1"></span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-2 lh-base text-wrap">
+                                        @if ($row->how_to_cal_water == 1)
+                                            {{ floor($row->water_monthly_rental) == $row->water_monthly_rental ? floor($row->water_monthly_rental) : $row->water_monthly_rental ; }}
+                                            บาท/เดือน
+                                        @elseif ($row->how_to_cal_water == 3)
+                                            {{ floor($row->water_baht_per_unit) == $row->water_baht_per_unit ? floor($row->water_baht_per_unit) : $row->water_baht_per_unit ; }}
+                                            บาท/ยูนิต
+                                        @elseif ($row->how_to_cal_water == 4)
+                                            {{ floor($row->water_baht_per_unit) }} บาท/ยูนิต
+                                            ขั้นต่ำ {{ floor($row->minimum_water_bill) }} บาท
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @else
+                            
+                            <div
+                                class="badge bg-label-secondary rounded-pill mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            class="ti-xs ti ti-droplet me-1"></span>
+                                    </div>
+                                    <div
+                                        class="flex-grow-1 ms-2 lh-base text-wrap">
+                                        ยังไม่ได้กำหนดค่าน้ำ
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if (!in_array($row->how_to_cal_ele, [null,0]))
+                            <div class="badge bg-label-danger rounded-pill">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            class="ti-xs ti ti-plug me-1"></span>
+                                    </div>
+                                    <div
+                                        class="flex-grow-1 ms-2 lh-base text-wrap">
+                                @if ($row->how_to_cal_ele == 1)
+                                    {{ floor($row->ele_monthly_rental) == $row->ele_monthly_rental ? floor($row->ele_monthly_rental) : $row->ele_monthly_rental ; }}
+                                    บาท/เดือน
+                                @elseif ($row->how_to_cal_ele == 2)
+                                    {{ floor($row->ele_baht_per_unit) == $row->ele_baht_per_unit ? floor($row->ele_baht_per_unit) : $row->ele_baht_per_unit ; }}
+                                    บาท/ยูนิต
+                                @elseif ($row->how_to_cal_ele == 3)
+                                    {{ floor($row->ele_baht_per_unit) }} บาท/ยูนิต
+                                    ขั้นต่ำ {{ floor($row->minimum_ele_bill) }} บาท
+                                @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="badge bg-label-secondary rounded-pill">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            class="ti-xs ti ti-plug me-1"></span>
+                                    </div>
+                                    <div
+                                        class="flex-grow-1 ms-2 lh-base text-wrap">
+                                        ยังไม่ได้กำหนดค่าไฟ
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+
+
                     </div>
                 </div>
             </div>
+            @endforeach
             <div class="col-md-6 col-lg5">
                 <div
                     class="card bg-lightGray card-check card-selected shadow-sm">
@@ -411,7 +466,7 @@
                             @endif
                             </span>
                         @else
-                        <span class="badge  bg-label-secondary rounded-pill">
+                            <span class="badge  bg-label-secondary rounded-pill">
                             <span class="ti-xs ti ti-droplet me-1"></span>ยังไม่ได้กำหนดค่าน้ำ</span>
                         @endif
                     </td>
