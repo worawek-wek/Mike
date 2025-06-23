@@ -165,7 +165,8 @@
                                                         class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false">
+                                                        aria-expanded="false"
+                                                        onclick="printPdfCheckCar()">
                                                         <span>
                                                             <i class="ti ti-file-upload"></i> 
                                                             พิมพ์เอกสารเช็ครถ
@@ -1251,6 +1252,7 @@
         </div>
     </div>
     <!-- / Layout wrapper -->
+    <iframe id="print-iframe" style="display: none;"></iframe>        
     @include('layout/inc_js')
     <script src="assets/vendor/libs/select2/select2.js"></script>
     <script src="assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
@@ -1419,5 +1421,25 @@
                     });
                 }
             });
-            
+            function printPdfCheckCar() {
+            $.ajax({
+                url: '/pdf/checkCarPDF-all/1',
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
 </script>

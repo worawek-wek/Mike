@@ -195,6 +195,7 @@ Route::middleware('auth')->group(function() {
         Route::get('pdf/invoice-many/{invoice_id}', 'invoice_many')->name('pdf.invoice_many');    //////////////////////////
         Route::get('pdf/invoice-bill-all/{invoice_id}', 'invoice_bill')->name('pdf.invoice_bill');    //////////////////////////
         Route::get('pdf/income-expenses-all/{invoice_id}', 'income_expenses_all')->name('pdf.income_expenses_all');    //////////////////////////
+        Route::get('pdf/checkCarPDF/{invoice_id}', 'checkCarPDF')->name('pdf.checkCarPDF');
     });
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////
