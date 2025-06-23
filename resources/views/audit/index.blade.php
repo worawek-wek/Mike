@@ -378,6 +378,30 @@
         });
     }
 
+    function printPdfInvoice(id) {
+        $.ajax({
+            url: '/pdf/invoice/'+id,
+            type: 'GET',
+            success: function(html) {
+                const iframe = document.getElementById('print-iframe');
+                const doc = iframe.contentWindow.document;
+                doc.open();
+                doc.write(html);
+                doc.close();
+
+                // รอโหลดก่อนค่อยพิมพ์
+                iframe.onload = function () {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                };
+            },
+            error: function(xhr) {
+                alert('เกิดข้อผิดพลาด');
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
     function loadInvoiceData(pages){
         
         $('.p_invoice_search').each(function() {

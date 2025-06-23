@@ -31,6 +31,15 @@ class BillController extends Controller
 {
     public function index(Request $request)
     {
+        // $rent = RentBill::get();
+        // foreach($rent as $re){
+        //     $ru = RentBill::find($re->id);
+        //     $ru->total = $ru->total_amount;
+        //     $ru->save();
+        // }
+
+        // DB::commit();
+
         $data['page_url'] = 'bill';
         $data['status_rent_bill'] = StatusRentBill::get();
         $data['buildings'] = Building::get();
@@ -75,8 +84,8 @@ class BillController extends Controller
         if(@$request->invoice_number){
             $results = $results->Where('rent_bills.invoice_number','LIKE','%'.$request->invoice_number.'%');
         }
-        if(@$request->room_rent != "all"){
-            $results = $results->Where('rooms.rent','LIKE','%'.$request->room_rent.'%');
+        if(@$request->room_rent){
+            $results = $results->Where('rent_bills.total', $request->room_rent);
         }
         if(@$request->building != "all"){
             $results = $results->Where('room_for_rents.ref_building_id', $request->building);
@@ -294,6 +303,7 @@ class BillController extends Controller
 
             $image_name = "";
             if($request->file('evidence_of_money_transfer')){
+                // return 3;
                 $file = $request->file('evidence_of_money_transfer');
                 $nameExtension = $file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
@@ -301,6 +311,7 @@ class BillController extends Controller
                 $path = "upload/receipt/";
                 $image_name = $img_name.rand().'.'.$extension;
             }
+            // return 2;
             
             if($request->payment_channel == 1){
                 $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');

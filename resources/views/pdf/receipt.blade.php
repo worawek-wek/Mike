@@ -146,7 +146,7 @@
         <table class="table-info">
             <tr>
                 <td>
-                    <strong>กิจติณธร เจริญใจ</strong><br>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
                     {{ $setting_bill->address }}<br>
                     โทร. {{ $setting_bill->phone }}<br>
                     <strong>ลูกค้า (Customer)</strong><br>
@@ -224,7 +224,7 @@
         <table class="table-info">
             <tr>
                 <td>
-                    <strong>กิจติณธร เจริญใจ</strong><br>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
                     {{ $setting_bill->address }}<br>
                     โทร. {{ $setting_bill->phone }}<br>
                     <strong>ลูกค้า (Customer)</strong><br>

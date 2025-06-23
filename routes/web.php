@@ -63,6 +63,7 @@ Route::get('/', function () {
 
 Route::get('dark-mode-switcher', [DarkModeController::class, 'switch'])->name('dark-mode-switcher');
 Route::get('color-scheme-switcher/{color_scheme}', [ColorSchemeController::class, 'switch'])->name('color-scheme-switcher');
+Route::get('user/check-have-email', [UserController::class, 'check_have_email'])->name('user.check-have-email');
 
 Route::controller(AuthController::class)->middleware('loggedin')->group(function() {
     Route::get('login', 'loginView')->name('login.index');
@@ -70,7 +71,8 @@ Route::controller(AuthController::class)->middleware('loggedin')->group(function
 });
 Route::controller(UserController::class)->middleware('loggedin')->group(function() {
     Route::get('register', 'register')->name('register.index');
-    Route::post('register', 'store')->name('register.store');
+    // Route::post('register', 'store')->name('register.store');
+    Route::post('user', 'store')->name('user.insert');    //////////////////////////
 });
 Route::middleware('auth')->group(function() {
     Route::controller(AnalysisController::class)->group(function() {                    //////////////////////////
@@ -96,6 +98,7 @@ Route::middleware('auth')->group(function() {
         Route::get('setting/fine/datatable', 'fine_datatable')->name('setting.fine-datatable');    //////////////////////////
         Route::get('setting/fine/{id}', 'fine_edit')->name('setting.fine-edit');    //////////////////////////
         Route::post('user/insert_user_has_branch', 'insert_user_has_branch')->name('user.insert-user-has-branch');    //////////////////////////
+        Route::post('user/insert_user_to_branch', 'insert_user_to_branch')->name('user.insert-user-has-branch');    //////////////////////////
         Route::post('user/change-position/{user_has_branch_id}', 'change_position')->name('user.insert-user-has-branch');    //////////////////////////
         Route::delete('setting/user/{id}', 'delete_user_in_branch')->name('registration.delete-user-in-branch');    //////////////////////////
         Route::post('setting/fine/update/{id}', 'fine_update')->name('setting.fine-update');    //////////////////////////
@@ -228,6 +231,8 @@ Route::middleware('auth')->group(function() {
         Route::get('meter/water/datatable', 'water_datatable')->name('meter.water-datatable');    //////////////////////////
         Route::post('meter/water_unit', 'water_unit_update')->name('meter.water-unit_update');    //////////////////////////
         Route::get('meter/electricity/datatable', 'electricity_datatable')->name('meter.electricity-datatable');    //////////////////////////
+        Route::get('meter/electricity/export/excel', 'electricityExportExcel')->name('meter.electricity-export-excel');    //////////////////////////
+        Route::get('meter/water/export/excel', 'waterExportExcel')->name('meter.water-export-excel');    //////////////////////////
     });
     Route::controller(RenterController::class)->group(function() {                   //////////////////////////
         Route::get('renter', 'index')->name('renter');    //////////////////////////
@@ -248,7 +253,6 @@ Route::middleware('auth')->group(function() {
         Route::get('user/datatable', 'datatable')->name('user.datatable');    //////////////////////////
         Route::get('user/check-user/{email}', 'check_user')->name('user.check-user');    //////////////////////////
         Route::get('user/{id}', 'edit')->name('user');    //////////////////////////
-        Route::post('user', 'store')->name('user.insert');    //////////////////////////
         Route::post('user/{id}', 'update')->name('user.update');    //////////////////////////
         Route::get('user/export/excel', 'exportExcel')->name('pdf.userPdf'); 
     });

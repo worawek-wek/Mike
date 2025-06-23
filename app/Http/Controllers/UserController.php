@@ -187,7 +187,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        
         try{
             $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
             $ref_user_id = $request->ref_user_id;
@@ -208,12 +207,6 @@ class UserController extends Controller
             // $user->ref_branch_id  =  session("branch_id");
             $user->password = Hash::make($request->password);
             $user->save();
-
-            $uhb = new UserHasBranch;
-            $uhb->ref_user_id  =  $user->id;
-            $uhb->ref_branch_id  =  session("branch_id");
-            $uhb->ref_position_id  =  $request->ref_position_id;
-            $uhb->save();
 
             DB::commit();
             
@@ -238,6 +231,14 @@ class UserController extends Controller
     public function show($id)
     {
         //
+    }
+    public function check_have_email(Request $request)
+    {
+        $email = User::where('email', $request->email)->first();
+        if(@$email){
+            return false;
+        }
+            return true;
     }
     public function ChangeDateFormat($date)
     { 
@@ -397,9 +398,7 @@ class UserController extends Controller
                         $row->email,
                         $row->phone,
                         $row->salary,
-                        $row->work_start_date,
-
-                        
+                        date('d/m/Y', strtotime($row->work_start_date)),  
             ];
         }
 

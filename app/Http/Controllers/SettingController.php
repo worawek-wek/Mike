@@ -984,7 +984,7 @@ class SettingController extends Controller
     //    User User User User
     ////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////
-    public function insert_user_has_branch(Request $request)
+    public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร
     {
         try{
             $user = User::where('email', $request->email)->first();
@@ -1012,6 +1012,45 @@ class SettingController extends Controller
             DB::rollBack();
         }
         //
+    }
+    public function insert_user_to_branch(Request $request) // สร้าง บุคลากร ด้วยตนเอง
+    {
+        try{
+            $work_start_date = null;
+            if($work_start_date){
+                $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
+            }
+            $ref_user_id = $request->ref_user_id;
+            if($ref_user_id == null){
+                $ref_user_id = 0;
+            }
+
+            $user = new User;
+            $user->name  =  $request->name;
+            $user->username  =  $request->username;
+            $user->salary  =  preg_replace('/\D/', '', $request->salary);
+            $user->phone  =  $request->phone;
+            $user->email  =  $request->email;
+            $user->work_start_date  =  $work_start_date;
+            $user->ref_position_id  =  $request->ref_position_id;
+            $user->ref_user_id  =  $ref_user_id;
+            $user->remark  =  $request->remark;
+            // $user->ref_branch_id  =  session("branch_id");
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            $uhb = new UserHasBranch;
+            $uhb->ref_user_id  =  $user->id;
+            $uhb->ref_branch_id  =  session("branch_id");
+            $uhb->ref_position_id  =  $request->ref_position_id;
+            $uhb->save();
+
+            DB::commit();
+            
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
     }
     public function change_position(Request $request, $user_has_branch_id)
     {

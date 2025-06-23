@@ -29,7 +29,7 @@
             </label>
         </div>
     </div>
-    <div class="col-sm-6">
+    {{-- <div class="col-sm-6">
         <div class="form-check custom-option custom-option-basic">
             <label class="form-check-label custom-option-content" for="payelectric1">
                 <input name="how_to_cal_ele" class="form-check-input" type="radio" value="1" {{ @$how['1'] }}
@@ -61,7 +61,7 @@
                 </span>
             </label>
         </div>
-    </div>
+    </div> --}}
 </div>
 <div class="d-flex h5 mt-3">
     <div class="flex-shrink-0">
@@ -96,7 +96,7 @@
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท/ยูนิต</label>
     </div>
 </div>
-<div class="box in_ele_1">
+{{-- <div class="box in_ele_1">
     <div class="mb-4 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">เหมารายเดือน</label>
         <div class="col-8 col-md-8">
@@ -150,7 +150,7 @@
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท</label>
     </div>
-</div>
+</div> --}}
 <script>
     $(function () {
         function toggleElectricBox(value) {

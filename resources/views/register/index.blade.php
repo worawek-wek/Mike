@@ -55,16 +55,17 @@
                                 <input name="salary" type="text" class="form-control" id="salary" placeholder="เงินเดือน" oninput="formatSalary()" required/>
                             </div>
                             <div class="col-sm-6">
-                                <label for="" class="form-label">เบอร์โทรศัพท์</label>
-                                <input name="phone" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" />
+                                <label for="" class="form-label">เบอร์โทรศัพท์</label></label><span class="text-danger"> *</span>
+                                <input name="phone" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" required />
                             </div>
                             <div class="col-sm-6">
-                                <label for="" class="form-label">อีเมล</label>
-                                <input name="email" type="email" class="form-control" placeholder="อีเมล" />
+                                <label for="" class="form-label">อีเมล</label></label><span class="text-danger"> *</span>
+                                <input name="email" id="email_2" type="email" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
+                                <span class="text-danger pt-4" id="Cant_Use" style="display: none;">Email นี้ถูกใช้แล้ว</span>
                             </div>
                             <div class="col-sm-6">
-                                <label for="bs-datepicker-format" class="form-label">วันที่เข้าทำงาน</label><span class="text-danger"> *</span>
-                                <input name="work_start_date" type="text" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" required/>
+                                <label for="bs-datepicker-format" class="form-label">วันที่เข้าทำงาน
+                                <input name="work_start_date" type="text" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" autocomplete="off"/>
                             </div>
                             <div class="col-sm-6">
                                 <label for="" class="form-label">ตำแหน่ง</label>
@@ -78,7 +79,7 @@
                             <div class="col-span-12">
                                 <div class="col-sm-6 mt-3">
                                     <label for="" class="form-label">ชื่อผู้ใช้</label><span class="text-danger"> *</span>
-                                    <input name="username" type="text" class="form-control" placeholder="ชื่อผู้ใช้" required />
+                                    <input name="username" type="text" class="form-control" placeholder="ชื่อผู้ใช้" id="username" required readonly />
                                 </div>
                                 <div class="col-sm-6 mt-3">
                                     <label for="update-profile-form-2" class="form-label">รหัสผ่าน</label><span class="text-danger"> *</span>
@@ -160,12 +161,38 @@
   });
 </script>
 <script>
+    
+        var no_insert = 0;
+        function check_have_email(email){
+            $('#username').val(email);
+
+            $.ajax({
+                type: "GET",
+                url: "user/check-have-email",
+                data: { email: email },
+                success: function(data) {
+                    if(data == true){
+                        $('#Cant_Use').hide();
+                        no_insert = 0;
+                    }else{
+                        $('#Cant_Use').show();
+                        no_insert = 1;
+                    }
+                }
+            });
+        }
         $('#insert_user').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
             if(!this.checkValidity()) {
                 // ถ้าฟอร์มไม่ถูกต้อง
                 this.reportValidity();
                 return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+            if(no_insert == 1){
+                Swal.fire('Email นี้ถูกใช้แล้ว', '', 'error');
+                $('#email_2').focus();
+
+                return ;
             }
             // return alert(123);
             Swal.fire({
@@ -204,6 +231,11 @@
                     // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
                 }
             });
+        });
+        $('#bs-datepicker-format').datepicker({
+            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
         });
 </script>
 

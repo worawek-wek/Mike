@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
 
 DB::beginTransaction();
@@ -318,5 +320,208 @@ class MeterController extends Controller
         } catch (QueryException $err) {
             DB::rollBack();
         }
+    }
+
+    public function electricityExportExcel(Request $request)
+    {
+        $month = date('m');
+        $year = date('Y');
+
+        if($request->month){
+            $month = explode('-', $request->month)[1];
+            $year = explode('-', $request->month)[0];
+        }
+
+        //////// หา เดือนก่อนหน้า
+        $year_month_previous = date('Y-m', strtotime($year.'-'.$month . ' -1 month'));
+        // dd($year_month_previous);
+        $month_previous = explode('-', $year_month_previous)[1];
+        $year_previous = explode('-', $year_month_previous)[0];
+        //////// หา เดือนก่อนหน้า จบ
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = Room::orderBy('rooms.name')
+                        ->leftJoin('meters', 'meters.ref_room_id', '=', 'rooms.id')
+                        ->leftJoin('floors', 'floors.id', '=', 'rooms.ref_floor_id')
+                        ->leftJoin('buildings', 'buildings.id', '=', 'floors.ref_building_id')
+                        ->Where('meters.month', $month)->Where('meters.year', $year)
+                        ->where('ref_branch_id',session("branch_id"))
+                        ->with([
+                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
+                            'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
+                            ])
+                        // ->WhereHas('room_for_rent', function ($query) {
+                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
+                        // })
+                        ->select('rooms.*', 'floors.name as floor_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        
+                        
+        if ($request->building != "all") {
+            // return 456;
+            $results->whereHas('floor', function ($query) use ($request) {
+                $query->where('ref_building_id', $request->building);
+            });
+        }
+        if ($request->floor != "all") {
+            // return 123;
+            $results->where('rooms.ref_floor_id', $request->floor);
+        }
+
+        $results = $results->get();
+        $data = 
+        [
+            ['ข้อมูล มิเตอร์ไฟ'],
+            [
+                'เดือน '.date('m/Y', strtotime($year.'-'.$month))
+            ],
+            [
+                "",
+                "",
+                "",
+                "",
+                // "",
+                // "",
+                // "",
+                "หน่วยที่ใช้"
+            ],
+            [
+                "ชั้น",
+                "ห้อง",
+                // "เลขมิเตอร์น้ำก่อนหน้า",
+                // "เลขมิเตอร์น้ำล่าสุด",
+                "เลขมิเตอร์ไฟฟ้าก่อนหน้า",
+                "เลขมิเตอร์ไฟฟ้าล่าสุด",
+                // "มิเตอร์น้ำ",
+                "มิเตอร์ไฟฟ้า"
+            ]
+        ];
+        // return $data;
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $row->floor_name,
+                        $row->room_name,
+                        // $row->meterPrevious->water_unit,
+                        // $row->water_unit,
+                        $row->meterPrevious->electricity_unit,
+                        $row->electricity_unit,
+                        // $row->meterPrevious->water_unit - $row->water_unit,
+                        $row->electricity_unit - $row->meterPrevious->electricity_unit,
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลมิเตอร์ไฟ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลมิเตอร์ไฟ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+    }
+    public function waterExportExcel(Request $request)
+    {
+        $month = date('m');
+        $year = date('Y');
+
+        if($request->month){
+            $month = explode('-', $request->month)[1];
+            $year = explode('-', $request->month)[0];
+        }
+
+        //////// หา เดือนก่อนหน้า
+        $year_month_previous = date('Y-m', strtotime($year.'-'.$month . ' -1 month'));
+        // dd($year_month_previous);
+        $month_previous = explode('-', $year_month_previous)[1];
+        $year_previous = explode('-', $year_month_previous)[0];
+        //////// หา เดือนก่อนหน้า จบ
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = Room::orderBy('rooms.name')
+                        ->leftJoin('meters', 'meters.ref_room_id', '=', 'rooms.id')
+                        ->leftJoin('floors', 'floors.id', '=', 'rooms.ref_floor_id')
+                        ->leftJoin('buildings', 'buildings.id', '=', 'floors.ref_building_id')
+                        ->Where('meters.month', $month)->Where('meters.year', $year)
+                        ->where('ref_branch_id',session("branch_id"))
+                        ->with([
+                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
+                            'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
+                            ])
+                        // ->WhereHas('room_for_rent', function ($query) {
+                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
+                        // })
+                        ->select('rooms.*', 'floors.name as floor_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        
+                        
+        if ($request->building != "all") {
+            // return 456;
+            $results->whereHas('floor', function ($query) use ($request) {
+                $query->where('ref_building_id', $request->building);
+            });
+        }
+        if ($request->floor != "all") {
+            // return 123;
+            $results->where('rooms.ref_floor_id', $request->floor);
+        }
+
+        $results = $results->get();
+        $data = 
+        [
+            ['ข้อมูล มิเตอร์น้ำ'],
+            [
+                'เดือน '.date('m/Y', strtotime($year.'-'.$month))
+            ],
+            [
+                "",
+                "",
+                "",
+                "",
+                // "",
+                // "",
+                // "",
+                "หน่วยที่ใช้"
+            ],
+            [
+                "ชั้น",
+                "ห้อง",
+                "เลขมิเตอร์น้ำก่อนหน้า",
+                "เลขมิเตอร์น้ำล่าสุด",
+                // "เลขมิเตอร์ไฟฟ้าก่อนหน้า",
+                // "เลขมิเตอร์ไฟฟ้าล่าสุด",
+                "มิเตอร์น้ำ",
+                // "มิเตอร์ไฟฟ้า"
+            ]
+        ];
+        // return $data;
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $row->floor_name,
+                        $row->name,
+                        $row->meterPrevious->water_unit,
+                        $row->water_unit,
+                        // $row->meterPrevious->electricity_unit,
+                        // $row->electricity_unit,
+                        $row->water_unit - $row->meterPrevious->water_unit,
+                        // $row->meterPrevious->electricity_unit - $row->electricity_unit,
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
     }
 }

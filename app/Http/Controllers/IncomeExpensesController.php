@@ -216,7 +216,7 @@ class IncomeExpensesController extends Controller
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
-        return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+        $writer->save("upload/export_excel/รายรับรายจ่าย".date('m-Y', strtotime('-1 month')).".xlsx");
+        return redirect("upload/export_excel/รายรับรายจ่าย".date('m-Y', strtotime('-1 month')).".xlsx");
     }
 }

@@ -188,7 +188,8 @@
                                                                     class="btn btn-warning buttons-collection waves-effect waves-light me-2"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="water_export_excel()">
                                                                     <span>
                                                                         <i class="ti ti-upload"></i> 
                                                                         ดาวน์โหลด Excel
@@ -298,10 +299,11 @@
                                                         <div class="col-md-3" style="padding-right: unset !important;">
                                                             <button
                                                                     style="padding-right: 14px;padding-left: 14px;"
-                                                                    class="btn btn-success buttons-collection btn-label-warning waves-effect waves-light me-2"
+                                                                    class="btn btn-warning buttons-collection btn-warning waves-effect waves-light me-2"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="electricity_export_excel()">
                                                                     <span>
                                                                         <i class="ti ti-upload"></i> 
                                                                         ดาวน์โหลด Excel
@@ -415,6 +417,44 @@
             }
         });
         // alert(page);
+    }
+    
+    function water_export_excel(){
+        var searchWaterData = {};
+
+        $('.p_water_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchWaterData[inputName] = inputValue;
+        });
+
+        // แปลงเป็น query string
+        var queryString = Object.keys(searchWaterData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(searchWaterData[key]))
+            .join('&');
+
+        var fullUrl = '{{$page_url}}/water/export/excel' + '?' + queryString;
+
+        window.open(fullUrl, '_blank');
+    }
+    
+    function electricity_export_excel(){
+        var searchElectricityData = {};
+
+        $('.p_electricity_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchElectricityData[inputName] = inputValue;
+        });
+
+        // แปลงเป็น query string
+        var queryString = Object.keys(searchElectricityData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(searchElectricityData[key]))
+            .join('&');
+
+        var fullUrl = '{{$page_url}}/electricity/export/excel' + '?' + queryString;
+
+        window.open(fullUrl, '_blank');
     }
 
             $('#selectpickerBuilding').change(function() {

@@ -190,7 +190,7 @@
                     <div class="modal-body">
                         <div class="row g-3 p-4">
                             <div class="col-sm-6">
-                                <label for="" class="form-label">อีเมล (ค้นหาด้วย อีเมล)</label>
+                                <label for="email" class="form-label">อีเมล (ค้นหาด้วย อีเมล)</label>
                                 <input id="email" name="email" type="email" class="form-control" placeholder="อีเมล" />
                             </div>
                             <div class="col-sm-6 d-flex align-items-end">
@@ -230,16 +230,17 @@
                                 <input name="salary" type="text" class="form-control" id="salary" placeholder="เงินเดือน" oninput="formatSalary()" required/>
                             </div>
                             <div class="col-sm-6">
-                                <label for="" class="form-label">เบอร์โทรศัพท์</label>
-                                <input name="phone" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" />
+                                <label for="" class="form-label">เบอร์โทรศัพท์<span class="text-danger"> *</span></label>
+                                <input name="phone" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" required/>
                             </div>
                             <div class="col-sm-6">
-                                <label for="" class="form-label">อีเมล</label>
-                                <input name="email" type="email" class="form-control" placeholder="อีเมล" />
+                                <label for="email_2" class="form-label">อีเมล</label><span class="text-danger"> *</span>
+                                <input name="email" id="email_2" type="email" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
+                                <span class="text-danger pt-4" id="Cant_Use" style="display: none;">Email นี้ถูกใช้แล้ว</span>
                             </div>
                             <div class="col-sm-6">
-                                <label for="bs-datepicker-format" class="form-label">วันที่เข้าทำงาน</label><span class="text-danger"> *</span>
-                                <input name="work_start_date" type="text" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" required/>
+                                <label for="bs-datepicker-format" class="form-label">วันที่เข้าทำงาน</label>
+                                <input name="work_start_date" type="text" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" autocomplete="off"/>
                             </div>
                             <div class="col-sm-6">
                                 <label for="" class="form-label">ตำแหน่ง</label>
@@ -255,8 +256,8 @@
                             
                             <div class="col-span-12">
                                 <div class="col-sm-6 mt-3">
-                                    <label for="" class="form-label">ชื่อผู้ใช้</label><span class="text-danger"> *</span>
-                                    <input name="username" type="text" class="form-control" placeholder="ชื่อผู้ใช้" required />
+                                    <label for="username" class="form-label">ชื่อผู้ใช้</label><span class="text-danger"> *</span>
+                                    <input name="username" type="text" class="form-control" placeholder="ชื่อผู้ใช้" id="username" required readonly />
                                 </div>
                                 <div class="col-sm-6 mt-3">
                                     <label for="update-profile-form-2" class="form-label">รหัสผ่าน</label><span class="text-danger"> *</span>
@@ -373,6 +374,26 @@
                 }
             });
         }
+        
+        var no_insert = 0;
+        function check_have_email(email){
+            $('#username').val(email);
+
+            $.ajax({
+                type: "GET",
+                url: "user/check-have-email",
+                data: { email: email },
+                success: function(data) {
+                    if(data == true){
+                        $('#Cant_Use').hide();
+                        no_insert = 0;
+                    }else{
+                        $('#Cant_Use').show();
+                        no_insert = 1;
+                    }
+                }
+            });
+        }
 
         function Delete(id){
             Swal.fire({
@@ -479,6 +500,13 @@
                 this.reportValidity();
                 return console.log('ฟอร์มไม่ถูกต้อง');
             }
+            if(no_insert == 1){
+                Swal.fire('Email นี้ถูกใช้แล้ว', '', 'error');
+                $('#email_2').focus();
+
+                return ;
+            }
+
             // return alert(123);
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',
@@ -495,14 +523,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{$page_url}}', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        url: '{{$page_url}}/insert_user_to_branch', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
                         type: 'POST',
                         data: $(this).serialize(),
                         success: function(response) {
                             if(response == true){
                                 $('#insert_user_2')[0].reset();
                                 Swal.fire('เพิ่มพนักงานเรียบร้อยแล้ว', '', 'success');
-                                $('#addserviceModal').modal('hide');
+                                $('#addserviceModal_2').modal('hide');
                                 loadData(page);
                             }else{
                                 Swal.fire(response, '', 'error');

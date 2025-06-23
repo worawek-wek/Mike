@@ -101,8 +101,8 @@
                                                     <input type="text" class="form-control" id="phone" name="phone" value="{{@$data->phone}}" placeholder="" />
                                                 </div>
                                                 <div class="col-sm-6">
-                                                    <label for="" class="form-label">อีเมล</label>
-                                                    <input type="email" class="form-control" id="email" name="email" value="{{@$data->email}}" placeholder="" />
+                                                    {{-- <label for="" class="form-label">อีเมล</label> --}}
+                                                    <input type="hidden" class="form-control" id="email" name="email" value="{{@$data->email}}" placeholder="" />
                                                 </div>
                                                 {{-- <div class="col-sm-12 text-center">
                                                     <button type="submit" class="btn btn-main">บันทึก</button>

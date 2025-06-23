@@ -146,9 +146,9 @@
         <table class="table-info">
             <tr>
                 <td>
-                    <strong>กิจติณธร เจริญใจ</strong><br>
-                    {{ $branch->address.' '.$branch->fullThaiAddress() }}<br>
-                    โทร. {{ $branch->phone }}<br>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
+                    {{ $setting_bill->address }}<br>
+                    โทร. {{ $setting_bill->phone }}<br>
                     <strong>ลูกค้า (Customer)</strong><br>
                     {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }}<br>
                     {{ $renter->address.' '.$renter->fullThaiAddress() }}<br>
@@ -223,9 +223,9 @@
         <table class="table-info">
             <tr>
                 <td>
-                    <strong>กิจติณธร เจริญใจ</strong><br>
-                    {{ $branch->address.' '.$branch->fullThaiAddress() }}<br>
-                    โทร. {{ $branch->phone }}<br>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
+                    {{ $setting_bill->address }}<br>
+                    โทร. {{ $setting_bill->phone }}<br>
                     <strong>ลูกค้า (Customer)</strong><br>
                     {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }}<br>
                     {{ $renter->address.' '.$renter->fullThaiAddress() }}<br>

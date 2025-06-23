@@ -50,7 +50,9 @@
                     {{ date('d/m/Y', strtotime($row->created_at)) }}
                 </td>
                 <td class="text-center">
-                    {{ $row->invoice_number }}
+                    <a href="javascript:void(0)" class="btn btn-label-primary waves-effect" onclick="printPdfInvoice({{$row->id}})">
+                        <span class="ti-sm ti ti-printer me-2"></span>{{ $row->invoice_number }}
+                    </a>
                 </td>
                 <td class="text-center">
                     {{ $type[$row->ref_type_id] }}

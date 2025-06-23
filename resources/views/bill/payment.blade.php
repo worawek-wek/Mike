@@ -21,7 +21,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<form id="payment_bill">
+<form id="payment_bill" enctype="multipart/form-data">
     @csrf
     
     <input name="ref_room_id" type="hidden" value="{{ $contract->ref_room_id }}">
@@ -408,10 +408,15 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+
+                    var formData = new FormData($('#payment_bill')[0]);
+
                     $.ajax({
                         url: '{{ $page_url }}/payment_bill', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
                         type: 'POST',
-                        data: $(this).serialize(),
+                        data: formData,
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             if(response == true){
                                 $('#invoice').modal('hide');
