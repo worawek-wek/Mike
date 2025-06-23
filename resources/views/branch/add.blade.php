@@ -80,7 +80,7 @@
                 </div>
                 <div class="col-sm-3">
                     <label>รหัสไปรษณีย์</label>
-                    <input name="zipcode" type="text" class="form-control" id=""
+                    <input name="zipcode" type="text" class="form-control" id="zipcode"
                         placeholder="รหัสไปรษณีย์" />
                 </div>
                 <div class="col-sm-12">
@@ -172,6 +172,60 @@
             }
         });
     });
+    
+        $(document).ready(function() {
+            $('#select2Basic').change(function() {
+                var provinceId = $(this).val();
+                
+                // เคลียร์ dropdown สำหรับอำเภอและตำบล
+                $('#select2District').empty().append('<option selected disabled hidden value="">เลือกอำเภอ</option>');
+                $('#select2Subdistrict').empty().append('<option selected disabled hidden value="">เลือกตำบล</option>');
+
+                if (provinceId) {
+                    $.ajax({
+                        url: '/get-districts/' + provinceId,
+                        type: 'GET',
+                        success: function(data) {
+                            data.forEach(function(district) {
+                                $('#select2District').append('<option value="' + district.id + '">' + district.name_in_thai + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+
+            $('#select2District').change(function() {
+                var districtId = $(this).val();
+                
+                // เคลียร์ dropdown สำหรับตำบล
+                $('#select2Subdistrict').empty().append('<option selected disabled hidden value="">เลือกตำบล</option>');
+
+                if (districtId) {
+                    $.ajax({
+                        url: '/get-subdistricts/' + districtId,
+                        type: 'GET',
+                        success: function(data) {
+                            data.forEach(function(subdistrict) {
+                                $('#select2Subdistrict').append('<option value="' + subdistrict.id + '">' + subdistrict.name_in_thai + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+            
+            $('#select2Subdistrict').change(function() {
+                var subdistrictsid = $(this).val();
+                if (subdistrictsid) {
+                    $.ajax({
+                        url: '/get-zipcode/' + subdistrictsid,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#zipcode').val(data);
+                        }
+                    });
+                }
+            });
+        });
     $('#select2District').select2();
     $('#select2Subdistrict').select2();
     $('#select2Billing_date').select2();
