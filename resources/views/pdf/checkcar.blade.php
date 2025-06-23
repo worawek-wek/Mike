@@ -78,9 +78,9 @@
             @endphp
             @foreach ($list_data as $key => $row)
                 <tr class="odd">
-                    <td>ขพ 8472</td>
+                    <td>{{@$row->vehicle->car_registration ?? '-'}}</td>
                     <td>{{ @$row->room_for_rent->room->name }}</td>
-                    <td></td>
+                    <td>{{@$row->vehicle->detail ?? '-'}}</td>
                     <td></td>
                     <td></td>
                     <td></td>

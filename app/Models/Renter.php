@@ -36,7 +36,7 @@ class Renter extends Model
         return $this->hasOne('App\Models\RoomForRents', 'ref_renter_id', 'id');
     }
 
-    public function vehicles()
+    public function vehicle()
     {
         return $this->hasOne(\App\Models\Vehicle::class, 'ref_renter_id', 'id');
     }

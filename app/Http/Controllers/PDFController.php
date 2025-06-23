@@ -128,7 +128,7 @@ class PDFController extends Controller
 
     public function checkCarPDF($invoice_id)
     {
-        $results = Renter::orderBy('id','DESC')->get();                
+        $results = Renter::whereHas('vehicle')->with('vehicle')->orderBy('id', 'DESC')->get();
         $data['list_data'] = $results;
         return view('pdf/checkcar', $data);
     }
