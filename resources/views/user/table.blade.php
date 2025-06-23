@@ -58,20 +58,33 @@
                     {{ date('d/m/Y', strtotime($row->work_start_date)) }}
                 </td>
                 <td class="text-center">
+                    @php 
+                    $ref_position_id_edit = 2;
+                    $branch_check = \App\Models\UserHasBranch::where(["ref_branch_id"=>session("branch_id"), "ref_user_id"=>Auth::id()])->first();
+                    if(@$branch_check){
+                        $ref_position_id_edit = $branch_check->ref_position_id;
+                    }
+                    @endphp
+
                     @if ($row->id == Auth::id())
                         {{ $row->user_has_branch->position->position_name }}
                     @else
-                        <select name="ref_position_id" class="select2 form-select form-select-lg select2Position2" onchange="change_position(this.value, {{ $row->user_has_branch->id }})">
-                            @foreach ($position as $pos)
-                                <option @if ($row->user_has_branch->ref_position_id == $pos->id)
-                                    selected
-                                @endif value="{{$pos->id}}">{{$pos->position_name}}</option>
-                            @endforeach
-                        </select>
+                        @if(@$ref_position_id_edit == 1)
+                            <select name="ref_position_id" class="select2 form-select form-select-lg select2Position2" onchange="change_position(this.value, {{ $row->user_has_branch->id }})">
+                                @foreach ($position as $pos)
+                                    <option @if ($row->user_has_branch->ref_position_id == $pos->id)
+                                        selected
+                                    @endif value="{{$pos->id}}">{{$pos->position_name}}</option>
+                                @endforeach
+                            </select>
+                        @else
+                        {{ $row->user_has_branch->position->position_name }}
+                        @endif
                     @endif
                 </td>
+               
                 <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
-                    {{ $row->remark }}
+                    {{ $row->remark }} 
                 </td>
                 <td class="table-report__action text-center" style="font-size: 12px;">
                     <div class="flex justify-center items-center">
