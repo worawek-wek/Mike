@@ -142,7 +142,9 @@ class RoomController extends Controller
         $data['month_thai'] = $month_thai;
         $data['receipt'] = Receipt::where('ref_room_id', $id)->where('ref_type_id', 3)->orderBy('id','DESC')->first();
         $data['room'] = $room;
-        $data['otherRooms'] = Room::where('status', 0)->whereNot('id', $id)->get();
+        $data['otherRooms'] = Room::whereHas('floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })->where('status', 0)->whereNot('id', $id)->get();
         $data['service'] = Service::get();
         $data['discount'] = Discount::get();
         $meter = Meter::where('ref_room_id', $id)->orderBy('created_at','DESC')->first();
@@ -389,12 +391,15 @@ class RoomController extends Controller
         $data['page_url'] = 'room';
         // $reservation_room_has = Contract::where('ref_renter_id', $id)->groupBy('ref_room_id')->get('ref_room_id')->toArray();
         $data['rent_bill_s'] = RentBill::leftJoin('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                                ->leftJoin('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                                ->leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
-                                ->where('renters.id', $id)
-                                ->select('rent_bills.*','rooms.name as room_name','rent_bills.id as rent_bill_id', 'renters.*', 'room_for_rents.ref_room_id', 'room_for_rents.deposit', 'room_for_rents.payment_received_date','rent_bills.id as rent_bill_id','renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
-                                ->orderBy('rent_bills.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
-                                ->get();
+                                        ->leftJoin('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
+                                        ->leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
+                                        ->where('renters.id', $id)
+                                        ->select('rent_bills.*','rooms.name as room_name','room_for_rents.ref_room_id', 
+                                                'room_for_rents.deposit', 'room_for_rents.payment_received_date',
+                                                DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
+                                        ->distinct() // <-- ใช้ตรงนี้
+                                        ->orderBy('rent_bills.created_at', 'desc')
+                                        ->get();
                                 
         $data['bank'] = Bank::get();
 

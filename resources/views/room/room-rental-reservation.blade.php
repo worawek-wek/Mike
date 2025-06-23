@@ -5,7 +5,9 @@
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
 
 <script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-
+{{-- @php
+    $id = []
+@endphp --}}
 @foreach ($rent_bill_s as $rent_bill)
 
 <input name="ref_room_id" type="hidden" value="{{ $rent_bill->ref_room_id }}">
@@ -20,7 +22,9 @@
     {{-- {{ number_format($rent_bill->room_for_rent->room->rent + $rent_bill->water_amount+$rent_bill->electricity_amount) }} --}}
     </span> &nbsp;บาท
 </h4>
-    
+{{-- @php
+    $id[] = [$rent_bill->room_name]
+@endphp --}}
 <div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
     <div class="d-flex">
         <div class="flex-grow-1 ms-3 g-3 row">

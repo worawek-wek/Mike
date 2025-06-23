@@ -125,7 +125,13 @@
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">วิเคราะห์รายรับค่าเช่ารายเดือน</h5>
-                                            <small class="text-muted">เดือนพฤษภาคม 2024</small>
+                                            <small class="text-muted">
+                                                @php
+                                                    \Carbon\Carbon::setLocale('th');
+                                                    $thaiDate = \Carbon\Carbon::now()->subMonth()->translatedFormat('F Y');
+                                                @endphp
+                                                <h4>{{ $thaiDate }}</h4>
+                                            </small>
                                         </div>
                                     </div>
                                     <div class="card-body">
