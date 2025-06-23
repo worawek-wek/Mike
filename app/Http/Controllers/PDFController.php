@@ -128,9 +128,9 @@ class PDFController extends Controller
 
     public function checkCarPDF($invoice_id)
     {
-        $results = IncomeExpenses::orderBy('id','DESC')->get();                
+        $results = Renter::orderBy('id','DESC')->get();                
         $data['list_data'] = $results;
-        return view('pdf/income-expenses-all', $data);
+        return view('pdf/checkcar', $data);
     }
     
     // public function receipt()

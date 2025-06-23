@@ -1423,7 +1423,7 @@
             });
             function printPdfCheckCar() {
             $.ajax({
-                url: '/pdf/checkCarPDF-all/1',
+                url: '/pdf/checkCarPDF/1',
                 type: 'GET',
                 success: function(html) {
                     const iframe = document.getElementById('print-iframe');
