@@ -48,6 +48,11 @@ class RenterController extends Controller
                 $results = $results->WhereHas('room_for_rent.room', function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search . '%');
                 });
+            }
+            if(@$request->search_type == 4){ // ค้นหาตามทะเบียนรถ
+                $results = $results->WhereHas('vehicle', function ($q) use ($request) {
+                    $q->where('car_registration', 'LIKE', '%' . $request->search . '%');
+                });
             }else{
                 $results = $results->where(function ($query) use ($request) {
                     $query->where('renters.prefix','LIKE','%'.$request->search.'%')
@@ -56,6 +61,9 @@ class RenterController extends Controller
                         ->orWhere('renters.phone','LIKE','%'.$request->search.'%')
                         ->orWhereHas('room_for_rent.room', function ($q) use ($request) {
                             $q->where('name', 'LIKE', '%' . $request->search . '%');
+                        })
+                        ->orWhereHas('vehicle', function ($q) use ($request) {
+                            $q->where('car_registration', 'LIKE', '%' . $request->search . '%');
                         });
                 });
             }

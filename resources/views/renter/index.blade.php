@@ -100,7 +100,7 @@
                                                                 <option value="1">ค้นหาตามชื่อ-นามสกุล</option>
                                                                 <option value="2">ค้นหาตามเบอร์โทร</option>
                                                                 <option value="3">ค้นหาตามห้อง</option>
-                                                                <option value="4">ค้นหาตามหมายเลขบัตรประชาชน</option>
+                                                                <option value="4">ค้นหาตามทะเบียนรถ</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
