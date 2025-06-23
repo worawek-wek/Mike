@@ -215,7 +215,7 @@
                         <td class="text-center">
                             {{ $row->prefix.' '.$row->name.' '.$row->surname }}
                         </td>
-                        <td class="text-center">{{ $row->room_for_rent->room->name }}
+                        <td class="text-center">{{ @$row->room_for_rent->room->name ?? '-' }}
                         </td>
                         <td class="text-center">{{ $row->phone }}
                         </td>
@@ -223,10 +223,18 @@
                             รถยนต์ ก 1234
                         </td>
                         <td class="text-center">
-                            {{ date('d/m/Y', strtotime($row->room_for_rent->date_stay)) }}
+                            @if(@$row->room_for_rent->date_stay)
+                            {{ date('d/m/Y', strtotime(@$row->room_for_rent->date_stay)) }}
+                            @else
+                            -
+                            @endif
                         </td>
                         <td class="text-center">
-                            {{ date('d/m/Y', strtotime("+6 months", strtotime($row->room_for_rent->date_stay))) }}
+                            @if(@$row->room_for_rent->date_stay)
+                            {{ date('d/m/Y', strtotime("+6 months", strtotime(@$row->room_for_rent->date_stay))) }}
+                            @else
+                            -
+                            @endif
                         </td>
                         <td class="text-center">
                             6

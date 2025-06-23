@@ -95,13 +95,12 @@
                                                 </ul>
                                                 <div class="row mt-4">
                                                     <div class="col-md-6">
-                                                        <select id="selectpickerBasic" class="form-select me-2" data-style="btn-default">
+                                                        <select id="selectpickerBasic" id="search_type" name="search_type" class="form-select me-2 p_current_search" data-style="btn-default">
                                                                 <option value="">ค้นหาตาม</option>
-                                                                <option value="1">1</option>
-                                                                <option value="2">2</option>
-                                                                <option value="3">3</option>
-                                                                <option value="4">4</option>
-                                                                <option value="5">5</option>
+                                                                <option value="1">ค้นหาตามชื่อ-นามสกุล</option>
+                                                                <option value="2">ค้นหาตามเบอร์โทร</option>
+                                                                <option value="3">ค้นหาตามห้อง</option>
+                                                                <option value="4">ค้นหาตามหมายเลขบัตรประชาชน</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
@@ -1292,7 +1291,6 @@
     }
 
     function loadCurrentData(pages){
-
         $('.p_current_search').each(function() {
             var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
             var inputValue = $(this).val(); // ดึงค่า value ของ input

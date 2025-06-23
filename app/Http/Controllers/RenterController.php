@@ -37,15 +37,29 @@ class RenterController extends Controller
         })
         ->distinct('renters.id');
         if(@$request->search){
-            $results = $results->where(function ($query) use ($request) {
-                $query->where('renters.prefix','LIKE','%'.$request->search.'%')
-                    ->orWhere('renters.name','LIKE','%'.$request->search.'%')
-                    ->orWhere('renters.surname','LIKE','%'.$request->search.'%')
-                    ->orWhere('renters.phone','LIKE','%'.$request->search.'%')
-                    ->orWhereHas('room_for_rent.room', function ($q) use ($request) {
-                        $q->where('name', 'LIKE', '%' . $request->search . '%');
-                    });
-            });
+
+            if(@$request->search_type == 1){ // ชื่อ - นามสกุล
+                $results = $results->where('renters.prefix','LIKE','%'.$request->search.'%')->orWhere('renters.name','LIKE','%'.$request->search.'%')->orWhere('renters.surname','LIKE','%'.$request->search.'%');
+            }
+            if(@$request->search_type == 2){ // เบอร์โทรศัพท์
+                $results = $results->where('renters.phone','LIKE','%'.$request->search.'%');
+            }
+            if(@$request->search_type == 3){ // ตามห้อง
+                $results = $results->WhereHas('room_for_rent.room', function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search . '%');
+                });
+            }else{
+                $results = $results->where(function ($query) use ($request) {
+                    $query->where('renters.prefix','LIKE','%'.$request->search.'%')
+                        ->orWhere('renters.name','LIKE','%'.$request->search.'%')
+                        ->orWhere('renters.surname','LIKE','%'.$request->search.'%')
+                        ->orWhere('renters.phone','LIKE','%'.$request->search.'%')
+                        ->orWhereHas('room_for_rent.room', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', '%' . $request->search . '%');
+                        });
+                });
+            }
+            
         }
         $limit = 15;
         if(@$request['limit']){
