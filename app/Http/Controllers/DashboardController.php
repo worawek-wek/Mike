@@ -48,7 +48,7 @@ class DashboardController extends Controller
     }
     public function overdue(Request $request)
     {
-        $all_overdue_payment = RentBill::where('rent_bills.ref_status_id', 3)
+        $all_overdue_payment = RentBill::where('rent_bills.ref_status_id', 7)
                                         ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                         ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                                         ->sum(DB::raw('rooms.rent + rent_bills.electricity_amount + rent_bills.water_amount'));
@@ -71,21 +71,21 @@ class DashboardController extends Controller
             ->map(function ($group) {
                 return $group->sum('total_amount');
             });
-
         $monthlyTotals = collect(range(1, 12))->map(function ($month) use ($invoiceByMonth) {
             return $invoiceByMonth->get($month, 0);
         });
 
-        return response()->json($monthlyTotals->values());
-        // ผลลัพธ์: [1 => xxx, 2 => yyy, ..., 12 => zzz]
+        // return response()->json($monthlyTotals->values());
+        // // ผลลัพธ์: [1 => xxx, 2 => yyy, ..., 12 => zzz]
+        //     return 12354;
 
-        return view('dashboard/table', $data);
+        // return view('dashboard/table', $data);
 
         $results = RentBill::orderBy('id','DESC')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                                ->Where('rent_bills.ref_status_id', 3)
+                                ->Where('rent_bills.ref_status_id', 7)
                                 ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
         
         if(@$request->search){

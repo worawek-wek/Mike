@@ -139,7 +139,7 @@
                                                 {{-- </div> --}}
                                                 <!-- Group -->
                                                 {{-- <div class="col-md-2 select_off" style="padding-right: unset !important;"> --}}
-                                                <select onchange='loadData("{{$page_url}}/datatable")' name="floor" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default">
+                                                <select onchange='loadData("{{$page_url}}/datatable")' name="floor" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default" disabled>
                                                         <option value="all"> &nbsp; &nbsp; ทุกชั้น &nbsp; &nbsp; </option>
                                                         @foreach ($floors as $f)
                                                             <option value="{{ $f->id }}"> &nbsp; &nbsp; {{ $f->name }} &nbsp; &nbsp; </option>
@@ -154,7 +154,11 @@
                                                     <span class="ti-xs ti ti-cash-banknote me-2"></span>กำหนดค่าเช่า
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-label-info waves-effect waves-light text-dark">
+                                                    class="btn btn-label-info waves-effect waves-light text-dark"
+                                                    onclick="floorChecked()"
+                                                    disabled
+                                                    id="all_floor"
+                                                    >
                                                     <span class="ti-xs ti ti-list-check me-2"></span>เลือกทั้งชั้น
                                                 </button>
                                             </div>
@@ -310,11 +314,17 @@ console.log(update_id);
                 // เคลียร์ dropdown สำหรับตำบล
                 $('#selectpickerFloor').empty().append('<option value="all"> &nbsp; &nbsp; ทุกชั้น &nbsp; &nbsp; </option>');
 
+                if(building == 'all'){
+                    $('#selectpickerFloor').prop('disabled', true);
+                    $("#all_floor").prop('disabled', true)
+                    return;
+                }
                 if (building) {
                     $.ajax({
                         url: '/get-floors/' + building,
                         type: 'GET',
                         success: function(data) {
+                            $('#selectpickerFloor').prop('disabled', false);
                             data.forEach(function(floor) {
                                 $('#selectpickerFloor').append('<option value="' + floor.id + '"> &nbsp; &nbsp; ' + floor.name + ' &nbsp; &nbsp; </option>');
                             });
@@ -323,6 +333,15 @@ console.log(update_id);
                 }
             });
 
+        $('#selectpickerFloor').change(function() {
+                let floor = $(this).val();
+                if(floor == "all"){
+                    $("#all_floor").prop('disabled', true)
+                }else{
+                    // alert(12);
+                    $("#all_floor").prop('disabled', false)
+                }
+            });
         
         // window.onload = function() {
         //     $('#addserviceModal').modal('show');

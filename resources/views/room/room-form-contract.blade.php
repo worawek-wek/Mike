@@ -178,7 +178,7 @@
         <div></div>
         <div class="col-sm-6">
             <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท)</label>
-            <input type="text" name="contract[1][security_deposit]" class="form-control" id="security_deposit" placeholder="" value=""/>
+            <input type="text" name="contract[1][security_deposit]" class="form-control" id="security_deposit" placeholder="" value="" required/>
         </div>
         <div class="col-sm-6 d-flex align-items-end pb-1">
             <button

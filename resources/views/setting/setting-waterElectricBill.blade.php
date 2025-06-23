@@ -108,7 +108,7 @@
                                                 <ul class="nav nav-pills" id="pills-tablayout" role="tablist">
                                                     <li class="nav-item me-1" role="presentation">
                                                         <button type="button"
-                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect active"
+                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect"
                                                             id="pills-home-tab" data-bs-toggle="pill"
                                                             data-bs-target="#pills-home" type="button" role="tab"
                                                             aria-controls="pills-home" aria-selected="true">
@@ -117,7 +117,7 @@
                                                     </li>
                                                     <li class="nav-item" role="presentation">
                                                         <button type="button"
-                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect"
+                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect active"
                                                             data-bs-toggle="pill" data-bs-target="#pills-profile"
                                                             type="button" role="tab" aria-controls="pills-profile"
                                                             aria-selected="false">
