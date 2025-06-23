@@ -220,7 +220,7 @@
                         <td class="text-center">{{ $row->phone }}
                         </td>
                         <td class="text-center">
-                            รถยนต์ ก 1234
+                            {{@$row->vehicles->car_registration ?? '-'}}
                         </td>
                         <td class="text-center">
                             @if(@$row->room_for_rent->date_stay)
