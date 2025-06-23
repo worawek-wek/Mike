@@ -2,174 +2,23 @@
     aria-labelledby="pills-home-tab" tabindex="0">
     <div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
         <div class="row g-3 new_box" style="padding: 0px 30px;">
-            <div class="col-md-6 col-lg5">
-                <div
-                    class="card bg-label-success card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A101</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ชำระเงินแล้ว
+
+            @if(@$list_data)
+                @foreach ($list_data as $key => $row)
+                <div class="col-md-6 col-lg5">
+                    <div class="card bg-lightGray card-check shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title" style="color: black"><b>{{ @$row->room_for_rent->room->name ?? '-' }}</b></h5>
+                                <p> {{ $row->prefix.' '.$row->name.' '.$row->surname }}</p>
+                            <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                                {{ $row->phone }}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div
-                    class="card bg-label-success card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A102</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ชำระเงินแล้ว
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div
-                    class="card bg-label-success card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A103</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ชำระเงินแล้ว
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-success card-check shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A104</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ชำระเงินแล้ว
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-success card-check shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A105</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ชำระเงินแล้ว
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-lightGray card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                            <p>ไม่มีผู้เช่า</p>
-                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องว่าง
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-lightGray card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                            <p>ไม่มีผู้เช่า</p>
-                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องว่าง
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-lightGray card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                            <p>ไม่มีผู้เช่า</p>
-                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องว่าง
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-lightGray card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                            <p>ไม่มีผู้เช่า</p>
-                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องว่าง
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-lightGray card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                            <p>ไม่มีผู้เช่า</p>
-                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องว่าง
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-danger card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ค้างชำระ
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-danger card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A107</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ค้างชำระ
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-danger card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A108</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ค้างชำระ
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-danger card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A109</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ค้างชำระ
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg5">
-                <div class="card bg-label-danger card-check shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ค้างชำระ
-                        </div>
-                    </div>
-                </div>
-            </div>
+                @endforeach
+            @endif
+
         </div>
     </div>
 </div>
