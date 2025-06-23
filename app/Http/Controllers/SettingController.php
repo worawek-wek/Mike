@@ -988,11 +988,11 @@ class SettingController extends Controller
     {
         try{
             $user = User::where('email', $request->email)->first();
-
+            
             if(!$user){
                 return "ไม่พบบุคลากร";
             }
-            
+            $ref_position_id = $user->ref_position_id;
             $u_h_b = UserHasBranch::where('ref_user_id', $user->id)->where("ref_branch_id", session("branch_id"))->first();
             
             if($u_h_b){
@@ -1002,7 +1002,7 @@ class SettingController extends Controller
             $uhb = new UserHasBranch;
             $uhb->ref_user_id  =  $user->id;
             $uhb->ref_branch_id  =  session("branch_id");
-            $uhb->ref_position_id  =  1;
+            $uhb->ref_position_id  =  $ref_position_id ?? 1;
             $uhb->save();
             
             DB::commit();
