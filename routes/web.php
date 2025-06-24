@@ -204,7 +204,8 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
         Route::post('room/insert_contract', 'insert_contract')->name('insert_contract');    //////////////////////////
-        Route::post('room/receipt', 'insert_receipt')->name('insert_receipt');    //////////////////////////
+        Route::post('room/receipt', 'insert_receipt')->name('insert-receipt');    //////////////////////////
+        Route::post('room/receipt/all', 'insert_receipt_all')->name('insert-receipt-all');    //////////////////////////
         Route::post('room/update_contract/{id}', 'update_contract')->name('update_contract');    //////////////////////////
         Route::get('room/get-room-rental-contract/{id}', 'get_room_rental_contract')->name('get_room_rental_contract');    //////////////////////////
         Route::get('room/get-room-rental-reservation/{id}', 'get_room_rental_reservation')->name('get_room_rental_reservation');    //////////////////////////

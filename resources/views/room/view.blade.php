@@ -162,7 +162,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </form>
                                         </div>
                                 </div>
                             </div>
@@ -607,6 +606,7 @@
                             if(response == true){
                                 loadData(page);
                                 Swal.fire('ย้ายห้องเรียบร้อยแล้ว', '', 'success')
+                                view($("#change_room").val())
                                 // $('#room-rental-contract').html('');
                             }
                         },

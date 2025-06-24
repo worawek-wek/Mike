@@ -439,13 +439,13 @@
                     <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าจองหลายห้อง</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="insert_contract123">
+                <form id="reservation_form_all" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="p-2">
                             <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
                                 <select name="ref_renter_id" id="select2Renter2" class="select2 form-select form-select-lg" onchange="get_room_rental_reservation(this.value)" required>
-                                    <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
+                                    <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                                     @foreach ($renter as $rent)
                                         <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
                                     @endforeach
@@ -656,8 +656,9 @@
                 url: "{{$page_url}}/reserve",
                 success: function(data) {
                     $("#reserve").html(data);
+                    // $('#select2Basic').select2();
                     $('#select2Basic').select2({
-                        placeholder: 'เลือกจังหวัด',
+                        placeholder: 'เลือกอำเภอ',
                         allowClear: true,
                         dropdownParent: $('#insertRenter'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
                         width: '100%'
@@ -723,10 +724,16 @@
             });
         }
         function get_room_rental_reservation(id){
+            if(id == 'no'){
+                $("#room-rental-reservation").html('');
+            }
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-rental-reservation/"+id,
                 success: function(data) {
+
+                    $('#select2RenterReservation').select2();
+
                     $("#room-rental-reservation").html(data);
                 }
             });
@@ -1049,6 +1056,58 @@
             });
         });
         
+        $('#reservation_form_all').on('submit', function(event) {
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ชำระเงิน ค่าจองห้อง หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ใช้ FormData แทน serialize เพื่อส่งไฟล์ได้
+                    let form = document.getElementById('reservation_form_all');
+                    let formData = new FormData(form);
+                    formData.append('_token', '{{ csrf_token() }}'); // สำหรับ Laravel CSRF
+
+                    $.ajax({
+                        url: '{{$page_url}}/receipt/all',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false, // ต้องมีเพื่อให้ส่ง multipart/form-data ได้
+                        processData: false,
+                        success: function(response) {
+                            if (response == true) {
+                                var modalEl = document.getElementById('roomRentalReservation');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                Swal.fire('ชำระเงิน ค่าจองห้อง เรียบร้อยแล้ว', '', 'success');
+                                loadData(page);
+                            }
+                        },
+                        error: function(error) {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', error);
+                        }
+                    });
+                }
+            });
+        });
+
         $(document).ready(function() {
             $('#select2Basic').change(function() {
                 var provinceId = $(this).val();

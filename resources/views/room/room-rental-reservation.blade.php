@@ -1,21 +1,15 @@
 {{-- Form ชำระ ค่า จองห้อง --}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 {{-- @php
     $id = []
 @endphp --}}
-@foreach ($rent_bill_s as $rent_bill)
+@foreach ($rent_bill_s as $key => $rent_bill)
 
-<input name="ref_room_id" type="hidden" value="{{ $rent_bill->ref_room_id }}">
-<input name="ref_rent_bill_id" type="hidden" value="{{ $rent_bill->rent_bill_id }}">
-<input name="ref_contract_id" type="hidden" value="{{ $rent_bill->contract_id }}">
-<input name="ref_renter_id" type="hidden" value="{{ $rent_bill->renter_id }}">
-<input name="ref_type_id" type="hidden" value="3">
-<input name="amount" class="total-price" type="hidden">
+<input name="insert[{{ $key }}][ref_room_id]" type="hidden" value="{{ $rent_bill->ref_room_id }}">
+<input name="insert[{{ $key }}][ref_rent_bill_id]" type="hidden" value="{{ $rent_bill->id }}">
+<input name="insert[{{ $key }}][ref_contract_id]" type="hidden" value="{{ $rent_bill->contract_id }}">
+<input name="insert[{{ $key }}][ref_renter_id]" type="hidden" value="{{ $rent_bill->ref_renter_id }}">
+<input name="insert[{{ $key }}][ref_type_id]" type="hidden" value="3">
+<input name="insert[{{ $key }}][amount]" class="total-price" type="hidden">
 
 <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">
     {{ number_format($rent_bill->deposit) }}
@@ -30,8 +24,8 @@
         <div class="flex-grow-1 ms-3 g-3 row">
             <b class="text-black">รูปแบบการชำระเงิน</b> <br>
                     <div class="col-sm-11">
-                        <input name="payment_format[]" class="form-check-input me-1" type="radio" id="payfull2" value="1" checked>
-                        <label class="form-check-label" for="payfull2"> จ่ายเต็มจำนวน </label>
+                        <input name="insert[{{ $key }}][payment_format]" class="form-check-input me-1" type="hidden" id="payfullRes" value="1">
+                        <label class="form-check-label" for="payfullRes"> จ่ายเต็มจำนวน </label>
                     </div>
                     <div class="col-sm-11" id="divsplit2">
                         
@@ -56,12 +50,12 @@
                                 <tr>
                                     <td>
                                         รับชำระค่าจองห้อง {{ $rent_bill->room_name }}
-                                        <input name="payment_list[title][]" type="hidden" value="รับชำระค่าจองห้อง {{ $rent_bill->room_name }}">
+                                        <input name="insert[{{ $key }}][payment_list][title][]" type="hidden" value="รับชำระค่าจองห้อง {{ $rent_bill->room_name }}">
                                     </td>
                                     <td class="text-end">
                                         {{-- {{ number_format($rent_bill->room_for_rent->room->rent) }} --}}
                                         {{ number_format($rent_bill->deposit) }}
-                                        <input type="hidden" name="payment_list[price][]" value="{{ $rent_bill->deposit }}">
+                                        <input type="hidden" name="insert[{{ $key }}][payment_list][price][]" value="{{ $rent_bill->deposit }}">
 
                                     </td>
                                 </tr>
@@ -86,19 +80,19 @@
         <div class="flex-grow-1 ms-3 g-3 row">
             <b class="text-black">ช่องทางการชำระเงิน</b> <br>
             <div class="col-sm-11">
-                <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
+                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
                 <label class="form-check-label" for="reservation_payByCash"> เงินสด </label>
             </div>
 
             <div id="paymentChanel_Res2">
                 <div class="col-sm-6 mb-2">
                     <label for="payment_date">วันที่ชำระเงิน</label>
-                    <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                    <input type="text" name="insert_single[payment_date]" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
                 </div>
             </div>
 
             <div class="col-sm-11">
-                <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
+                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
                 <label class="form-check-label" for="reservation_payByTransfer"> โอนเงิน </label>
             </div>
 
@@ -106,7 +100,7 @@
             <div id="paymentChanel_Res" style="display:none;">
                 <div class="col-sm-6 mb-2">
                     <label>เลือกบัญชีธนาคาร</label><span class="text-danger"> *</span>
-                    <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
+                    <select class="select2 form-select mb-2" name="insert_single[ref_bank_id]" id="select2RenterReservation">
                         @foreach ($bank as $r_bank)
                             <option value="{{ $r_bank->id }}">{{ $r_bank->bank.' '.$r_bank->bank_account_name }}</option>
                         @endforeach
@@ -114,19 +108,18 @@
                 </div>
                 <div class="col-sm-3 mb-2">
                     <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
-                    <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off" />
+                    <input type="time" name="insert_single[transfer_time]" class="form-control" placeholder="" id="transfer_time" autocomplete="off" />
                 </div>
                 <div class="col-sm-6 mb-2">
                     <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                    <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                    <input type="text" name="insert_single[payment_date2]" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}"/>
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                    <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer">
+                    <input type="file" name="insert_single[evidence_of_money_transfer]" class="form-control mb-2" id="evidence_of_money_transfer">
                     <div class="preview-container">
                         <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                     </div>
-                    
                 </div>
             </div>
 
@@ -141,21 +134,6 @@
     </div>
 </div>
 
-<script>
-    
-</script>
-
-  
-  <div class="modal-footer rounded-0 justify-content-center">
-      {{-- <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ยกเลิก</button> --}}
-      <button class="btn btn-info" type="submit">
-        <span>
-        <i class="ti-md ti ti-report-money"></i>
-        <b class="dam">
-          ชำระ
-        </b>
-      </span></button>
-  </div>
   <script>
     
         $('#payment_date').datepicker({
@@ -174,22 +152,12 @@
             if (this.checked) {
                 $('#divsplit2').show();
                 $('#totalsplit').show();
-                $('#totalpayfull2').hide();
                 calculatePrice();
             }
         });
         $(document).ready(function() {
             $('.total-price').html("{{ number_format($rent_bill->deposit) }}");
             $('.total-price').val("{{ $rent_bill->deposit }}");
-        });
-        $('#payfull2').on('change', function () {
-            if (this.checked) {
-                $('#divsplit2').hide();
-                $('#totalsplit').hide();
-                $('#totalpayfull2').show();
-                $('.total-price').html("{{ number_format($rent_bill->deposit) }}");
-                $('.total-price').val("{{ $rent_bill->deposit }}");
-            }
         });
         $('.reservation_payment_channel').on('change', function() {
             const paymentChannel = $('.reservation_payment_channel:checked').val();
@@ -322,7 +290,7 @@
             // อัปเดตค่า total ใน span#total-price
             // document.getElementById('total-price').innerText = total.toLocaleString();
         }
-        $('#select2RenterContract').select2();
+        $('#select2RenterReservation').select2();
 
         // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
         // togglePaymentFields();

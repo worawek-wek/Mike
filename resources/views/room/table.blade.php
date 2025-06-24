@@ -121,42 +121,31 @@ aria-labelledby="pills-profile-tab" tabindex="0">
     </thead>
     <tbody>
         @foreach ($list_data as $key => $row2)
+        @php
+            $onclick = '';
+                if ($row2->status != 0){
+                    if($row2->status == 1 && $row2->rent_bill_status != 5){
+                        $onclick = 'style="cursor: pointer" onclick="openReservation('.$row2->rent_bill_id.')"';
+                    }else{
+                        $onclick = 'style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view('.$row2->id.')"';
+                    }
+                }
+        @endphp
         <tr class="odd">
 
             <td class="control" tabindex="0" style="display: none;">
             </td>
             <td class="dt-checkboxes-cell"><input type="checkbox"
                     class="dt-checkboxes form-check-input check-list-td"></td>
-            <td class="text-center"
-            
-                @if($row2->status == 1 && $row2->rent_bill_status != 5)
-                    style="cursor: pointer" onclick="openReservation({{ $row2->rent_bill_id }})"
-                @else
-                    style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row2->id }})"
-                @endif
-            
-            >{{ $row2->room_name }}</td>
-            <td class="text-center"
-            
-                @if($row2->status == 1 && $row2->rent_bill_status != 5)
-                    style="cursor: pointer" onclick="openReservation({{ $row2->rent_bill_id }})"
-                @else
-                    style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row2->id }})"
-                @endif
-
-            >
+            <td class="text-center" {!! $onclick !!} >
+                {{ $row2->room_name }}
+            </td>
+            <td class="text-center"  {!! $onclick !!} >
                 @if ($row2->status_name != "ห้องว่าง")
                     <span class="text-truncate">{{ $row2->prefix.' '.$row2->renter_name }}</span>
                 @endif
             </td>
-            <td class="text-center"
-            
-                @if($row2->status == 1 && $row2->rent_bill_status != 5)
-                    style="cursor: pointer" onclick="openReservation({{ $row2->rent_bill_id }})"
-                @else
-                    style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row2->id }})"
-                @endif
-            >
+            <td class="text-center"  {!! $onclick !!}>
                 @if($row2->status == 1 && $row2->rent_bill_status != 5)
                     <span class="badge bg-info" style="font-size: unset;" text-capitalized="">ห้องจอง<span class="text-danger">(ค้างชำระ)</span></span></td>
                 @else

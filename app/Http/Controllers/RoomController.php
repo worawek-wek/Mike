@@ -291,7 +291,7 @@ class RoomController extends Controller
     public function insert_receipt(Request $request)
     {
         // return 1;
-        // return $request;
+        // return $request->payment_date2;
         // return 456;
         try{
             
@@ -304,11 +304,10 @@ class RoomController extends Controller
                 $path = "upload/receipt/";
                 $image_name = $img_name.rand().'.'.$extension;
             }
-            
             if($request->payment_channel == 1){
-                $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
+                $payment_date = Carbon::createFromFormat('d/m/Y', '24/06/2025')->format('Y-m-d');
             }else{
-                $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date2)->format('Y-m-d');
+                $payment_date = Carbon::createFromFormat('d/m/Y', trim($request->payment_date2))->format('Y-m-d');
             }
             $receipt = new Receipt;
             $receipt->receipt_number =  $this->generateReceiptCode();
@@ -366,6 +365,19 @@ class RoomController extends Controller
         }
         //
     }
+    public function insert_receipt_all(Request $request)
+    {
+        try{
+            foreach($request->insert as $insert){
+                $merged = array_merge($insert, $request->insert_single);
+                $this->insert_receipt(new Request($merged));
+            }
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
     public function get_room_rental_contract($id)
     {
         $data['room'] = Room::find($id);
@@ -394,10 +406,11 @@ class RoomController extends Controller
                                         ->leftJoin('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                                         ->leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                         ->where('renters.id', $id)
+                                        ->where('rent_bills.ref_status_id', 7)
+                                        ->where('rent_bills.ref_type_id', 3)
                                         ->select('rent_bills.*','rooms.name as room_name','room_for_rents.ref_room_id', 
-                                                'room_for_rents.deposit', 'room_for_rents.payment_received_date',
+                                                'room_for_rents.deposit','room_for_rents.ref_renter_id', 'room_for_rents.payment_received_date',
                                                 DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
-                                        ->distinct() // <-- ใช้ตรงนี้
                                         ->orderBy('rent_bills.created_at', 'desc')
                                         ->get();
                                 
@@ -466,6 +479,7 @@ class RoomController extends Controller
         
         $receipt = Receipt::where('ref_room_id', $id)
                             ->where('ref_type_id', 2)
+                            ->where('ref_contract_id', $contract->contract_id)
                             ->orderBy('id',"DESC")
                             ->get(); // ใบเสร็จ
         
@@ -618,9 +632,22 @@ class RoomController extends Controller
     {
         try{
             // return $old_room_id.' '.$new_room_id;
+            $rfr = RoomForRents::where('ref_room_id', $old_room_id)->latest()->first();
             RoomForRents::where('ref_room_id', $old_room_id)->orderBy('updated_at','DESC')->update([
                 'ref_room_id' => $new_room_id
             ]);
+            if($rfr){
+                
+                $contract = Contract::where('ref_room_id', $old_room_id)->where('ref_renter_id', $rfr->ref_renter_id)->first();
+                
+                Contract::where('ref_room_id', $old_room_id)->where('ref_renter_id', $rfr->ref_renter_id)->update([
+                    'ref_room_id' => $new_room_id
+                ]);
+ 
+                Receipt::where('ref_room_id', $old_room_id)->where('ref_renter_id', $rfr->ref_renter_id)->update([
+                    'ref_room_id' => $new_room_id
+                ]);
+            }
 
             $status = Room::find(($old_room_id))->status;
 
@@ -753,7 +780,7 @@ class RoomController extends Controller
                 $r_b->water_amount  =  0;
                 $r_b->invoice_number  =  $this->generateInvoiceCode();
                 $r_b->ref_contract_id =  $contract->id;
-                $r_b->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
+                $r_b->ref_status_id =  7; // 7 = ค้างชำระ
                 $r_b->ref_type_id =  2; // 2 = ค่าประกันห้อง
                 $r_b->ref_user_id =  Auth::id();
                 $r_b->save();
@@ -838,7 +865,13 @@ class RoomController extends Controller
                     }
                 }
                 
+                $update_r_1 = RentBill::find($r_b_room->id);
+                $update_r_1->total = $update_r_1->total_amount;
+                $update_r_1->save();
 
+                $update_r_2 = RentBill::find($r_b->id);
+                $update_r_2->total = $update_r_2->total_amount;
+                $update_r_2->save();
                 // return 333;
 
                 $room->status = 2;
@@ -1056,8 +1089,9 @@ class RoomController extends Controller
                             $r_b->electricity_amount  =  0;
                             $r_b->water_unit  =  0;
                             $r_b->water_amount  =  0;
+                            $r_b->total  =  $request->deposit;
                             $r_b->invoice_number  =  $this->generateInvoiceCode();
-                            $r_b->ref_status_id =  3; //  3 = ไม่สมบูรณ์
+                            $r_b->ref_status_id =  7; //  3 = ไม่สมบูรณ์
                             $r_b->ref_type_id =  3;  //  3 ค่าจอง
                             $r_b->ref_user_id =  Auth::id();
                             $r_b->save();
@@ -1111,8 +1145,9 @@ class RoomController extends Controller
                             $r_b->electricity_amount  =  0;
                             $r_b->water_unit  =  0;
                             $r_b->water_amount  =  0;
+                            $r_b->total  =  $request->deposit;
                             $r_b->invoice_number  =  $this->generateInvoiceCode();
-                            $r_b->ref_status_id =  3; //  3 = ไม่สมบูรณ์
+                            $r_b->ref_status_id =  7; //  3 = ไม่สมบูรณ์
                             $r_b->ref_type_id =  3;  //  3 ค่าจอง
                             $r_b->ref_user_id =  Auth::id();
                             $r_b->save();

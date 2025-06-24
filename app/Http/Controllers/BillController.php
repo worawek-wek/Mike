@@ -292,7 +292,7 @@ class BillController extends Controller
     public function payment_bill(Request $request)
     {
         try{
-            // return true;
+            // return $request;
             // return $this->generateInvoiceCode();
             $rent_bill = RentBill::find($request->id);
             // $rent_bill->payment_channel = $request->payment_channel;
@@ -401,7 +401,8 @@ class BillController extends Controller
 
                 }
             }
-            // $rent_bill->total = 2;
+            $rent_bill->total = $rent_bill->total_amount;
+            $rent_bill->payment_channel = $request->payment_channel;
 
             $rent_bill->save();
             
