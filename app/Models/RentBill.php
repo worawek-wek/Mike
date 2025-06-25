@@ -51,4 +51,19 @@ class RentBill extends Model
 
         return $total - $discount;
     }
+    public function getBalanceAmountAttribute()
+    {
+        // ดึงยอดรวมที่ต้องจ่ายจาก payment_list ของ RentBill (document_type = 1)
+        $this->loadMissing('payment_list', 'receipt.payment_list');
+
+        $billAmount = $this->payment_list->where('discount', 0)->sum('price')
+                    - $this->payment_list->where('discount', 1)->sum('price');
+
+        // รวมยอดที่จ่ายแล้วใน receipts
+        $paidAmount = $this->receipt->sum(function ($receipt) {
+            return $receipt->total_amount; // ต้องมี accessor นี้ใน Receipt
+        });
+
+        return $billAmount - $paidAmount;
+    }
 }

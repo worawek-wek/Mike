@@ -400,7 +400,7 @@
             </div>
         </div>
     </div>
-<div class="modal fade modalHeadDecor" id="roomRentalContract" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modalHeadDecor" id="roomRentalContract" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
@@ -432,7 +432,7 @@
             </div>
         </div>
     </div>
-<div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
@@ -547,7 +547,71 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body p-3">
+                    <img id="previewImage" src="" class="img-fluid w-100" alt="Preview">
+                </div>
+                <div class="modal-footer rounded-0 justify-content-center">
+                    <button type="button" class="btn btn-label-secondary text-black" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modalHeadDecor" id="move-out-upload" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title">อัพโหลดหลักฐาน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="asset_upload_image_move_out" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="id" id="room_has_asset_id">
+                    <div class="modal-body px-5">
+                        <div class="row mt-1">
+                            <label for="image" class="col-sm-12 col-form-label text-black">
+                            <strong>อัพโหลดรูปภาพก่อนย้ายออก</strong>
+                            <input class="form-control mt-1" type="file" id="image_move_out" name="image_move_out" accept="image/*" onchange="previewImageMoveOutImage(event)">
+                            </label>
+                        </div>
 
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                            <img id="image_move_out_preview" alt="Preview" style="display: none;" class="img-thumbnail">
+                            </div>
+                        </div>
+                        
+                        <script>
+                            function previewImageMoveOutImage(event) {
+                                const input = event.target;
+                                const preview = document.getElementById('image_move_out_preview');
+                            
+                                if (input.files && input.files[0]) {
+                                    const reader = new FileReader();
+                            
+                                    reader.onload = function(e) {
+                                    preview.src = e.target.result;
+                                    preview.style.display = 'block';
+                                    };
+                            
+                                    reader.readAsDataURL(input.files[0]);
+                                } else {
+                                    preview.src = '#';
+                                    preview.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </div>
+                    <div class="modal-footer rounded-0 justify-content-center">
+                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-main">อัพโหลด</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
     {{-- ///////////////////////////////////////////////////////////// --}}
     @include('room/add-renter')
@@ -586,6 +650,21 @@
             // var myModal = new bootstrap.Modal(document.getElementById('deposit'));
             //     myModal.show();
         }
+// function แสดงรูป ทรัพย์สิน ในย้ายออก
+        function showImage(src) {
+            document.getElementById('previewImage').src = src;
+
+            // ดึง modal instance
+            const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            imageModal.show();
+        }
+
+        function showUploadImage(id) {
+            document.getElementById('room_has_asset_id').value = id;
+            // ดึง modal instance
+            const imageModal = new bootstrap.Modal(document.getElementById('move-out-upload'));
+            imageModal.show();
+        }
 
         function openReservation(rent_bill_id){
             $.ajax({
@@ -614,6 +693,9 @@
                     $("#view").html(data);
                     // $('#select2District').select2('destroy');
 
+                    setTimeout(() => {
+                        new TomSelect('#select2RenterMove');
+                    }, 1000);
                     $('#change_room').select2({
                         placeholder: 'ย้ายห้อง',
                         allowClear: true,
@@ -626,19 +708,6 @@
                         dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
                         width: '100%'
                     });
-                    // setTimeout(() => {
-                    //     alert(154)
-                    $('#select2RenterMove').select2({
-                            dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                        });
-
-                        // $('#select2RenterMove').select2({
-                        //     placeholder: 'เลือกข้อมูลจากผู้เช่า',
-                        //     allowClear: true,
-                        //     dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                        //     width: '100%'
-                        // });
-                    // }, 100);
                     $('#select2RenterContract2').select2({
                         placeholder: 'เลือกข้อมูลจากผู้เช่า',
                         allowClear: true,
@@ -656,6 +725,18 @@
                 url: "{{$page_url}}/reserve",
                 success: function(data) {
                     $("#reserve").html(data);
+                    
+                    // setTimeout(() => {
+                    //     new TomSelect('#select2Basic');
+                    // }, 1000);
+                    
+                    // setTimeout(() => {
+                    //     new TomSelect('#select2District99');
+                    // }, 1000);
+                    
+                    // setTimeout(() => {
+                    //     new TomSelect('#select2Subdistrict');
+                    // }, 1000);
                     // $('#select2Basic').select2();
                     $('#select2Basic').select2({
                         placeholder: 'เลือกอำเภอ',
@@ -1003,6 +1084,58 @@
                 }
             });
         });
+        $('#asset_upload_image_move_out').on('submit', function(event) {
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ อัพโหลดรูปก่อนย้ายออก หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ใช้ FormData แทน serialize เพื่อส่งไฟล์ได้
+                    let form = document.getElementById('asset_upload_image_move_out');
+                    let formData = new FormData(form);
+                    formData.append('_token', '{{ csrf_token() }}'); // สำหรับ Laravel CSRF
+
+                    $.ajax({
+                        url: '{{$page_url}}/asset/asset-upload-image-move-out',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false, // ต้องมีเพื่อให้ส่ง multipart/form-data ได้
+                        processData: false,
+                        success: function(response) {
+                            if (response.success == true) {
+                                var modalEl = document.getElementById('move-out-upload');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                Swal.fire('อัพโหลดรูปก่อนย้ายออก เรียบร้อยแล้ว', '', 'success');
+                                loadData(page);
+                                var room_has_asset_id = $('#room_has_asset_id').val();
+                                $('#id_image_move_out'+room_has_asset_id).html(response.button);
+                            }
+                        },
+                        error: function(error) {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', error);
+                        }
+                    });
+                }
+            });
+        });
 
         $('#reservation_form').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
@@ -1107,6 +1240,56 @@
                 }
             });
         });
+        
+        // $('#payment_bill').on('submit', function(event) {
+        //     event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+        //     if(!this.checkValidity()) {
+        //         // ถ้าฟอร์มไม่ถูกต้อง
+        //         this.reportValidity();
+        //         return console.log('ฟอร์มไม่ถูกต้อง');
+        //     }
+        //     // return alert(123);
+        //     Swal.fire({
+        //         title: 'ยืนยันการดำเนินการ?',
+        //         text: 'คุณต้องการ บันทึกการเปลี่ยนแปลง หรือไม่?',
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'ตกลง',
+        //         cancelButtonText: 'ยกเลิก',
+        //         showDenyButton: false,
+        //         didOpen: () => {
+        //             // โฟกัสที่ปุ่ม confirm
+        //             Swal.getConfirmButton().focus();
+        //         }
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+
+        //             var formData = new FormData($('#payment_bill')[0]);
+
+        //             $.ajax({
+        //                 url: 'bill/payment_bill', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+        //                 type: 'POST',
+        //                 data: formData,
+        //                 processData: false,
+        //                 contentType: false,
+        //                 success: function(response) {
+        //                     if(response == true){
+        //                         // $('#invoice').modal('hide');
+        //                         // summary();
+        //                         loadData(page);
+        //                         Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+        //                     }
+        //                 },
+        //                 error: function(error) {
+        //                     Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+        //                     console.error('เกิดข้อผิดพลาด:', error);
+        //                 }
+        //             });
+        //         } else if (result.isDismissed) {
+        //             // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+        //         }
+        //     });
+        // });
 
         $(document).ready(function() {
             $('#select2Basic').change(function() {

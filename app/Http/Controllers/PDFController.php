@@ -165,12 +165,14 @@ class PDFController extends Controller
 
         return $result;
     }
-
-    private function readThaiNumber($number)
+    public function readThaiNumber($number)
     {
+        $is_negative = $number < 0;
+        $number = abs((int)$number);
+
         $position_call = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
         $number_call = ["", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
-        $number = (string)(int)$number;
+        $number = (string)$number;
 
         $result = '';
         $len = strlen($number);
@@ -192,7 +194,8 @@ class PDFController extends Controller
             }
         }
 
-        return $result;
+        return $is_negative ? 'ลบ' . $result : $result;
     }
+
 
 }

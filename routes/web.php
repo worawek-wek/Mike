@@ -225,6 +225,7 @@ Route::middleware('auth')->group(function() {
         Route::get('room/{id}', 'show')->name('show');    //////////////////////////
         Route::get('room/asset/{room_id}/{asset_id}', 'get_asset')->name('room.get_asset');    //////////////////////////
         Route::post('room/asset/update_asset', 'update_asset')->name('room.update_asset');    //////////////////////////
+        Route::post('room/asset/asset-upload-image-move-out', 'asset_upload_image_move_out')->name('room.asset-upload-image-move-out');    //////////////////////////
 
 
     });

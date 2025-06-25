@@ -27,6 +27,7 @@ use App\Models\RoomHasAsset;
 use App\Models\RoomForRents;
 use App\Models\Contract;
 use App\Models\StatusRoom;
+use App\Models\AdditionalCosts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -111,7 +112,7 @@ class RoomController extends Controller
         
         $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                                     ->where('room_for_rents.ref_room_id', $id)
-                                                    ->select('room_for_rents.*', 'renters.*', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
+                                                    ->select('room_for_rents.*','room_for_rents.id as room_for_rent_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
                                                     ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
                                                     ->first();
         $data['room_for_rent'] = $room_for_rent;
@@ -154,21 +155,26 @@ class RoomController extends Controller
         $province = Province::find($room_for_rent->ref_province_id)->name_in_thai;
         $district = District::find($room_for_rent->ref_district_id)->name_in_thai;
         $subdistrict = Subdistrict::find($room_for_rent->ref_subdistrict_id);
-        $data['asset'] = Asset::whereIn('id',[1,2])->get();
+        $data['asset'] = Asset::with(['room_has_asset' => function ($query) use ($id) { // ดึงข้อมูล รายการทรัพย์สิน
+                                        $query->where('ref_room_id', $id); // with โดยแค่อันที่ห้องนี้มี
+                                    }])->whereIn('id',[1,2])->get();
         $data['asset_has_room'] = RoomHasAsset::whereIn('ref_room_id', (array) $id)
                                                 ->pluck('status', 'ref_asset_id')
                                                 ->toArray();
         $data['address'] = $room_for_rent->addess.' '.$subdistrict->name_in_thai.' '.$district.' '.$province.' '.$subdistrict->zip_code;
-        
-        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->id)->first();
-        $move_invoice_5 = RentBill::where('ref_status_id', 5)->where('ref_room_for_rent_id', $room_for_rent->id)->first();
-        if(@$move_invoice){
-            $move_contract = Contract::find($move_invoice_7->ref_contract_id);
+        // return $room_for_rent->room_for_rent_id;
+        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_contract = Contract::find($move_invoice_5->ref_contract_id);
+        $data['move_contract'] = $move_contract;
+        if(@$move_invoice_7){
             $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
             $data['move_invoice_7'] = $move_invoice_7;
-            $data['move_contract'] = $move_contract;
             $data['move_bank'] = Bank::get();
         }
+        
+        $data['move_invoice_2'] = $move_invoice_2;
         $data['move_invoice_5'] = $move_invoice_5;
         
         return view('room/view', $data);
@@ -237,6 +243,49 @@ class RoomController extends Controller
         }
         //
     }
+//// Update รายการทรัพย์สิน ก่อนย้ายออก
+    public function asset_upload_image_move_out(Request $request)
+    {
+        try{
+            $r_h_a = RoomHasAsset::find($request->id);
+            if($request->file('image_move_out')){
+                // return 123;
+                $file = $request->file('image_move_out');
+                $nameExtension = $file->getClientOriginalName();
+                $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+                $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+                $path = "upload/asset/";
+                $image_move_out = $img_name.rand().'.'.$extension;
+                //////////////
+                $r_h_a->image_move_out = $image_move_out;
+                //////////////
+            }
+            
+            $r_h_a->save();
+
+            $button = "<button class='btn btn-xs btn-label-info waves-effect text-black px-2'
+                    onclick=\"showImage('" . asset('upload/asset/' . $r_h_a->image_move_out) . "')\">
+                    <i class='ti ti-photo me-1'></i> ภาพก่อนย้ายออก
+                </button>";
+
+            DB::commit();
+            
+            if(@$file) {
+                @unlink("$path/$lastImage");
+                $file->move($path, $image_move_out);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'บันทึกเรียบร้อยแล้ว',
+                'button' => $button
+            ]);
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        //
+    }
+    
     // form ชำระค่าประกัน
     public function get_deposit(Request $request)
     {
