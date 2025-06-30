@@ -354,7 +354,7 @@ class MeterController extends Controller
                         // ->WhereHas('room_for_rent', function ($query) {
                         //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
                         // })
-                        ->select('rooms.*', 'floors.name as floor_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
                         
                         
         if ($request->building != "all") {
@@ -455,7 +455,7 @@ class MeterController extends Controller
                         // ->WhereHas('room_for_rent', function ($query) {
                         //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
                         // })
-                        ->select('rooms.*', 'floors.name as floor_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
                         
                         
         if ($request->building != "all") {
@@ -501,7 +501,7 @@ class MeterController extends Controller
         foreach($results as $key=>$row){
             $data[] = [
                         $row->floor_name,
-                        $row->name,
+                        $row->room_name,
                         $row->meterPrevious->water_unit,
                         $row->water_unit,
                         // $row->meterPrevious->electricity_unit,

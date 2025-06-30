@@ -42,7 +42,7 @@
                 @endif
                 </td>
                 <td class="text-center">
-                    {{ $row->meterPrevious->water_unit }}
+                    {{ intval($row->meterPrevious->water_unit) }}
                 </td>
                 <td class="text-center d-flex">
                     <span class="badge rounded-pill bg-label-info text-black d-flex" text-capitalized="" style="font-size: unset;">
@@ -58,7 +58,7 @@
                     </div>
                 </td>
                 <td class="text-center text-danger">
-                    {{ $row->water_unit - $row->meterPrevious->water_unit }}
+                    {{ intval($row->water_unit) - intval($row->meterPrevious->water_unit) }}
                 </td>
             </tr>
             @endforeach

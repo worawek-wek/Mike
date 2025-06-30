@@ -63,7 +63,7 @@
                                                     ค่าบริการ ส่วนลด
                                                 </h4>
                                             </div>
-                                            <div class="col-sm-12">
+                                            {{-- <div class="col-sm-12">
                                                 <ul class="nav nav-pills nav-fill " role="tablist">
                                                     <li class="nav-item">
                                                         <button type="button" class="nav-link active" role="tab"
@@ -77,6 +77,28 @@
                                                             data-bs-target="#navs-pills-top-profile"
                                                             aria-controls="navs-pills-top-profile"
                                                             aria-selected="false">ส่วนลด</button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                             --}}
+                                            <div class="col-sm-12" style="font-weight: 500;">
+                                                <ul class="nav nav-pills nav-fill " role="tablist">
+                                                    <li class="nav-item pe-4">
+                                                        <button type="button" class="nav-link btn-primary active" id="meter_water" role="tab"
+                                                            data-bs-toggle="tab" data-bs-target="#navs-pills-top-home"
+                                                            aria-controls="navs-pills-top-home"
+                                                            aria-selected="true">
+                                                            ค่าบริการ
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <button type="button" class="nav-link btn-label-danger" id="meter_electricity" role="tab"
+                                                            data-bs-toggle="tab"
+                                                            data-bs-target="#navs-pills-top-profile"
+                                                            aria-controls="navs-pills-top-profile"
+                                                            aria-selected="false">
+                                                            ส่วนลด
+                                                        </button>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1016,6 +1038,19 @@
             $(".box").not(targetBox).hide();
             $(targetBox).show();
         });
+    });
+    
+    $('#meter_water').on('click', function() {
+        $('.nav-link').removeClass('active btn-danger');
+        $('#meter_electricity').addClass('btn-label-danger');
+        $(this).removeClass('btn-label-primary');
+        $(this).addClass('active btn-primary');
+    });
+    $('#meter_electricity').on('click', function() {
+        $('.nav-link').removeClass('active btn-primary');
+        $('#meter_water').addClass('btn-label-primary');
+        $(this).removeClass('btn-label-danger');
+        $(this).addClass('active btn-danger');
     });
     </script>
 </body>

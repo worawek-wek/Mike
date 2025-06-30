@@ -40,7 +40,7 @@
                 @endif
                 </td>
                 <td class="text-center">
-                    {{ $row->meterPrevious->electricity_unit }}
+                    {{ intval($row->meterPrevious->electricity_unit) }}
                 </td>
                 <td class="text-end">
                     <span class="badge rounded-pill bg-label-danger text-black" text-capitalized="" style="font-size: unset;display: block;" >
@@ -50,7 +50,7 @@
                     
                 </td>
                 <td class="text-center text-danger">
-                    {{ intval($row->electricity_unit) - $row->meterPrevious->electricity_unit }}
+                    {{ intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit) }}
                 </td>
             </tr>
             @endforeach

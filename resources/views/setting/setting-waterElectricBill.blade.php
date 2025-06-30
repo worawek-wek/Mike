@@ -156,14 +156,14 @@
                                                     data-bs-toggle="modal" data-bs-target="#setElectricModal" onclick="view_electric('all')">
                                                     <span class="ti-xs ti ti-plug me-2"></span>กำหนดค่าไฟ
                                                 </button>
-                                                <button type="button"
+                                                {{-- <button type="button"
                                                     class="btn btn-label-info waves-effect waves-light text-dark"
                                                     onclick="floorChecked()"
                                                     disabled
                                                     id="all_floor"
                                                     >
                                                     <span class="ti-xs ti ti-list-check me-2"></span>เลือกทั้งชั้น
-                                                </button>
+                                                </button> --}}
                                             </div>
                                         </div>
                                     </div>

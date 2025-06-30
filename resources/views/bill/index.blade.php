@@ -261,7 +261,8 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="printPdfBill()"
+                                                        onclick="window.open('{{$page_url}}/export/excel-summary', '_blank')"
+                                                        {{-- onclick="printPdfBill()" --}}
                                                         >
                                                     <span>
                                                     <i class="ti ti-file-upload"></i> พิมพ์ใบสรุปบิล</span>

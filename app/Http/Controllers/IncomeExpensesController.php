@@ -94,9 +94,9 @@ class IncomeExpensesController extends Controller
             $expenses = new IncomeExpenses;
             $expenses->type  =  $request->type;
             $expenses->label  =  $request->label;
-            $expenses->amount  =  $request->amount;
+            $expenses->amount  =  $request->amount ?? 0;
             $expenses->date  =  $date;
-            $expenses->ref_category_id  =  $request->ref_category_id;
+            $expenses->ref_category_id  =  $request->ref_category_id ?? 1;
             $expenses->ref_room_id  =  $request->ref_room_id;
             $expenses->name  =  $request->name;
             $expenses->address  =  $request->address;
@@ -171,12 +171,38 @@ class IncomeExpensesController extends Controller
     }
 
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        // ตัวอย่างข้อมูล
-        $results = IncomeExpenses::orderBy('id','DESC')->get();
+        
+        $results = IncomeExpenses::orderBy('id','DESC');
+        
+        if(@$request->search){
+            $results = $results->Where(function ($query) use ($request) {
+                                    $query->where('label','LIKE','%'.$request->search.'%');
+                                        // ->orWhere('email','LIKE','%'.$request->search.'%');
+                                });
+        }
+
+        if(@$request->ref_category_id != "all"){
+            $results = $results->Where('ref_category_id', $request->ref_category_id);
+        }
+
+        if(@$request->type != "all"){
+            $results = $results->Where('type', $request->type);
+        }
+
+        if(@$request->from_month){
+            $to_month = 2000-01;
+            if(@$request->to_month){
+                $to_month = $request->to_month;
+            }
+            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$request->from_month, $to_month]);
+        }
+
+        $results = $results->get();
+        
         $data = 
         [
             ['รายรับ-รายจ่าย'],

@@ -284,6 +284,7 @@ Route::middleware('auth')->group(function() {
         Route::get('bill/datatable', 'datatable')->name('bill.datatable');    //////////////////////////
         Route::get('bill/waiting-for-confirmation', 'waiting_for_confirmation')->name('bill.waiting-for-confirmation');    //////////////////////////
         Route::get('bill/export/excel', 'export_excel')->name('bill.export-excel');    //////////////////////////
+        Route::get('bill/export/excel-summary', 'export_excel_summary')->name('bill.export-excel-summary');    //////////////////////////
         Route::post('bill/incomplete_update', 'incomplete_update')->name('bill.incomplete_update');    //////////////////////////
         Route::post('bill/payment_bill', 'payment_bill')->name('bill.payment_bill');    //////////////////////////
         Route::get('bill/{id}', 'invoice')->name('bill.invoice');    //////////////////////////

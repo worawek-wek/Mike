@@ -9,17 +9,17 @@
         <tbody>
             <tr>
                 <td>ค่าเช่าห้อง (บาท/เดือน)</td>
-                <td><input name="rent" type="number" class="form-control form-control-sm bg-lightGray" min="0"
+                <td><input name="rent" type="number" class="form-control form-control-sm" min="0"
                         value="{{ @$room_rent->rent }}" oninput="updateTotal()"></td>
             </tr>
             <tr>
                 <td>ค่าเช่าเฟอร์นิเจอร์ (บาท/เดือน)</td>
-                <td><input name="furniture_rental" type="number" class="form-control form-control-sm bg-lightGray" min="0"
+                <td><input name="furniture_rental" type="number" class="form-control form-control-sm" min="0"
                         value="{{ @$room_rent->furniture_rental }}" oninput="updateTotal()"></td>
             </tr>
             <tr>
                 <td>ค่าเช่าแอร์ (บาท/เดือน)</td>
-                <td><input name="air_rental" type="number" class="form-control form-control-sm bg-lightGray" min="0"
+                <td><input name="air_rental" type="number" class="form-control form-control-sm" min="0"
                         value="{{ @$room_rent->air_rental }}" oninput="updateTotal()"></td>
             </tr>
         </tbody>

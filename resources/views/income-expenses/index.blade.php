@@ -154,7 +154,7 @@
                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                     type="button" aria-haspopup="dialog"
                                                     aria-expanded="false"
-                                                    onclick="window.open('{{$page_url}}/export/excel', '_blank')"
+                                                    onclick="export_excel()"
                                                     >
                                                 <span>
                                                 <i class="ti ti-upload"></i> ดาวน์โหลด Excel</span>
@@ -289,7 +289,7 @@
                             @endphp
                             <input name="date" type="text" class="form-control" id="bs-datepicker-format" placeholder="วันที่" value="{{ date('d/m/Y') }}" />
                         </div>
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <label for="select2IE1" class="form-label">หมวดหมู่ <span class="text-danger">*</span></label>
                             <select name="ref_category_id" id="select2IE1" class="select2 form-select form-select-lg" data-allow-clear="true">
                                 @foreach ($category as $cate)
@@ -298,10 +298,11 @@
                                     @endif
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="col-sm-12">
                             <label for="selectRoom" class="form-label">รายจ่ายของห้อง <span class="text-danger">*</span></label>
                             <select name="ref_room_id" id="selectRoom" class="select2 form-select form-select-lg" data-allow-clear="true">
+                                <option value="0">รายจ่ายของ Office</option>
                                 @foreach ($room as $r)
                                         <option value="{{$r->id}}">{{$r->name}}</option>
                                 @endforeach
@@ -347,15 +348,15 @@
                             <label for="exampleFormControlInput1" class="form-label">รายละเอียด <span class="text-danger">*</span></label>
                             <input name="label" type="text" class="form-control" id="exampleFormControlInput1" placeholder="รายละเอียด" />
                         </div>
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">จำนวนเงิน (บาท) <span class="text-danger">*</span></label>
                             <input name="amount" type="text" class="form-control" id="exampleFormControlInput1" placeholder="จำนวนเงิน" />
-                        </div>
+                        </div> --}}
                         <div class="col-sm-6">
                             <label for="bs-datepicker-format-2" class="form-label">วันที่ <span class="text-danger">*</span></label>
                             <input name="date" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="วันที่" autocomplete="off"/>
                         </div>
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <label for="C" class="form-label">หมวดหมู่ <span class="text-danger">*</span></label>
                             <select name="ref_category_id" id="C" class="select2 form-select form-select-lg" data-allow-clear="true">
                                 @foreach ($category as $cate)
@@ -364,7 +365,7 @@
                                     @endif
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="col-sm-12">
                             <label for="selectRoomIncome" class="form-label">รายรับของห้อง <span class="text-danger">*</span></label>
                             <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" data-allow-clear="true">
@@ -718,6 +719,19 @@
             // document.getElementById('total-price').innerText = total.toLocaleString();
         }
 
+        function export_excel() {
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // สร้าง query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // เปิดลิงก์พร้อม query string ในแท็บใหม่
+            window.open('{{$page_url}}/export/excel?' + queryString, '_blank');
+        }
         function printPdfBill() {
             $.ajax({
                 url: '/pdf/income-expenses-all/1',

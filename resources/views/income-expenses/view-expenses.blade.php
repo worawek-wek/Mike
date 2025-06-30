@@ -21,17 +21,19 @@
                     <td>{{ $income_expenses->room->name }}</td>
                 </tr>
             </tbody>
-            <tbody>
-                <tr>
-                    <td>หมวดหมู่</td>
-                    <td>{{ $income_expenses->category->name }}</td>
-                </tr>
-            </tbody>
+            @if ($income_expenses->type == 2)
+                <tbody>
+                    <tr>
+                        <td>หมวดหมู่</td>
+                        <td>{{ $income_expenses->category->name }}</td>
+                    </tr>
+                </tbody>
+            @endif
             <tbody>
                 <tr>
                     <td>จำนวนเงิน</td>
                     @if ($income_expenses->type == 1)
-                        <td class="text-success">{{ $income_expenses->amount }} บาท</td>
+                        <td class="text-success">{{ $income_expenses->total_amount }} บาท</td>
                     @else
                         <td class="text-danger">-{{ $income_expenses->amount }} บาท</td>
                     @endif

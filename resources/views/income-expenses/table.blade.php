@@ -15,9 +15,9 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         <th class="text-center">
             ห้อง
         </th>
-        <th class="text-center">
+        {{-- <th class="text-center">
             หมวดหมู่
-        </th>
+        </th> --}}
         <th class="text-center">
             จำนวนเงิน
         </th>
@@ -33,15 +33,19 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         {{-- <td class="text-center">RC202404000121</td> --}}
         <td class="text-center">-</td>
         <td class="text-center">{{ $row->label }}</td>
-        <td class="text-center">{{ $row->room->name }}</td>
-        <td class="text-center">{{ $row->category->name }}</td>
+        <td class="text-center">{{ $row->room->name ?? "รายจ่ายของ Office" }}</td>
+        {{-- <td class="text-center">{{ $row->category->name }}</td> --}}
         @if ($row->type == 1)
             <td class="text-center text-success">
         @else
             <td class="text-center text-danger">
             -
         @endif
-            {{ number_format($row->amount,2) }}</td>
+        @if ($row->type == 2)
+            {{ number_format($row->amount, 2) }}</td>            
+        @else
+            {{ number_format($row->total_amount, 2) }}</td>            
+        @endif
         <td class="text-center">{{ $row->user->name }}</td>
     </tr>
     @endforeach

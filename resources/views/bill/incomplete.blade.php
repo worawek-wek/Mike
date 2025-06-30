@@ -181,7 +181,7 @@
         {{-- <button type="button" class="btn btn-primary waves-effect"><span
                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
         <button type="submit" class="btn btn-info waves-effect">
-            <span class="fas fa-paper-plane me-2" style="font-size: x-large;"></span>ส่งบิล</button>
+            <span class="fas fa-paper-plane me-2" style="font-size: x-large;"></span>คอนเฟิร์มบิล</button>
     </div>
 </form>
 <script>
@@ -321,7 +321,7 @@
             // return alert(123);
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',
-                text: 'คุณต้องการ บันทึกการเปลี่ยนแปลง หรือไม่?',
+                text: 'คุณต้องการ คอนเฟิร์มบิล หรือไม่?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'ตกลง',
