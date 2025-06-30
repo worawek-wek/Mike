@@ -110,6 +110,7 @@
                                                     <span class="mx-2 badge bg-label-danger">ค้างชำระ</span>
                                             </td>
                                             <td>
+                                                <input class="price_increase" type="hidden" value="{{ 0-$move_invoice_7->balance_amount }}">
                                                 <span>
                                                     {{-- {{ @$move_invoice_7->receipts->sum(fn($r) => $r->total_amount) }} --}}
                                                     {{-- @if ($move_invoice_7 && $move_invoice_7->receipts)
@@ -198,7 +199,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                {{-- <table class="table table-bordered" id="discount-table2" >
+                                                                <table class="table table-bordered" id="discount-table2" >
                                                                     <thead>
                                                                         <tr>
                                                                             <th>รายการ</th>
@@ -296,15 +297,15 @@
                                                                     $('.total-price_2').val(total);
 
                                                                     // อัปเดตค่า total ใน span#total-price
-                                                                    // document.getElementById('total-price').innerText = total.toLocaleString();
+                                                                    document.getElementById('total-price').innerText = total.toLocaleString();
                                                                 }
 
-                                                                </script> --}}
+                                                                </script>
                                                     
                                                     {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
                                                 </div>
-                                                        {{-- <div class="row mt-2" id="expenses-split-container">
-                                                        </div> --}}
+                                                        <div class="row mt-2" id="expenses-split-container">
+                                                        </div>
                                                 <script>
                                                     document.getElementById('checksplit').addEventListener('change', function() {
                                                         document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
@@ -361,12 +362,12 @@
                                                             <input type="hidden" name="">
                                                         </div>
                                                             <div class="col-sm-3 mb-2">
-                                                                <label for="transfer_time">เวลาโอนเงิน</label>
+                                                                <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
                                                                 <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
                                                             </div>
                                                             <div class="col-sm-6 mb-2">
-                                                                <label for="payment_date2">วันที่โอนเงิน</label>
-                                                                <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                                                <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                                                                <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                                                             </div>
                                                         <div class="col-sm-10 mt-3">
                                                             <label for="paymentReceipt">แนบหลักฐานการโอน</label>
@@ -699,6 +700,7 @@
                                     <span class="badge badge-center rounded-pill bg-primary me-1" style="background-color: #54BAB9 !important;">3</span>
                                     เงินประกัน
                                 </label>
+                                        @if (@$move_invoice_2->payment_list)
                                 
                                         <table class="table table-bordered" id="discount-table3" >
                                             <thead>
@@ -708,16 +710,17 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($move_invoice_2->payment_list as $prakan)
-                                                    <tr>
-                                                        <td>
-                                                            <input name="payment_list[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <input type="number" name="payment_list[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
+                                                    @foreach ($move_invoice_2->payment_list as $prakan)
+                                                        <tr>
+                                                            <td>
+                                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <input type="number" name="payment_list[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                
 
                                             </tbody>
                                             <tfoot>
@@ -729,6 +732,7 @@
                                                 </tr>
                                             </tfoot>
                                         </table>
+                                                @endif
                                         
                                         <div align="right">
                                             <button
@@ -811,7 +815,7 @@
                                     <span class="badge bg-label-success text-black mt-5" style="width: 100%;font-size: larger;">
                                         สรุปการย้ายออก
                                     </span>
-                                    <h4 class="text-success mt-2 amount">เงินจากการหักเงินประกัน 0 บาท</h4>
+                                    <h4 class="mt-2 amount">เงินจากการหักเงินประกัน 0 บาท</h4>
                                     
                                     <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
                                         <thead>
@@ -825,19 +829,73 @@
                                     </table>
                                 </div>
                                 {{-- /////////////////////////////// --}}
-                                <div class="modal-footer rounded-0 justify-content-start mb-0">
-                                    <button type="button" class="btn btn-label-primary waves-effect text-black"><span
-                                            class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
-                                    </button>
-                                    <button type="submit" class="btn btn-main waves-effect ms-auto" onclick="paymentChannel(1)">
-                                        บันทึกยอดเงินทั้งหมดแล้วย้ายออก
-                                    </button>
-                                </div>
+                                <form id="move_out_submit">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $room->id }}">
+                                    <div class="modal-footer rounded-0 justify-content-start mb-0">
+                                        {{-- <button type="button" class="btn btn-label-primary waves-effect text-black"><span
+                                                class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
+                                        </button> --}}
+                                        <button type="submit" class="btn btn-main waves-effect ms-auto" onclick="paymentChannel(1)">
+                                            บันทึกยอดเงินทั้งหมดแล้วย้ายออก
+                                        </button>
+                                    </div>
+                                </form>
                                 {{-- /////////////////////////////// --}}
                                 <script>
+                                    
+                                    $('#move_out_submit').on('submit', function(event) {
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        // return alert(123);
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ ย้ายออก หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '/room/move-out-submit', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                                                    type: 'POST',
+                                                    data: $(this).serialize(),
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            
+                                                            var modalEl = document.getElementById('insurance');
+                                                            var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                                            if (modalInstance) {
+                                                                modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                                            }
+                                                            
+                                                            loadData(page);
+                                                            summary();
+                                                            Swal.fire('ย้ายออกเรียบร้อยแล้ว', '', 'success');
+                                                        }
+                                                    },
+                                                    error: function(error) {
+                                                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                        console.error('เกิดข้อผิดพลาด:', error);
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
                                     calculateTotal()
                                     function calculateTotal() {
-                                        // alert(123);
                                         let total = 0;
                                         const inputs = document.querySelectorAll('.price_increase');
 
@@ -848,8 +906,18 @@
 
                                         const formatted = total.toLocaleString('th-TH', { minimumFractionDigits: 2 });
                                         const amountText = document.querySelector('.amount');
+
                                         if (amountText) {
                                             amountText.textContent = `ยอดเงินประกันคืนผู้เช่า ${formatted} บาท`;
+
+                                            // เปลี่ยนสีตามค่าบวกหรือลบ
+                                            if (total < 0) {
+                                                amountText.style.color = 'red';
+                                            } else if (total >= 0) {
+                                                amountText.style.color = '#28c76f';
+                                            } else {
+                                                amountText.style.color = ''; // ค่าเป็น 0 กลับไปใช้ค่า default
+                                            }
                                         }
                                     }
                                 </script>

@@ -247,12 +247,12 @@
                                     <input type="hidden" name="">
                                 </div>
                                     <div class="col-sm-3 mb-2">
-                                        <label for="transfer_time">เวลาโอนเงิน</label>
-                                        <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
+                                        <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
+                                        <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off" required/>
                                     </div>
                                     <div class="col-sm-6 mb-2">
-                                        <label for="payment_date2">วันที่โอนเงิน</label>
-                                        <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                        <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                                        <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                                     </div>
                                 <div class="col-sm-10 mt-3">
                                     <label for="paymentReceipt">แนบหลักฐานการโอน</label>

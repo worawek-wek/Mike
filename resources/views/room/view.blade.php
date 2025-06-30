@@ -71,7 +71,7 @@
                                 data-bs-target="#navs-pills-top-payment"
                                 aria-controls="navs-pills-top-payment"
                                 aria-selected="false" tabindex="-1"
-                                {{-- onclick="get_bill('{{$bill_month[0]->year."-".$bill_month[0]->month}}')" --}}
+                                onclick="get_bill('{{ date('Y-m') }}')"
                                 >
                         <span>
                           <i class="ti ti-cash-banknote pe-1"></i>
@@ -94,7 +94,9 @@
                     </li>
                     <li class="nav-item" role="presentation">
                       <button class="btn btn-outline-warning nav-link" 
-                        role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-MoveOut" aria-controls="navs-pills-top-MoveOut" aria-selected="false" tabindex="-1">
+                        role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-MoveOut" aria-controls="navs-pills-top-MoveOut" aria-selected="false" tabindex="-1"
+                        onclick="get_move_out()"
+                        >
                         <span>
                           <i class="ti ti-door-exit pe-1"></i>
                           <b class="dam">
@@ -417,6 +419,15 @@
             url: "{{ $page_url }}/get-bill/{{$room->id}}/"+month,
             success: function(data) {
                 $("#bill").html(data);
+            }
+        });
+    }
+    function get_move_out(month){
+        $.ajax({
+            type: "GET",
+            url: "{{ $page_url }}/get-move-out/{{$room->id}}",
+            success: function(data) {
+                $("#navs-pills-top-MoveOut").html(data);
             }
         });
     }

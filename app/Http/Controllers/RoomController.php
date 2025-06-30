@@ -64,7 +64,9 @@ class RoomController extends Controller
                                                 ->distinct()
                                                 ->get();
 
-        $data['renter'] = Renter::get();
+        $data['renter'] = Renter::whereHas('room_for_rent', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })->get();
                                         
         $data['province'] = Province::get();
         $data['district'] = District::get();
@@ -166,7 +168,7 @@ class RoomController extends Controller
         $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
-        $move_contract = Contract::find($move_invoice_5->ref_contract_id);
+        $move_contract = Contract::find(@$move_invoice_5->ref_contract_id);
         $data['move_contract'] = $move_contract;
         if(@$move_invoice_7){
             $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
@@ -206,6 +208,44 @@ class RoomController extends Controller
         }
         
         return view('room/room-asset-form', $data);
+    }
+
+//// ย้ายออก
+    public function get_move_out($id)
+    {
+        $room = Room::find($id);
+        $data['room'] = $room;
+
+        return $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
+                                                    ->where('room_for_rents.ref_room_id', $id)
+                                                    ->select('room_for_rents.*','room_for_rents.id as room_for_rent_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
+                                                    ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
+                                                    ->first();
+
+        $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                                    ->where('room_for_rents.ref_room_id', $id)
+                                    ->select('renters.*')
+                                    ->get();
+
+        $data['asset'] = Asset::with(['room_has_asset' => function ($query) use ($id) { // ดึงข้อมูล รายการทรัพย์สิน
+                                        $query->where('ref_room_id', $id); // with โดยแค่อันที่ห้องนี้มี
+                                    }])->whereIn('id',[1,2])->get();
+
+        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_contract = Contract::find(@$move_invoice_5->ref_contract_id);
+        $data['move_contract'] = $move_contract;
+        if(@$move_invoice_7){
+            $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
+            $data['move_invoice_7'] = $move_invoice_7;
+            $data['move_bank'] = Bank::get();
+        }
+        
+        $data['move_invoice_2'] = $move_invoice_2;
+        $data['move_invoice_5'] = $move_invoice_5;
+
+        return view('room/move-out', $data);
     }
 
 //// Update รายการทรัพย์สิน
@@ -414,6 +454,19 @@ class RoomController extends Controller
         }
         //
     }
+    public function move_out_submit(Request $request)
+    {
+        try{
+            $room = Room::find($request->id);
+            $room->status = 0;
+            $room->save();
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
     public function insert_receipt_all(Request $request)
     {
         try{
@@ -447,6 +500,7 @@ class RoomController extends Controller
 
         return view('room/room-rental-contract', $data);
     }
+    //// ชำระค่าจองหลายห้อง
     public function get_room_rental_reservation($id)
     {
         $data['page_url'] = 'room';
@@ -464,7 +518,7 @@ class RoomController extends Controller
                                         ->get();
                                 
         $data['bank'] = Bank::get();
-
+        
         return view('room/room-rental-reservation', $data);
     }
     // form สัญญา
@@ -1108,6 +1162,15 @@ class RoomController extends Controller
                             'message' => 'ไม่สามารถจองห้องเหล่านี้ได้ <br>' . implode(', ', $vacant_room_all)
                         ]);
                     }
+                    
+                    $renter_blacklist = Renter::where('name', $request->name)->where('surname', $request->surname)->where('blacklist_status', 1)->first();
+                    if (!empty($renter_blacklist)) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'บุคคลนี้ไม่สามารถ จอง ได้ เนื่องจากถูกขึ้นบัญชีดำ <br>' . implode(', ', $vacant_room_all)
+                        ]);
+                    }
+                    
                 // เช็คห้องที่ไม่ว่าง ถ้ามีให้ error ว่า ห้องเหล่านี้ไม่ว่าง จบ }
                 
                 

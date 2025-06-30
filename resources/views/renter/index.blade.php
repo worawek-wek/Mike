@@ -1312,7 +1312,6 @@
     }
 
     function loadOldData(pages){
-        
         $('.p_old_search').each(function() {
             var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
             var inputValue = $(this).val(); // ดึงค่า value ของ input

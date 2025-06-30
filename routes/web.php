@@ -166,6 +166,13 @@ Route::middleware('auth')->group(function() {
         Route::post('setting/bank/update/{id}', 'bank_update')->name('setting.bank-update');    //////////////////////////
         Route::delete('setting/bank/{id}', 'bank_delete')->name('setting.bank-delete');    //////////////////////////
         ////////////////
+        Route::get('setting/blacklist', 'blacklist')->name('setting.blacklist');    //////////////////////////
+        Route::get('setting/blacklist/datatable', 'blacklist_datatable')->name('setting.blacklist-datatable');    //////////////////////////
+        Route::post('setting/blacklist/insert', 'blacklist_insert')->name('setting.blacklist-insert');    //////////////////////////
+        Route::get('setting/blacklist/{id}', 'blacklist_edit')->name('setting.blacklist-edit');    //////////////////////////
+        Route::post('setting/blacklist/update', 'blacklist_update')->name('setting.blacklist-update');    //////////////////////////
+        Route::delete('setting/blacklist/{id}', 'blacklist_delete')->name('setting.blacklist-delete');    //////////////////////////
+        ////////////////
         Route::get('setting/company', 'company')->name('setting.company');    //////////////////////////
         Route::get('setting/company/datatable', 'company_datatable')->name('setting.company-datatable');    //////////////////////////
         Route::post('setting/company/insert', 'company_insert')->name('setting.company-insert');    //////////////////////////
@@ -203,6 +210,7 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-deposit', 'get_deposit')->name('get-deposit');    //////////////////////////
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
+        Route::post('room/move-out-submit', 'move_out_submit')->name('move-out-submit');    //////////////////////////
         Route::post('room/insert_contract', 'insert_contract')->name('insert_contract');    //////////////////////////
         Route::post('room/receipt', 'insert_receipt')->name('insert-receipt');    //////////////////////////
         Route::post('room/receipt/all', 'insert_receipt_all')->name('insert-receipt-all');    //////////////////////////
@@ -212,6 +220,7 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-room-detail-contract/{id}', 'get_room_detail_contract')->name('get_room_detail_contract');    //////////////////////////
         Route::get('room/get-room-form-contract/{id}', 'get_room_form_contract')->name('get_room_form_contract');    //////////////////////////
         Route::get('room/get-bill/{id}/{month}', 'get_bill')->name('get_bill');    //////////////////////////
+        Route::get('room/get-move-out/{id}', 'get_move_out')->name('get-move-out');    //////////////////////////
         Route::get('get-districts/{id}', 'get_districts')->name('get-districts');    //////////////////////////
         Route::get('get-subdistricts/{id}', 'get_subdistricts')->name('get-subdistricts');    //////////////////////////
         Route::get('get-zipcode/{id}', 'get_zipcode')->name('get-zipcode');    //////////////////////////

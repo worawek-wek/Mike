@@ -725,6 +725,7 @@
                 url: "{{$page_url}}/reserve",
                 success: function(data) {
                     $("#reserve").html(data);
+                    document.getElementById('loadingOverlay').style.display = 'none';
                     
                     // setTimeout(() => {
                     //     new TomSelect('#select2Basic');
@@ -757,6 +758,7 @@
                         width: '100%'
                     });
                     
+                    setTimeout(() => {
                     $('#bs-datepicker-format').datepicker({
                         format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
                         autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
@@ -777,8 +779,8 @@
                         autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
                         todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
                     });
+                    }, 3000);
                     
-                    document.getElementById('loadingOverlay').style.display = 'none';
                 }
             });
         }
@@ -918,7 +920,13 @@
                         data: $(this).serialize(),
                         success: function(response) {
                             if(response == true){
-                                $('#insertRenter').modal('hide');
+                                
+                                var modalEl = document.getElementById('insertRenter');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                // $('#insertRenter').modal('hide');
                                 $('#insert_renter')[0].reset();
                                 loadData(page);
                                 summary();

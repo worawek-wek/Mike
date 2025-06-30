@@ -42,6 +42,7 @@ class VehicleController extends Controller
                             ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                             ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
                             ->where('buildings.ref_branch_id', session("branch_id"))
+                            ->whereIn('rooms.status', [1,2])
                             ->groupBy('vehicles.id')
                             ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ');
 
@@ -82,6 +83,7 @@ class VehicleController extends Controller
                             ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                             ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
                             ->where('buildings.ref_branch_id', session("branch_id"))
+                            ->where('rooms.status', 0)
                             ->groupBy('vehicles.id')
                             ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ');
 

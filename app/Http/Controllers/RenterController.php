@@ -82,9 +82,11 @@ class RenterController extends Controller
     }
     public function old_datatable(Request $request)
     {
-        $results = Renter::whereHas('room_for_rent.room', function ($query) {
-                                                    $query->whereIn('status', [0]);
-                                                })
+        $results = Renter::whereHas('room_for_rent', function ($q) {
+                                        $q->whereHas('room', function ($q2) {
+                                            $q2->whereIn('status', [0]);
+                                        });
+                                    })
                                 // ->with('room_for_rent.room')
                                 ->distinct('renters.id');
         // $results = Receipt::orderBy('olds.id','DESC')
@@ -129,7 +131,7 @@ class RenterController extends Controller
             $limit = $request['limit'];
         }
 
-        return $results = $results->paginate($limit);
+        $results = $results->paginate($limit);
 
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();

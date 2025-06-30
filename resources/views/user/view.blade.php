@@ -1,11 +1,3 @@
-{{-- <style>
-    .select2-container {
-        z-index: 9999; /* เพิ่ม z-index เพื่อให้ dropdown แสดงอยู่ข้างบน */
-    }
-    .swal2-container {
-        z-index: 9999 !important; /* ปรับ z-index ให้สูงกว่า modal อื่น */
-    }
-</style> --}}
 <div class="modal-content rounded-0">
     <div class="modal-header rounded-0">
         <span class="modal-title">

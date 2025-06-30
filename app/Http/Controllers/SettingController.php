@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
 use App\Models\Bank;
+use App\Models\Renter;
 use App\Models\Building;
 use App\Models\Service;
 use App\Models\RoomHasService;
@@ -900,6 +901,105 @@ class SettingController extends Controller
     {
         try{
             Bank::destroy($id);
+            
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+        //
+    }
+    
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+
+    public function blacklist(Request $request)
+    {
+        $data['page_url'] = 'setting/blacklist';
+        $data['renters'] = Renter::where('blacklist_status', 0)->get();
+
+        return view('setting/setting-blacklist', $data);
+    }
+    public function blacklist_datatable(Request $request)
+    {
+        $results = Renter::where('blacklist_status', 1)->orderBy('blacklist_date', 'desc');
+        
+        if(@$request->search){
+            $results = $results->where(function ($query) use ($request) {
+                                    $query->where('name','LIKE','%'.$request->search.'%')
+                                        ->orWhere('surname','LIKE','%'.$request->search.'%')
+                                        ->orWhere('phone','LIKE','%'.$request->search.'%')
+                                        ->orWhere('id_card_number','LIKE','%'.$request->search.'%');
+                                });
+        }
+
+        $limit = 15;
+        if(@$request['limit']){
+            $limit = $request['limit'];
+        }
+        // $data['prefix'] = [ 1 => 'บริษัท', 2 => 'นาย', 3 => 'นางสาว', 4 => 'นาง'];
+        $results = $results->paginate($limit);
+        
+        $data['list_data'] = $results;
+
+        return view('setting/setting-blacklist-table', $data);
+    }
+    
+    public function blacklist_insert(Request $request)
+    {
+        
+        try{
+            $update = Renter::find($request->id);
+            $update->blacklist_detail  =  $request->blacklist_detail;
+            $update->blacklist_status  =  1;
+            $update->blacklist_date  =  Carbon::now();
+            $update->save();
+            
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+        //
+    }
+    public function blacklist_edit($id)
+    {
+        $data['page_url'] = 'blacklist';
+        $data['renters'] = Renter::where('blacklist_status', 0)->get();
+        $data['blacklist'] = Renter::find($id);
+        return view('setting/setting-blacklist-form', $data);
+    }
+ 
+
+    public function blacklist_update(Request $request)
+    {
+        
+        try{
+                $update = Renter::find($request->last_id);
+                $update->blacklist_detail  =  null;
+                $update->blacklist_status  =  0;
+                $update->save();
+
+                $update_new = Renter::find($request->id);
+                $update_new->blacklist_detail  =  $request->blacklist_detail;
+                $update_new->blacklist_status  =  1;
+                $update_new->blacklist_date  =  $update->blacklist_date;
+                $update_new->save();
+                
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+    }
+    public function blacklist_delete($id)
+    {
+        try{
+            $update = Renter::find($id);
+            $update->blacklist_detail  =  null;
+            $update->blacklist_status  =  0;
+            $update->blacklist_date  =  null;
+            $update->save();
             
             DB::commit();
             return 1;

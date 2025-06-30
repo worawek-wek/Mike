@@ -260,6 +260,11 @@
                         <div data-i18n="บัญชีธนาคาร">บัญชีธนาคาร</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="/setting/blacklist" class="menu-link">
+                        <div data-i18n="บัญชีดำ">บัญชีดำ</div>
+                    </a>
+                </li>
             </ul>
         </li>
     </ul>

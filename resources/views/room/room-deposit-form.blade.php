@@ -151,7 +151,7 @@
 
             <div class="col-sm-11">
                 <input name="payment_channel" class="form-check-input me-1 deposit_payment_channel" type="radio" id="payByTransfer" value="2">
-                <label class="form-check-label" for="payByTransfer"> โอนเงิน </label>
+                <label class="form-check-label" for="payByTransfer"> โอนเงิน 12 </label>
             </div>
 
             <!-- แสดงเมื่อเลือก โอนเงิน -->
@@ -165,12 +165,12 @@
                     </select>
                 </div>
                 <div class="col-sm-3 mb-2">
-                    <label for="transfer_time">เวลาโอนเงิน</label>
+                    <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
                     <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
                 </div>
                 <div class="col-sm-6 mb-2">
-                    <label for="payment_date2">วันที่โอนเงิน</label>
-                    <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                    <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                    <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
@@ -248,9 +248,17 @@
             if (paymentChannel === '2') {
                 $('#paymentChanel_').show();
                 $('#paymentChanel_2').hide();
+                // ใส่ required
+                $('#ref_bank_id').attr('required', true);
+                $('#transfer_time').attr('required', true);
+                $('#payment_date2').attr('required', true);
             } else {
                 $('#paymentChanel_').hide();
                 $('#paymentChanel_2').show();
+                // เอา required ออก
+                $('#ref_bank_id').removeAttr('required');
+                $('#transfer_time').removeAttr('required');
+                $('#payment_date2').removeAttr('required');
             }
         });
         
