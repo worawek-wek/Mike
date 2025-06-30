@@ -179,6 +179,7 @@
                                                                 @if (count($move_invoice_7->receipt) > 0)
                                                                 checked    
                                                                 @endif
+                                                                disabled
                                                                 > 
                                                                 <label class="form-check-label" for="checksplit"> แบ่งจ่าย </label>
                                                             </div>
@@ -552,11 +553,15 @@
                                                 <span >{{ number_format($item->fine) }}</span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-xs btn-label-info waves-effect text-black px-2"
-                                                        onclick="showImage('{{ asset('upload/asset/' . $item->room_has_asset->image_name) }}')">
-                                                    <i class="ti ti-photo me-1"></i>
-                                                    ภาพก่อนเข้าพัก
-                                                </button>
+                                                @if ($item->room_has_asset->image_name == '')
+                                                    ไม่ได้อัพโหลดรูป
+                                                @else
+                                                    <button class="btn btn-xs btn-label-info waves-effect text-black px-2"
+                                                            onclick="showImage('{{ asset('upload/asset/' . $item->room_has_asset->image_name) }}')">
+                                                        <i class="ti ti-photo me-1"></i>
+                                                        ภาพก่อนเข้าพัก
+                                                    </button>
+                                                @endif
                                             </td>
                                             <td id="id_image_move_out{{$item->room_has_asset->id}}">
                                                 @if (!$item->room_has_asset->image_move_out)

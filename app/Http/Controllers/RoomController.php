@@ -216,7 +216,7 @@ class RoomController extends Controller
         $room = Room::find($id);
         $data['room'] = $room;
 
-        return $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
+        $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                                     ->where('room_for_rents.ref_room_id', $id)
                                                     ->select('room_for_rents.*','room_for_rents.id as room_for_rent_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
                                                     ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
@@ -856,7 +856,7 @@ class RoomController extends Controller
 
                 // $electricity_unit = $this->find_meter_by_name($room->name);
 
-                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'])->first();
+                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'])->latest()->first();
 
                 $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
                 $r_b_room->ref_room_for_rent_id  =  $r_f_r->id;

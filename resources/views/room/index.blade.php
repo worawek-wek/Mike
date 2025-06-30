@@ -660,8 +660,12 @@
         }
 
         function showUploadImage(id) {
+            document.getElementById("asset_upload_image_move_out").reset();
+            document.getElementById('image_move_out_preview').style.display = 'none';
+
             document.getElementById('room_has_asset_id').value = id;
             // ดึง modal instance
+
             const imageModal = new bootstrap.Modal(document.getElementById('move-out-upload'));
             imageModal.show();
         }
@@ -1130,6 +1134,7 @@
                                 if (modalInstance) {
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
+
                                 Swal.fire('อัพโหลดรูปก่อนย้ายออก เรียบร้อยแล้ว', '', 'success');
                                 loadData(page);
                                 var room_has_asset_id = $('#room_has_asset_id').val();
