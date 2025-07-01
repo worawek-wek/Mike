@@ -191,7 +191,7 @@
                         <div class="row g-3 p-4">
                             <div class="col-sm-6">
                                 <label for="email" class="form-label">ค้นหาด้วย อีเมลหรือเบอร์โทร</label>
-                                <input id="email" name="email" type="email" class="form-control" placeholder="กรอกอีเมลหรือเบอร์โทร" />
+                                <input id="email" name="email" type="text" class="form-control" placeholder="กรอกอีเมลหรือเบอร์โทร" />
                             </div>
                             <div class="col-sm-6 d-flex align-items-end">
                                 <button type="button" class="btn btn-info" onclick="check_user()"><i class="ti ti-search me-2"></i> ค้นหา</button>
@@ -235,7 +235,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <label for="email_2" class="form-label">อีเมล</label><span class="text-danger"> *</span>
-                                <input name="email" id="email_2" type="email" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
+                                <input name="email" id="email_2" type="name" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
                                 <span class="text-danger pt-4" id="Cant_Use" style="display: none;">Email นี้ถูกใช้แล้ว</span>
                             </div>
                             <div class="col-sm-6">

@@ -1088,7 +1088,13 @@ class SettingController extends Controller
     public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร
     {
         try{
-            $user = User::where('email', $request->email)->first();
+            // $user = User::where('email', $request->email)->first();
+            $email_check = $request->email;
+            $user = User::where(function ($query) use ($email_check) {
+                $query->where('email', $email_check)
+                ->orWhere('phone', $email_check);
+            })
+            ->first();
             
             if(!$user){
                 return "ไม่พบบุคลากร";
