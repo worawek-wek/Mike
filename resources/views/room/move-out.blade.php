@@ -158,7 +158,7 @@
 
                                         <input type="hidden" name="id" value="{{$move_invoice_7->id}}">
                                     <div class="mt-3" id="pay1" style="display: none;">
-                                        <div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                                        <div class="mb-3" style="padding: 15px 2px;">
                                             <div class="d-flex">
                                                 <div class="flex-grow-1 ms-3 g-3 row">
                                                     <b class="text-black">รูปแบบการชำระเงิน</b> <br>
@@ -182,10 +182,10 @@
                                                                 <label class="form-check-label" for="checksplit"> แบ่งจ่าย </label>
                                                             </div>
                                                 
-                                                            <div class="col-sm-11" id="divsplit" 
-                                                                @if (count($move_invoice_7->receipt) == 0)
+                                                            <div class="col-sm-11" id="divsplit"
+                                                                {{-- @if (count($move_invoice_7->receipt) == 0)
                                                                     style="display: none;"
-                                                                @endif
+                                                                @endif --}}
                                                             >
                                                                 
                                                                 <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
@@ -206,100 +206,51 @@
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
+                                                                    @foreach ($move_invoice_7->payment_list as $key => $payment_list_item)
                                                                         <tr>
-                                                                            <td>
-                                                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $move_invoice_7->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
+                                                                            {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
+                                                                            <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
+
+                                                                                {{ $payment_list_item->title }}
+
+                                                                            @if ($key == 1)
+                                                                                {{ number_format($payment_list_item->unit) }} = {{ $payment_list_item->unit-0 }} ยูนิต)
+                                                                                    
+                                                                            @endif
                                                                             </td>
-                                                                            <td class="text-end">
-                                                                                <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                            <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                                                            @if ($key == 1)
+                                                                                <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
+                                                                                    <span id="text_water_amount">
+                                                                                        {{ $payment_list_item->price }}
+                                                                                    </span>
+                                                                            @else
+                                                                                @if ($payment_list_item->discount == 1)
+                                                                                    {{ number_format(0-$payment_list_item->price) }}
+                                                                                    <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                                                                @else
+                                                                                    {{ number_format($payment_list_item->price) }}
+                                                                                    <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                                                                @endif
+                                                                            @endif
                                                                             </td>
                                                                         </tr>
+                                                                    @endforeach
                                                                     </tbody>
                                                                     <tfoot>
                                                                         <tr>
                                                                             <th>รวม</th>
-                                                                            <th class="text-end mb-0 fw-bold total-price_2">
-                                                                                0
+                                                                            <th class="text-end mb-0 fw-bold total-price">
+                                                                                {{ number_format($move_invoice_7->total_amount) }}
                                                                             </th>
                                                                         </tr>
                                                                     </tfoot>
                                                                 </table>
                                                                 
-                                                                <div align="right">
-                                                                    <button
-                                                                            id="add_expenses2"
-                                                                            style="padding-right: 14px;padding-left: 14px;"
-                                                                            class="btn btn-sm buttons-collection btn-label-warning waves-effect waves-light me-2 mt-2"
-                                                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                                                            type="button" aria-haspopup="dialog"
-                                                                            aria-expanded="false">
-                                                                        <span>
-                                                                        <i class="ti ti-plus"></i> เพิ่มรายการ</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="col-sm-11 mt-3 mb-3">
+                                                                <div class="col-sm-12 mt-3 mb-3">
                                                                     <label>หมายเหตุ</label>
                                                                     <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
                                                                 </div>
-                                                                
-                                                                <script>
-                                                                    
-                                                                document.getElementById('add_expenses2').addEventListener('click', function() {
-                                                                    const tableBody = document.querySelector('#discount-table2 tbody');
-                                                                    const newRow = document.createElement('tr');
-                                                                    newRow.style.backgroundColor = 'rgb(255 240 225)'; // Set background color
-                                                                    newRow.innerHTML = `
-                                                                        <td>
-                                                                            <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" required />
-                                                                        </td>
-                                                                        <td class="text-end">
-                                                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_2 add_expenses2_price" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
-                                                                                <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
-                                                                            </div>
-                                                                        </td>
-                                                                    `;
-                                                                    
-                                                                    tableBody.appendChild(newRow);
-                                                                    addRemoveEvent_2(newRow);
-                                                                });
-                                                            
-                                                                function addRemoveEvent_2(row) {
-                                                                    row.querySelector('.remove-row2').addEventListener('click', function() {
-                                                                        row.remove();
-                                                                        calculate_2Price();
-                                                                    });
-                                                                }
-
-                                                                function calculate_2Price() { 
-                                                                    const inputs = document.querySelectorAll('.calculate_2');  // เลือกทุก input ที่มี class="calculate"
-                                                                    let total = 0;
-
-                                                                    inputs.forEach(input => {
-                                                                        // ลบเครื่องหมายจุลภาคจากค่าที่รับมา
-                                                                        let value = input.value.replace(/,/g, ''); 
-                                                                        
-                                                                        if (value.trim() !== "" && !isNaN(value)) {
-                                                                            // ตรวจสอบว่า input มี class="discount_price_2" หรือไม่
-                                                                            if (input.classList.contains('discount_price_2')) {
-                                                                                // ถ้ามี class="discount_price_2", ลบค่าออกจาก total
-                                                                                total -= parseFloat(value.replace(/[^0-9.-]+/g, ""));
-                                                                            } else {
-                                                                                // ถ้าไม่มี class="discount_price_2", เพิ่มค่าเข้าไปใน total
-                                                                                if (!isNaN(value) && value.trim() !== "") {
-                                                                                    total += parseFloat(value);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                    $('.total-price_2').html(total.toLocaleString());
-                                                                    $('.total-price_2').val(total);
-
-                                                                    // อัปเดตค่า total ใน span#total-price
-                                                                    document.getElementById('total-price').innerText = total.toLocaleString();
-                                                                }
-
-                                                                </script>
                                                     
                                                     {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
                                                 </div>
@@ -325,7 +276,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                                        <div class="mb-3 pb-4" style="padding: 15px 2px;">
                                             <div class="d-flex">
                                                 <div class="flex-grow-1 ms-3 g-3 row">
                                                     <b class="text-black">ช่องทางการชำระเงิน</b> <br>
@@ -538,13 +489,13 @@
                                             </td>
                                             <td class="text-start">
                                                 <div>
-                                                    <input name="condition[{{$key}}][]" class="form-check-input" type="radio" id="notDamaged{{$key}}" onclick="sia(0,'1_damaged{{$key}}')" @if($item->room_has_asset->condition == 1) checked @endif>
+                                                    <input name="condition[{{$key}}][]" class="form-check-input" type="radio" id="notDamaged{{$key}}" onchange="sia(0,'1_damaged{{$key}}','')" @if($item->room_has_asset->condition == 1) checked @endif>
                                                     <label class="form-check-label" for="notDamaged{{$key}}"> ไม่เสียหาย </label>
                                                 </div>
                                                 <div>
-                                                    <input name="condition[{{$key}}][]" class="form-check-input" type="radio" id="damaged{{$key}}" onclick="sia({{ $item->fine }},'1_damaged{{$key}}')" @if($item->room_has_asset->condition == 0) checked @endif> 
+                                                    <input name="condition[{{$key}}][]" class="form-check-input" type="radio" id="damaged{{$key}}" onchange="sia({{ $item->fine }},'1_damaged{{$key}}','{{$item->room_has_asset->asset->name}}')" @if($item->room_has_asset->condition == 0) checked @endif> 
                                                     <label class="form-check-label" for="damaged{{$key}}"> เสียหาย </label>
-                                                    <input type="hidden" id="1_damaged{{$key}}" class="price_increase">
+                                                    {{-- <input type="hidden" id="1_damaged{{$key}}" class="price_increase"> --}}
                                                 </div>
                                             </td>
                                             <td>
@@ -581,8 +532,13 @@
                                 </table>
                                
 <script>
-    function sia(fine, id){
+    function sia(fine, id, title){
         $('#'+id).val(0-fine);
+        if(title == ''){
+            $('#tr'+id).remove();
+        }else{
+            addRow(title, fine, id)
+        }
         calculateTotal()
     }
     document.querySelector('input[name="evidence_file"]').addEventListener('change', function(e) {
@@ -640,48 +596,38 @@
                                         <textarea name="remark" class="form-control" id="renter_remark"></textarea>
                                     </div>
                                 </div>
-                                
-                                {{-- <table class="table table-bordered mt-4 table-detail">
+                                <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                                    รายการชำระเงิน
+                                </label>
+                                <table class="table table-bordered mt-2" id="discount-table2" >
                                     <thead>
                                         <tr>
-                                            <th width="70%">รายการ</th>
-                                            <th>
-                                                จำนวนเงิน(บาท)
-                                            </th>
+                                            <th>รายการ</th>
+                                            <th width="35%">จำนวนเงิน (บาท)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
-                                                ค่าเช่าห้อง
+                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ">
                                             </td>
-                                            <td>
-                                                0
+                                            <td class="text-end">
+                                                <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
                                             </td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th>
-                                                รวมทั้งหมด
-                                            </th>
-                                            <th>
+                                            <th>รวม</th>
+                                            <th class="text-end mb-0 fw-bold total-price_2">
                                                 0
                                             </th>
                                         </tr>
                                     </tfoot>
                                 </table>
+
                                 <div class="mt-4 text-end col-12">
-                                    <button
-                                            id="add_discount"
-                                            style="padding-right: 14px;padding-left: 14px;"
-                                            class="btn btn-sm buttons-collection btn-info waves-effect waves-light me-2"
-                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                            type="button" aria-haspopup="dialog"
-                                            aria-expanded="false">
-                                        <span>
-                                        <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
-                                    </button>
+                                    
                                     <button
                                             id="add_discount"
                                             style="padding-right: 14px;padding-left: 14px;"
@@ -702,7 +648,84 @@
                                         <span>
                                         <i class="ti ti-plus"></i> เพิ่มรายการ</span>
                                     </button>
-                                </div> --}}
+                                </div>
+                                    {{-- <button
+                                            id="add_discount"
+                                            style="padding-right: 14px;padding-left: 14px;"
+                                            class="btn btn-sm buttons-collection btn-info waves-effect waves-light me-2"
+                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                            type="button" aria-haspopup="dialog"
+                                            aria-expanded="false">
+                                        <span>
+                                        <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
+                                    </button> --}}
+                                    <script>
+                                        function calculate_2Price() {
+                                            let total = 0;
+
+                                            $('#discount-table2 tbody tr').each(function () {
+                                                const title = $(this).find('input[name="payment_list[title][]"]').val()?.trim() || '';
+                                                const priceInput = $(this).find('input[name="payment_list[price][]"]');
+                                                const price = parseFloat(priceInput.val());
+
+                                                if (!isNaN(price)) {
+                                                    if (title === 'ส่วนลด') {
+                                                        total -= price; // คิดเป็นลบ
+                                                    } else {
+                                                        total += price;
+                                                    }
+                                                }
+                                            });
+
+                                            $('.total-price_2').text(
+                                                total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                            );
+                                            calculateTotal()
+                                        }
+
+                                        function addRow(title = '', price = '', id = '') {
+                                            const html = `
+                                                <tr id="tr${id}">
+                                                    <td>
+                                                        <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
+                                                    </td>
+                                                    <td class="text-end d-flex gap-1">
+                                                        <input type="number" name="payment_list[price][]" class="form-control price_increase calculate_2" value="${price}" placeholder="จำนวนเงิน">
+                                                        <button type="button" class="btn btn-sm btn-danger btn-remove-row">
+                                                            ลบ
+                                                        </button>
+                                                    </td>
+                                                </tr>`;
+                                            $('#discount-table2 tbody').append(html);
+                                            calculate_2Price();
+                                        }
+
+                                        // เพิ่มรายการทั่วไป
+                                        $('#add_expenses').click(() => addRow());
+
+                                        // เพิ่มรายการส่วนลด
+                                        $('#add_discount').click(() => addRow('ส่วนลด', '0')); // จะคำนวณเป็น -100 โดยอัตโนมัติ
+
+                                        // คำนวณเมื่อมีการพิมพ์ชื่อหรือจำนวน
+                                        $(document).on('input', '.payment_list_title, .calculate_2', function () {
+                                            calculate_2Price();
+                                        });
+
+                                        // ลบเฉพาะแถวที่หัวข้อเป็น "ส่วนลด"
+                                        $(document).on('click', '.btn-remove-row', function () {
+                                            const row = $(this).closest('tr');
+                                            const title = row.find('input[name="payment_list[title][]"]').val()?.trim();
+
+                                                row.remove();
+                                                calculate_2Price();
+                                        });
+
+                                        // เรียกใช้ตอนโหลด
+                                        calculate_2Price();
+                                    </script>
+
+
+
 
                                 {{-- /////////////////////////////// --}}
 
@@ -720,10 +743,21 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                    @foreach ($move_invoice_2->payment_list as $prakan)
+                                                    @foreach ($move_invoice_2->payment_list as $k => $prakan)
+                                                    @php
+                                                    if ($prakan->discount == 1) {
+                                                        continue;
+                                                    }
+                                                        
+                                                    @endphp
                                                         <tr>
                                                             <td>
-                                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                                                @if ($k == 0)
+                                                                    {{ $prakan->title }}
+                                                                    <input name="payment_list[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
+                                                                @else
+                                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                                                @endif
                                                             </td>
                                                             <td class="text-end">
                                                                 <input type="number" name="payment_list[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
@@ -773,7 +807,7 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                                        <input name="payment_list[price][]" type="number" class="form-control calculate_3 add_expenses3_price price_increase" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                        <input name="payment_list[price][]" type="number" class="form-control calculate_3 add_expenses3_price" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                                                         <button type="button" class="btn btn-danger btn-sm remove-row3">ลบ</button>
                                                     </div>
                                                 </td>
@@ -789,6 +823,7 @@
                                                 calculate_3Price();
                                             });
                                         }
+                                        calculate_3Price();
 
                                         function calculate_3Price() { 
                                             const inputs = document.querySelectorAll('.calculate_3');  // เลือกทุก input ที่มี class="calculate"
