@@ -169,9 +169,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="text-center pt-4">
+                                            {{-- <div class="text-center pt-4">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
-                                            </div>
+                                            </div> --}}
 
                                             <div class="" hidden>
                                             <hr class="border-light my-4">
@@ -188,9 +188,11 @@
                                                 <h4 class="text-center">ตั้งค่ารูปแบบเอกสาร<span class="text-main">ใบเสร็จจองห้องพัก</span></h4>
                                                 <div id="full-editor1">{!!@$data->detail_doc!!}</div>
                                                 <input type="hidden" name="detail_doc" id="detail_doc" value="{{@$data->detail_doc}}">
-                                                <div class="text-center pt-4">
-                                                    <button type="button" onclick="check_add();" class="btn btn-main">บันทึก</button>
-                                                </div>
+                                               
+                                            </div>
+
+                                            <div class="text-center pt-4">
+                                                <button type="button" onclick="check_add();" class="btn btn-main">บันทึก</button>
                                             </div>
                                         </form>
                                     </div>
