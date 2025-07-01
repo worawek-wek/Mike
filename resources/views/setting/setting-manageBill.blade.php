@@ -135,7 +135,7 @@
                                                                             for="customRadioIcon1">
                                                                             <span class="custom-option-body">
                                                                                 <div class="ratio ratio-1x1 mb-3">
-                                                                                    {{-- <img src="{{@$image1}}" class="object-fit-contain" alt="..."> --}}
+                                                                                    <img src="{{@$image1}}" class="object-fit-contain" alt="...">
                                                                                 </div>
                                                                                 <span class="custom-option-title">ต้นฉบับ-สำเนาอยู่ใน 1 แผ่น</span>
                                                                             </span>
@@ -143,7 +143,7 @@
                                                                         </label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md mb-md-0 mb-5">
+                                                                {{-- <div class="col-md mb-md-0 mb-5">
                                                                     <div
                                                                         class="form-check custom-option custom-option-icon">
                                                                         <label
@@ -151,22 +151,21 @@
                                                                             for="customRadioIcon2">
                                                                             <span class="custom-option-body">
                                                                                 <div class="ratio ratio-1x1 mb-3">
-                                                                                    {{-- <img src="{{@$image2}}" class="object-fit-contain" alt="..."> --}}
+                                                                                    <img src="{{@$image2}}" class="object-fit-contain" alt="...">
                                                                                 </div>
                                                                                 <span class="custom-option-title"> ต้นฉบับ-สำเนา 1 แผ่น </span>
                                                                             </span>
                                                                             <input class="form-check-input" type="radio" data-image="{{@$image2}}" value="1" id="customRadioIcon2" name="type_doc" @if(@$data->type_doc == 1) checked @endif>
                                                                         </label>
                                                                     </div>
-                                                                </div>
+                                                                </div> --}}
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 text-center">
+                                                        {{-- <div class="col-sm-6 text-center">
                                                             <div class="ratio ratio-1x1 bg-white rounded">
-                                                                {{-- <img id="previewImage" src="{{@$image_show}}" class="object-fit-contain border rounded" alt="..."> --}}
-                                                                <img id="" src="{{@$image_show}}" class="object-fit-contain border rounded" alt="...">
+                                                                <img id="previewImage" src="{{@$image_show}}" class="object-fit-contain border rounded" alt="...">
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                 </div>
                                             </div>
