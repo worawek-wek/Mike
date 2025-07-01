@@ -878,7 +878,7 @@
                                     @csrf
                                     <input type="hidden" id="type_move_out" name="type_move_out" value="1">
                                     <input type="hidden" name="id" value="{{ $room->id }}">
-                                    <input type="hidden" name="ref_renter_id" value="{{ $contract->ref_renter_id }}">
+                                    <input type="hidden" name="ref_renter_id" value="{{ @$contract->ref_renter_id }}">
                                     <div class="modal-footer rounded-0 justify-content-start mb-0">
                                         {{-- <button type="button" class="btn btn-label-primary waves-effect text-black"><span
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
@@ -890,7 +890,6 @@
                                 </form>
                                 {{-- /////////////////////////////// --}}
                                 <script>
-                                    
                                     $('#move_out_submit').on('submit', function(event) {
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {

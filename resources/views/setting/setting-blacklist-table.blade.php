@@ -10,6 +10,9 @@
                         ชื่อผู้เช่า
                     </th>
                     <th class="text-center">
+                        รายละเอียด
+                    </th>
+                    <th class="text-center">
                         เบอร์ติดต่อ
                     </th>
                     <th class="text-center">
@@ -31,6 +34,9 @@
                         </td>
                         <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#editModal" onclick="view({{ $row->id }})">
                             {{ $row->prefix.' '.$row->name.' '.$row->surname }}
+                        </td>
+                        <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#editModal" onclick="view({{ $row->id }})">
+                            {{ $row->blacklist_detail }}
                         </td>
                         <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#editModal" onclick="view({{ $row->id }})">
                             {{ $row->phone }}

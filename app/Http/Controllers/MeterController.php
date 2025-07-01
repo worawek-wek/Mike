@@ -577,7 +577,7 @@ class MeterController extends Controller
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
-        return redirect("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+        $writer->save("upload/export_excel/ข้อมูลมิเตอร์น้ำ-ไฟฟ้า".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลมิเตอร์น้ำ-ไฟฟ้า".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
     }
 }

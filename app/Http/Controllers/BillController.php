@@ -506,7 +506,7 @@ class BillController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
         
-        $results = RentBill::orderBy('rent_bills.id','DESC')
+        $results = RentBill::orderBy('rooms.name','asc')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
