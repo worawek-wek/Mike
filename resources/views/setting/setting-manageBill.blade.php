@@ -169,9 +169,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            {{-- <div class="text-center pt-4">
+                                            <div class="text-center pt-4">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
-                                            </div> --}}
+                                            </div>
 
                                             <div class="" hidden>
                                             <hr class="border-light my-4">
