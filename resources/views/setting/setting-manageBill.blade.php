@@ -173,9 +173,8 @@
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
                                             </div> --}}
 
-
+                                            <div class="" hidden>
                                             <hr class="border-light my-4">
-                                           <div class="" hidden>
                                             <h4 class="text-center">ตั้งค่าข้อความท้าย<span class="text-main">ใบแจ้งหนี้</span></h4>
                                             <div id="full-editor">{!!@$data->detail_footer!!}</div>
                                             <input type="hidden" name="detail_footer" id="detail_footer" value="{{@$data->detail_footer}}">
@@ -184,12 +183,14 @@
                                             {{-- <div class="text-center pt-4">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
                                             </div> --}}
-                                            <hr class="border-light my-4">
-                                            <h4 class="text-center">ตั้งค่ารูปแบบเอกสาร<span class="text-main">ใบเสร็จจองห้องพัก</span></h4>
-                                            <div id="full-editor1">{!!@$data->detail_doc!!}</div>
-                                            <input type="hidden" name="detail_doc" id="detail_doc" value="{{@$data->detail_doc}}">
-                                            <div class="text-center pt-4">
-                                                <button type="button" onclick="check_add();" class="btn btn-main">บันทึก</button>
+                                            <div class="" hidden>
+                                                <hr class="border-light my-4">
+                                                <h4 class="text-center">ตั้งค่ารูปแบบเอกสาร<span class="text-main">ใบเสร็จจองห้องพัก</span></h4>
+                                                <div id="full-editor1">{!!@$data->detail_doc!!}</div>
+                                                <input type="hidden" name="detail_doc" id="detail_doc" value="{{@$data->detail_doc}}">
+                                                <div class="text-center pt-4">
+                                                    <button type="button" onclick="check_add();" class="btn btn-main">บันทึก</button>
+                                                </div>
                                             </div>
                                         </form>
                                     </div>
