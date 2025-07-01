@@ -143,7 +143,7 @@
                                                                         </label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md mb-md-0 mb-5">
+                                                                {{-- <div class="col-md mb-md-0 mb-5">
                                                                     <div
                                                                         class="form-check custom-option custom-option-icon">
                                                                         <label
@@ -158,24 +158,28 @@
                                                                             <input class="form-check-input" type="radio" data-image="{{@$image2}}" value="1" id="customRadioIcon2" name="type_doc" @if(@$data->type_doc == 1) checked @endif>
                                                                         </label>
                                                                     </div>
-                                                                </div>
+                                                                </div> --}}
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 text-center">
+                                                        {{-- <div class="col-sm-6 text-center">
                                                             <div class="ratio ratio-1x1 bg-white rounded">
                                                                 <img id="previewImage" src="{{@$image_show}}" class="object-fit-contain border rounded" alt="...">
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                 </div>
                                             </div>
                                             {{-- <div class="text-center pt-4">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
                                             </div> --}}
+
+
                                             <hr class="border-light my-4">
+                                           <div class="" hidden>
                                             <h4 class="text-center">ตั้งค่าข้อความท้าย<span class="text-main">ใบแจ้งหนี้</span></h4>
                                             <div id="full-editor">{!!@$data->detail_footer!!}</div>
                                             <input type="hidden" name="detail_footer" id="detail_footer" value="{{@$data->detail_footer}}">
+                                           </div>
                                             
                                             {{-- <div class="text-center pt-4">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>

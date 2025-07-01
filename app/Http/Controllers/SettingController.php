@@ -122,7 +122,8 @@ class SettingController extends Controller
                 $data->phone  =  $request->phone;
                 $data->email  =  $request->email;
                 $data->type_doc  =  $request->type_doc;
-                $data->detail_footer  =  $request->detail_footer;
+                // $data->detail_footer  =  $request->detail_footer;
+                $data->detail_footer  =  null;
                 $data->detail_doc  =  $request->detail_doc;
                 if($data->save()){
                     DB::commit();
