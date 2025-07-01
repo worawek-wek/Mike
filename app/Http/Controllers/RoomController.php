@@ -111,6 +111,7 @@ class RoomController extends Controller
                 $query->where('ref_branch_id', session("branch_id"));
             })
             ->where('rooms.name',$keyword)
+            ->where('rooms.status',0)
             ->first();
         return response()->json([
             'found' => $room ? true : false
