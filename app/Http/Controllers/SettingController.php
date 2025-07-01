@@ -995,14 +995,20 @@ class SettingController extends Controller
     public function blacklist_delete($id)
     {
         try{
-            $update = Renter::find($id);
-            $update->blacklist_detail  =  null;
-            $update->blacklist_status  =  0;
-            $update->blacklist_date  =  null;
-            $update->save();
             
-            DB::commit();
-            return 1;
+            if(Auth::user()->user_has_branch->position->id == 1)
+            {
+                $update = Renter::find($id);
+                $update->blacklist_detail  =  null;
+                $update->blacklist_status  =  0;
+                $update->blacklist_date  =  null;
+                $update->save();
+                DB::commit();
+                return 1;
+
+            }else{
+                return 0;
+            }
         } catch (QueryException $err) {
             DB::rollBack();
         }
