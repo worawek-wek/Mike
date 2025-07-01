@@ -129,7 +129,7 @@
                                                         </button>
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
-                                                                class="btn btn-success buttons-collection  btn-info waves-effect waves-light"
+                                                                class="btn btn-primary buttons-collection  btn-info waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addserviceModal_2">
