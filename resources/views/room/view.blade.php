@@ -428,6 +428,16 @@
             url: "{{ $page_url }}/get-move-out/{{$room->id}}",
             success: function(data) {
                 $("#navs-pills-top-MoveOut").html(data);
+                
+                new TomSelect("#select-renter", {
+                    create: false,      // ไม่ให้พิมพ์เพิ่มเอง
+                    maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
+                    allowEmptyOption: true, // แสดง option แรกที่ไม่มีค่า (เช่น "-- กรุณาเลือก --")
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
             }
         });
     }

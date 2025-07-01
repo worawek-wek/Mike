@@ -75,27 +75,21 @@
                                                     เลือกรอบจดมิเตอร์
                                                 </h4>
                                             </div>
-                                            {{-- <div class="col-sm-12">
-                                                <ul class="nav nav-pills nav-fill " role="tablist">
-                                                    <li class="nav-item">
-                                                        <button type="button" class="nav-link active" role="tab"
-                                                        style="background-color: #d6f4f7;color: black;"
-                                                            data-bs-toggle="tab"
-                                                            data-bs-target="#navs-pills-top-home"
-                                                            aria-controls="navs-pills-top-home"
-                                                            aria-selected="true">มิเตอร์น้ำ</button>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <button type="button" class="nav-link" role="tab"
-                                                        style="background-color: #ffe2e3;color: black;"
-                                                            data-bs-toggle="tab"
-                                                            data-bs-target="#navs-pills-top-home"
-                                                            aria-controls="navs-pills-top-home"
-                                                            aria-selected="false">มิเตอร์ไฟ</button>
-                                                    </li>
-                                                </ul>
-                                            </div> --}}
                                             
+                                            <div class="col-sm-12 text-end">
+                                                    <button
+                                                        style="padding-right: 14px;padding-left: 14px;"
+                                                        class="btn btn-warning buttons-collection waves-effect waves-light me-2"
+                                                        tabindex="0" aria-controls="DataTables_Table_0"
+                                                        type="button" aria-haspopup="dialog"
+                                                        aria-expanded="false"
+                                                        onclick="all_export_excel()">
+                                                        <span>
+                                                            <i class="ti ti-upload"></i> 
+                                                            Excel ค่าน้ำ ค่าไฟฟ้า
+                                                        </span>
+                                                </button>
+                                            </div>
                                             <div class="col-sm-12" style="font-weight: 500;">
                                                 <ul class="nav nav-pills nav-fill " role="tablist">
                                                     <li class="nav-item pe-4">
@@ -191,7 +185,7 @@
                                                                     onclick="water_export_excel()">
                                                                     <span>
                                                                         <i class="ti ti-upload"></i> 
-                                                                        ดาวน์โหลด Excel
+                                                                        Excel ค่าน้ำ
                                                                     </span>
                                                             </button>
                                                         </div>
@@ -304,7 +298,7 @@
                                                                     onclick="electricity_export_excel()">
                                                                     <span>
                                                                         <i class="ti ti-upload"></i> 
-                                                                        ดาวน์โหลด Excel
+                                                                        Excel ค่าไฟฟ้า
                                                                     </span>
                                                             </button>
                                                         </div>
@@ -417,6 +411,12 @@
         // alert(page);
     }
     
+    function all_export_excel(){
+        var searchWaterData = {};
+        var fullUrl = '{{$page_url}}/all/export/excel';
+
+        window.open(fullUrl, '_blank');
+    }
     function water_export_excel(){
         var searchWaterData = {};
 

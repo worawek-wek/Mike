@@ -8,9 +8,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-
 <style>
 .no-data-box {
     background-color: #f8f9fa; /* สีเทาอ่อน */
@@ -43,7 +40,6 @@
                                     </tbody>
                                 </table>
                                 <div class="row">
-                                    
                                     <ul class="nav nav-pills nav-fill p-4" role="tablist">
                                         <li class="nav-item pe-4">
                                             <button type="button" class="nav-link btn-warning active" id="meter_water" role="tab"
@@ -69,9 +65,11 @@
                                     </ul>
 <script>
     function showMoveOut(){
+        $('#type_move_out').val(1);
         $('.showMoveOut').show();
     }
     function showEscapes(){
+        $('#type_move_out').val(2);
         $('.showMoveOut').hide();
     }
 </script>
@@ -607,32 +605,39 @@
                                 <div class="row g-2 pt-1">
                                     <div class="p-2">
                                         <label class="mb-1 text-black"><i class="ti ti-license text-main mb-1"></i> รายละเอียดหัวบิล</label>
-                                            <select name="ref_renter_id" id="select2RenterMove" onchange="get_room_rental_contract(this.value)" required>
+                                            <select name="ref_renter_id" id="select-renter" class="select-renter" onchange="get_room_rental_move_out(this.value)" required>
                                                 <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                                                 @foreach ($renter as $rent)
                                                     <option value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
                                                 @endforeach
                                             </select>
+                                            
+                                                {{-- <select id="select-renter" name="customer_id" placeholder="เลือกชื่อลูกค้า...">
+                                                    <option value="">-- กรุณาเลือก --</option>
+                                                    <option value="1">สมชาย ใจดี</option>
+                                                    <option value="2">สมหญิง ขยันมาก</option>
+                                                    <option value="3">วราวุธ เก่งจริง</option>
+                                                </select> --}}
                                     </div>
                                     <div class="col-sm-12">
-                                        <label for="exampleFormControlInput1" class="form-label">ชื่อผู้เข้าพัก</label>
-                                        <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="" />
+                                        <label for="renter_name" class="form-label">ชื่อผู้เข้าพัก</label>
+                                        <input type="text" name="name" class="form-control" id="renter_name" placeholder="" value="" />
                                     </div>
                                     <div class="col-sm-12">
-                                        <label for="exampleFormControlInput2" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-                                        <input type="text" name="homeland" class="form-control" id="exampleFormControlInput2" placeholder="" value="" />
+                                        <label for="renter_address" class="form-label">ที่อยู่ผู้เข้าพัก</label>
+                                        <input type="text" name="homeland" class="form-control" id="renter_address" placeholder="" value="" />
                                     </div>
                                     <div class="col-sm-12">
-                                        <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label>
-                                        <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="" />
+                                        <label for="renter_phone" class="form-label">เบอร์โทรผู้เข้าพัก</label>
+                                        <input type="text" name="phone" class="form-control" id="renter_phone" placeholder="" value="" />
                                     </div>
                                     <div class="col-sm-12">
-                                        <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
-                                        <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="" />
+                                        <label for="renter_id_card_number" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
+                                        <input type="text" name="id_card_number" class="form-control" id="renter_id_card_number" placeholder="" value="" />
                                     </div>
                                     <div class="col-sm-12">
-                                        <label for="" class="form-label">หมายเหตุ</label>
-                                        <textarea name="remark" class="form-control"></textarea>
+                                        <label for="renter_remark" class="form-label">หมายเหตุ</label>
+                                        <textarea name="remark" class="form-control" id="renter_remark"></textarea>
                                     </div>
                                 </div>
                                 
@@ -836,12 +841,14 @@
                                 {{-- /////////////////////////////// --}}
                                 <form id="move_out_submit">
                                     @csrf
+                                    <input type="hidden" id="type_move_out" name="type_move_out" value="1">
                                     <input type="hidden" name="id" value="{{ $room->id }}">
+                                    <input type="hidden" name="ref_renter_id" value="{{ $contract->ref_renter_id }}">
                                     <div class="modal-footer rounded-0 justify-content-start mb-0">
                                         {{-- <button type="button" class="btn btn-label-primary waves-effect text-black"><span
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
                                         </button> --}}
-                                        <button type="submit" class="btn btn-main waves-effect ms-auto" onclick="paymentChannel(1)">
+                                        <button type="submit" class="btn btn-main waves-effect ms-auto">
                                             บันทึกยอดเงินทั้งหมดแล้วย้ายออก
                                         </button>
                                     </div>

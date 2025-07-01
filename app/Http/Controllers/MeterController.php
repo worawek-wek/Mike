@@ -376,37 +376,21 @@ class MeterController extends Controller
                 'เดือน '.date('m/Y', strtotime($year.'-'.$month))
             ],
             [
-                "",
-                "",
-                "",
-                "",
-                // "",
-                // "",
-                // "",
-                "หน่วยที่ใช้"
-            ],
-            [
                 "ชั้น",
                 "ห้อง",
-                // "เลขมิเตอร์น้ำก่อนหน้า",
-                // "เลขมิเตอร์น้ำล่าสุด",
                 "เลขมิเตอร์ไฟฟ้าก่อนหน้า",
                 "เลขมิเตอร์ไฟฟ้าล่าสุด",
-                // "มิเตอร์น้ำ",
-                "มิเตอร์ไฟฟ้า"
+                "หน่วยที่ใช้"
             ]
         ];
         // return $data;
         foreach($results as $key=>$row){
             $data[] = [
-                        $row->floor_name,
-                        $row->room_name,
-                        // $row->meterPrevious->water_unit,
-                        // $row->water_unit,
-                        $row->meterPrevious->electricity_unit,
-                        $row->electricity_unit,
-                        // $row->meterPrevious->water_unit - $row->water_unit,
-                        $row->electricity_unit - $row->meterPrevious->electricity_unit,
+                        intval($row->floor_name),
+                        intval($row->room_name),
+                        intval($row->meterPrevious->electricity_unit),
+                        intval($row->electricity_unit),
+                        intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit),
             ];
         }
 
@@ -477,37 +461,109 @@ class MeterController extends Controller
                 'เดือน '.date('m/Y', strtotime($year.'-'.$month))
             ],
             [
-                "",
-                "",
-                "",
-                "",
-                // "",
-                // "",
-                // "",
-                "หน่วยที่ใช้"
+                "ชั้น",
+                "ห้อง",
+                "เลขมิเตอร์น้ำก่อนหน้า",
+                "เลขมิเตอร์น้ำล่าสุด",
+                "หน่วยที่ใช้",
+            ]
+        ];
+        // return $data;
+        foreach($results as $key=>$row){
+            $data[] = [
+                        intval($row->floor_name),
+                        intval($row->room_name),
+                        intval($row->meterPrevious->water_unit),
+                        intval($row->water_unit),
+                        intval($row->water_unit) - intval($row->meterPrevious->water_unit),
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+        return redirect("upload/export_excel/ข้อมูลมิเตอร์น้ำ".date('m-Y', strtotime($year.'-'.$month)).".xlsx");
+    }
+    public function allExportExcel(Request $request)
+    {
+        $month = date('m');
+        $year = date('Y');
+
+        if($request->month){
+            $month = explode('-', $request->month)[1];
+            $year = explode('-', $request->month)[0];
+        }
+
+        //////// หา เดือนก่อนหน้า
+        $year_month_previous = date('Y-m', strtotime($year.'-'.$month . ' -1 month'));
+        // dd($year_month_previous);
+        $month_previous = explode('-', $year_month_previous)[1];
+        $year_previous = explode('-', $year_month_previous)[0];
+        //////// หา เดือนก่อนหน้า จบ
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // ตัวอย่างข้อมูล
+        $results = Room::orderBy('rooms.name')
+                        ->leftJoin('meters', 'meters.ref_room_id', '=', 'rooms.id')
+                        ->leftJoin('floors', 'floors.id', '=', 'rooms.ref_floor_id')
+                        ->leftJoin('buildings', 'buildings.id', '=', 'floors.ref_building_id')
+                        ->Where('meters.month', $month)->Where('meters.year', $year)
+                        ->where('ref_branch_id',session("branch_id"))
+                        ->with([
+                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
+                            'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
+                            ])
+                        // ->WhereHas('room_for_rent', function ($query) {
+                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
+                        // })
+                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id')
+                        ->get();
+        $data = 
+        [
+            ['ข้อมูล มิเตอร์น้ำ'],
+            [
+                'เดือน '.date('m/Y', strtotime($year.'-'.$month))
             ],
             [
                 "ชั้น",
                 "ห้อง",
                 "เลขมิเตอร์น้ำก่อนหน้า",
                 "เลขมิเตอร์น้ำล่าสุด",
-                // "เลขมิเตอร์ไฟฟ้าก่อนหน้า",
-                // "เลขมิเตอร์ไฟฟ้าล่าสุด",
-                "มิเตอร์น้ำ",
-                // "มิเตอร์ไฟฟ้า"
+                "หน่วยที่ใช้",
+                "เลขมิเตอร์ไฟฟ้าก่อนหน้า",
+                "เลขมิเตอร์ไฟฟ้าล่าสุด",
+                "หน่วยที่ใช้"
             ]
         ];
         // return $data;
         foreach($results as $key=>$row){
+
+            $water_unit_used = "0";
+            $ele_unit_used = "0";
+            if(intval($row->water_unit) - intval($row->meterPrevious->water_unit) != 0){
+                $water_unit_used = intval($row->water_unit) - intval($row->meterPrevious->water_unit);
+            }
+            if(intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit) != 0){
+                $ele_unit_used = intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit);
+            }
+
             $data[] = [
                         $row->floor_name,
                         $row->room_name,
-                        $row->meterPrevious->water_unit,
-                        $row->water_unit,
-                        // $row->meterPrevious->electricity_unit,
-                        // $row->electricity_unit,
-                        $row->water_unit - $row->meterPrevious->water_unit,
-                        // $row->meterPrevious->electricity_unit - $row->electricity_unit,
+                        intval($row->meterPrevious->water_unit),
+                        intval($row->water_unit),
+                        $water_unit_used,
+                        intval($row->meterPrevious->electricity_unit),
+                        intval($row->electricity_unit),
+                        $ele_unit_used,
             ];
         }
 

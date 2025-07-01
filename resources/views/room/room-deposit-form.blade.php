@@ -151,7 +151,7 @@
 
             <div class="col-sm-11">
                 <input name="payment_channel" class="form-check-input me-1 deposit_payment_channel" type="radio" id="payByTransfer" value="2">
-                <label class="form-check-label" for="payByTransfer"> โอนเงิน 12 </label>
+                <label class="form-check-label" for="payByTransfer"> โอนเงิน </label>
             </div>
 
             <!-- แสดงเมื่อเลือก โอนเงิน -->

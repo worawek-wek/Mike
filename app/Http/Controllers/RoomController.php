@@ -216,6 +216,11 @@ class RoomController extends Controller
         $room = Room::find($id);
         $data['room'] = $room;
 
+        if($room->status == 2){
+            $contract = Contract::where('ref_room_id', $id)->orderBy('id','DESC')->first();
+            $data['contract'] = $contract;
+        }
+
         $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                                     ->where('room_for_rents.ref_room_id', $id)
                                                     ->select('room_for_rents.*','room_for_rents.id as room_for_rent_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
@@ -225,6 +230,7 @@ class RoomController extends Controller
         $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                                     ->where('room_for_rents.ref_room_id', $id)
                                     ->select('renters.*')
+                                    ->orderBy('room_for_rents.id',"DESC")
                                     ->get();
 
         $data['asset'] = Asset::with(['room_has_asset' => function ($query) use ($id) { // ดึงข้อมูล รายการทรัพย์สิน
@@ -460,6 +466,15 @@ class RoomController extends Controller
             $room = Room::find($request->id);
             $room->status = 0;
             $room->save();
+
+            if($request->type_move_out == 2){
+                    $up_renter = Renter::find($request->ref_renter_id);
+                    $up_renter->blacklist_detail  =  "ผู้เช่าหนี";
+                    $up_renter->blacklist_status  =  1;
+                    $up_renter->blacklist_date  =  Carbon::now();
+                    $up_renter->save();
+            }
+
             DB::commit();
             return true;
         } catch (QueryException $err) {
@@ -499,6 +514,16 @@ class RoomController extends Controller
         //                                         ->get();
 
         return view('room/room-rental-contract', $data);
+    }
+    public function get_room_rental_move_out($id)
+    {
+        $renter = Renter::find($id);
+
+        return response()->json([
+            'success' => true,
+            'renter' => $renter,
+            'renter_address' => $renter->fullThaiAddress()
+        ]);
     }
     //// ชำระค่าจองหลายห้อง
     public function get_room_rental_reservation($id)
@@ -1112,8 +1137,9 @@ class RoomController extends Controller
             DB::rollBack();
             return false;
         }
-        //
+        
     }
+    // จองห้อง
     public function store(Request $request)
     {
         $booking_date = Carbon::createFromFormat('d/m/Y', $request->booking_date)->format('Y-m-d');
@@ -1121,8 +1147,15 @@ class RoomController extends Controller
         $payment_received_date = Carbon::createFromFormat('d/m/Y', $request->date_stay)->format('Y-m-d');
         // return $request;
         try{
-            
-            // return $this->generateInvoiceCode();
+            // return 123;
+            $renter_blacklist = Renter::where('id_card_number', $request->id_card_number)->where('blacklist_status', 1)->first();
+            if ($renter_blacklist) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'บุคคลนี้ไม่สามารถ จอง ได้ เนื่องจากถูกขึ้นบัญชีดำ <br>'
+                ]);
+            }
+
             $renter = new Renter;
             $renter->prefix  =  $request->prefix;
             $renter->name  =  $request->name;
@@ -1160,14 +1193,6 @@ class RoomController extends Controller
                         return response()->json([
                             'status' => false,
                             'message' => 'ไม่สามารถจองห้องเหล่านี้ได้ <br>' . implode(', ', $vacant_room_all)
-                        ]);
-                    }
-                    
-                    $renter_blacklist = Renter::where('name', $request->name)->where('surname', $request->surname)->where('blacklist_status', 1)->first();
-                    if (!empty($renter_blacklist)) {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'บุคคลนี้ไม่สามารถ จอง ได้ เนื่องจากถูกขึ้นบัญชีดำ <br>' . implode(', ', $vacant_room_all)
                         ]);
                     }
                     

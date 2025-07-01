@@ -112,7 +112,9 @@
 
 {{-- <link rel="stylesheet" href="assets/vendor/libs/select2/select2.css" />
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-select/bootstrap-select.css" /> --}}
-
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<!-- ก่อน </body> -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
@@ -620,9 +622,6 @@
 
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
-    {{-- <script src="assets/vendor/libs/select2/select2.js"></script>
-    <script src="assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
-    <script src="assets/js/forms-selects.js"></script> --}}
     <script>
         
         var page = "{{$page_url}}/datatable";
@@ -697,9 +696,9 @@
                     $("#view").html(data);
                     // $('#select2District').select2('destroy');
 
-                    setTimeout(() => {
-                        new TomSelect('#select2RenterMove');
-                    }, 1000);
+                    // setTimeout(() => {
+                    //     new TomSelect('#select2RenterMove');
+                    // }, 1000);
                     $('#change_room').select2({
                         placeholder: 'ย้ายห้อง',
                         allowClear: true,
@@ -807,6 +806,18 @@
                 url: "{{ $page_url }}/get-room-rental-contract/"+id,
                 success: function(data) {
                     $("#room-rental-contract").html(data);
+                }
+            });
+        }
+        function get_room_rental_move_out(id){
+            $.ajax({
+                type: "GET",
+                url: "{{ $page_url }}/get-room-rental-move-out/"+id,
+                success: function(data) {
+                    $("#renter_name").val(data.renter.prefix+' '+data.renter.name+' '+data.renter.surname)
+                    $("#renter_address").val(data.renter_address)
+                    $("#renter_phone").val(data.renter.phone)
+                    $("#renter_id_card_number").val(data.renter.id_card_number)
                 }
             });
         }

@@ -374,6 +374,7 @@ class BillController extends Controller
                 DB::commit();
                 return true;
             }
+
             $insert = RentBill::whereIn('id', explode(',', $id));
             $insert->update(['ref_status_id' => $request->status]);
 

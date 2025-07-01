@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function() {
         Route::post('room/receipt/all', 'insert_receipt_all')->name('insert-receipt-all');    //////////////////////////
         Route::post('room/update_contract/{id}', 'update_contract')->name('update_contract');    //////////////////////////
         Route::get('room/get-room-rental-contract/{id}', 'get_room_rental_contract')->name('get_room_rental_contract');    //////////////////////////
+        Route::get('room/get-room-rental-move-out/{id}', 'get_room_rental_move_out')->name('get_room_rental_move_out');    //////////////////////////
         Route::get('room/get-room-rental-reservation/{id}', 'get_room_rental_reservation')->name('get_room_rental_reservation');    //////////////////////////
         Route::get('room/get-room-detail-contract/{id}', 'get_room_detail_contract')->name('get_room_detail_contract');    //////////////////////////
         Route::get('room/get-room-form-contract/{id}', 'get_room_form_contract')->name('get_room_form_contract');    //////////////////////////
@@ -245,6 +246,7 @@ Route::middleware('auth')->group(function() {
         Route::get('meter/electricity/datatable', 'electricity_datatable')->name('meter.electricity-datatable');    //////////////////////////
         Route::get('meter/electricity/export/excel', 'electricityExportExcel')->name('meter.electricity-export-excel');    //////////////////////////
         Route::get('meter/water/export/excel', 'waterExportExcel')->name('meter.water-export-excel');    //////////////////////////
+        Route::get('meter/all/export/excel', 'allExportExcel')->name('meter.all-export-excel');    //////////////////////////
     });
     Route::controller(RenterController::class)->group(function() {                   //////////////////////////
         Route::get('renter', 'index')->name('renter');    //////////////////////////

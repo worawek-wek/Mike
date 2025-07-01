@@ -21,17 +21,6 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<form id="payment_bill" enctype="multipart/form-data">
-    @csrf
-    
-    <input name="ref_room_id" type="hidden" value="{{ $contract->ref_room_id }}">
-    <input name="ref_rent_bill_id" type="hidden" value="{{ $invoice->id }}">
-    <input name="ref_contract_id" type="hidden" value="{{ $contract->id }}">
-    <input name="ref_renter_id" type="hidden" value="{{ $contract->ref_renter_id }}">
-    <input name="ref_type_id" type="hidden" value="1">
-    <input name="amount" class="total-price" type="hidden">
-
-    <input type="hidden" name="id" value="{{$invoice->id}}">
     <div class="modal-body pb-1">
         <div class="card shadow-none bg-transparent ms-auto mb-4">
             <ul class="nav nav-pills" role="tablist" style="">
@@ -119,13 +108,37 @@
                     </tr>
                 </tfoot>
             </table>
-            
-                        <div class="modal-footer rounded-0 justify-content-start mt-4">
-                            <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})"><span
-                                    class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button>
+                        
+                        <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
+                            <div>
+                                <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
+                                    <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
+                                </button>
+                            </div>
+                            <div>
+                                @if (count($invoice->receipt) == 0)
+                                    <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกบิล')">
+                                        <span>
+                                            <i class="ti-md ti ti-x"></i>
+                                            <b class="dam">ยกเลิกบิล</b>
+                                        </span>
+                                    </button>
+                                @endif
+                            </div>
                         </div>
           </div>
         </div>
+<form id="payment_bill" enctype="multipart/form-data">
+    @csrf
+    
+    <input name="ref_room_id" type="hidden" value="{{ $contract->ref_room_id }}">
+    <input name="ref_rent_bill_id" type="hidden" value="{{ $invoice->id }}">
+    <input name="ref_contract_id" type="hidden" value="{{ $contract->id }}">
+    <input name="ref_renter_id" type="hidden" value="{{ $contract->ref_renter_id }}">
+    <input name="ref_type_id" type="hidden" value="1">
+    <input name="amount" class="total-price" type="hidden">
+
+    <input type="hidden" name="id" value="{{$invoice->id}}">
         {{-- ////////////////////////////////////////////////// --}}
         <div class="tab-content" style="box-shadow: unset;padding:0px">
             <div class="tab-pane fade show" id="navs-pills-top-contract" role="tabpanel">
@@ -427,10 +440,8 @@
                 </div>
             </div>
         </div>
-        
+    </form>               
     </div>
-
-</form>               
 <script>
     
         $('#transfer_date').datepicker({
