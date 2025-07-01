@@ -105,7 +105,14 @@ class RoomController extends Controller
 
     public function reserve_form_check_user(Request $request){
         $keyword = $request->input('keyword');
-        $room = Room::where('name', $keyword)->first();
+        // $room = Room::where('name', $keyword)->first();
+        $room = Room::orderBy('rooms.ref_floor_id','ASC')
+            ->whereHas('floor.building', function ($query) {
+                $query->where('ref_branch_id', session("branch_id"));
+            })
+            ->where('rooms.name',$keyword)
+            ->where('rooms.status',0)
+            ->first();
         return response()->json([
             'found' => $room ? true : false
         ]);

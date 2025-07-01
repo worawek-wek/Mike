@@ -48,8 +48,9 @@
                             {{ date('d/m/Y', strtotime($row->blacklist_date)) }}
                         </td>
                         <td class="text-center">
-                            <a href="javascript:void(0);" class="card-reload text-danger" onclick="deleteBlacklist('{{ $row->id }}')"><i
-                                    class="tf-icons ti ti-trash ti-sm"></i></a>
+                            @if(Auth::user()->user_has_branch->position->id == 1)
+                            <a href="javascript:void(0);" class="card-reload text-danger" onclick="deleteBlacklist('{{ $row->id }}')"><i class="tf-icons ti ti-trash ti-sm"></i></a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

@@ -289,7 +289,8 @@
                                 if(response == true){
                                     loadData(page);
                                     Swal.fire('ลบบัญชีดำเรียบร้อยแล้ว', '', 'success');
-
+                                }else{
+                                    Swal.fire('ไม่สามารถลบบัญชีได้', '', 'error');
                                 }
                             },
                             error: function(error) {

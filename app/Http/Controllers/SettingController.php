@@ -995,14 +995,20 @@ class SettingController extends Controller
     public function blacklist_delete($id)
     {
         try{
-            $update = Renter::find($id);
-            $update->blacklist_detail  =  null;
-            $update->blacklist_status  =  0;
-            $update->blacklist_date  =  null;
-            $update->save();
             
-            DB::commit();
-            return 1;
+            if(Auth::user()->user_has_branch->position->id == 1)
+            {
+                $update = Renter::find($id);
+                $update->blacklist_detail  =  null;
+                $update->blacklist_status  =  0;
+                $update->blacklist_date  =  null;
+                $update->save();
+                DB::commit();
+                return 1;
+
+            }else{
+                return 0;
+            }
         } catch (QueryException $err) {
             DB::rollBack();
         }
@@ -1088,7 +1094,13 @@ class SettingController extends Controller
     public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร
     {
         try{
-            $user = User::where('email', $request->email)->first();
+            // $user = User::where('email', $request->email)->first();
+            $email_check = $request->email;
+            $user = User::where(function ($query) use ($email_check) {
+                $query->where('email', $email_check)
+                ->orWhere('phone', $email_check);
+            })
+            ->first();
             
             if(!$user){
                 return "ไม่พบบุคลากร";
