@@ -266,7 +266,12 @@ class UserController extends Controller
      {
         $data['page_url'] = 'user';
         $user_has_branch = UserHasBranch::where('ref_branch_id', session("branch_id"))->pluck('ref_user_id')->toArray();
-        $user = User::whereNotIn('id', $user_has_branch)->where('email', $email)->first();
+        $user = User::whereNotIn('id', $user_has_branch)
+                ->where(function ($query) use ($email) {
+                    $query->where('email', $email)
+                          ->orWhere('phone', $email);
+                })
+                ->first();
         if($user){
             return "ค้นพบบุคลากร : <span class='text-success'>$user->name</span>";
         }else{

@@ -190,8 +190,8 @@
                     <div class="modal-body">
                         <div class="row g-3 p-4">
                             <div class="col-sm-6">
-                                <label for="email" class="form-label">อีเมล (ค้นหาด้วย อีเมล)</label>
-                                <input id="email" name="email" type="email" class="form-control" placeholder="อีเมล" />
+                                <label for="email" class="form-label">ค้นหาด้วย อีเมลหรือเบอร์โทร</label>
+                                <input id="email" name="email" type="email" class="form-control" placeholder="กรอกอีเมลหรือเบอร์โทร" />
                             </div>
                             <div class="col-sm-6 d-flex align-items-end">
                                 <button type="button" class="btn btn-info" onclick="check_user()"><i class="ti ti-search me-2"></i> ค้นหา</button>
