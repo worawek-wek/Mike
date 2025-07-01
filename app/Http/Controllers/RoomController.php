@@ -102,6 +102,14 @@ class RoomController extends Controller
         
         return view('room/room-reserve-form', $data);
     }
+
+    public function reserve_form_check_user(Request $request){
+        $keyword = $request->input('keyword');
+        $room = Room::where('name', $keyword)->first();
+        return response()->json([
+            'found' => $room ? true : false
+        ]);
+    }
     public function show($id)
     {
         $data['page_url'] = 'room';

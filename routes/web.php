@@ -207,6 +207,8 @@ Route::middleware('auth')->group(function() {
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////
         Route::get('room/reserve', 'reserve_form')->name('reserve');    //////////////////////////
+        Route::post('room/reserve/chec-user', 'reserve_form_check_user')->name('reserve_form_check_user');    //////////////////////////
+        
         Route::get('room/get-deposit', 'get_deposit')->name('get-deposit');    //////////////////////////
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////

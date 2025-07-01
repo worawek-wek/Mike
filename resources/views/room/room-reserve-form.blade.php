@@ -1,3 +1,28 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+<style>
+    .bootstrap-tagsinput {
+      width: 100%;
+    }
+    .bootstrap-tagsinput .tag.invalid {
+      background-color: #dc3545 !important;
+      color: white;
+    }
+
+    .bootstrap-tagsinput .tag {
+    color: white !important; 
+    background-color: #007bff !important; 
+    padding: 5px;
+    border-radius: 4px;
+    margin-right: 2px;
+    }
+
+    .bootstrap-tagsinput .tag.invalid {
+    background-color: #dc3545 !important; /* สีแดง */
+    color: white !important;
+    }
+
+  </style>
 <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
                         <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);;">
                             <i class="tf-icons ti ti-user text-main" style="font-size: 25px;vertical-align: baseline;"></i>
@@ -98,7 +123,8 @@
                             </div>
                             <div></div>
                             <div class="col-sm-12" id="selectForm">
-                                <textarea name="room_text" class="form-control" id="room_text" placeholder="พิมพ์ชื่อห้อง ห้อง1, ห้อง2, ห้อง3" required></textarea>
+                                {{-- <textarea name="room_text" class="form-control user-tags" id="room_text" placeholder="พิมพ์ชื่อห้องและกด Enter" required></textarea> --}}
+                                <input name="room_text" class="form-control user-tags" data-role="tagsinput" id="room_text" placeholder="พิมพ์ชื่อห้องและกด Enter" required>
                             </div>
                             <div class="col-sm-7 selectForm2" style="display: none;">
                                 <label for="exampleFormControlInput14" class="form-label">เลือกห้อง</label>
@@ -370,4 +396,32 @@
                                 }
                             });
                         });
+
+                        $(document).ready(function() {
+                            $('.user-tags').on('itemAdded', function (event) {
+                                const value = event.item;
+                                $.ajax({
+                                url: 'room/reserve/chec-user',
+                                method: 'POST',
+                                data: {
+                                    keyword: value,
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (res) {
+                                    if (!res.found) {
+                                    let tags = $('.bootstrap-tagsinput span.tag');
+                                    tags.each(function () {
+                                        if ($(this).text().trim() === value) {
+                                        $(this).addClass('invalid');
+                                        }
+                                    });
+                                    }
+                                },
+                                error: function () {
+                                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+                                }
+                                });
+                            });
+                        });
+
                     </script>
