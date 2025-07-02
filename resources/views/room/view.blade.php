@@ -391,7 +391,7 @@
             }
         });
     }
-    function get_move_out(month){
+    function get_move_out(){
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-move-out/{{$room->id}}",

@@ -46,7 +46,8 @@
 <style>
     .table-detail {
         border-collapse: collapse; /* รวมเส้นขอบของตาราง */
-        /* border-radius: 10px; */
+        border-radius: 5px;
+        overflow: hidden;
     }
     .table-detail th, .table-detail td {
         border: 1px solid #d9d9d9 !important; /* กำหนดเส้นขอบของ th และ td */

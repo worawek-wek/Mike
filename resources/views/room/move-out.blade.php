@@ -722,6 +722,11 @@
                                         <span>
                                         <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
                                     </button> --}}
+                                    <style>
+                                        .bg-lob {
+                                            background-color: rgb(252 228 228);   
+                                        }
+                                    </style>
                                     <script>
                                         function calculate_2Price() {
                                             let total = 0;
@@ -745,10 +750,11 @@
                                         }
 
                                         function addRow(title = '', price = '', isDiscount = false, id_tr = "") {
-                                            const discountClass = isDiscount ? 'discount-value' : '';
+                                            const discountClass = isDiscount ? 'discount-value' : 'price_increase';
+                                            const trBackground = isDiscount ? 'bg-lob' : '';
 
                                             const html = `
-                                                <tr id="tr${id_tr}">
+                                                <tr id="tr${id_tr}" class='${trBackground}'>
                                                     <td>
                                                         <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
                                                     </td>
@@ -867,7 +873,7 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                                        <input name="payment_list[price][]" type="number" class="form-control calculate_3 add_expenses3_price" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                        <input name="payment_list[price][]" type="number" class="form-control calculate_3 add_expenses3_price price_increase" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                                                         <button type="button" class="btn btn-danger btn-sm remove-row3">ลบ</button>
                                                     </div>
                                                 </td>
@@ -1073,6 +1079,7 @@
                                                             // summary();
                                                             loadData(page);
                                                             Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+                                                            get_move_out()
                                                         }
                                                     },
                                                     error: function(error) {
