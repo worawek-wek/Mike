@@ -537,9 +537,10 @@
         if(title == ''){
             $('#tr'+id).remove();
         }else{
-            addRow(title, fine, id)
+            addRow(title, fine, true, id)
         }
         calculateTotal()
+        calculate_2Price();
     }
     document.querySelector('input[name="evidence_file"]').addEventListener('change', function(e) {
         const fileName = e.target.files[0]?.name;
@@ -612,7 +613,7 @@
                                                 <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ">
                                             </td>
                                             <td class="text-end">
-                                                <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                <input type="number" name="payment_list[price][]" class="form-control price_increase calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
                                             </td>
                                         </tr>
                                     </tbody>
@@ -664,13 +665,12 @@
                                             let total = 0;
 
                                             $('#discount-table2 tbody tr').each(function () {
-                                                const title = $(this).find('input[name="payment_list[title][]"]').val()?.trim() || '';
                                                 const priceInput = $(this).find('input[name="payment_list[price][]"]');
                                                 const price = parseFloat(priceInput.val());
 
                                                 if (!isNaN(price)) {
-                                                    if (title === 'ส่วนลด') {
-                                                        total -= price; // คิดเป็นลบ
+                                                    if (priceInput.hasClass('discount-value')) {
+                                                        total -= price;
                                                     } else {
                                                         total += price;
                                                     }
@@ -680,17 +680,18 @@
                                             $('.total-price_2').text(
                                                 total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                             );
-                                            calculateTotal()
                                         }
 
-                                        function addRow(title = '', price = '', id = '') {
+                                        function addRow(title = '', price = '', isDiscount = false, id_tr = "") {
+                                            const discountClass = isDiscount ? 'discount-value' : '';
+
                                             const html = `
-                                                <tr id="tr${id}">
+                                                <tr id="tr${id_tr}">
                                                     <td>
                                                         <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
                                                     </td>
                                                     <td class="text-end d-flex gap-1">
-                                                        <input type="number" name="payment_list[price][]" class="form-control price_increase calculate_2" value="${price}" placeholder="จำนวนเงิน">
+                                                        <input type="number" name="payment_list[price][]" class="form-control calculate_2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน">
                                                         <button type="button" class="btn btn-sm btn-danger btn-remove-row">
                                                             ลบ
                                                         </button>
@@ -700,11 +701,8 @@
                                             calculate_2Price();
                                         }
 
-                                        // เพิ่มรายการทั่วไป
+                                        $('#add_discount').click(() => addRow('ส่วนลด', '', true));
                                         $('#add_expenses').click(() => addRow());
-
-                                        // เพิ่มรายการส่วนลด
-                                        $('#add_discount').click(() => addRow('ส่วนลด', '0')); // จะคำนวณเป็น -100 โดยอัตโนมัติ
 
                                         // คำนวณเมื่อมีการพิมพ์ชื่อหรือจำนวน
                                         $(document).on('input', '.payment_list_title, .calculate_2', function () {
@@ -851,7 +849,6 @@
 
                                             // อัปเดตค่า total ใน span#total-price
                                             // document.getElementById('total-price').innerText = total.toLocaleString();
-                                            calculateTotal()
                                         }
                                 </script>
 
@@ -943,11 +940,17 @@
                                     calculateTotal()
                                     function calculateTotal() {
                                         let total = 0;
-                                        const inputs = document.querySelectorAll('.price_increase');
 
-                                        inputs.forEach(input => {
+                                        // รวบรวมค่าปกติ
+                                        document.querySelectorAll('.price_increase').forEach(input => {
                                             const value = parseFloat(input.value) || 0;
                                             total += value;
+                                        });
+
+                                        // ลบค่าที่เป็นส่วนลด
+                                        document.querySelectorAll('.discount-value').forEach(input => {
+                                            const value = parseFloat(input.value) || 0;
+                                            total -= value; // คิดเป็นลบเสมอ
                                         });
 
                                         const formatted = total.toLocaleString('th-TH', { minimumFractionDigits: 2 });
@@ -959,13 +962,16 @@
                                             // เปลี่ยนสีตามค่าบวกหรือลบ
                                             if (total < 0) {
                                                 amountText.style.color = 'red';
-                                            } else if (total >= 0) {
+                                            } else if (total > 0) {
                                                 amountText.style.color = '#28c76f';
                                             } else {
-                                                amountText.style.color = ''; // ค่าเป็น 0 กลับไปใช้ค่า default
+                                                amountText.style.color = ''; // default
                                             }
                                         }
                                     }
+                                    $(document).on('input', '.price_increase, .discount-value', function () {
+                                        calculateTotal();
+                                    });
                                 </script>
                                 <script>
                                     $('#payment_bill').on('submit', function(event) {
