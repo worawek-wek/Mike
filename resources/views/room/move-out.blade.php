@@ -1,13 +1,7 @@
 {{-- ////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก
-ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
 <style>
 .no-data-box {
     background-color: #f8f9fa; /* สีเทาอ่อน */
@@ -67,10 +61,12 @@
     function showMoveOut(){
         $('#type_move_out').val(1);
         $('.showMoveOut').show();
+        $('.label-move-out').css('background-color', '#54BAB9');
     }
     function showEscapes(){
         $('#type_move_out').val(2);
         $('.showMoveOut').hide();
+        $('.label-move-out').css('background-color', '#d34c4d');
     }
 </script>
                                     <div class="tab-content p-0">
@@ -85,7 +81,7 @@
                                 {{-- /////////////////////////////// --}}
                                 
                                 <label class="mb-0 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1" style="background-color: #54BAB9 !important;">1</span>
+                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">1</span>
                                     รายการบิล
                                 </label>
                                 @if (@$move_invoice_7)
@@ -427,31 +423,100 @@
                                     ยอดค้างชำระ {{ number_format($move_invoice_7->balance_amount) }}
                                 </div>
                             @else
-                                <div class="no-data-box">
-                                    ไม่มีข้อมูลบิลค้างชำระ
-                                </div>
+                                @if (@$receipt_1)
+                                {{-- @foreach ($receipt_1 as $key => $receipt) --}}
+                                    <div class="p-4 mt-4" style="border: 1px solid #59d57a;border-radius: 5px;">
+                                    <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt_1->receipt_number }}</span></p>
+                                        <table class="table table-detail table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <td width="50%">
+                                                        <span style="color: black; font-weight: 500;">รายละเอียดหัวบิล</span> <br>
+                                                        {{ $contract->full_name }} <br>
+                                                        เลขประจำตัวผู้เสียภาษี {{ $contract->id_card_number }} <br>
+                                                        โทร {{ $contract->phone }}
+                                                    </td>
+                                                    <td style="color: black;">
+                                                                @php
+                                                                    $date = new DateTime(date('Y-m-d', strtotime($receipt_1->created_at)));
+                                                                    $englishDay = $date->format('l');
+                                                                    
+                                                                @endphp
+                                                                    <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($receipt_1->created_at)) !!}<br>
+                                                                    <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; {{ $receipt_1->payment_channel == 1 ? "เงินสด": "โอนเงิน"; }}<br>
+                                                                    <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $receipt_1->user->name }}<br>
+                                                                    &nbsp;
+                                                    </td>
+                                                    
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <table class="table table-detail table-bordered mt-4">
+                                            <thead>
+                                                <tr>
+                                                    <th width="70%" style="vertical-align: middle;font-weight: 500;">รายการ</th>
+                                                    <th style="vertical-align: middle;font-weight: 500;">
+                                                        จำนวนเงิน (บาท)
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    $amount = 0;
+                                                @endphp
+                                                @foreach ($receipt_1->payment_list as $key => $item_payment_list)
+                                                <tr>
+                                                    <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                                        {{ $item_payment_list->title }}
+                                                        @if($item_payment_list->unit > 0 && $key == 1)    
+                                                            {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
+                                                        @endif
+                                                    </td>
+
+                                                        @if ($item_payment_list->discount == 1)
+                                                            @php
+                                                                $amount -= $item_payment_list->price;
+                                                            @endphp
+                                                            <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+
+                                                        @else
+                                                            @php    
+                                                            $amount += $item_payment_list->price;
+                                                            @endphp
+                                                            <td>{{ number_format($item_payment_list->price) }}</td>
+                                                        @endif
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>รวม</th>
+                                                    <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                                                    {{ number_format($amount) }}
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        {{--  --}}
+                                        <div class="modal-footer rounded-0 justify-content-start mt-2 pb-0">
+                                            <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{$receipt_1->id}})"><span
+                                                    class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="no-data-box">
+                                        ไม่มีข้อมูลบิลค้างชำระ
+                                    </div>
+                                @endif
                             @endif
 
                                 {{-- /////////////////////////////// --}}
 
                                 <label class="mt-4 mb-0 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1" style="background-color: #54BAB9 !important;">2</span>
+                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
                                     รายการทรัพย์สิน (รับห้อง)
                                 </label>
                                 <style>
-                                    .table-detail {
-                                        border-collapse: collapse; /* รวมเส้นขอบของตาราง */
-                                        /* border-radius: 10px; */
-                                    }
-                                    .table-detail th, .table-detail td {
-                                        border: 1px solid #d9d9d9 !important; /* กำหนดเส้นขอบของ th และ td */
-                                    }
-                                    .table-detail th {
-                                        vertical-align: middle;
-                                        font-weight: 500;
-                                        font-size: 14px;
-                                        color: black !important;
-                                    }
                                     .custom-file-upload {
                                         display: inline-block;
                                         cursor: pointer;
@@ -548,15 +613,12 @@
             alert("ไฟล์ที่เลือก: " + fileName);
         }
     });
-    // setTimeout(() => {
-    //     new TomSelect('#select2RenterMove');
-    // }, 1000);
 </script>
 
                                 {{-- /////////////////////////////// --}}
                                 
                                 <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1" style="background-color: #54BAB9 !important;">3</span>
+                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
                                     ใบเสร็จย้ายออก
                                 </label>
                                 <div class="row g-2 pt-1">
@@ -600,7 +662,7 @@
                                 <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
                                     รายการชำระเงิน
                                 </label>
-                                <table class="table table-bordered mt-2" id="discount-table2" >
+                                <table class="table table-bordered mt-2 table-detail" id="discount-table2" >
                                     <thead>
                                         <tr>
                                             <th>รายการ</th>
@@ -728,12 +790,12 @@
                                 {{-- /////////////////////////////// --}}
 
                                 <label class="my-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1" style="background-color: #54BAB9 !important;">3</span>
+                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
                                     เงินประกัน
                                 </label>
                                         @if (@$move_invoice_2->payment_list)
                                 
-                                        <table class="table table-bordered" id="discount-table3" >
+                                        <table class="table table-bordered table-detail" id="discount-table3" >
                                             <thead>
                                                 <tr>
                                                     <th>รายการ</th>

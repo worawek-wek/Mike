@@ -297,37 +297,6 @@
                             
                         </div>
                     </div>
-{{-- <script>
-    const selectMonth = document.getElementById("select2month");
-
-    const thaiMonths = [
-        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-    ];
-
-    const now = new Date();
-    let currentYear = now.getFullYear();
-    let currentMonth = now.getMonth(); // 0 = มกราคม
-
-    while (currentYear > 2025 || (currentYear === 2025 && currentMonth >= 0)) {
-        const value = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-        const text = `${thaiMonths[currentMonth]} ${currentYear}`;
-
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = text;
-
-        selectMonth.appendChild(option);
-
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-    }
-</script> --}}
-
-
 
 
 {{-- ////////////////////////////////////////////////////////////////////////////////////////////////////////

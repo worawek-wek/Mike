@@ -38,7 +38,7 @@
         </div>
         <div></div>
         @if (@$room->status != 2)
-        <table class="table table-bordered" id="discount-table">
+        <table class="table table-detail table-bordered" id="discount-table">
             <tbody>
                 <tr>
                     <td>ค่าเช่าห้อง (Room rate)</td>

@@ -230,7 +230,12 @@ class RoomController extends Controller
     {
         $room = Room::find($id);
         $data['room'] = $room;
-
+        if(in_array($room->status, [0,1])){
+            return '<div class="text-center mx-4 text-muted">
+                        <i class="ti ti-file-x" style="font-size: 60px;"></i>
+                        <h5 class="mt-2">ไม่พบข้อมูล</h5>
+                    </div>';
+        }
         if($room->status == 2){
             $contract = Contract::where('ref_room_id', $id)->orderBy('id','DESC')->first();
             $data['contract'] = $contract;
@@ -242,6 +247,8 @@ class RoomController extends Controller
                                                     ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
                                                     ->first();
 
+        $data['receipt_1'] = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->orderBy('id','DESC')->latest()->first();
+
         $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                                     ->where('room_for_rents.ref_room_id', $id)
                                     ->select('renters.*')
@@ -252,7 +259,7 @@ class RoomController extends Controller
                                         $query->where('ref_room_id', $id); // with โดยแค่อันที่ห้องนี้มี
                                     }])->whereIn('id',[1,2])->get();
 
-        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_contract = Contract::find(@$move_invoice_5->ref_contract_id);
@@ -265,6 +272,16 @@ class RoomController extends Controller
         
         $data['move_invoice_2'] = $move_invoice_2;
         $data['move_invoice_5'] = $move_invoice_5;
+
+        $data['days'] = [
+            'Sunday'    => 'อาทิตย์',
+            'Monday'    => 'จันทร์',
+            'Tuesday'   => 'อังคาร',
+            'Wednesday' => 'พุธ',
+            'Thursday'  => 'พฤหัสบดี',
+            'Friday'    => 'ศุกร์',
+            'Saturday'  => 'เสาร์',
+        ];
 
         return view('room/move-out', $data);
     }

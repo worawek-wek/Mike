@@ -109,23 +109,23 @@
                 </tfoot>
             </table>
                         
-                        <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
-                            <div>
-                                <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
-                                    <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
-                                </button>
-                            </div>
-                            <div>
-                                @if (count($invoice->receipt) == 0)
-                                    <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกบิล')">
-                                        <span>
-                                            <i class="ti-md ti ti-x"></i>
-                                            <b class="dam">ยกเลิกบิล</b>
-                                        </span>
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
+            <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
+                <div>
+                    <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
+                        <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
+                    </button>
+                </div>
+                <div>
+                    @if (count($invoice->receipt) == 0)
+                        <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกบิล')">
+                            <span>
+                                <i class="ti-md ti ti-x"></i>
+                                <b class="dam">ยกเลิกบิล</b>
+                            </span>
+                        </button>
+                    @endif
+                </div>
+            </div>
           </div>
         </div>
 <form id="payment_bill" enctype="multipart/form-data">

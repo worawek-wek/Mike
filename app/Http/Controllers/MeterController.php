@@ -518,12 +518,8 @@ class MeterController extends Controller
                         ->Where('meters.month', $month)->Where('meters.year', $year)
                         ->where('ref_branch_id',session("branch_id"))
                         ->with([
-                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
                             'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
                             ])
-                        // ->WhereHas('room_for_rent', function ($query) {
-                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
-                        // })
                         ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id')
                         ->get();
         $data = 

@@ -38,7 +38,7 @@
                                 </div>
                             </div>
                         </div>
-                        <table class="table border-dbdade" id="discount-table2">
+                        <table class="table table-detail border-dbdade" id="discount-table2">
                             <thead>
                                 <tr>
                                     <th>รายการ</th>

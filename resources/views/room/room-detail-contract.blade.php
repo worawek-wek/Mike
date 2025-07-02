@@ -192,38 +192,3 @@
         });
     }
 </script>
-        {{-- <table class="table table-detail table-bordered">
-            <thead>
-                <tr>
-                <th width="35%">วันที่รับเงินประกัน</th>
-                <th width="32.5%">เงินประกันทั้งหมด</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <td>พฤหัสบดี 27/06/2024</td>
-                <td>{{ number_format(@$contract->security_deposit) }} บาท</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <table class="table table-detail table-bordered mt-3" style="width: 65%;margin-right: 0;margin-left: auto;">
-            <thead>
-                <tr>
-                <th width="50%">รายการค่าประกัน</th>
-                <th>จำนวนเงิน (บาท)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <td>เงินประกันห้อง</td>
-                <td>{{ number_format(@$contract->security_deposit) }}</td>
-                </tr>
-                <tr>
-                <th>รวม</th>
-                <th class="text-success" style="color: rgba(var(--bs-success-rgb), var(--bs-text-opacity)) !important;">
-                    {{ number_format(@$contract->security_deposit) }}
-                </th>
-                </tr>
-            </tbody>
-        </table> --}}
