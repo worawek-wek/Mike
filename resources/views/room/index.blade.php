@@ -44,6 +44,19 @@
 </style>
 
 <style>
+    .table-detail {
+        border-collapse: collapse; /* รวมเส้นขอบของตาราง */
+        /* border-radius: 10px; */
+    }
+    .table-detail th, .table-detail td {
+        border: 1px solid #d9d9d9 !important; /* กำหนดเส้นขอบของ th และ td */
+    }
+    .table-detail th {
+        vertical-align: middle;
+        font-weight: 500;
+        font-size: 14px;
+        color: black !important;
+    }
     .new_box .col-md-6 {
         padding: 5px 12px;
     }
