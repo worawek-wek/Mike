@@ -203,7 +203,7 @@
                                         </div>
                                         <div class="col-md-3 mt-1" style="padding-right: unset !important;font-weight: 500;" align="right">
                                             <span style="font-size: 22px" class="me-2">
-                                            @php
+                                            {{-- @php
                                                 $months = [
                                                     'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
                                                     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
@@ -213,7 +213,7 @@
                                                 $year = date('Y');  // ปีปัจจุบัน
 
                                                 echo $months[$month_index] . " " . $year;
-                                            @endphp    
+                                            @endphp     --}}
                                             </span><span style="font-size: 16px"> ตั้งแต่</span>
                                         </div>
                                         <div class="col-md-2" style="padding-right: unset !important;">
@@ -368,7 +368,7 @@
                         </div> --}}
                         <div class="col-sm-12">
                             <label for="selectRoomIncome" class="form-label">รายรับของห้อง <span class="text-danger">*</span></label>
-                            <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" data-allow-clear="true">
+                            <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" onchange="get_room_rental(this.value)" data-allow-clear="true">
                                 @foreach ($room as $r)
                                         <option value="{{$r->id}}">{{$r->name}}</option>
                                 @endforeach
@@ -377,23 +377,23 @@
                         <b class="mt-4"><i class="tf-icons ti ti-calculator text-main ti-xl" style="margin-right: 10px;"></i>ใบเสร็จรับเงิน</b>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">ชื่อบริษัท/ชื่อลูกค้า</label>     
-                            <input class="form-control" name="name" type="text" id="formFile" placeholder="ชื่อบริษัท/ชื่อลูกค้า" />
+                            <input class="form-control" name="name" type="text" id="renter_name" placeholder="ชื่อบริษัท/ชื่อลูกค้า" />
                         </div>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">รายละเอียดที่อยู่</label>
-                            <input class="form-control" name="address" type="text" id="formFile" placeholder="รายละเอียดที่อยู่" />
+                            <input class="form-control" name="address" type="text" id="renter_address" placeholder="รายละเอียดที่อยู่" />
                         </div>
                         <div class="col-sm-6">
                             <label for="exampleFormControlInput1" class="form-label">เลขประจำตัวผู้เสียภาษี</label>
-                            <input class="form-control" name="id_card_number" type="text" id="formFile" placeholder="เลขประจำตัวผู้เสียภาษี" />
+                            <input class="form-control" name="id_card_number" type="text" id="renter_id_card_number" placeholder="เลขประจำตัวผู้เสียภาษี" />
                         </div>
                         <div class="col-sm-6">
                             <label for="exampleFormControlInput1" class="form-label">สำนักงาน/สาขาที่อยู่</label>
-                            <input class="form-control" name="branch" type="text" id="formFile" placeholder="สำนักงาน/สาขาที่อยู่" />
+                            <input class="form-control" name="branch" type="text" placeholder="สำนักงาน/สาขาที่อยู่" />
                         </div>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">หมายเลขโทรศัพท์</label>
-                            <input class="form-control" name="phone" type="text" id="formFile" placeholder="หมายเลขโทรศัพท์" />
+                            <input class="form-control" name="phone" type="text" id="renter_phone" placeholder="หมายเลขโทรศัพท์" />
                         </div>
                         <b class="mt-4"><i class="tf-icons ti ti-calculator text-main ti-xl" style="margin-right: 10px;"></i>รายการชำระเงิน</b>
                         <div class="col-sm-12">
@@ -406,7 +406,7 @@
                                 </thead>
                                 <tbody>
                                     <tr style="background-color: rgb(255, 240, 225);">
-                                        <td><input class="form-control" name="payment_sd_list[title][]" type="text" placeholder="หัวข้อส่วนลด"/></td>
+                                        <td><input class="form-control" name="payment_sd_list[title][]" type="text" placeholder="หัวข้อรายการ" required /></td>
                                         <td>
                                             <input class="form-control calculate" name="payment_sd_list[price][]"  oninput="calculatePrice()" type="number" placeholder="จำนวนเงิน"/>
                                             <input type="hidden" name="payment_sd_list[discount][]" value='0'>
@@ -508,6 +508,19 @@
                 url: "{{ $page_url }}/"+id,
                 success: function(data) {
                     $("#view").html(data);
+                }
+            });
+        }
+        get_room_rental("{{$room[0]->id}}")
+        function get_room_rental(id){
+            $.ajax({
+                type: "GET",
+                url: "room/get-room-rental-move-out/"+id,
+                success: function(data) {
+                    $("#renter_name").val(data.renter.prefix+' '+data.renter.name+' '+data.renter.surname)
+                    $("#renter_address").val(data.renter_address)
+                    $("#renter_phone").val(data.renter.phone)
+                    $("#renter_id_card_number").val(data.renter.id_card_number)
                 }
             });
         }

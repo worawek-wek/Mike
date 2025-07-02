@@ -1,3 +1,8 @@
+<style>
+    .no-pointer {
+        cursor: default !important;
+    }
+</style>
 <div class="col-sm-6 col-lg-4" style="padding: 0 15px;">
     <div class="card card-border-shadow-info">
         <div class="card-body">

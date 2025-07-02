@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
+use App\Models\IncomeExpenses;
 use App\Models\User;
 use App\Models\Contract;
 use App\Models\Receipt;
@@ -203,6 +204,7 @@ class BillController extends Controller
             $receipt->ref_user_id =  Auth::id();
             $receipt->save();
             
+            
             $total = Room::find($request->ref_room_id)->rent;
 
             if($request->payment_format == 1){
@@ -274,56 +276,24 @@ class BillController extends Controller
 
             $rent_bill->save();
             
-            // $r_b = RentBill::find($request->ref_rent_bill_id);
-            // $r_b->ref_status_id =  5; //  5 = ชำระแล้ว
-            // $r_b->save();
-            
             if(@$file) $file->move($path, $image_name);
 
-            // if(@$request->add_expenses_title){
-            //     $expenses = new AdditionalCosts();
-            //     $expenses->title = $request->add_expenses_title;
-            //     $expenses->amount = $request->add_expenses_price;
-            //     $expenses->ref_rent_bill_id = $rent_bill->id;
-            //     $expenses->status = 1;
-            //     $expenses->save();
-            // }
-            // if(@$request->discount_title){
-            //     $update = new AdditionalCosts();
-            //     $update->title = $request->discount_title;
-            //     $update->amount = $request->discount_price;
-            //     $update->ref_rent_bill_id = $rent_bill->id;
-            //     $update->status = 2;
-            //     $update->save();
-            // }
-
-            // foreach($request->buildings as $key => $building){
-            //     $r_t_r = new RoomForRents;
-            //     $r_t_r->date_stay  =  $date_stay;
-            //     $r_t_r->ref_room_id  =  $room;
-            //     $r_t_r->ref_floor_id  =  $key_2;
-            //     $r_t_r->ref_building_id  =  $key;
-            //     $r_t_r->ref_branch_id  =  $key;
-            //     $r_t_r->ref_renter_id  =  $insert->id;
-            //     $r_t_r->ref_user_id  =  1;
-            //     $r_t_r->deposit  =  $request->deposit;
-            //     $r_t_r->payment_method  =  $request->payment_method;
-            //     $r_t_r->payment_received_date  =  $payment_received_date;
-            //     $r_t_r->save();
-                
-            //     $r_b = new RentBill;
-            //     $r_b->ref_room_for_rent_id  =  $r_t_r->id;
-            //     $r_b->month  =  date('m')-1;
-            //     $r_b->year  =  date('Y');
-            //     $r_b->electricity_unit  =  300;
-            //     $r_b->electricity_amount  =  105;
-            //     $r_b->water_unit  =  200;
-            //     $r_b->water_amount  =  106;
-            //     $r_b->invoice_number =  $this->generateInvoiceCode();
-            //     $r_b->ref_status_id =  1;
-            //     $r_b->save();
-            // }
-
+            $expenses = new IncomeExpenses;
+            $expenses->type  =  1;
+            $expenses->label  =  "ใบเสร็จค่าเช่าห้อง";
+            $expenses->amount  =  0;
+            $expenses->date  =  Carbon::now();
+            $expenses->ref_room_id  =  $request->ref_room_id;
+            $expenses->ref_category_id  =  0;
+            $expenses->name  =  $receipt->room->renter_name;
+            $expenses->address  =  $receipt->room->renter_address;
+            $expenses->id_card_number  =  $receipt->room->renter_id_card_number;
+            $expenses->branch  =  0;
+            $expenses->phone  =  $receipt->room->renter_phone;
+            $expenses->remark  =  0;
+            $expenses->ref_user_id  =  Auth::id();
+            $expenses->ref_branch_id  =  session("branch_id");
+            $expenses->save();
             
             DB::commit();
             return true;

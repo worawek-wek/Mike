@@ -90,12 +90,12 @@
                 <tr style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance"
                     onclick="view({{ $row->id }})">
                     <td class="text-center">{{ date('d/m/Y', strtotime($row->date)) }}</td>
-                    <td class="text-center">-</td>
+                    <td class="text-center">{{ $row->receipt->receipt_number ?? '-' }}</td>
                     <td class="text-center">{{ $row->label }}</td>
-                    <td class="text-center">{{ $row->room->name }}</td>
-                    <td class="text-center">{{ $row->category->name }}</td>
+                    <td class="text-center">{{ $row->room->name ?? "รายจ่ายของ Office" }}</td>
+                    <td class="text-center">{{ @$row->category->name }}</td>
                     @if ($row->type == 1)
-                        <td class="text-center text-success">{{ number_format($row->amount, 2) }}</td>
+                        <td class="text-center text-success">{{ number_format($row->receipt->total_amount ?? $row->total_amount, 2) }}</td>
                     @else
                         <td class="text-center text-danger">-{{ number_format($row->amount, 2) }}</td>
                     @endif

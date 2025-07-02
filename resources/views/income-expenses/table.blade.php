@@ -31,7 +31,7 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
     <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
         <td class="text-center">{{ date('d/m/Y', strtotime($row->date)) }}</td>
         {{-- <td class="text-center">RC202404000121</td> --}}
-        <td class="text-center">-</td>
+        <td class="text-center">{{ $row->receipt->receipt_number ?? '-' }}</td>
         <td class="text-center">{{ $row->label }}</td>
         <td class="text-center">{{ $row->room->name ?? "รายจ่ายของ Office" }}</td>
         {{-- <td class="text-center">{{ $row->category->name }}</td> --}}
@@ -44,7 +44,7 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         @if ($row->type == 2)
             {{ number_format($row->amount, 2) }}</td>            
         @else
-            {{ number_format($row->total_amount, 2) }}</td>            
+            {{ number_format($row->receipt->total_amount ?? $row->total_amount, 2) }}</td>            
         @endif
         <td class="text-center">{{ $row->user->name }}</td>
     </tr>

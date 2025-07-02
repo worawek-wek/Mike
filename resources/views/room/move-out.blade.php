@@ -194,7 +194,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <table class="table table-bordered" id="discount-table2" >
+                                                                <table class="table table-detail table-bordered" id="discount-table2" >
                                                                     <thead>
                                                                         <tr>
                                                                             <th>รายการ</th>
@@ -675,7 +675,7 @@
                                                 <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ">
                                             </td>
                                             <td class="text-end">
-                                                <input type="number" name="payment_list[price][]" class="form-control price_increase calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                <input type="number" name="payment_list[price][]" class="form-control discount-value calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
                                             </td>
                                         </tr>
                                     </tbody>
@@ -737,9 +737,9 @@
 
                                                 if (!isNaN(price)) {
                                                     if (priceInput.hasClass('discount-value')) {
-                                                        total -= price;
-                                                    } else {
                                                         total += price;
+                                                    } else {
+                                                        total -= price;
                                                     }
                                                 }
                                             });
@@ -750,7 +750,7 @@
                                         }
 
                                         function addRow(title = '', price = '', isDiscount = false, id_tr = "") {
-                                            const discountClass = isDiscount ? 'discount-value' : 'price_increase';
+                                            const discountClass = isDiscount ? 'price_increase' : 'discount-value';
                                             const trBackground = isDiscount ? 'bg-lob' : '';
 
                                             const html = `
@@ -789,9 +789,6 @@
                                         // เรียกใช้ตอนโหลด
                                         calculate_2Price();
                                     </script>
-
-
-
 
                                 {{-- /////////////////////////////// --}}
 
@@ -932,7 +929,7 @@
                                         <tr class="text-start">
                                             <th>วันที่ย้ายออก</th>
                                             <th style="color: red !important;">
-                                                25/06/2024
+                                                {{ date('d/m/Y') }}
                                             </th>
                                         </tr>
                                         </thead>

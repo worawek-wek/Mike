@@ -28,14 +28,34 @@ class IncomeExpenses extends Model
     {
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
     }
+    public function receipt()
+    {
+        return $this->hasOne('App\Models\Receipt', 'id', 'ref_receipt_id');
+    }
     public function payment_list()
     {
         return $this->hasMany('App\Models\IncomeList', 'ref_payment_id', 'id');
     }
+    // ความสัมพันธ์ใหม่ (จาก ref_payment_id => ref_receipt_id)
+    public function receipt_payment_list()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'ref_receipt_id');
+    }
+    // ✅ ใช้ตัวนี้เป็นค่า default
     public function getTotalAmountAttribute()
     {
+        $lists = $this->payment_list;
 
-        $lists = $this->payment_list; // ใช้ attribute ที่ถูกโหลดแล้ว
+        $total = $lists->where('discount', 0)->sum('price');
+        $discount = $lists->where('discount', 1)->sum('price');
+
+        return $total - $discount;
+    }
+
+    // ✅ หากคุณยังอยากดึงยอดรวมจาก payment_list แบบเก่า
+    public function getTotalFromPaymentList()
+    {
+        $lists = $this->receipt_payment_list;
 
         $total = $lists->where('discount', 0)->sum('price');
         $discount = $lists->where('discount', 1)->sum('price');

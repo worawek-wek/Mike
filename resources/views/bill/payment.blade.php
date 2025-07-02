@@ -211,15 +211,22 @@
                                                 </table>
                                                 
                                                 <div align="right">
-                                                    <button
-                                                            id="add_expenses2"
+                                                    <button id="add_discount2"
+                                                            style="padding-right: 14px;padding-left: 14px;"
+                                                            class="btn btn-sm buttons-collection btn-label-danger waves-effect waves-light me-2 mt-2"
+                                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                                            type="button" aria-haspopup="dialog"
+                                                            aria-expanded="false">
+                                                        <i class="ti ti-plus"></i> เพิ่มส่วนลด
+                                                    </button>
+
+                                                    <button id="add_expenses2"
                                                             style="padding-right: 14px;padding-left: 14px;"
                                                             class="btn btn-sm buttons-collection btn-label-warning waves-effect waves-light me-2 mt-2"
                                                             tabindex="0" aria-controls="DataTables_Table_0"
                                                             type="button" aria-haspopup="dialog"
                                                             aria-expanded="false">
-                                                        <span>
-                                                        <i class="ti ti-plus"></i> เพิ่มรายการ</span>
+                                                        <i class="ti ti-plus"></i> เพิ่มรายการ
                                                     </button>
                                                 </div>
                                                 <div class="col-sm-11 mt-3 mb-3">
@@ -228,7 +235,6 @@
                                                 </div>
                                                 
                                                 <script>
-                                                    
                                                 document.getElementById('add_expenses2').addEventListener('click', function() {
                                                     const tableBody = document.querySelector('#discount-table2 tbody');
                                                     const newRow = document.createElement('tr');
@@ -245,6 +251,26 @@
                                                         </td>
                                                     `;
                                                     
+                                                    tableBody.appendChild(newRow);
+                                                    addRemoveEvent_2(newRow);
+                                                });
+                                                document.getElementById('add_discount2').addEventListener('click', function() {
+                                                    const tableBody = document.querySelector('#discount-table2 tbody');
+                                                    const newRow = document.createElement('tr');
+                                                    newRow.style.backgroundColor = '#ffe0e0'; // สีแดงอ่อนสำหรับส่วนลด
+
+                                                    newRow.innerHTML = `
+                                                        <td>
+                                                            <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="ส่วนลด" value="ส่วนลด" required />
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_2 discount_price_2" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                                <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
+                                                            </div>
+                                                        </td>
+                                                    `;
+
                                                     tableBody.appendChild(newRow);
                                                     addRemoveEvent_2(newRow);
                                                 });

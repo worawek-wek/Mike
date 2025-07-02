@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
+use App\Models\IncomeExpenses;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Receipt;
@@ -474,14 +475,35 @@ class RoomController extends Controller
                 $pay_list->save();
             }
 
-            $receipt = Receipt::where('ref_rent_bill_id', $request->ref_rent_bill_id)->get()->pluck('total_amount')->sum();
-            $invoice = RentBill::find($request->ref_rent_bill_id)->total_amount;
-            if($invoice == $receipt){
+            $receipt_total_amount = Receipt::where('ref_rent_bill_id', $request->ref_rent_bill_id)->get()->pluck('total_amount')->sum();
+            $invoice_total_amount = RentBill::find($request->ref_rent_bill_id)->total_amount;
+            if($invoice_total_amount == $receipt_total_amount){
                 $r_b = RentBill::find($request->ref_rent_bill_id);
                 $r_b->ref_status_id =  5; //  5 = ชำระแล้ว
                 $r_b->save();
             }
-            
+            $expenses = new IncomeExpenses;
+            $expenses->type  =  1;
+            if($request->ref_type_id == 2){
+                $expenses->label  =  "ใบเสร็จค่าประกันห้อง";
+            }else{
+                $expenses->label  =  "ใบเสร็จค่าจองห้อง";
+            }
+            $expenses->amount  =  0;
+            $expenses->date  =  Carbon::now();
+            $expenses->ref_room_id  =  $request->ref_room_id;
+            $expenses->ref_category_id  =  0;
+            $expenses->name  =  $receipt->room->renter_name;
+            $expenses->address  =  $receipt->room->renter_address;
+            $expenses->id_card_number  =  $receipt->room->renter_id_card_number;
+            $expenses->branch  =  0;
+            $expenses->phone  =  $receipt->room->renter_phone;
+            $expenses->remark  =  0;
+            $expenses->ref_user_id  =  Auth::id();
+            $expenses->ref_receipt_id  =  $receipt->id;
+            $expenses->ref_branch_id  =  session("branch_id");
+            $expenses->save();
+
             if(@$file) $file->move($path, $image_name);
 
             DB::commit();
@@ -969,7 +991,7 @@ class RoomController extends Controller
                 
 
                 $pay_list = new PaymentList; // สร้างรายการ ค่าน้ำ
-                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน 4/2025 ( 0 - ";  // เดือน 5/2025
+                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน ".(date('m')-1)." ( 0 - ";  // เดือน 5/2025
                 $pay_list->unit  =  15;
                 $pay_list->price  =  360;
                 $pay_list->ref_payment_id  =  $r_b_room->id;
@@ -977,7 +999,7 @@ class RoomController extends Controller
                 $pay_list->save();
 
                 $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
-                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน 4/2025 ( 358-456 = 98 ยูนิต)";
+                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน ".(date('m')-1)." ( 358-456 = 98 ยูนิต)";
                 $pay_list->unit  =  456;
                 $pay_list->price  =  105;
                 $pay_list->ref_payment_id  =  $r_b_room->id;

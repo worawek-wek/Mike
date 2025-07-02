@@ -43,7 +43,8 @@ class IncomeExpensesController extends Controller
     }
     public function datatable(Request $request)
     {
-        $results = IncomeExpenses::orderBy('id','DESC');
+        $results = IncomeExpenses::orderBy('id','DESC')
+                                    ->where('ref_branch_id', session("branch_id"));
         
         if(@$request->search){
             $results = $results->Where(function ($query) use ($request) {
@@ -104,6 +105,7 @@ class IncomeExpensesController extends Controller
             $expenses->branch  =  $request->branch;
             $expenses->phone  =  $request->phone;
             $expenses->remark  =  $request->remark;
+            $expenses->ref_branch_id  =  session("branch_id");
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // return $request->file('proof_of_payment');
@@ -129,7 +131,7 @@ class IncomeExpensesController extends Controller
                 $expenses->payment_voucher = $payment_voucher;
             }
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            $expenses->ref_user_id  =  1;
+            $expenses->ref_user_id  =  Auth::id();
             $expenses->save();
             
             if(@$request->payment_sd_list['title']){
@@ -161,7 +163,10 @@ class IncomeExpensesController extends Controller
     }
     public function summary_IE()
     {
-        $income = IncomeExpenses::where('type', 1)->sum('amount');
+        $income = IncomeExpenses::with('payment_list')->where('type', 1)->get()->sum('total_amount') + IncomeExpenses::with('payment_list')->get()
+                                                                                                                    ->sum(function ($item) {
+                                                                                                                        return $item->getTotalFromPaymentList();
+                                                                                                                    });
         $expenses = IncomeExpenses::where('type', 2)->sum('amount');
         $data['income'] = $income;
         $data['expenses'] = $expenses;
