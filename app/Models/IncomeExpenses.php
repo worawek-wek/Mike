@@ -28,6 +28,10 @@ class IncomeExpenses extends Model
     {
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
     }
+    public function branch()
+    {
+        return $this->hasOne('App\Models\Branch', 'id', 'ref_branch_id');
+    }
     public function receipt()
     {
         return $this->hasOne('App\Models\Receipt', 'id', 'ref_receipt_id');

@@ -746,8 +746,18 @@
             window.open('{{$page_url}}/export/excel?' + queryString, '_blank');
         }
         function printPdfBill() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // สร้าง query string
+            const queryString = new URLSearchParams(searchData).toString();
+
             $.ajax({
-                url: '/pdf/income-expenses-all/1',
+                url: '/pdf/income-expenses-all/1?' + queryString,
                 type: 'GET',
                 success: function(html) {
                     const iframe = document.getElementById('print-iframe');

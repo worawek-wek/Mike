@@ -46,11 +46,8 @@
 </head>
 
 <body>
-    @php 
-    $name_room = "หอพักคร เจริญใจ"
-    @endphp
-    <div class="header-title">{{@$name_room}}</div>
-    <div class="header-title">รายรับ-รายจ่าย เดือน มิถุนายน/2025 (01/06/2025 - 30/06/2025)</div>
+    <div class="header-title">{{@$name_branch}}</div>
+    <div class="header-title">รายรับ-รายจ่าย เดือน {{ $month_to }}</div>
 
     <!-- ตารางสรุป -->
     <table class="summary-table" style="margin-bottom: 10px;">

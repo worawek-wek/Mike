@@ -1198,6 +1198,41 @@ class SettingController extends Controller
             DB::rollBack();
         }
     }
+    public function upload_qr_code(Request $request)
+    {
+            
+        try{
+
+            $r_h_a = Building::find($request->id);
+            $lastImage = $r_h_a->qr_code;
+            if($request->file('qr_code')){
+                // return 123;
+                $file = $request->file('qr_code');
+                $nameExtension = $file->getClientOriginalName();
+                $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+                $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+                $path = "upload/qr-code/";
+                $image_name = $img_name.rand().'.'.$extension;
+
+                $r_h_a->qr_code = $image_name;
+
+            }
+            
+            $r_h_a->save();
+
+            DB::commit();
+            
+            if(@$file) {
+                @unlink("$path/$lastImage");
+                $file->move($path, $image_name);
+            }
+
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+            
+    }
     public function change_position(Request $request, $user_has_branch_id)
     {
         try{

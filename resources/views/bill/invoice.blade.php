@@ -82,8 +82,8 @@
 </div>
 
 <div class="modal-footer rounded-0 justify-content-start">
-    {{-- <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $invoice->id }})"><span
-            class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
+    <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $invoice->id }})"><span
+            class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button>
             
     {{-- <button type="button" class="btn btn-label-secondary waves-effect"><span
         class="ti-md ti ti-pencil"></span></button> --}}

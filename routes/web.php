@@ -122,6 +122,7 @@ Route::middleware('auth')->group(function() {
         ////////////////
         Route::get('setting/room-layout/building', 'room_layout_building')->name('setting.room_layout_building');    //////////////////////////
         Route::post('setting/room-layout/building', 'room_layout_building_insert')->name('setting.room_layout_building_insert');    //////////////////////////
+        Route::post('setting/room-layout/upload_qr_code', 'upload_qr_code')->name('setting.upload_qr_code');    //////////////////////////
         Route::delete('setting/room-layout/building/{id}', 'room_layout_building_delete')->name('setting.room_layout_building_delete');    //////////////////////////
         Route::get('setting/room-layout/floor/{building_id}', 'room_layout_floor')->name('setting.room_layout_floor');    //////////////////////////
         Route::post('setting/room-layout/floor', 'room_layout_floor_insert')->name('setting.room_layout_floor_insert');    //////////////////////////

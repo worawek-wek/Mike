@@ -1,4 +1,10 @@
-
+<style>
+    .preview-container img {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 4px;
+    }
+</style>
     <div class="accordion mt-3 accordion-bordered" id="accordionStyle1">
         @foreach ($building as $row)
             <div class="accordion-item card">
@@ -12,13 +18,33 @@
                         <span style="font-size: medium;font-weight: 430">{{ $row->name }}</span>
                     </span>
                     </button>
-              <div id="accordionStyle{{ $row->id }}-1" class="accordion-collapse collapse" data-bs-parent="#accordionStyle1">
-                <div class="accordion-body">
+                <div id="accordionStyle{{ $row->id }}-1" class="accordion-collapse collapse" data-bs-parent="#accordionStyle1">
+                    <div class="accordion-body">
+                    <form class="upload_qr_code" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="{{ $row->id }}">
+                        @csrf
+                        <div class="col-sm-3 mt-3 d-flex flex-column align-items-center">
+                            <label for="qr_code{{ $row->id }}" class="align-self-start">QR Code</label>
+                            <input name="qr_code" type="file" class="form-control mb-2" id="qr_code{{ $row->id }}">
+                            
+                            <div class="preview-container mb-2 text-center">
+                                <img id="preview{{ $row->id }}" src="upload/qr-code/{{ $row->qr_code }}" alt="Preview" style="
+                                @if($row->qr_code == '')
+                                    display: none;
+                                @endif
+                                    width:100%; max-width:150px;">
+                            </div>
+
+                            <button type="submit" class="btn btn-sm btn-light-main">
+                                <i class="ti ti-plus me-1"></i> อัพโหลด
+                            </button>
+                        </div>
+                    </form>
                     <div class="text-end">
                         <button type="button" class="btn btn-danger" onclick="deleteBuilding('{{ $row->id }}')">
                             <i class="ti-xs ti ti-minus me-2"></i>ลบตึก</button>
                     </div>
-                    <form class="insert_floor">
+                    <form class="">
                         @csrf
                         <input name="ref_building_id" type="hidden" value="{{ $row->id }}" required />
                         <div class="addFloor py-3">
@@ -44,6 +70,7 @@
                 </div>
               </div>
             @endforeach
+            
         </div>
     <script>
         var building = 0;
@@ -58,6 +85,31 @@
             });
             // alert(page);
         }
+        "@foreach ($building as $row)"
+            handleFileInput('qr_code{{$row->id}}', 'preview{{$row->id}}');
+        "@endforeach"
+        function handleFileInput(fileInputId, previewId) {
+            const fileInput = document.getElementById(fileInputId);
+            const previewImage = document.getElementById(previewId);
+
+            fileInput.addEventListener('change', function () {
+                const file = fileInput.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';  // แสดงภาพพรีวิว
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.style.display = 'none'; // ซ่อนพรีวิวถ้าไม่ได้เลือกไฟล์
+                }
+            });
+        }
+    
         function deleteFloor(idFloor, idBuilding){
                 building = idBuilding;
                 Swal.fire({
@@ -143,6 +195,48 @@
                 }
             });
         });
+        $('.upload_qr_code').on('submit', function (event) {
+            event.preventDefault();
+
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการบันทึกการเปลี่ยนแปลง หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                didOpen: () => {
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData(this); // ใช้ this เพื่ออ้างถึงฟอร์มปัจจุบัน
+
+                    $.ajax({
+                        url: '/setting/room-layout/upload_qr_code', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response == true) {
+                                Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+                                get_move_out(); // หรือฟังก์ชันอื่นที่คุณใช้
+                            }
+                        },
+                        error: function (error) {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', error);
+                        }
+                    });
+                }
+            });
+        });
         
         function deleteBuilding(idBuilding){
                 Swal.fire({
@@ -181,5 +275,5 @@
                         // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
                     }
                 });
-        }
+            }
     </script>

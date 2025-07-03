@@ -119,9 +119,47 @@ class PDFController extends Controller
 
         return view('pdf/invoice-all', $data);
     }
-    public function income_expenses_all($invoice_id)
+    public function income_expenses_all(Request $request, $invoice_id)
     {
-        $results = IncomeExpenses::orderBy('id','DESC')->get();                
+        $results = IncomeExpenses::where('ref_branch_id', session("branch_id"))->orderBy('id','DESC');
+        
+        if(@$request->from_month){
+            $to_month = 2000-01;
+            if(@$request->to_month){
+                $to_month = $request->to_month;
+            }
+            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$request->from_month, $to_month]);
+        }
+
+        $results = $results->get(); 
+        
+        $thaiMonths = [
+            'January' => 'มกราคม',
+            'February' => 'กุมภาพันธ์',
+            'March' => 'มีนาคม',
+            'April' => 'เมษายน',
+            'May' => 'พฤษภาคม',
+            'June' => 'มิถุนายน',
+            'July' => 'กรกฎาคม',
+            'August' => 'สิงหาคม',
+            'September' => 'กันยายน',
+            'October' => 'ตุลาคม',
+            'November' => 'พฤศจิกายน',
+            'December' => 'ธันวาคม',
+        ];
+
+        // ถ้าไม่มีค่า ให้กำหนด default
+        $fromMonth = $request->from_month ?? '2025-01';
+        $toMonth = $request->to_month ?? date('Y-m'); // default เป็นเดือนปัจจุบัน
+
+        $from = Carbon::createFromFormat('Y-m', $fromMonth);
+        $to = Carbon::createFromFormat('Y-m', $toMonth);
+
+        $fromText = $thaiMonths[$from->format('F')] . '/' . $from->format('Y');
+        $toText = $thaiMonths[$to->format('F')] . '/' . $to->format('Y');
+
+        $data['month_to'] = "$fromText - $toText";
+        $data['name_branch'] = Branch::find(session("branch_id"))->name;
         $data['list_data'] = $results;
         return view('pdf/income-expenses-all', $data);
     }

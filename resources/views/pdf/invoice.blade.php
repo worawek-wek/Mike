@@ -202,16 +202,24 @@
                 </td>
             </tr>
         </table>
-        <div class="note">หมายเหตุ(Note) </div>
-        <div class="signature">
-            <div class="signature-line">
-                <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
-            </div>
-            <div class="signature-line">
-                <span>( ................................................. )</span>
-            </div>
-        </div>
-
+        <table>
+            <tr>
+                <td width="150px" style="padding-top: 5px;">
+                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
+                </td>
+                <td width="80%" style="padding: 0px 40px;">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
         @if(count($invoice->payment_list) < 4)
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
@@ -279,15 +287,24 @@
                 </td>
             </tr>
         </table>
-        <div class="note">หมายเหตุ (Note):</div>
-        <div class="signature">
-            <div class="signature-line">
-                <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
-            </div>
-            <div class="signature-line">
-                <span>( ................................................. )</span>
-            </div>
-        </div>
+        <table>
+            <tr>
+                <td width="150px" style="padding-top: 5px;">
+                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
+                </td>
+                <td width="80%" style="padding: 0px 40px;">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

@@ -602,7 +602,7 @@
         if(title == ''){
             $('#tr'+id).remove();
         }else{
-            addRow(title, fine, true, id)
+            addRow(title, fine, false, id)
         }
         calculateTotal()
         calculate_2Price();

@@ -163,11 +163,11 @@ class IncomeExpensesController extends Controller
     }
     public function summary_IE()
     {
-        $income = IncomeExpenses::with('payment_list')->where('type', 1)->get()->sum('total_amount') + IncomeExpenses::with('payment_list')->get()
-                                                                                                                    ->sum(function ($item) {
-                                                                                                                        return $item->getTotalFromPaymentList();
-                                                                                                                    });
-        $expenses = IncomeExpenses::where('type', 2)->sum('amount');
+        $income = IncomeExpenses::with('payment_list')->where('ref_branch_id', session("branch_id"))->where('type', 1)->get()->sum('total_amount') + IncomeExpenses::with('receipt_payment_list')->where('ref_branch_id', session("branch_id"))->where('type', 1)->get()
+                                                                                                                                                                        ->sum(function ($item) {
+                                                                                                                                                                            return $item->getTotalFromPaymentList();
+                                                                                                                                                                        });
+        $expenses = IncomeExpenses::where('type', 2)->where('ref_branch_id', session("branch_id"))->sum('amount');
         $data['income'] = $income;
         $data['expenses'] = $expenses;
         $data['total'] = $income-$expenses;
@@ -181,7 +181,7 @@ class IncomeExpensesController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         
-        $results = IncomeExpenses::orderBy('id','DESC');
+        $results = IncomeExpenses::where('ref_branch_id', session("branch_id"))->orderBy('id','DESC');
         
         if(@$request->search){
             $results = $results->Where(function ($query) use ($request) {
