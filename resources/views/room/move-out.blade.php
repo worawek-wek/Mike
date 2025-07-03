@@ -887,7 +887,6 @@
                                             });
                                         }
                                         calculate_3Price();
-
                                         function calculate_3Price() { 
                                             const inputs = document.querySelectorAll('.calculate_3');  // เลือกทุก input ที่มี class="calculate"
                                             let total = 0;
@@ -911,7 +910,6 @@
                                             });
                                             $('.total-price_3').html(total.toLocaleString());
                                             $('.total-price_3').val(total);
-
                                             // อัปเดตค่า total ใน span#total-price
                                             // document.getElementById('total-price').innerText = total.toLocaleString();
                                         }
@@ -922,7 +920,7 @@
                                     <span class="badge bg-label-success text-black mt-5" style="width: 100%;font-size: larger;">
                                         สรุปการย้ายออก
                                     </span>
-                                    <h4 class="mt-2 amount">เงินจากการหักเงินประกัน 0 บาท</h4>
+                                    <h4 class="my-4 amount">เงินจากการหักเงินประกัน 0 บาท</h4>
                                     
                                     <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
                                         <thead>
@@ -959,7 +957,10 @@
                                             this.reportValidity();
                                             return console.log('ฟอร์มไม่ถูกต้อง');
                                         }
-                                        // return alert(123);
+                                        if(total_amount < 0){
+                                            return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
+                                        }
+                                        return alert(456);
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
                                             text: 'คุณต้องการ ย้ายออก หรือไม่?',
@@ -1002,6 +1003,7 @@
                                             }
                                         });
                                     });
+                                    var total_amount = 0;
                                     calculateTotal()
                                     function calculateTotal() {
                                         let total = 0;
@@ -1017,22 +1019,26 @@
                                             const value = parseFloat(input.value) || 0;
                                             total -= value; // คิดเป็นลบเสมอ
                                         });
-
+                                        
                                         const formatted = total.toLocaleString('th-TH', { minimumFractionDigits: 2 });
                                         const amountText = document.querySelector('.amount');
 
                                         if (amountText) {
-                                            amountText.textContent = `ยอดเงินประกันคืนผู้เช่า ${formatted} บาท`;
 
                                             // เปลี่ยนสีตามค่าบวกหรือลบ
                                             if (total < 0) {
-                                                amountText.style.color = 'red';
-                                            } else if (total > 0) {
+                                                total = total*(-1);
+                                                const formatted = total.toLocaleString('th-TH', { minimumFractionDigits: 2 });
                                                 amountText.style.color = '#28c76f';
+                                                amountText.textContent = `เก็บเงินผู้เช่าเพิ่ม ${formatted} บาท`;
+                                            } else if (total > 0) {
+                                                amountText.style.color = 'red';
+                                                amountText.textContent = `ยอดเงินประกันคืนผู้เช่า ${formatted} บาท`;
                                             } else {
                                                 amountText.style.color = ''; // default
                                             }
                                         }
+                                        total_amount = total;
                                     }
                                     $(document).on('input', '.price_increase, .discount-value', function () {
                                         calculateTotal();

@@ -66,7 +66,7 @@ class PDFController extends Controller
     public function invoice_many($invoice_id)
     {
         
-        $invoice = RentBill::find(53);
+        $invoice = RentBill::first();
         $data['invoice'] = $invoice;
         $data['branch'] = Branch::find(session("branch_id"));
         $data['renter'] = Renter::find($invoice->room_for_rent->ref_renter_id);

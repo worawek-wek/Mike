@@ -100,6 +100,7 @@ Route::middleware('auth')->group(function() {
         Route::post('user/insert_user_has_branch', 'insert_user_has_branch')->name('user.insert-user-has-branch');    //////////////////////////
         Route::post('user/insert_user_to_branch', 'insert_user_to_branch')->name('user.insert-user-has-branch');    //////////////////////////
         Route::post('user/change-position/{user_has_branch_id}', 'change_position')->name('user.insert-user-has-branch');    //////////////////////////
+        Route::post('user/{user_id}', 'update_user')->name('user.update-user');    //////////////////////////
         Route::delete('setting/user/{id}', 'delete_user_in_branch')->name('registration.delete-user-in-branch');    //////////////////////////
         Route::post('setting/fine/update/{id}', 'fine_update')->name('setting.fine-update');    //////////////////////////
 
@@ -269,7 +270,7 @@ Route::middleware('auth')->group(function() {
         Route::get('user/datatable', 'datatable')->name('user.datatable');    //////////////////////////
         Route::get('user/check-user/{email}', 'check_user')->name('user.check-user');    //////////////////////////
         Route::get('user/{id}', 'edit')->name('user');    //////////////////////////
-        Route::post('user/{id}', 'update')->name('user.update');    //////////////////////////
+        // Route::post('user/{id}', 'update')->name('user.update');    //////////////////////////
         Route::get('user/export/excel', 'exportExcel')->name('pdf.userPdf'); 
     });
     Route::controller(AuditController::class)->group(function() {                   //////////////////////////

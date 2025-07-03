@@ -1167,6 +1167,37 @@ class SettingController extends Controller
             DB::rollBack();
         }
     }
+    public function update_user(Request $request, $id)
+    {
+        
+        try{
+
+            $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
+
+            $user = User::find($id);
+            $user->name  =  $request->name;
+            $user->username  =  $request->username;
+            $user->salary  =  preg_replace('/\D/', '', $request->salary);
+            $user->phone  =  $request->phone;
+            $user->email  =  $request->email;
+            $user->work_start_date  =  $work_start_date;
+            $user->ref_position_id  =  $request->ref_position_id;
+            $user->remark  =  $request->remark;
+            if(!empty($request->password)){
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+            
+            $uhb = UserHasBranch::where('ref_user_id',$id)->first();
+            $uhb->ref_position_id  =  $request->ref_position_id;
+            $uhb->save();
+
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+    }
     public function change_position(Request $request, $user_has_branch_id)
     {
         try{

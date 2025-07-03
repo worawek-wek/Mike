@@ -45,7 +45,7 @@
                                             <i class="ti ti-check text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">สถานะ:</span> <span class="text-success">พนักงาน</span>
                                             </li>
                                             <li class="d-flex align-items-center mb-3">
-                                            <i class="ti ti-crown text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">ตำแหน่ง:</span> <span>{{ $user->position->position_name }}</span>
+                                            <i class="ti ti-crown text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">ตำแหน่ง:</span> <span>{{ $user->user_has_branch->position->position_name }}</span>
                                             </li>
                                             <li class="d-flex align-items-center mb-3">
                                             <i class="ti ti-flag text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">เงินเดือน:</span> <span>{{ $user->salary }}</span>
@@ -171,28 +171,7 @@
                     </div>
                     </div>
                 </div>
-                {{-- <button
-                        style="padding-right: 14px;padding-left: 14px;"
-                        class="btn btn-success buttons-collection btn-label-warning waves-effect waves-light me-2"
-                        tabindex="0" aria-controls="DataTables_Table_0"
-                        type="button" aria-haspopup="dialog"
-                        aria-expanded="false">
-                        <span>
-                            <i class="ti ti-upload"></i> 
-                            ดาวน์โหลด Excel
-                        </span>
-                </button> --}}
-                
         </div>
-        
-        {{-- <div class="col-sm-12">
-            <div class="card shadow-none bg-transparent border mb-3">
-                <div class="card-body">
-                  <h5 class="card-title">Secondary card title</h5>
-                  <p class="card-text">Some quick example text to build on the card title and make up.</p>
-                </div>
-              </div>
-        </div> --}}
     </div>
 </div>
 </div>

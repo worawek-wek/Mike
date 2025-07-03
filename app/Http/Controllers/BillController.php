@@ -390,7 +390,7 @@ class BillController extends Controller
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent')
+                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent', 'renters.phone')
                                 ->get();
         $branch = Branch::find(session("branch_id"));
         $data = 
@@ -441,18 +441,16 @@ class BillController extends Controller
                         0,
                         0,
                         number_format($row->total_amount),
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
-                        $row->rent,
+                        0,
+                        0,
+                        $row->water_unit,
+                        0,
+                        $row->electricity_unit,
+                        $row->renter_name,
+                        @$row->room_for_rent->renter->fullThaiAddress(),
+                        $row->id_card_number,
+                        "",
+                        $row->phone
                         
             ];
         }

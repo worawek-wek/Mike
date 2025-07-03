@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Room;
 use App\Models\RoomForRents;
 use App\Models\RentBill;
+use App\Models\Receipt;
 use App\Models\Renter;
 use App\Models\Contract;
 
@@ -18,11 +19,19 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function summary($branch_id)
     {
-        $confirm_by_employee = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->where('rent_bills.ref_status_id', 2)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
+        $confirm_by_employee = Receipt::with('payment_list')
+                                        ->whereHas('invoice', function ($q) {
+                                            $q->where('ref_status_id', 2);
+                                        })
+                                        ->where('ref_type_id', 1)
+                                        ->get()
+                                        ->sum(function ($receipt) {
+                                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                                        });
 
-        $confirm_by_ceo = RentBill::with('payment_list')->where('ref_status_id', 5)->where('ref_type_id', 1)->get()->sum('total_amount');
+        $confirm_by_ceo = Receipt::with('payment_list')->whereHas('invoice', function ($q) {
+                                            $q->where('ref_status_id', 5);
+                                        })->where('ref_type_id', 1)->get()->sum('total_amount');
 
         $confirm_by_ceo_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
                                                 ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])->where('ref_status_id', 5)
@@ -33,14 +42,28 @@ class Controller extends BaseController
                                                 ->where('ref_type_id', 1)->get()->sum('total_amount');
                             // ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                             // ->where('rent_bills.ref_status_id', 5)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
-
-        $cash = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->where('rent_bills.ref_status_id', 2)->where('rent_bills.payment_channel', 1)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
         
-        $transfer = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->where('rent_bills.ref_status_id', 2)->where('rent_bills.payment_channel', 2)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
+        $cash = Receipt::with('payment_list')
+                        ->whereHas('invoice', function ($q) {
+                            $q->where('ref_status_id', 2)
+                                ->where('payment_channel', 1);
+                        })
+                        ->where('ref_type_id', 1)
+                        ->get()
+                        ->sum(function ($receipt) {
+                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                        });
+        
+        $transfer = Receipt::with('payment_list')
+                            ->whereHas('invoice', function ($q) {
+                                $q->where('ref_status_id', 2)
+                                    ->where('payment_channel', 2);
+                            })
+                            ->where('ref_type_id', 1)
+                            ->get()
+                            ->sum(function ($receipt) {
+                                return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                            });
 
         $all_renter = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                             ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
