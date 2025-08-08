@@ -99,6 +99,9 @@
 
                                             </div>
                                         {{-- </form> --}}
+                                            <div id="QRCode">
+
+                                            </div>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +130,7 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
-        
+
         loadData();
         
         function loadData(){
@@ -141,6 +144,20 @@
             });
             // alert(page);
         }
+
+        QRCode();
+        function QRCode(){
+            // alert(page);
+            $.ajax({
+                type: "GET",
+                url: "/setting/room-layout/qr-code",
+                success: function(data) {
+                    $("#QRCode").html(data);
+                }
+            });
+            // alert(page);
+        }
+
         $('#inser_building').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
             if(!this.checkValidity()) {
@@ -185,6 +202,7 @@
                 }
             });
         });
+        
         
     </script>
 </body>

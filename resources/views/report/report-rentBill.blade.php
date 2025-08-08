@@ -63,7 +63,7 @@
                                                                     <i class="ti ti-check ti-26px"></i>
                                                                 </span>
                                                             </div>
-                                                            <h3 class="mb-0 me-2 text-success">504,861 บาท</h3>
+                                                            <h3 class="mb-0 me-2 text-success" id="paid">0 บาท</h3>
                                                         </div>
                                                         <div class="card-title mb-0">
                                                             <p class="mb-0">ชำระแล้ว</p>
@@ -81,7 +81,7 @@
                                                                     <i class="ti ti-x ti-26px"></i>
                                                                 </span>
                                                             </div>
-                                                            <h3 class="mb-0 me-2 text-danger">416,140 บาท</h3>
+                                                            <h3 class="mb-0 me-2 text-danger" id="overdue">0 บาท</h3>
                                                         </div>
                                                         <div class="card-title mb-0">
                                                             <p class="mb-0">ยอดค้างชำระ</p>
@@ -100,7 +100,7 @@
                                                             data-series="72" data-progress_variant="true"></div>
                                                         <div class="me-2">
                                                             <h6 class="mb-1">เงินสดรอคอนเฟิร์ม</h6>
-                                                            <small>419,868</small>
+                                                            <small id="cash_waiting_for_confirmation">0</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -110,7 +110,7 @@
                                                             data-series="48" data-progress_variant="true"></div>
                                                         <div class="me-2">
                                                             <h6 class="mb-1">เงินสดคอนเฟิร์มแล้ว</h6>
-                                                            <small>44,388</small>
+                                                            <small id="cash_onfirmed">0</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -120,7 +120,7 @@
                                                             data-series="15" data-progress_variant="true"></div>
                                                         <div class="me-2">
                                                             <h6 class="mb-1">ผ่านการโอนเงิน </h6>
-                                                            <small>40,605 บาท</small>
+                                                            <small id="transfer">0 บาท</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -140,8 +140,8 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select name="DataTables_Table_0_length"
-                                                                aria-controls="DataTables_Table_0" class="form-select">
+                                                            <select name="limit" name="DataTables_Table_0_length" onchange='loadData("{{$page_url}}/datatable")'
+                                                                aria-controls="DataTables_Table_0" class="form-select p_search">
                                                                 <option value="7">7</option>
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
@@ -158,7 +158,7 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input type="month" name="month" class="form-control p_search" onchange='loadData("{{$page_url}}/datatable")' value="{{ date('Y-m') }}">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
 
@@ -187,332 +187,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table class="datatables-products table dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
-                                                <thead class="border-top">
-                                                    <tr class="text-center table-info">
-                                                        <th class="control  dtr-hidden" rowspan="1"
-                                                            colspan="1" style="width: 0px; display: none;"
-                                                            aria-label=""></th>
-                                                        <th class="text-center" style="padding: 0 50px;">
-                                                            ห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ชื่อผู้เช่า
-                                                        </th>
-                                                        <th class="text-center" style="width: 57px;">
-                                                            เลขที่ใบเสร็จ
-                                                        </th>
-                                                        <th class="text-center" style="width: 150px;">
-                                                            วันที่รับชำระ
-                                                        </th>
-                                                        <th class="text-nowrap text-center">
-                                                            ช่องทาง
-                                                        </th>
-                                                        <th class="text-nowrap text-center">
-                                                            รับชำระโดย
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวม
-                                                        </th>
-                                                        <th class="text-center" style="width: 100px;">
-                                                            ค่าห้องเช่า
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าน้ำ
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าไฟ
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าที่จอด <br> รถยนต์
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าที่จอด <br> รถมอเตอร์ไซค์
-                                                        </th>
-                                                        <th class="text-nowrap text-center">
-                                                            ส่วนกลาง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวม
-                                                        </th>
-                                                        <th class="text-center">
-                                                            สถานะ
-                                                        </th>
-                                                        <!-- <th class="sorting_disabled" rowspan="1" colspan="1"
-                                                            style="width: 87px;" aria-label="Actions">จัดการ</th> -->
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="odd table-success" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td style="padding: 0 45px;"><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td style="padding: 0 32px;"><span>4,000</span></td>
-                                                        <td style="padding: 0 62px;"><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-success"
-                                                                text-capitalized="">ชำระแล้ว</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="even table-success" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-success"
-                                                                text-capitalized="">ชำระแล้ว</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="odd table-success" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-success"
-                                                                text-capitalized="">ชำระแล้ว</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="even table-warning" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-warning"
-                                                                text-capitalized="">รอชำระ</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="odd table-success" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-success"
-                                                                text-capitalized="">แบ่งชำระ</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="even table-danger" align="center">
-                                                        <td class="control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td><span>RC202405000109</span></td>
-                                                        <td style="padding: 0 22px;"><span>25/04/2022</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span>4,000</span></td>
-                                                        <td><span>105</span></td>
-                                                        <td><span>2,023</span></td>
-                                                        <td><span>3,450</span></td>
-                                                        <td><span class="badge bg-label-danger"
-                                                                text-capitalized="">ค้างชำระ</span></td>
-                                                        <!-- <td>
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            <div id="loadData">
+
                                             </div>
                                             <div style="width: 1%;"></div>
                                         </div>
@@ -542,6 +218,57 @@
     </div>
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    <script>
+        var page = "{{$page_url}}/datatable";
+        var searchData = {};
+        loadData(page);
+        
+        function loadData(pages){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
+
+            // alert(page);
+            page = pages;
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    $("#loadData").html(data);
+                    summary();
+                }
+            });
+            // alert(page);
+        }
+        summary();
+        function summary(){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "{{ $page_url }}/summary",
+                data: searchData,
+                success: function(data) {
+                    $('#paid').html(data.paid);
+                    $('#overdue').html(data.overdue);
+                    $('#cash_waiting_for_confirmation').html(data.cash_waiting_for_confirmation);
+                    $('#cash_onfirmed').html(data.cash_onfirmed);
+                    $('#transfer').html(data.transfer);
+                }
+            });
+        }
+    </script>
     <script src="assets/js/app-academy-dashboard.js"></script>
 
 </body>

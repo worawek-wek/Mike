@@ -24,9 +24,17 @@ class Room extends Model
     {
         return $this->hasOne('App\Models\StatusRoom', 'id', 'status');
     }
+    public function contract()
+    {
+        return $this->hasOne('App\Models\Contract', 'ref_room_id', 'id');
+    }
     public function room_for_rent()
     {
         return $this->hasOne('App\Models\RoomForRents', 'ref_room_id', 'id')->where('status', 0);
+    }
+    public function room_for_rent_s()
+    {
+        return $this->hasMany('App\Models\RoomForRents', 'ref_room_id', 'id');
     }
     // public function room_has_asset()
     // {

@@ -2,199 +2,307 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-<div class="modal fade modalHeadDecor" id="addRenter" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content rounded-0">
-            <div class="modal-header rounded-0">
-                <h5 class="modal-title" id="exampleModalLabel1">เพิ่มผู้เช่าห้อง</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-                <form id="insert_renterAddRenter">
-                    @csrf
-            <div class="modal-body">
-                <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
-                    <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);;">
-                        <i class="tf-icons ti ti-user text-main" style="font-size: 25px;vertical-align: baseline;"></i>
-                        ข้อมูลส่วนตัว
-                    </h5>
-                    <div class="row g-3 p-4 pt-1">
-                        <div class="col-sm-2">
-                            <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
-                            <select name="prefix" class="form-select" id="exampleFormControlSelect1"
-                                aria-label="Default select example">
-                                <option value="บริษัท" selected>บริษัท</option>
-                                <option value="นาย">นาย</option>
-                                <option value="นางสาว">นางสาว</option>
-                                <option value="นาง">นาง</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-5">
-                            <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label>
-                            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="วรเวก"/>
-                        </div>
-                        <div class="col-sm-5">
-                            <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
-                            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="ชึรัมย์" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label>
-                            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="0987776543"/>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label>
-                            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="1234567890123"/>
-                        </div>
-                        <div class="col-sm-12">
-                            <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
-                            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="12/34"/>
-                        </div>
-                        <div class="col-sm-4">
-                            <label>เลือกจังหวัด</label>
-                            <select name="ref_province_id" id="select2BasicAddRenter" class="select2 form-select form-select-lg" required>
-                                <option selected disabled hidden value="">เลือกจังหวัด</option>
-                                @foreach ($province as $pro)
-                                    <option value="{{ $pro->id }}" @if ($pro->id == 2) selected @endif>{{ $pro->name_in_thai }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label>เลือกอำเภอ</label>
-                            <select name="ref_district_id" id="select2DistrictAddRenter" class="select2 form-select form-select-lg" required>
-                                <option selected disabled hidden value="">เลือกอำเภอ</option>
-                                @foreach ($district as $dis)
-                                    <option value="{{ $dis->id }}" @if ($dis->id == 53) selected @endif>{{ $dis->name_in_thai }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label>เลือกตำบล</label>
-                            <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter" class="select2 form-select form-select-lg" required>
-                                <option selected disabled hidden value="">เลือกตำบล</option>
-                                @foreach ($subdistrict as $sub_dis)
-                                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == 176) selected @endif>{{ $sub_dis->name_in_thai }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="10540" />
-                        </div>
-                        <div class="col-sm-12">
-                            <label for="bs-datepicker-format" class="form-label">วันเดือนปีเกิดผู้จอง</label>
-                            <input type="text" name="birthdate" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" required value="24/04/2025"/>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label>
-                            <input type="text" name="booking_date" value="24/04/2025" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" required value="24/04/2025"/>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="exampleFormControlInput12" class="form-label">ช่องทางการจอง</label>
-                            <input type="text" name="booking_channel" class="form-control" id="exampleFormControlInput12" placeholder="ช่องทางการจอง" value="จองโดยตรงกับที่พัก" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
-                    <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
-                        <i class="tf-icons ti ti-device-ipad-dollar text-main" style="font-size: 25px;vertical-align: baseline;"></i>
-                        รายละเอียดการชำระเงิน
-                    </h5>
-                    <div class="row g-3 p-4 pt-1">
-                        <div class="col-sm-12">
-                            <label for="exampleFormControlInput30" class="form-label">ค่ามัดจำ (บาท)</label>
-                            <input type="text" name="deposit" class="form-control" id="exampleFormControlInput30" placeholder="" value="2000"/>
-                        </div>
-                        <div class="col-sm-12">
-                            <div>
-                                <label for="exampleFormControlInput31" class="form-label">วิธีการชำระเงิน</label>
-                            </div>
-                            <div class="ms-3">
-                            <input
-                                name="payment_method"
-                                class="form-check-input"
-                                type="radio"
-                                value="1"
-                                id="defaultRadio1"
-                                checked />
-                            <label class="form-check-label" for="defaultRadio1">&nbsp; เงินสด </label>
-                            <input
-                                name="payment_method"
-                                class="form-check-input ms-2"
-                                type="radio"
-                                value="2"
-                                id="defaultRadio2" />
-                            <label class="form-check-label" for="defaultRadio2">&nbsp; โอนเงิน </label>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <label for="exampleFormControlInput33" class="form-label">วันที่รับชำระเงิน</label>
-                            <input type="text" name="payment_received_date" class="form-control" id="exampleFormControlInput33" placeholder="วัน/เดือน/ปี" value="24/04/2025" required/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer rounded-0 justify-content-center">
-                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                <button type="submit" class="btn btn-main">บันทึก</button>
-            </div>
-            </form>
+@php
+    $thaiNames = [
+        "กิตติ", "วราภรณ์", "อนันต์", "ศศิธร", "ธนพล", "พิชชา", "ศุภชัย", "นฤมล", "ธนวัฒน์", "อารยา",
+        "ธนากร", "ณัฐชา", "ปริญญา", "อัญชลี", "สราวุฒิ", "จุฑารัตน์", "วิชาญ", "นงนุช", "ภูริ", "ชุติมา",
+        "พีรพล", "ธัญญา", "ภานุวัฒน์", "อุไร", "ชลธี", "จิตราภรณ์", "ปกรณ์", "วาสนา", "ณัฐพล", "มยุรี",
+        "พีระ", "นฤมาศ", "ชัยวัฒน์", "สายฝน", "วิทยา", "อรวรรณ", "วัฒนา", "สุรีย์พร", "พงศกร", "ธีราพร",
+        "วรินทร", "สุนีย์", "จักรพงษ์", "ธิดารัตน์", "ประเสริฐ", "กมลวรรณ", "พชร", "วิลาสินี", "ศักดิ์สิทธิ์", "รัตนา",
+        "สรยุทธ", "ปวีณา", "เจษฎา", "ปาริชาติ", "ธวัชชัย", "สุวิมล", "ภาณุ", "ทิพย์วรรณ", "สันติ", "อัญญา",
+        "ปริวัฒน์", "ดารารัตน์", "ธีรพล", "พรรณี", "ชัยณรงค์", "สมหญิง", "สันติภาพ", "ลดาวัลย์", "ณัฐวุฒิ", "นฤดี",
+        "พิสิษฐ์", "วราภรณ์", "กฤษณะ", "เบญจมาศ", "ภาสกร", "ชลธิชา", "ทรงพล", "อุษา", "อนุชา", "เพ็ญศรี",
+        "ศรัณย์", "พัชรี", "อธิพงษ์", "ชไมพร", "ภัทรพล", "บุญรัตน์", "เกรียงไกร", "สุภาพร", "ภูวเดช", "สุนันทา",
+        "กษิดิศ", "วิลาวัลย์", "อิทธิพล", "รุ่งทิพย์", "ณัฐพงษ์", "จารุวรรณ", "อมรชัย", "บุษกร", "ชาญชัย", "วิมล"
+    ];
+    $thaiSurnames = [
+        "สุขสันต์", "ใจดี", "วัฒนากูล", "ศรีสุวรรณ", "พานิชย์", "บุญมี", "ประเสริฐศรี", "กุลวงศ์", "ธรรมรักษ์", "อินทร์แปลง",
+        "สุทธิสาร", "พัฒนกิจ", "ศักดิ์ศรี", "จันทร์เพ็ญ", "ทองแท้", "ศิริวัฒน์", "เจริญสุข", "เรืองฤทธิ์", "สกุลไทย", "เจนจิตต์",
+        "สาครินทร์", "รัตนคุณ", "มงคลชัย", "เศรษฐ์สิทธิ์", "อัครเดช", "ศิริวงศ์", "พงษ์พิพัฒน์", "พูนทรัพย์", "เพ็งดี", "กิตติพงษ์",
+        "ธรรมวงศ์", "ชัยยศ", "ชาญณรงค์", "สังข์ทอง", "ปรีดารัตน์", "วงศ์วาน", "ทองใบ", "ทองคำ", "ทวีทรัพย์", "เกียรติชัย",
+        "ยศธร", "เชิดชู", "มณีรัตน์", "สมหมาย", "วรรณพงษ์", "หงส์ทอง", "บุญศรี", "เนตรทิพย์", "ลิขิตวงศ์", "กาญจนวัฒน์",
+        "เพ็ญนภา", "จันทร์แก้ว", "อนันต์ชัย", "ชนะชัย", "แสงทอง", "รุ่งเรือง", "ตั้งจิตต์", "ตระการไทย", "เผ่าพันธุ์", "อร่ามเรือง",
+        "กิตติวงศ์", "ลิ้มทองคำ", "วงษ์สมบูรณ์", "กัลยาณมิตร", "สุนทรวัฒน์", "สุภกิจ", "อรุณรุ่ง", "อ่อนละม้าย", "พุฒิพงษ์", "จิตติธรรม",
+        "ประดิษฐ์", "ธนวัฒน์", "อารีย์วงศ์", "อ่อนใจดี", "เครือวัลย์", "เศรษฐศักดิ์", "ประภากร", "กาญจนสุวรรณ", "อุทัยวรรณ", "พิทักษ์กิจ",
+        "เพชรรัตน์", "ศักดากุล", "กิตติศักดิ์", "โสภา", "พิริยจิตร", "หาญกล้า", "ฤกษ์ดี", "รุ่งสว่าง", "กมลชัย", "วรสาร",
+        "อ่อนละไม", "จิตรเจริญ", "บุญช่วย", "เพ็ญศิริ", "จิตต์กมล", "สุทธินันท์", "ภักดี", "ทองพูล", "สวัสดี", "ธีรพัฒน์"
+    ];
+@endphp
+<input type="hidden" name="room_id" value="{{ $room->id }}">
+@if (@$renter_edit->id)
+    <input id="renter_edit" type="hidden" name="renter_id" value="{{ $renter_edit->id }}">
+@endif
+<div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
+    <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);;">
+        <i class="tf-icons ti ti-user text-main" style="font-size: 25px;vertical-align: baseline;"></i>
+        ข้อมูลส่วนตัว
+    </h5>
+    <div class="row g-3 p-4 pt-1">
+        <div class="col-sm-2">
+            <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
+            <select name="prefix" class="form-select" id="exampleFormControlSelect1"
+                aria-label="Default select example">
+                <option value="บริษัท" selected>บริษัท</option>
+                <option value="นาย">นาย</option>
+                <option value="นางสาว">นางสาว</option>
+                <option value="นาง">นาง</option>
+            </select>
         </div>
+        <div class="col-sm-5">
+            <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label>
+            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="{{ $renter_edit->name ?? $thaiNames[array_rand($thaiNames)] }}"/>
+        </div>
+        <div class="col-sm-5">
+            <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
+            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $renter_edit->surname ?? $thaiSurnames[array_rand($thaiSurnames)] }}" />
+        </div>
+        <div class="col-sm-6">
+            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label>
+            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="{{ $renter_edit->phone ?? "0".rand(900000000, 999999999) }}"/>
+        </div>
+        <div class="col-sm-6">
+            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label>
+            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ $renter_edit->id_card_number ?? rand(9000000000000, 9999999999999) }}"/>
+        </div>
+        <div class="col-sm-12">
+            <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
+            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="{{ $renter_edit->address ?? rand(1, 99)."/".rand(1, 99) }}"/>
+        </div>
+        <div class="col-sm-4">
+            <label>เลือกจังหวัด</label>
+            <select name="ref_province_id" id="select2BasicAddRenter" required>
+                <option selected disabled hidden value="">เลือกจังหวัด</option>
+                @foreach ($province as $pro)
+                    <option value="{{ $pro->id }}" @if ($pro->id == 2) selected @endif>{{ $pro->name_in_thai }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label>เลือกอำเภอ</label>
+            <select name="ref_district_id" id="select2DistrictAddRenter" required>
+                <option selected disabled hidden value="">เลือกอำเภอ</option>
+                @foreach ($district as $dis)
+                    <option value="{{ $dis->id }}" @if ($dis->id == 53) selected @endif>{{ $dis->name_in_thai }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label>เลือกตำบล</label>
+            <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter" required>
+                <option selected disabled hidden value="">เลือกตำบล</option>
+                @foreach ($subdistrict as $sub_dis)
+                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == 176) selected @endif>{{ $sub_dis->name_in_thai }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-sm-6">
+            <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
+            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="10540" />
+        </div>
+        <div class="col-sm-12">
+            <label for="bs-datepicker-format" class="form-label">วันเดือนปีเกิดผู้จอง</label>
+            <input type="text" name="birthdate" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" required value="24/04/2025"/>
+        </div>
+        {{-- <div class="col-sm-6">
+            <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label>
+            <input type="text" name="booking_date" value="24/04/2025" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" required value="24/04/2025"/>
+        </div>
+        <div class="col-sm-6">
+            <label for="exampleFormControlInput12" class="form-label">ช่องทางการจอง</label>
+            <input type="text" name="booking_channel" class="form-control" id="exampleFormControlInput12" placeholder="ช่องทางการจอง" value="จองโดยตรงกับที่พัก" />
+        </div> --}}
     </div>
 </div>
+
+<div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
+    <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
+        <i class="tf-icons ti ti-device-ipad-dollar text-main" style="font-size: 25px;vertical-align: baseline;"></i>
+        ยานพาหนะที่นำมาใช้
+    </h5>
+    @php
+    $vehicles = $renter_edit->vehicles ?? [];
+    @endphp
+
+    <div class="row g-3 p-4 pt-1" id="vehicleContainer">
+        @foreach ($vehicles as $key => $veh)
+            <div class="vehicle-group row g-3 mb-2">
+                <div class="col-sm-2">
+                    <label class="form-label">คันที่ {{ $key+1 }}</label>
+                    <select name="vehicles[{{$key}}][ref_type_id]" class="form-control w-100" data-style="btn-default" required>
+                        <option value="1" {{ @$veh->ref_type_id == 1 ? 'selected' : '' }}>รถยนต์</option>
+                        <option value="2" {{ @$veh->ref_type_id == 2 ? 'selected' : '' }}>มอเตอร์ไซค์</option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">ทะเบียนรถ</label>
+                    <input type="text" name="vehicles[{{$key}}][car_registration]" class="form-control" placeholder="ทะเบียนรถ" value="{{ @$veh->car_registration }}" />
+                </div>
+                <div class="col-sm-5">
+                    <label class="form-label">รายละเอียด</label>
+                    <input type="text" name="vehicles[{{$key}}][detail]" class="form-control" placeholder="รายละเอียด" value="{{ @$veh->detail }}" />
+                </div>
+                <div class="col-sm-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-sm btn-danger remove-vehicle w-100">
+                        <i class="ti ti-trash"></i> ลบ
+                    </button>
+                </div>
+            </div>
+        @endforeach
+            <div class="vehicle-group row g-3 mb-2">
+                <div class="col-sm-2">
+                    <label class="form-label">คันที่ {{ count($vehicles)+1 }}</label>
+                    <select name="vehicles[{{ count($vehicles) }}][ref_type_id]" class="form-control w-100" data-style="btn-default" required>
+                        <option value="1" {{ @$veh->ref_type_id == 1 ? 'selected' : '' }}>รถยนต์</option>
+                        <option value="2" {{ @$veh->ref_type_id == 2 ? 'selected' : '' }}>มอเตอร์ไซค์</option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">ทะเบียนรถ</label>
+                    <input type="text" name="vehicles[{{ count($vehicles) }}][car_registration]" class="form-control" placeholder="ทะเบียนรถ" value="" />
+                </div>
+                <div class="col-sm-5">
+                    <label class="form-label">รายละเอียด</label>
+                    <input type="text" name="vehicles[{{ count($vehicles) }}][detail]" class="form-control" placeholder="รายละเอียด" value="" />
+                </div>
+                <div class="col-sm-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-sm btn-danger remove-vehicle w-100">
+                        <i class="ti ti-trash"></i> ลบ
+                    </button>
+                </div>
+            </div>
+    </div>
+
+    <!-- ปุ่มเพิ่ม -->
+    <div class="p-4">
+        <button
+            id="add_vehicles"
+            class="btn btn-sm btn-warning mt-3"
+            type="button">
+            <i class="ti ti-plus"></i> เพิ่ม
+        </button>
+    </div>
+</div>
+
 <script>
-    $(document).ready(function() {
-            $('#select2BasicAddRenter').change(function() {
-                var provinceId = $(this).val();
-                
-                // เคลียร์ dropdown สำหรับอำเภอและตำบล
-                $('#select2DistrictAddRenter').empty().append('<option selected disabled hidden value="">เลือกอำเภอ</option>');
-                $('#select2SubdistrictAddRenter').empty().append('<option selected disabled hidden value="">เลือกตำบล</option>');
+    $(document).ready(function () {
+        let vehicleIndex = {{ count($vehicles) + 1 }};
 
-                if (provinceId) {
-                    $.ajax({
-                        url: '/get-districts/' + provinceId,
-                        type: 'GET',
-                        success: function(data) {
-                            data.forEach(function(district) {
-                                $('#select2DistrictAddRenter').append('<option value="' + district.id + '">' + district.name_in_thai + '</option>');
-                            });
-                        }
-                    });
-                }
-            });
+        $('#add_vehicles').on('click', function () {
+            vehicleIndex++;
 
-            $('#select2DistrictAddRenter').change(function() {
-                var districtId = $(this).val();
-                
-                // เคลียร์ dropdown สำหรับตำบล
-                $('#select2SubdistrictAddRenter').empty().append('<option selected disabled hidden value="">เลือกตำบล</option>');
+            let html = `
+                <div class="vehicle-group row g-3 mb-2">
+                    <div class="col-sm-2">
+                        <label class="form-label">คันที่ ${vehicleIndex}</label>
+                        <select name="vehicles[${vehicleIndex - 1}][ref_type_id]" class="form-control w-100" required>
+                            <option value="1">รถยนต์</option>
+                            <option value="2">มอเตอร์ไซค์</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="form-label">ทะเบียนรถ</label>
+                        <input type="text" name="vehicles[${vehicleIndex - 1}][car_registration]" class="form-control" placeholder="ทะเบียนรถ" />
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="form-label">รายละเอียด</label>
+                        <input type="text" name="vehicles[${vehicleIndex - 1}][detail]" class="form-control" placeholder="รายละเอียด" />
+                    </div>
+                    <div class="col-sm-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-sm btn-danger remove-vehicle w-100">
+                            <i class="ti ti-trash"></i> ลบ
+                        </button>
+                    </div>
+                </div>
+            `;
 
-                if (districtId) {
-                    $.ajax({
-                        url: '/get-subdistricts/' + districtId,
-                        type: 'GET',
-                        success: function(data) {
-                            data.forEach(function(subdistrict) {
-                                $('#select2SubdistrictAddRenter').append('<option value="' + subdistrict.id + '">' + subdistrict.name_in_thai + '</option>');
-                            });
-                        }
-                    });
-                }
-            });
-            
-            $('#select2SubdistrictAddRenter').change(function() {
-                var subdistrictsid = $(this).val();
-                if (subdistrictsid) {
-                    $.ajax({
-                        url: '/get-zipcode/' + subdistrictsid,
-                        type: 'GET',
-                        success: function(data) {
-                            $('#zipcodeAddRenter').val(data);
-                        }
-                    });
-                }
-            });
+            $('#vehicleContainer').append(html);
         });
+
+        // ใช้ event delegation สำหรับปุ่มลบ
+        $(document).on('click', '.remove-vehicle', function () {
+            $(this).closest('.vehicle-group').remove();
+        });
+    });
+
+    $(document).ready(function() {
+        $('#select2BasicAddRenter').on('change', function () {
+            const provinceId = $(this).val();
+            if (provinceId) {
+            
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+            if (tomDistrict2) {
+                tomDistrict2.destroy();
+            }
+            $('#select2DistrictAddRenter').html('<option selected disabled hidden value="">เลือกอำเภอ</option>');
+
+                $.ajax({
+                    url: '/get-districts/' + provinceId,
+                    type: 'GET',
+                    success: function (data) {
+                        data.forEach(function (district) {
+                            $('#select2DistrictAddRenter').append(
+                                `<option value="${district.id}">${district.name_in_thai}</option>`
+                            );
+                        });
+
+                        tomDistrict2 = new TomSelect("#select2DistrictAddRenter", {
+                            create: false,
+                            maxItems: 1,
+                            allowEmptyOption: true,
+                            sortField: { field: "text", direction: "asc" }
+                        });
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        $('#select2DistrictAddRenter').on('change', function () {
+            var districtId = $(this).val();
+            
+            if (districtId) {
+            
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+            if (tomSubdistrict2) {
+                tomSubdistrict2.destroy();
+            }
+            $('#select2SubdistrictAddRenter').html('<option selected disabled hidden value="">เลือกตำบล</option>');
+
+                $.ajax({
+                    url: '/get-subdistricts/' + districtId,
+                    type: 'GET',
+                    success: function (data) {
+                        data.forEach(function (subdistrict) {
+                            $('#select2SubdistrictAddRenter').append(
+                                `<option value="${subdistrict.id}">${subdistrict.name_in_thai}</option>`
+                            );
+                        });
+
+                        tomSubdistrict2 = new TomSelect("#select2SubdistrictAddRenter", {
+                            create: false,
+                            maxItems: 1,
+                            allowEmptyOption: true,
+                            sortField: { field: "text", direction: "asc" }
+                        });
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        $('#select2SubdistrictAddRenter').change(function() {
+            var subdistrictsid = $(this).val();
+            if (subdistrictsid) {
+                $.ajax({
+                    url: '/get-zipcode/' + subdistrictsid,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#zipcode').val(data);
+                    }
+                });
+            }
+        });
+    });
 </script>

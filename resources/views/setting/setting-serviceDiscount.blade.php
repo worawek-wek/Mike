@@ -604,7 +604,7 @@
             });
             // alert(page);
         }
-        function deleteService(){
+        function formDeleteService(){
             $.ajax({
                 type: "GET",
                 url: 'setting/service/delete_service',

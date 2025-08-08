@@ -92,7 +92,7 @@
                                 @if ($key == 1)
                                     <input name="water_unit" style="width: 18%;background-color: #d6f7fb;border-color: #00bad1;"
                                         type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ $payment_list_item->unit }}" required />
-                                        = {{ $payment_list_item->unit-0 }} ยูนิต)
+                                        = {{ $payment_list_item->unit-$meterPrevious->unit }} ยูนิต)
                                         
                                 @endif
                                 </td>

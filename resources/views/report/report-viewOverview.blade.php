@@ -88,8 +88,8 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select name="DataTables_Table_0_length"
-                                                                aria-controls="DataTables_Table_0" class="form-select">
+                                                            <select name="limit" onchange='loadData("{{$page_url}}/datatable")'
+                                                                aria-controls="DataTables_Table_0" class="form-select p_search">
                                                                 <option value="7">7</option>
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
@@ -106,13 +106,14 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input type="month" name="month" class="form-control p_search" onchange='loadData("{{$page_url}}/datatable")' value="{{ date('Y-m') }}">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
                                                             <button
                                                                 class="btn btn-secondary add-new btn-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
-                                                                type="button">
+                                                                type="button"
+                                                                onclick="printPdf()">
                                                                 <span>
                                                                     <i class="ti ti-file-upload me-0 me-sm-1"></i>
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
@@ -124,7 +125,8 @@
                                                                     class="btn btn-success buttons-collection  btn-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="exportExcel()">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -134,217 +136,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table
-                                                class="datatables-products table table-bordered dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-                                                style="width: 1396px;">
-                                                <thead class="border-top table-info">
-                                                    <tr class="text-nowrap ">
-                                                        <th class="control sorting_disabled dtr-hidden" rowspan="2"
-                                                            style="width: 0px; display: none;" aria-label=""></th>
-                                                        <th class="text-center" rowspan="2" style="padding: 0 50px;">ห้อง</th>
-                                                        <th class="text-center" colspan="7">บิลค่าเช่าห้อง</th>
-                                                        <th class="text-center" colspan="2">บิลจองห้อง</th>
-                                                        <th class="text-center" colspan="2">บิลเงินประกัน</th>
-                                                        <th class="text-center" colspan="2">บิลย้ายออก</th>
-                                                        <th class="text-center" rowspan="2">คืนเงินประกัน</th>
-                                                    </tr>
-                                                    <tr class="text-nowrap">
-                                                        <th>ค่าเช่าห้อง</th>
-                                                        <th>ค่าน้ำ</th>
-                                                        <th>ค่าไฟ</th>
-                                                        <th>ค่าที่จอดรถยนต์</th>
-                                                        <th>ค่าที่จอดรถมอเตอร์ไซค์</th>
-                                                        <th>ส่วนกลาง</th>
-                                                        <th>ค่าไฟเกิน</th>
-                                                        <th>ค่ามัดจำการจอง</th>
-                                                        <th>คืนมัดจำการจอง</th>
-                                                        <th>ค่าประกันห้อง</th>
-                                                        <th>หักค่ามัดจำจอง</th>
-                                                        <th>ค่าน้ำ</th>
-                                                        <th>ค่าไฟ</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="odd text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                    <tr class="odd text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                    <tr class="odd text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">4,000</span>
-                                                        </td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>1,344</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            <div id="loadData">
+
                                             </div>
                                             <div style="width: 1%;"></div>
                                         </div>
@@ -447,9 +240,84 @@
             </div>
         </div>
     </div>
+    <iframe id="print-iframe" style="display: none;"></iframe>    
+
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    <script>
+        var page = "{{$page_url}}/datatable";
+        var searchData = {};
+        loadData(page);
+        
+        function loadData(pages){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
 
+            // alert(page);
+            page = pages;
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    $("#loadData").html(data);
+                }
+            });
+            // alert(page);
+        }
+        
+        function printPdf() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                url: '/pdf/{{$page_url}}',
+                type: 'GET',
+                data: searchData,
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+        function exportExcel() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // แปลงเป็น query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // สร้าง URL พร้อมพารามิเตอร์
+            const targetUrl = `/{{$page_url}}/excel?${queryString}`;
+
+            // เปิด URL ใหม่ (แท็บใหม่)
+            window.open(targetUrl, '_blank');
+        }
+    </script>
 </body>
 
 </html>

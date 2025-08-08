@@ -21,6 +21,11 @@ class RoomForRents extends Model
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
     }
 
+    public function user()
+    {
+        return $this->hasOne('App\Models\User', 'id', 'ref_user_id');
+    }
+
     public function room_3()
     {
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id')->where('status',3);
@@ -31,6 +36,10 @@ class RoomForRents extends Model
         return $this->hasOne('App\Models\RentBill', 'ref_room_for_rent_id', 'id');
     }
 
+    public function branch()
+    {
+        return $this->hasOne('App\Models\Branch', 'id', 'ref_branch_id');
+    }
     public function renter()
     {
         return $this->hasOne('App\Models\Renter', 'id', 'ref_renter_id');

@@ -117,7 +117,7 @@
                                                     </div>
                                                     <h5 class="mb-0 d-flex">รอคอนเฟิร์ม
                                                         <button type="button"
-                                                            class="btn btn-main btn-sm rounded-2 ms-auto"
+                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#editserviceModal"
                                                             onclick="waitingForConfirmation()">
@@ -237,7 +237,7 @@
                                             </div>
                                             <div class="col-md-7 text-end" style="padding-right: unset !important;">
                                                 <button
-                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light"
+                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false" data-bs-toggle="modal" data-bs-target="#123"
@@ -247,7 +247,7 @@
                                                 </button>
                                                 <button 
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
+                                                        class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -257,7 +257,7 @@
                                                 </button>
                                                 <button
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2"
+                                                        class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -269,7 +269,7 @@
                                                 </button>
                                                 <button
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-danger waves-effect waves-light me-2"
+                                                        class="btn btn-success buttons-collection btn-danger waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -316,7 +316,7 @@
                                             <h4 id="thai-month-label">พฤษภาคม 2024</h4>
                                         </div>
                                         <div class="col-md-2" style="padding-right: unset !important;">
-                                            <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ date('Y-m', strtotime('-1 month')) }}" />
+                                            <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ date('Y-m') }}" />
                                         </div>
                                         
                                     </div>
@@ -408,9 +408,58 @@
                         iframe.contentWindow.print();
                     };
                 },
-                error: function(xhr) {
-                    alert('เกิดข้อผิดพลาด');
-                    console.error(xhr.responseText);
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
+                }
+            });
+        }
+        function printPdfReceipt(id) {
+            $.ajax({
+                url: '/pdf/receipt/'+id,
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
                 }
             });
         }
@@ -431,9 +480,22 @@
                         iframe.contentWindow.print();
                     };
                 },
-                error: function(xhr) {
-                    alert('เกิดข้อผิดพลาด');
-                    console.error(xhr.responseText);
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
                 }
             });
         }
@@ -454,9 +516,22 @@
                         iframe.contentWindow.print();
                     };
                 },
-                error: function(xhr) {
-                    alert('เกิดข้อผิดพลาด');
-                    console.error(xhr.responseText);
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
                 }
             });
         }
@@ -537,9 +612,74 @@
                                 Swal.fire(title+' เรียบร้อยแล้ว', '', 'success');
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+        }
+        function changeDeleteReceipt(receipt_id, invoice_id){
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ยกเลิก ใบเสร็จ หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ $page_url }}/delete-receipt/"+receipt_id,
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if(response == true){
+                                loadData(page);
+                                Swal.fire('ยกเลิก ใบเสร็จ เรียบร้อยแล้ว', '', 'success');
+                                view(invoice_id,'table');
+                            }
+                        
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {
@@ -647,9 +787,22 @@
                                 Swal.fire('ชำระเงินทั้งหมด เรียบร้อยแล้ว', '', 'success');
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {

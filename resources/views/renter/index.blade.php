@@ -95,7 +95,7 @@
                                                 </ul>
                                                 <div class="row mt-4">
                                                     <div class="col-md-6">
-                                                        <select id="selectpickerBasic" id="search_type" name="search_type" class="form-select me-2 p_current_search" data-style="btn-default">
+                                                        <select id="selectpickerBasic" id="search_type" name="search_type" class="form-select me-2 p_current_search" onchange='loadCurrentData("{{$page_url2}}/datatable"); loadOldData("{{$page_url3}}/datatable")' data-style="btn-default">
                                                                 <option value="">ค้นหาตาม</option>
                                                                 <option value="1">ค้นหาตามชื่อ-นามสกุล</option>
                                                                 <option value="2">ค้นหาตามเบอร์โทร</option>
@@ -112,7 +112,7 @@
                                                             class="form-control p_current_search"
                                                             placeholder="ค้นหาคีย์เวิร์ดที่ต้องการ"
                                                             aria-label="ค้นหาคีย์เวิร์ดที่ต้องการ"
-                                                            aria-describedby="basic-addon-search31" oninput="loadCurrentData('{{$page_url2}}/datatable')" />
+                                                            aria-describedby="basic-addon-search31" oninput="loadCurrentData('{{$page_url2}}/datatable'); loadOldData('{{$page_url3}}/datatable')" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -128,7 +128,7 @@
                                         <div class="col-lg-4">
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
-                                                <select onchange='loadCurrentData("{{$page_url2}}/datatable")' name="limit" class="form-select ms-2 me-2 p_current_search" style="width:100px">
+                                                <select onchange='loadCurrentData("{{$page_url2}}/datatable"); loadOldData("{{$page_url3}}/datatable")' name="limit" class="form-select ms-2 me-2 p_current_search" style="width:100px">
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>
                                                     <option value="100">100</option>
@@ -162,7 +162,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="printPdfCheckCar()">
+                                                        onclick="printPdfCheckCar([1,2])">
                                                         <span>
                                                             <i class="ti ti-file-upload"></i> 
                                                             พิมพ์เอกสารเช็ครถ
@@ -174,7 +174,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="window.open('{{$page_url}}/export/excel', '_blank')"
+                                                        onclick="window.open('{{$page_url}}/export/excel/1,2', '_blank')"
                                                         >
                                                         <span>
                                                             <i class="ti ti-upload"></i> 
@@ -238,7 +238,8 @@
                                                         class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false">
+                                                        aria-expanded="false"
+                                                        onclick="printPdfCheckCar([0])">
                                                         <span>
                                                             <i class="ti ti-file-upload"></i> 
                                                             พิมพ์เอกสารเช็ครถ
@@ -249,7 +250,9 @@
                                                         class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false">
+                                                        aria-expanded="false"
+                                                        onclick="window.open('{{$page_url}}/export/excel/0', '_blank')"
+                                                        >
                                                         <span>
                                                             <i class="ti ti-upload"></i> 
                                                             ดาวน์โหลด Excel
@@ -1312,7 +1315,7 @@
     }
 
     function loadOldData(pages){
-        $('.p_old_search').each(function() {
+        $('.p_current_search').each(function() {
             var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
             var inputValue = $(this).val(); // ดึงค่า value ของ input
             
@@ -1415,9 +1418,9 @@
                     });
                 }
             });
-            function printPdfCheckCar() {
+            function printPdfCheckCar(status) {
             $.ajax({
-                url: '/pdf/checkCarPDF/1',
+                url: '/pdf/checkCarPDF/'+status,
                 type: 'GET',
                 success: function(html) {
                     const iframe = document.getElementById('print-iframe');

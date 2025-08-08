@@ -83,6 +83,9 @@
                             <th class="text-center">
                                 จำนวนเงินรวม
                             </th>
+                            {{-- <th class="text-center">
+                                ดำเนินการ
+                            </th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -94,12 +97,16 @@
                                 <td class="text-center"><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="text-truncate">{{ number_format($row_2->rent+$row_2->electricity_amount+$row_2->water_amount+@$row_2->additional_costs[0]->amount-@$row_2->additional_costs[1]->amount) }}</span>
-                                    @if ($key == 4)
-                                        <br><span class="text-truncate text-success">จ่ายแล้ว 1,000</span>
-                                        <br><span class="text-truncate text-danger">ค้างจ่าย 3,365</span>
-                                    @endif
+                                    <span class="text-truncate">{{ number_format($row_2->total_amount) }}</span>
                                 </td>
+                                {{-- <td class="text-center">
+                                    <button class="btn btn-danger" onclick="changeStatusBill({{ $row_2->invoice->id }},3,'ยกเลิกใบเสร็จ')">
+                                        <span>
+                                            <i class="ti-md ti ti-x"></i>
+                                            <b class="dam">ยกเลิกใบเสร็จ</b>
+                                        </span>
+                                    </button>
+                                </td> --}}
                             </tr>
                         @endforeach
                         <tr class="bg-label-warning">

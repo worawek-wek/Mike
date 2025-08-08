@@ -52,8 +52,8 @@
                         placeholder="บ้านเลขที่/ หมู่/ ซอย/ ถนน" required/>
                 </div>
                 <div class="col-sm-3">
-                    <label>เลือกจังหวัด</label>
-                    <select name="ref_province_id" id="select2Basic" class="select2 form-select form-select-lg">
+                    <label>เลือกจังหวัด <span class="text-danger">*</span></label>
+                    <select name="ref_province_id" id="select2Basic" class="select2 form-select form-select-lg" required>
                         <option selected>เลือกจังหวัด</option>
                         @foreach ($province as $pro)
                             <option value="{{ $pro->id }}">{{ $pro->name_in_thai }}</option>
@@ -61,8 +61,8 @@
                     </select>
                 </div>
                 <div class="col-sm-3">
-                    <label>เลือกอำเภอ</label>
-                    <select name="ref_district_id" id="select2District" class="select2 form-select form-select-lg">
+                    <label>เลือกอำเภอ <span class="text-danger">*</span></label>
+                    <select name="ref_district_id" id="select2District" class="select2 form-select form-select-lg" required>
                         <option selected>เลือกอำเภอ</option>
                         @foreach ($district as $dis)
                             <option value="{{ $dis->id }}">{{ $dis->name_in_thai }}</option>
@@ -70,8 +70,8 @@
                     </select>
                 </div>
                 <div class="col-sm-3">
-                    <label>เลือกตำบล</label>
-                    <select name="ref_subdistrict_id" id="select2Subdistrict" class="select2 form-select form-select-lg">
+                    <label>เลือกตำบล <span class="text-danger">*</span></label>
+                    <select name="ref_subdistrict_id" id="select2Subdistrict" class="select2 form-select form-select-lg" required>
                         <option selected>เลือกตำบล</option>
                         @foreach ($subdistrict as $sub_dis)
                             <option value="{{ $sub_dis->id }}">{{ $sub_dis->name_in_thai }}</option>
@@ -79,9 +79,9 @@
                     </select>
                 </div>
                 <div class="col-sm-3">
-                    <label>รหัสไปรษณีย์</label>
+                    <label>รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                     <input name="zipcode" type="text" class="form-control" id="zipcode"
-                        placeholder="รหัสไปรษณีย์" />
+                        placeholder="รหัสไปรษณีย์" required/>
                 </div>
                 <div class="col-sm-12">
                     <label>ระบุตำแหน่งสาขาของคุณ</label>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="col-sm-6">
                     <label>เบอร์โทรติดต่อสาขา <span class="text-danger">*</span></label>
-                    <input name="phone" type="text" class="form-control" id="" placeholder="เบอร์โทรติดต่อสาขา" required/>
+                    <input name="phone" type="tel" class="form-control" id="" placeholder="เบอร์โทรติดต่อสาขา" pattern="^\d{9,10}$" required/>
                 </div>
                 <div class="col-sm-6">
                     <label>อีเมลติดต่อสาขา </label>
@@ -229,8 +229,8 @@
     $('#select2Subdistrict').select2();
     $('#select2Billing_date').select2();
     $('#select2Payment_end_date').select2();
-    const draggableMap = L.map('dragMap').setView([48.817152, 2.455], 12);
-        const markerLocation = L.marker([48.817152, 2.455], {
+    const draggableMap = L.map('dragMap').setView([13.7563, 100.5018], 12);
+        const markerLocation = L.marker([13.7563, 100.5018], {
             draggable: 'true'
         }).addTo(draggableMap);
         markerLocation.bindPopup("<b>ที่ตั้งสาขา</b>").openPopup();

@@ -71,6 +71,47 @@
                                                     data-bs-toggle="modal" data-bs-target="#addModal"><i
                                                         class="ti-xs ti ti-plus me-2"></i>เพิ่มบัญชี</button>
                                             </div> -->
+                                            {{-- <div class="col-md-12 flex text-end" style="padding-right: unset !important;">
+                                                <button
+                                                        style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
+                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light"
+                                                        tabindex="0" aria-controls="DataTables_Table_0"
+                                                        type="button" aria-haspopup="dialog"
+                                                        aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addserviceModal">
+                                                    <span><i class="ti ti-plus"></i> เพิ่มบริษัท</span>
+                                                </button>
+                                            </div> --}}
+                                            {{-- <div class="col-sm-12">
+                                                <label for="exampleFormControlInput1" class="form-label">ชื่อบริษัท</label>
+                                                <input type="text" class="form-control" name="name" id="exampleFormControlInput1" placeholder="" value="{{ @$company['name'] ?? 'ORANGE TECHNOLOGY SOLUTION COMPANY LIMITED' }}" />
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <label for="exampleFormControlInput1" class="form-label">รายละเอียด</label>
+                                                <input type="text" class="form-control" name="detail" id="exampleFormControlInput1" placeholder="" value="{{ @$company['detail'] ?? 'รับผิดชอบ ค่าเช่าห้อง' }} " />
+                                            </div>
+                                            <label class="form-label">เลือกรับผิดชอบ</label>
+                                            <div class="d-flex gap-3 mt-0">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="period_type" id="daily" value="daily" checked>
+                                                    <label class="form-check-label" for="daily">
+                                                        ค่าเช่าห้อง
+                                                    </label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="period_type" id="monthly" value="monthly">
+                                                    <label class="form-check-label" for="monthly">
+                                                        ค่านำค่าไฟ
+                                                    </label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="period_type" id="yearly" value="yearly">
+                                                    <label class="form-check-label" for="yearly">
+                                                        ค่าบริการ
+                                                    </label>
+                                                </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                     <div class="card-body pt-4">

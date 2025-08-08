@@ -24,63 +24,12 @@
                                                     สัญญาเช่า
                                                 </h4>
                                             </div>
-                                            <!-- <div class="col-sm-6 text-end">
-                                                <button type="button" class="btn btn-main waves-effect waves-light"
-                                                    data-bs-toggle="modal" data-bs-target="#addModal"><i
-                                                        class="ti-xs ti ti-plus me-2"></i>เพิ่มบัญชี</button>
-                                            </div> -->
                                         </div>
                                     </div>
                                     <div class="card-body pt-4">
                                         <form>
                                             <h4>คลิกเพื่อใส่ข้อมูล</h4>
-                                            {{-- <div class="mb-3 d-flex gap-2 flex-wrap">
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary waves-effect">ชื่อหอพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary waves-effect">ที่อยู่หอพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary waves-effect">วันที่ปัจจุบัน</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary waves-effect">เดือน/ปีปัจจุบัน</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary waves-effect">ชื่อผู้เช่า</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">หมายเลขบัตรประชาชนผู้เช่า</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">เบอร์โทรผู้เช่า</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">หมายเลขห้องพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">หมายเลขชั้นของห้องพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">ระยะเวลาสัญญา</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">วันที่เริ่มต้นสัญญา</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">วันที่สิ้นสุดสัญญา</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">เงินประกันห้อง</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">ค่าเช่าห้อง</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">ค่าเช่าเฟอร์นิเจอร์</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">ค่าเช่าห้องไม่รวมค่าเฟอร์นิเจอร์</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">วันที่สิ้นสุดการชำระเงิน</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">เลขมิเตอร์ไฟฟ้าเข้าพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">เลขมิเตอร์น้ำเข้าพัก</button>
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary  waves-effect">ลายเซนต์ผู้เช่า</button>
-                                            </div> --}}
                                             <div id="full-editor"></div>
-                                            {{-- <div class="addFloor text-center pt-4">
-                                                <button type="button" class="btn btn-main"><i
-                                                        class="ti-xs ti ti-device-floppy me-2"></i>บันทึกแก้ไข</button>
-                                            </div> --}}
                                         </form>
                                     </div>
                                 </div>

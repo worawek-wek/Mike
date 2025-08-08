@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\QRCode;
 use App\Models\Bank;
 use App\Models\Renter;
 use App\Models\Building;
@@ -142,9 +143,10 @@ class SettingController extends Controller
     
     public function rental_contract(Request $request)
     {
-        return view('setting/setting-rentalContract',[
-            'data' => RentalcontractModel::find(1),
-        ]);
+        $data['data'] = RentalcontractModel::find(1);
+        // $data['company'] = Company::where('ref_branch_id', session('branch_id'))->get();
+
+        return view('setting/setting-rentalContract',$data);
     }
     public function rental_contractSubmit(Request $request)
     {
@@ -308,34 +310,6 @@ class SettingController extends Controller
                 $room->name  =  $value[0];
                 $room->ref_floor_id  =  $floor->id;
                 $room->save();
-                // if($value[0] == ''){ continue; }
-                // if($value[0] != '' && @$spreadSheetAry[$key-1][0] == ''){ continue; }
-
-                // $check = UserTime::where("employee_code", $value[2])->where("day_date", date('Y-m-d', strtotime($value[6])))->first();
-                // if(!$check){
-                //     $user = new UserTime;
-                //     $user->ref_user_id = User::where('employee_id', $value[2])->first()->id;
-                //     $user->machine_code = $value[1];
-                //     $user->employee_code = $value[2];
-                //     $user->position_name = $value[4];
-                //     $user->branch_name = $value[5];
-                //     $user->day_date = date('Y-m-d', strtotime($value[6]));
-                //     $user->day_time_in = $value[7];
-                //     $user->day_time_out = $value[8];
-                //     $user->save();
-                // }else{
-                //     $user = UserTime::find($check->id);
-                //     $user->ref_user_id = User::where('employee_id', $value[2])->first()->id;
-                //     $user->machine_code = $value[1];
-                //     $user->employee_code = $value[2];
-                //     $user->position_name = $value[4];
-                //     $user->branch_name = $value[5];
-                //     $user->day_date = date('Y-m-d', strtotime($value[6]));
-                //     $user->day_time_in = $value[7];
-                //     $user->day_time_out = $value[8];
-                //     $user->save();
-                // }
-                // if($value[0] == ''){ break; }
                 
             }
 
@@ -363,10 +337,10 @@ class SettingController extends Controller
     public function room_layout_building_insert(Request $request)
     {
         try{
-            $user = new Building;
-            $user->name  =  $request->name;
-            $user->ref_branch_id  =  session("branch_id");
-            $user->save();
+            $insert = new Building;
+            $insert->name  =  $request->name;
+            $insert->ref_branch_id  =  session("branch_id");
+            $insert->save();
             
             DB::commit();
             return 1;
@@ -401,10 +375,10 @@ class SettingController extends Controller
     public function room_layout_floor_insert(Request $request)
     {
         try{
-            $user = new Floor;
-            $user->name  =  $request->name;
-            $user->ref_building_id  =  $request->ref_building_id;
-            $user->save();
+            $insert = new Floor;
+            $insert->name  =  $request->name;
+            $insert->ref_building_id  =  $request->ref_building_id;
+            $insert->save();
             
             DB::commit();
             return 1;
@@ -434,11 +408,11 @@ class SettingController extends Controller
     public function room_layout_room_insert(Request $request)
     {
         try{
-            $user = new Room;
-            $user->name  =  $request->name;
-            $user->ref_floor_id  =  $request->ref_floor_id;
-            $user->minimum_water_bill = 0;
-            $user->save();
+            $insert = new Room;
+            $insert->name  =  $request->name;
+            $insert->ref_floor_id  =  $request->ref_floor_id;
+            $insert->minimum_water_bill = 0;
+            $insert->save();
             
             DB::commit();
             return 1;
@@ -706,6 +680,7 @@ class SettingController extends Controller
     {
         try{
             Service::destroy($id);
+            RoomHasService::where('ref_service_id', $id)->delete();
             
             DB::commit();
             return 1;
@@ -822,6 +797,7 @@ class SettingController extends Controller
     {
         try{
             Discount::destroy($id);
+            RoomHasDiscount::where('ref_discount_id', $id)->delete();
             
             DB::commit();
             return 1;
@@ -1171,7 +1147,6 @@ class SettingController extends Controller
     {
         
         try{
-
             $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
 
             $user = User::find($id);
@@ -1188,7 +1163,7 @@ class SettingController extends Controller
             }
             $user->save();
             
-            $uhb = UserHasBranch::where('ref_user_id',$id)->first();
+            $uhb = UserHasBranch::where('ref_user_id',$id)->where('ref_branch_id', session("branch_id"))->first();
             $uhb->ref_position_id  =  $request->ref_position_id;
             $uhb->save();
 
@@ -1198,13 +1173,28 @@ class SettingController extends Controller
             DB::rollBack();
         }
     }
+    
+    public function room_layout_qr_code(Request $request)
+    {
+        $data['qr_code'] = QRCode::where('ref_branch_id', session("branch_id"))->get();
+        $data['building'] = Building::where('ref_branch_id',session("branch_id"))->get();
+        return view('setting/setting-roomLayout-qr-code', $data);
+    }
+    
     public function upload_qr_code(Request $request)
     {
             
         try{
-
-            $r_h_a = Building::find($request->id);
-            $lastImage = $r_h_a->qr_code;
+            $request->validate([
+                'qr_code' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ],[
+                'qr_code.required' => 'กรุณาเลือกรูปภาพ',
+                'qr_code.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                'qr_code.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                'qr_code.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+            ]);
+            $qrc = new QRCode;            
+            $qrc->ref_branch_id = session("branch_id");
             if($request->file('qr_code')){
                 // return 123;
                 $file = $request->file('qr_code');
@@ -1214,11 +1204,10 @@ class SettingController extends Controller
                 $path = "upload/qr-code/";
                 $image_name = $img_name.rand().'.'.$extension;
 
-                $r_h_a->qr_code = $image_name;
+                $qrc->qr_code = $image_name;
 
             }
-            
-            $r_h_a->save();
+            $qrc->save();
 
             DB::commit();
             
@@ -1232,6 +1221,40 @@ class SettingController extends Controller
             DB::rollBack();
         }
             
+    }
+    public function update_qr_code(Request $request)
+    {
+            
+        try{
+            Floor::query()->update(['qr_code' => ""]);
+            foreach($request->floor as $key => $floor){
+                $qrc = Floor::find($key);            
+                $qrc->qr_code = $floor;
+                $qrc->save();
+            }
+            
+            DB::commit();
+            
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+            
+    }
+    public function delete_qr_code($id)
+    {
+        try{
+            $qr_code = QRCode::find($id);
+            $delete = QRCode::destroy(explode(',',$id));
+
+            Floor::where('qr_code', $qr_code->qr_code)->update(['qr_code' => ""]);
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+        //
     }
     public function change_position(Request $request, $user_has_branch_id)
     {

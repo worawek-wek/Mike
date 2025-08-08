@@ -53,6 +53,7 @@
     <script src="assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
     <script src="assets/vendor/libs/select2/select2.js"></script>
     <script src="assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="assets/js/ui-popover.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

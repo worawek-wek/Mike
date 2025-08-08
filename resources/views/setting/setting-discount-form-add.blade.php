@@ -42,7 +42,7 @@
     </div>
     <div class="col-sm-6">
         <label for="exampleFormControlInput1" class="form-label">ค่าส่วนลด</label>
-        <input type="text" name="price" class="form-control" id="exampleFormControlInput1" placeholder="" required/>
+        <input type="number" name="price" class="form-control" id="exampleFormControlInput1" placeholder="" required/>
     </div>
 </div>
 <script>

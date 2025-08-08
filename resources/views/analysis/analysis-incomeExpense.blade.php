@@ -40,7 +40,7 @@
                                                 วิเคราะห์รายรับ-รายจ่าย
                                             </h4>
                                         </div>
-                                        <div class="col-sm-3">
+                                        {{-- <div class="col-sm-3">
                                             <div class="input-group input-group-merge">
                                                 <span id="basic-icon-default-fullname2" class="input-group-text"><i
                                                         class="ti ti-calendar"></i></span>
@@ -48,7 +48,7 @@
                                                     placeholder="John Doe" aria-label="John Doe"
                                                     aria-describedby="basic-icon-default-fullname2">
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -61,7 +61,22 @@
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">รายได้แยกตามประเภท</h5>
                                         </div>
-                                        <div class="btn-group">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                                <label for="yearSelect">ปี</label>
+                                            
+                                            <select id="yearSelect" class="form-control"></select>
+
+                                                <script>
+                                                const yearSelect = document.getElementById("yearSelect");
+                                                const currentYear = new Date().getFullYear();
+
+                                                for (let year = currentYear; year >= 2020; year--) {
+                                                    let option2 = new Option(year, year);
+                                                    yearSelect.add(option2);
+                                                }
+                                                </script>
+                                        </div>
+                                        {{-- <div class="btn-group">
                                             <button type="button"
                                                 class="btn btn-label-secondary waves-effect">เดือนปัจจุบัน</button>
                                             <button type="button"
@@ -95,7 +110,7 @@
                                                 <li><a class="dropdown-item waves-effect"
                                                         href="javascript:void(0);">December</a></li>
                                             </ul>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="card-body">
                                         <div id="chart01"></div>
@@ -116,19 +131,19 @@
                                                 <input type="text" id="bs-rangepicker-basic" class="form-control">
                                             </div> --}}
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect">ปี</label>
+                                                <label for="yearSelect2">ปี</label>
                                             
-                                            <select id="yearSelect" class="form-control"></select>
+                                            <select id="yearSelect2" class="form-control"></select>
 
-                                                <script>
-                                                const yearSelect = document.getElementById("yearSelect");
-                                                const currentYear = new Date().getFullYear();
+                                            <script>
+                                                const yearSelect2 = document.getElementById("yearSelect2");
+                                                const currentYear2 = new Date().getFullYear();
 
-                                                for (let year = currentYear; year >= 2020; year--) {
+                                                for (let year = currentYear2; year >= 2020; year--) {
                                                     let option = new Option(year, year);
-                                                    yearSelect.add(option);
+                                                    yearSelect2.add(option);
                                                 }
-                                                </script>
+                                            </script>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -145,9 +160,25 @@
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">รายจ่ายแยกตามประเภท</h5>
                                         </div>
-                                        <div class="btn-group">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                                <label for="yearSelect3">ปี</label>
+                                            
+                                            <select id="yearSelect3" class="form-control"></select>
+
+                                                <script>
+                                                const yearSelect3 = document.getElementById("yearSelect3");
+                                                const currentYear3 = new Date().getFullYear();
+
+                                                for (let year = currentYear3; year >= 2020; year--) {
+                                                    let option2 = new Option(year, year);
+                                                    yearSelect3.add(option2);
+                                                }
+                                                </script>
+                                        </div>
+                                        {{-- <div class="btn-group">
                                             <button type="button"
                                                 class="btn btn-label-secondary waves-effect">เดือนปัจจุบัน</button>
+                                            <select id="yearSelect3" class="form-control"></select>
                                             <button type="button"
                                                 class="btn btn-label-secondary dropdown-toggle dropdown-toggle-split waves-effect"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -179,7 +210,7 @@
                                                 <li><a class="dropdown-item waves-effect"
                                                         href="javascript:void(0);">December</a></li>
                                             </ul>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="card-body">
                                         <div id="chart03"></div>
@@ -202,16 +233,16 @@
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <label for="yearSelect">ปี</label>
                                             
-                                            <select id="yearSelect2" class="form-control"></select>
+                                            <select id="yearSelect4" class="form-control"></select>
 
                                                 <script>
-                                                const yearSelect2 = document.getElementById("yearSelect2");
-                                                const currentYear = new Date().getFullYear();
+                                                    const yearSelect4 = document.getElementById("yearSelect4");
+                                                    const currentYear4 = new Date().getFullYear();
 
-                                                for (let year = currentYear; year >= 2020; year--) {
-                                                    let option2 = new Option(year, year);
-                                                    yearSelect2.add(option2);
-                                                }
+                                                    for (let year = currentYear4; year >= 2020; year--) {
+                                                        let option2 = new Option(year, year);
+                                                        yearSelect4.add(option2);
+                                                    }
                                                 </script>
                                         </div>
                                     </div>
@@ -221,20 +252,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <!-- Sales last 6 months -->
+                        {{-- <div class="row">
                             <div class="col-md-12 mb-4">
                                 <div class="card h-100">
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">รายได้และรายจ่ายรวม</h5>
                                         </div>
-                                        <div class="">
-                                            <div class="input-group input-group-merge">
-                                                <span class="input-group-text" id="basic-addon-search31"><i
-                                                        class="ti ti-calendar-event"></i></span>
-                                                <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                            </div>
+                                        <div style="display: flex;align-items: center;gap: 10px;">
+                                            <label for="year">ปี:</label>
+                                            <select onchange="onYearChange(this)" name="year" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default">
+                                                @for ($year = date('Y'); $year >= 2000; $year--)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -243,7 +274,7 @@
                                 </div>
                             </div>
 
-                        </div>
+                        </div> --}}
                     </div>
                     <!-- / Content -->
 
@@ -466,9 +497,15 @@
     </script>
     <script>
     var options = {
-        series: [30, 20, 20, 30],
-        labels: ['Incorrect address', 'Weather conditions', 'Federal Holidays', 'Damage during transit'],
-        colors: ['#28C76F', '#56CA00', '#56CA0099', '#56CA0066'],
+        series: [100
+        // , 20, 20, 30
+    ],
+        labels: [''
+        // , 'Weather conditions', 'Federal Holidays', 'Damage during transit'
+    ],
+        colors: ['#28C76F'
+        // , '#56CA00', '#56CA0099', '#56CA0066'
+    ],
         chart: {
             type: 'donut',
             height: '450px'
@@ -522,7 +559,7 @@
                             fontWeight: 600,
                             label: 'ภาพรวมรายได้',
                             formatter: function(w) {
-                                return '72%';
+                                return '100%';
                             }
                         }
                     }
@@ -708,7 +745,7 @@
                     fontFamily: 'IBM plex sans thai',
                     fontWeight: 600,
                 },
-            }5151515
+            }
         },
         fill: {
             opacity: 1

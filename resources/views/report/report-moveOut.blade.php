@@ -201,8 +201,8 @@
                                                     <tr class="odd text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
                                                         <td class="sorting_1">A212</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>09/07/2024</span></td>
@@ -217,8 +217,8 @@
                                                     <tr class="even text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
                                                         <td class="sorting_1">A606</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>
@@ -233,8 +233,8 @@
                                                     <tr class="odd text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
                                                         <td class="sorting_1">A502</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>
@@ -249,8 +249,8 @@
                                                     <tr class="even text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
                                                         <td class="sorting_1">A605</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>

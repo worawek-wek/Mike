@@ -10,8 +10,8 @@ use App\Models\Branch;
 use App\Models\Work_shift;
 use App\Models\Category;
 use App\Models\IncomeList;
-use App\Models\UserLeave;
-use App\Models\News;
+use App\Models\PaymentList;
+use App\Models\Receipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -135,6 +135,27 @@ class IncomeExpensesController extends Controller
             $expenses->save();
             
             if(@$request->payment_sd_list['title']){
+                
+                $receipt = new Receipt;
+                $receipt->receipt_number =  $this->generateReceiptCode();
+                $receipt->ref_room_id  =  $request->ref_room_id;
+                $receipt->ref_rent_bill_id  =  0;
+                $receipt->ref_contract_id  =  0;
+                $receipt->ref_renter_id  =  0;
+                $receipt->payment_format  =  0;
+                $receipt->payment_channel  =  0; // รูปแบบชำระเงิน 1=เงินสด / 2=โอนเงิน
+                $receipt->ref_bank_id  =  0;
+                $receipt->transfer_time  =  0;
+                $receipt->payment_date  =  $date;
+                $receipt->amount  =  0;
+                $receipt->ref_type_id  =  0;
+                $receipt->evidence_of_money_transfer  =  0;
+                $receipt->ref_user_id =  Auth::id();
+                $receipt->save();
+                
+                $expenses->ref_receipt_id  =  $receipt->id;
+                $expenses->save(); 
+
                 foreach($request->payment_sd_list['title'] as $key => $payment_sd_list_title){
 
                     $pay_list = new IncomeList;
@@ -144,7 +165,13 @@ class IncomeExpensesController extends Controller
                     $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
                     $pay_list->save();
                     
-                
+                    $pay_list = new PaymentList;
+                    $pay_list->title  =  $payment_sd_list_title;
+                    $pay_list->price  =  $request->payment_sd_list['price'][$key];
+                    $pay_list->ref_payment_id  =  $receipt->id;
+                    $pay_list->document_type  =  2; // Receipt ใบเสร็จรับเงิน
+                    $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
+                    $pay_list->save();
                 }
             }
             
@@ -155,10 +182,32 @@ class IncomeExpensesController extends Controller
         }
         //
     }
+    
+    public function generateReceiptCode()
+    {
+        $year = Carbon::now()->year;
+        $month = Carbon::now()->month;
+        
+        $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
+        
+        $latestReceipt = Receipt::whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month)
+                                ->latest('id')
+                                ->first();
+        
+        $sequence = $latestReceipt ? ((int) substr($latestReceipt->receipt_number, -6)) + 1 : 1;
+        $sequenceCode = str_pad($sequence, 6, '0', STR_PAD_LEFT);
+        
+        $receiptCode = 'RE' . $yearMonth . $sequenceCode;
+        
+        return $receiptCode;
+        
+    }
     public function show($id)
     {
         $data['page_url'] = 'income-expenses';
         $data['income_expenses'] = IncomeExpenses::find($id);
+        // return $data['income_expenses'];
         return view('income-expenses/view-expenses', $data);
     }
     public function summary_IE()

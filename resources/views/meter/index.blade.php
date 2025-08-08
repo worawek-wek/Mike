@@ -8,6 +8,9 @@
     <title>Dashboard - CRM | Vuexy - Bootstrap Admin Template</title>
 </head>
 <style>
+table {
+    border-collapse: unset;
+  }
 .table th {
     font-size: 15px;
     font-weight: bold;
@@ -73,6 +76,7 @@
                                                 <h4 class="mb-0">
                                                     <i class="tf-icons ti ti-id text-main ti-md"></i>
                                                     เลือกรอบจดมิเตอร์
+                                                    
                                                 </h4>
                                             </div>
                                             
@@ -342,6 +346,95 @@
             <!-- / Layout page -->
         </div>
 
+        <div class="modal fade modalHeadDecor" id="change_meter" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header rounded-0">
+                        <span class="modal-title">
+                            <span class="h5" style="color: white;">&nbsp;เปลี่ยนมิเตอร์&nbsp;</span>
+                        </span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="change_meter_form">
+                        @csrf
+                        <div class="col-md-12">
+                            <div class="card shadow-none bg-transparent mb-3">
+                                <div class="card-body p-5">
+                                    <div class="row g-3">
+
+                                        <!-- Radio: มิเตอร์น้ำเต็ม -->
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input name="ref_reason_id" class="form-check-input" type="radio" id="defaultRadio1" value="1" checked onclick="toggleReasonFields()">
+                                                <label class="form-check-label" for="defaultRadio1">มิเตอร์น้ำเต็ม</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Input + Button Group -->
+                                        <div class="col-12 px-5 pb-3" id="div_reason1">
+                                            <label for="max_meter" class="form-label">กรุณาเลือกค่าสูงสุดของมิเตอร์น้ำ</label>
+                                            <div class="input-group">
+                                                <!-- ปุ่มลบ -->
+                                                <button class="btn" style="border: 2px solid #a69feb" type="button" id="btn-decrease">
+                                                    <i class="tf-icons ti ti-minus"></i>
+                                                </button>
+
+                                                <!-- input -->
+                                                <input readonly
+                                                    name="meter_before_change[1]"
+                                                    type="number"
+                                                    class="form-control text-center"
+                                                    value="9999"
+                                                    id="max_meter"
+                                                    style="background-color: rgba(75, 70, 92, 0.08);"
+                                                />
+                                                <input type="hidden" name="start_value_of_new_meter[1]" value="0">
+
+                                                <!-- ปุ่มเพิ่ม -->
+                                                <button class="btn" style="border: 2px solid #a69feb" type="button" id="btn-increase">
+                                                    <i class="tf-icons ti ti-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Radio: เปลี่ยนมิเตอร์น้ำ -->
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input name="ref_reason_id" class="form-check-input" type="radio" id="defaultRadio2" value="2" onclick="toggleReasonFields()">
+                                                <label class="form-check-label" for="defaultRadio2">เปลี่ยนมิเตอร์น้ำ</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- รายละเอียดเพิ่มเติม (เมื่อเลือก "เปลี่ยนมิเตอร์น้ำ") -->
+                                        <div id="div_reason2" class="col-12 px-5" style="display:none;">
+                                            <div class="mb-3">
+                                                <label for="meter_before_change[2]" class="form-label">
+                                                    กรุณากรอกหน่วยมิเตอร์ล่าสุดของมิเตอร์น้ำตัวเก่า<span class="text-danger"> *</span>
+                                                </label>
+                                                <input type="number" name="meter_before_change[2]" class="form-control text-center" id="meter_before_change" autocomplete="off" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="start_value_of_new_meter" class="form-label">
+                                                    กรุณากรอกหน่วยมิเตอร์เริ่มต้นของมิเตอร์น้ำตัวใหม่<span class="text-danger"> *</span>
+                                                </label>
+                                                <input type="number" name="start_value_of_new_meter[2]" class="form-control text-center" id="start_value_of_new_meter" autocomplete="off" value="0" required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer rounded-0 justify-content-center">
+                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                            <button type="submit" class="btn btn-main">บันทึก</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
 
@@ -351,6 +444,7 @@
     <!--add service  Modal -->
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    
     <script src="assets/vendor/libs/select2/select2.js"></script>
     <script src="assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
     <script src="assets/js/forms-selects.js"></script>
@@ -384,11 +478,39 @@
             data: searchWaterData,
             success: function(data) {
                 $(".water_table").html(data);
+                $('[data-bs-toggle="tooltip"]').tooltip();
             }
         });
 
     }
+    const input = document.getElementById("max_meter");
+    const btnPlus = document.getElementById("btn-increase");
+    const btnMinus = document.getElementById("btn-decrease");
 
+    btnPlus.addEventListener("click", () => {
+        let value = input.value;
+        input.value = value + "9"; // เพิ่ม 9 ต่อท้าย
+    });
+
+    btnMinus.addEventListener("click", () => {
+        let value = input.value;
+        if (value.length > 1) {
+            input.value = value.slice(0, -1); // ลบ 1 หลักด้านท้าย
+        }
+    });
+    function toggleReasonFields() {
+            const input_reason = document.querySelector('input[name="ref_reason_id"]:checked').value;
+            const div_reason1 = document.getElementById('div_reason1');
+            const div_reason2 = document.getElementById('div_reason2');
+            // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
+            if (input_reason == '1') {
+                div_reason1.style.display = 'block';
+                div_reason2.style.display = 'none';
+            } else {
+                div_reason1.style.display = 'none';
+                div_reason2.style.display = 'block';
+            }
+        }
     function loadElectricityData(pages){
         
         $('.p_electricity_search').each(function() {

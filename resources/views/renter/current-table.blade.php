@@ -72,21 +72,31 @@
                             {{@$row->vehicle->car_registration ?? '-'}}
                         </td>
                         <td class="text-center">
-                            @if(@$row->room_for_rent->date_stay)
-                            {{ date('d/m/Y', strtotime(@$row->room_for_rent->date_stay)) }}
+                            @if(@$row->room_for_rent->room->contract->contract_date)
+                            {{ date('d/m/Y', strtotime(@$row->room_for_rent->room->contract->contract_date)) }}
                             @else
                             -
                             @endif
                         </td>
                         <td class="text-center">
-                            @if(@$row->room_for_rent->date_stay)
-                            {{ date('d/m/Y', strtotime("+6 months", strtotime(@$row->room_for_rent->date_stay))) }}
+                            @if(@$row->room_for_rent->room->contract->contract_date)
+                                @php
+                                    $contractDate = @$row->room_for_rent->room->contract->contract_date;
+                                    $period = @$row->room_for_rent->room->contract->period;
+                                    $endDate = null;
+
+                                    if ($contractDate && $period) {
+                                        $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
+                                    }
+                                @endphp
+
+                                {{ $endDate ?? '-' }}
                             @else
                             -
                             @endif
                         </td>
                         <td class="text-center">
-                            6
+                            {{ @$row->room_for_rent->room->contract->period }}
                             {{-- {{ $row->room_for_rent->room->name }} --}}
                         </td>
                         {{-- <td class="text-center">

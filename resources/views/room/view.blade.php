@@ -126,57 +126,65 @@
                       <div class="tab-pane fade active show mb-5" id="navs-pills-top-edit" role="tabpanel">
                         <div class="card shadow-none bg-transparent">
                             <div class="card-body mb-4" style="background-color: #f5f5f5;border-radius: 1em;border: 1.6px solid #b5b5b56b;">
-                                <div class="d-flex">
+                                <div class="row mb-3">
+                                    <div class="col-md-8" style="padding-right: unset !important;">
+                                    </div>
+                                    <div class="col-md-2" style="padding-right: 0">
+                                        <select name="change_room" id="change_room" data-style="btn-default" onchange="change_room(this.val)">
+                                                <option value="all">ย้ายห้อง</option>
+                                                @foreach ($otherRooms as $or)
+                                                    <option value="{{ $or->id }}">{{ $or->name }}</option>
+                                                @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 d-flex justify-content-bottom align-items-bottom">
+                                        <div class="text-end">
+                                            <button type="submit" id="change_room_btn" class="btn btn-warning waves-effect waves-light" disabled>ยืนยัน</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @foreach ($renter as $key => $rorc)
+                                    
+                                <div class="d-flex mb-2">
                                     <div class="col-sm-2">
                                         <img src="/main_picture/user-detail.png" width="100%" style="border-radius: 50%;">
                                     </div>
                                     <div class="col-sm-9 px-4">
                                         <b class="dam border-bottom border-light mb-2" style="display: block;">
-                                            {{ $room_for_rent->prefix.' '.$room_for_rent->full_name }}
+                                            {{ $rorc->prefix.' '.$rorc->full_name }}
+                                            <span class="text-main mx-2" style="cursor: pointer;" onclick="addRenter({{ $room->id }}, {{ $rorc->id }})"><i class="ti ti-search"></i></span>
+                                            @if ($key > 0)
+                                                <span class="text-danger" style="cursor: pointer;" onclick="deleteRenter({{ $room->id }}, {{ $rorc->id }})"><i class="ti ti-trash"></i></span>
+                                            @endif
                                         </b>
                                             <b class="dam-l">
                                                 เบอร์โทร :
                                             </b>
-                                            <span>{{ $room_for_rent->phone }}</span>
+                                            <span>{{ $rorc->phone }}</span>
                                             <br>
                                             <b class="dam-l">
                                                 เลขบัตรประชาชน :
                                             </b>
-                                            <span>{{ $room_for_rent->id_card_number }}</span>
+                                            <span>{{ $rorc->id_card_number }}</span>
                                             
-                                                <div class="row mt-3">
-                                                    <div class="col-md-4" style="padding-right: unset !important;">
-                                                    </div>
-                                                    <div class="col-md-4" style="padding-right: 0">
-                                                        <select name="change_room" id="change_room" class="select2 form-select form-select-sm" data-style="btn-default" onchange="change_room(this.val)">
-                                                                <option value="all">ย้ายห้อง</option>
-                                                                @foreach ($otherRooms as $or)
-                                                                    <option value="{{ $or->id }}">{{ $or->name }}</option>
-                                                                @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4 d-flex justify-content-bottom align-items-bottom">
-                                                        <div class="text-end">
-                                                            <button type="submit" id="change_room_btn" class="btn btn-warning waves-effect waves-light" disabled>ยืนยัน</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                         </div>
                                 </div>
+                                @endforeach
+
                             </div>
                             {{-- <button type="button" class="btn btn-success waves-effect waves-light mt-3 m-auto"></button> --}}
                             <button class="btn btn-success waves-effect waves-light mt-3 m-auto"
                                     tabindex="0" aria-controls="DataTables_Table_0"
                                     type="button" aria-haspopup="dialog"
-                                    aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addRenter">
+                                    {{-- aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addRenter" --}}
+                                    onclick="addRenter({{ $room->id }})"
+                                    >
                                 <span><i class="ti ti-plus"></i> เพิ่มข้อมูลผู้เช่า</span>
                             </button>
 
                         </div>
                     </div>
                     
-
-
 
 {{-- ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -186,8 +194,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
                         <div class="tab-pane fade" id="navs-pills-top-contract" role="tabpanel">
-                            
-                        
                         <form id="form_contract" @if ($room->status == 2) style="display:none;" @endif>
                             @csrf
                             <input type="hidden" name="ref_renter_id" value="{{ $room_for_rent->id }}">
@@ -229,11 +235,14 @@
                       </div>
 <script>
     edit_contract();
-    function edit_contract(){   // function ดึงข้อมูล แสดง form แก้ไขสัญญา
+    function edit_contract(contract_id = null){   // function ดึงข้อมูล แสดง form แก้ไขสัญญา
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-room-form-contract/{{$room->id}}",
             success: function(data) {
+                if(contract_id != null){
+                    url = "/room/update_contract/"+contract_id;
+                }
                 $("#room-form-contract").html(data);
 
                 initContractFormScript();
@@ -289,9 +298,9 @@
                       <div class="tab-pane fade" id="navs-pills-top-payment" role="tabpanel">
                             <label class="mb-1">เลือกบิลย้อนหลัง</label>
                             <select name="month" id="select2month" class="select2 form-select form-select-lg" onchange="get_bill(this.value)" required>
-                                <option value="2025-6">{{ $month_thai[5] }} 2025</option>
-                                <option value="2025-5">{{ $month_thai[4] }} 2025</option>
-                                <option value="2025-4">{{ $month_thai[3] }} 2025</option>
+                                @foreach ($month_year_bill as $month)
+                                    <option value="{{ $month->year.'-'.$month->month }}">{{ $month_thai[$month->month].'/'.$month->year}}</option>
+                                @endforeach
                             </select>
                         <div id="bill">
                             
@@ -365,7 +374,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
                             <div class="tab-pane fade" id="navs-pills-top-MoveOut" role="tabpanel">
-                                @include('room/move-out')
+                                @if($room->status == 2)
+                                    @include('room/move-out')
+                                @else
+                                
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -488,9 +501,22 @@
                                 view('{{$room->id}}');
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {
@@ -552,9 +578,22 @@
 
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 }
@@ -597,9 +636,22 @@
                                 // $('#room-rental-contract').html('');
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {
@@ -631,6 +683,8 @@
                 $('#contract_date_to').val(newDate);
             }
         });
+        var url = "/room/insert_contract";
+
         $('#form_contract').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
             
@@ -640,7 +694,6 @@
                 return console.log('ฟอร์มไม่ถูกต้อง');
             }
 
-            let url = "/room/insert_contract";
             
             if("{{$room->status}}" == 2 ){   // ถ้าทำสัญญาแล้ว ให้เรียกใช้ funtion get_contract()
                 
@@ -681,9 +734,22 @@
                                 // $('#room-rental-contract').html('');
                             // }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {

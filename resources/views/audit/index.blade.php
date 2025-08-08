@@ -193,7 +193,7 @@
                                                     <div class="col-md-2" style="padding-right: unset !important;">
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;"
-                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
+                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false"
@@ -285,7 +285,7 @@
                                                     <div class="col-md-2" style="padding-right: unset !important;">
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;"
-                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
+                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false"

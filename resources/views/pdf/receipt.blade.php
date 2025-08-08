@@ -199,7 +199,7 @@
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
                 <td style="font-size: large;">
-                    {{ number_format($receipt->amount) }} บาท
+                    {{ number_format($receipt->total_amount) }} บาท
                 </td>
             </tr>
         </table>
@@ -277,7 +277,7 @@
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
                 <td style="font-size: large;">
-                    {{ number_format($receipt->amount) }} บาท
+                    {{ number_format($receipt->total_amount) }} บาท
                 </td>
             </tr>
         </table>

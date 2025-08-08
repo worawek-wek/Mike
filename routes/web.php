@@ -87,10 +87,17 @@ Route::middleware('auth')->group(function() {
     Route::controller(ReportController::class)->group(function() {                    //////////////////////////
         Route::get('report/view-overview', 'view_overview')->name('report.view_overview');    //////////////////////////
         Route::get('report/rent-bill', 'rent_bill')->name('report.rent_bill');    //////////////////////////
+        Route::get('report/rent-bill/datatable', 'rent_bill_datatable')->name('report.rent-bill-datatable');    //////////////////////////
+        Route::get('report/rent-bill/summary', 'rent_bill_summary')->name('report.rent-bill-summary');    //////////////////////////
         Route::get('report/move-in', 'move_in')->name('report.move_in');    //////////////////////////
+        Route::get('report/move-in/datatable', 'move_in_datatable')->name('report.move-in-datatable');    //////////////////////////
         Route::get('report/move-out', 'move_out')->name('report.move_out');    //////////////////////////
         Route::get('report/bad-debt', 'badDebt')->name('report.bad_debt');    //////////////////////////
         Route::get('report/monthly-booking', 'monthly_booking')->name('report.monthly_booking');    //////////////////////////
+        Route::get('report/monthly-booking/datatable', 'monthly_booking_datatable')->name('report.monthly_booking-datatable');    //////////////////////////
+        Route::get('report/monthly-booking/excel', 'monthly_booking_excel')->name('report.monthly_booking-excel');    //////////////////////////
+        Route::get('report/view-overview/datatable', 'view_overview_datatable')->name('report.view-overview-datatable');    //////////////////////////
+        Route::get('report/view-overview/excel', 'view_overview_excel')->name('report.view-overview-excel');    //////////////////////////
     });
     Route::controller(SettingController::class)->group(function() {                    //////////////////////////
 
@@ -120,9 +127,12 @@ Route::middleware('auth')->group(function() {
         Route::get('setting/room-layout', 'room_layout')->name('setting.room_layout');    //////////////////////////
         Route::post('insert_all', 'insert_all')->name('setting.insert_all');    //////////////////////////
         ////////////////
+        Route::get('setting/room-layout/qr-code', 'room_layout_qr_code')->name('setting.room_layout_qr-code');    //////////////////////////
         Route::get('setting/room-layout/building', 'room_layout_building')->name('setting.room_layout_building');    //////////////////////////
         Route::post('setting/room-layout/building', 'room_layout_building_insert')->name('setting.room_layout_building_insert');    //////////////////////////
         Route::post('setting/room-layout/upload_qr_code', 'upload_qr_code')->name('setting.upload_qr_code');    //////////////////////////
+        Route::post('setting/room-layout/update_qr_code', 'update_qr_code')->name('setting.update_qr_code');    //////////////////////////
+        Route::delete('setting/room-layout/delete_qr_code/{id}', 'delete_qr_code')->name('setting.delete_qr_code');    //////////////////////////
         Route::delete('setting/room-layout/building/{id}', 'room_layout_building_delete')->name('setting.room_layout_building_delete');    //////////////////////////
         Route::get('setting/room-layout/floor/{building_id}', 'room_layout_floor')->name('setting.room_layout_floor');    //////////////////////////
         Route::post('setting/room-layout/floor', 'room_layout_floor_insert')->name('setting.room_layout_floor_insert');    //////////////////////////
@@ -191,8 +201,9 @@ Route::middleware('auth')->group(function() {
         // ////////////////
     });
     Route::controller(DashboardController::class)->group(function() {                    //////////////////////////
-        Route::get('dashboard', 'index')->name('dashboard');    //////////////////////////
+        Route::get('dashboard', 'index')->name('dashboard');    ////////////////////////// 
         Route::get('dashboard/datatable', 'datatable')->name('room.datatable');    //////////////////////////
+        Route::get('dashboard/monthly-rent-income', 'monthly_rent_income')->name('room.monthly-rent-income');    //////////////////////////
         Route::get('dashboard/overdue', 'overdue')->name('dashboard.overdue');    //////////////////////////
         Route::get('dashboard/overdue/{id}', 'invoice')->name('dashboard.invoice');    //////////////////////////
         Route::get('dashboard/{branch_id}', 'index')->name('dashboard');    //////////////////////////
@@ -204,13 +215,18 @@ Route::middleware('auth')->group(function() {
         Route::get('pdf/invoice-many/{invoice_id}', 'invoice_many')->name('pdf.invoice_many');    //////////////////////////
         Route::get('pdf/invoice-bill-all/{invoice_id}', 'invoice_bill')->name('pdf.invoice_bill');    //////////////////////////
         Route::get('pdf/income-expenses-all/{invoice_id}', 'income_expenses_all')->name('pdf.income_expenses_all');    //////////////////////////
-        Route::get('pdf/checkCarPDF/{invoice_id}', 'checkCarPDF')->name('pdf.checkCarPDF');
+        Route::get('pdf/checkCarPDF/{status}', 'checkCarPDF')->name('pdf.checkCarPDF');
+        Route::get('pdf/report/monthly-booking', 'report_monthly_booking')->name('pdf.report-monthly-booking');
+        Route::get('pdf/report/view-overview', 'report_view_overview')->name('pdf.report-view-overview');
     });
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////
         Route::get('room/reserve', 'reserve_form')->name('reserve');    //////////////////////////
-        Route::post('room/reserve/chec-user', 'reserve_form_check_user')->name('reserve_form_check_user');    //////////////////////////
+        Route::get('room/form-room-rental-contract', 'room_rental_contract_form')->name('form-room-rental-contract');    //////////////////////////
+        Route::post('room/reserve/chec-user', 'reserve_form_check_user')->name('reserve_form_check_user');    ////////////////////////// 
         
+        Route::get('room/get-form-add-renter/{room_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
+        Route::get('room/get-form-add-renter/{room_id}/{renter_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
         Route::get('room/get-deposit', 'get_deposit')->name('get-deposit');    //////////////////////////
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
@@ -234,8 +250,8 @@ Route::middleware('auth')->group(function() {
         Route::get('room/datatable', 'datatable')->name('room.datatable');    //////////////////////////
         Route::get('room/summary', 'room_summary')->name('room.summary');    //////////////////////////
         Route::post('room/change_room/{old}/{new}', 'change_room')->name('room.change_room');    //////////////////////////
-        Route::post('room/insert_renter', 'insert_renter')->name('room.insert_renter');    //////////////////////////
-        Route::get('room/export/excel', 'export_excel')->name('room.insert_renter');    //////////////////////////
+        Route::post('room/insert-or-update-renter', 'insert_or_update_renter')->name('room.insert_or_update_renter');    //////////////////////////
+        Route::get('room/export/excel', 'export_excel')->name('room.export_excel');    //////////////////////////
         Route::get('room/{id}', 'show')->name('show');    //////////////////////////
         Route::get('room/asset/{room_id}/{asset_id}', 'get_asset')->name('room.get_asset');    //////////////////////////
         Route::post('room/asset/update_asset', 'update_asset')->name('room.update_asset');    //////////////////////////
@@ -246,7 +262,9 @@ Route::middleware('auth')->group(function() {
     Route::controller(MeterController::class)->group(function() {                   //////////////////////////
         Route::get('meter', 'index')->name('meter');    //////////////////////////
         Route::get('meter/water/datatable', 'water_datatable')->name('meter.water-datatable');    //////////////////////////
+        Route::get('meter/get-water-meter-unit/{id}', 'get_water_meter_unit')->name('meter.get-water-meter-unit');    //////////////////////////
         Route::post('meter/water_unit', 'water_unit_update')->name('meter.water-unit_update');    //////////////////////////
+        Route::post('meter/change-meter/water/{id}', 'change_meter')->name('meter.water-change-meter');    //////////////////////////
         Route::get('meter/electricity/datatable', 'electricity_datatable')->name('meter.electricity-datatable');    //////////////////////////
         Route::get('meter/electricity/export/excel', 'electricityExportExcel')->name('meter.electricity-export-excel');    //////////////////////////
         Route::get('meter/water/export/excel', 'waterExportExcel')->name('meter.water-export-excel');    //////////////////////////
@@ -254,9 +272,10 @@ Route::middleware('auth')->group(function() {
     });
     Route::controller(RenterController::class)->group(function() {                   //////////////////////////
         Route::get('renter', 'index')->name('renter');    //////////////////////////
+        Route::delete('renter/{renter_id}/{room_id}', 'destroy')->name('renter.destroy');    //////////////////////////
         Route::get('renter/current/datatable', 'current_datatable')->name('renter.current-datatable');    //////////////////////////
         Route::get('renter/old/datatable', 'old_datatable')->name('renter.old-datatable');    //////////////////////////
-        Route::get('renter/export/excel', 'exportExcel'); 
+        Route::get('renter/export/excel/{status}', 'exportExcel'); 
     });
     Route::controller(VehicleController::class)->group(function() {                   //////////////////////////
         Route::get('vehicle', 'index')->name('vehicle');    //////////////////////////
@@ -295,6 +314,7 @@ Route::middleware('auth')->group(function() {
         Route::post('bill/payment_bill', 'payment_bill')->name('bill.payment_bill');    //////////////////////////
         Route::get('bill/{id}', 'invoice')->name('bill.invoice');    //////////////////////////
         Route::post('bill/change_status_bill/{id}', 'change_status_bill')->name('bill.change-status-bill');    //////////////////////////
+        Route::post('bill/delete-receipt/{receipt_id}', 'delete_receipt')->name('bill.delete-receipt');    //////////////////////////
     });
     Route::controller(ApartmentController::class)->group(function() {                    //////////////////////////
         Route::get('apartment', 'index')->name('apartment');    //////////////////////////

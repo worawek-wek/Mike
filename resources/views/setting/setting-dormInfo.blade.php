@@ -88,8 +88,8 @@
                                                         placeholder="บ้านเลขที่/ หมู่/ ซอย/ ถนน" value="{{ $branch->address }}" required />
                                                 </div>
                                                 <div class="col-sm-3">
-                                                    <label>เลือกจังหวัด</label>
-                                                    <select name="ref_province_id" id="select2Basic" class="select2 form-select form-select-lg">
+                                                    <label>เลือกจังหวัด <span class="text-danger">*</span></label>
+                                                    <select name="ref_province_id" id="select2Basic" class="select2 form-select form-select-lg" required>
                                                         <option selected>เลือกจังหวัด</option>
                                                         @foreach ($province as $pro)
                                                             <option @if ($pro->id == $branch->ref_province_id)
@@ -99,8 +99,8 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-3">
-                                                    <label>เลือกอำเภอ</label>
-                                                    <select name="ref_district_id" id="select2District" class="select2 form-select form-select-lg">
+                                                    <label>เลือกอำเภอ <span class="text-danger">*</span></label>
+                                                    <select name="ref_district_id" id="select2District" class="select2 form-select form-select-lg" required>
                                                         <option selected>เลือกอำเภอ</option>
                                                         @foreach ($district as $dis)
                                                             <option @if ($dis->id == $branch->ref_district_id)
@@ -110,8 +110,8 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-3">
-                                                    <label>เลือกตำบล</label>
-                                                    <select name="ref_subdistrict_id" id="select2Subdistrict" class="select2 form-select form-select-lg">
+                                                    <label>เลือกตำบล <span class="text-danger">*</span></label>
+                                                    <select name="ref_subdistrict_id" id="select2Subdistrict" class="select2 form-select form-select-lg" required>
                                                         <option selected>เลือกตำบล</option>
                                                         @foreach ($subdistrict as $sub_dis)
                                                             <option @if ($sub_dis->id == $branch->ref_subdistrict_id)
@@ -121,9 +121,9 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-3">
-                                                    <label for="" class="form-label">รหัสไปรษณีย์</label>
+                                                    <label for="" class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                                     <input type="text" name="zipcode" class="form-control" id="zipcode"
-                                                        placeholder="รหัสไปรษณีย์" value="{{ $branch->zipcode }}" />
+                                                        placeholder="รหัสไปรษณีย์" value="{{ $branch->zipcode }}" required/>
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <input type="hidden" id="lat" name="lat" value="{{ $branch->lat }}">
@@ -134,7 +134,7 @@
                                                 <div class="col-sm-6">
                                                     <label for="" class="form-label">เบอร์โทรติดต่อหอพัก<span
                                                             class="text-danger">*</span></label>
-                                                    <input type="text" name="phone" class="form-control" id="" placeholder=""
+                                                    <input type="tel" name="phone" class="form-control" id="" placeholder=""  pattern="^\d{9,10}$"
                                                     value="{{ $branch->phone }}" required />
                                                 </div>
                                                 <div class="col-sm-6">

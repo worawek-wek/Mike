@@ -4,62 +4,71 @@
     }
 </script>
 <style>
-    .active .menu-link i {
-        color: #000000 !important; /* เปลี่ยนสีของไอคอนใน <li> ที่มีคลาส active */
-    }
-    .active .menu-link {
-        color: #000000 !important; /* เปลี่ยนสีของไอคอนใน <li> ที่มีคลาส active */
-        background: white !important;
-    }
-    .active .menu-link > div {
-        color: #000000 !important;
-    }
-    .layout-menu{
+    /* สีพื้นหลัง sidebar */
+    aside#layout-menu {
         background-color: #6f6f6f !important;
     }
-    .menu-link > div{
-        color:white;
+
+    /* ปิด pseudo-element ที่อาจทับ background */
+    aside#layout-menu .menu-link::before {
+        display: none !important;
     }
-    .menu-link i {
-        color: white !important; /* เปลี่ยนสีของไอคอนใน <li> ที่มีคลาส active */
+
+    /* สีปกติของลิงก์เมนู (ยังไม่ active) */
+    aside#layout-menu .menu-link > div,
+    aside#layout-menu .menu-link i {
+        color: white !important;
     }
-    .menu-link:hover > div,
-    .menu-link:hover > i {
-        color: #000000 !important; /* Change background on hover */
+
+    /* Hover (เมื่อเอาเมาส์ชี้) */
+    aside#layout-menu .menu-link:hover > div,
+    aside#layout-menu .menu-link:hover > i {
+        color: #000000 !important;
     }
-    .menu-toggle::after {
-        content: "";
-        position: absolute;
-        top: 48%;
-        display: block;
-        width: 0.42em;
-        height: 0.42em;
-        border: 1.5px solid white;
-        border-bottom: 0;
-        border-left: 0;
-        transform: translateY(-50%) rotate(45deg);
+
+    /* เมนูหลักที่ active */
+    aside#layout-menu .menu-item.active > .menu-link {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-radius: 6px;
+        font-weight: bold;
     }
-    .menu-item.open .menu-toggle::after {
-        content: "";
-        position: absolute;
-        top: 48%;
-        display: block;
-        width: 0.42em;
-        height: 0.42em;
-        border: 1.5px solid #6f6f6f;
-        border-bottom: 0;
-        border-left: 0;
-        transform: translateY(-50%) rotate(45deg);
+
+    aside#layout-menu .menu-item.active > .menu-link > div,
+    aside#layout-menu .menu-item.active > .menu-link i {
+        color: #000000 !important;
     }
-    .menu-item.open .menu-icon {
-        color: #6f6f6f !important; /* เปลี่ยนสีพื้นหลัง */
+
+    /* เมนูย่อยที่ active */
+    aside#layout-menu .menu-sub .menu-item.active > .menu-link {
+        background-color: #f0f0f0 !important;
+        color: #000000 !important;
+        border-radius: 6px;
     }
-    .menu-item.open .menu-toggle > div {
-        color: #6f6f6f !important; /* เปลี่ยนสีพื้นหลัง */
-        font-weight: 500;
+
+    aside#layout-menu .menu-sub .menu-item.active > .menu-link > div,
+    aside#layout-menu .menu-sub .menu-item.active > .menu-link i {
+        color: #000000 !important;
     }
-    /* .menu-link > i:hover {
-        color: #53b9b8 !important; /* เปลี่ยนสีของไอคอนใน <li> ที่มีคลาส active */
+
+    /* ลบ gradient เดิมที่อาจถูกกำหนดใน theme เดิม */
+    .bg-menu-theme.menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+    .menu-vertical .menu-item .menu-toggle::after {
+        color: white;
+    }
+    .menu-vertical .menu-item:hover .menu-toggle::after {
+        color: #000000; /* หรือสีที่คุณต้องการเวลาชี้เมาส์ */
+    }
+    .menu-vertical .menu-item.active .menu-toggle::after {
+        color: rgb(0, 0, 0);
+    }
+    .bg-menu-theme .menu-inner .menu-item.open > .menu-link.menu-toggle
+    {
+        background:#9d9da0;
+    }
 </style>
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme pt-2">
     <div class="app-brand demo" style="height: 66px;">
@@ -270,15 +279,29 @@
     </ul>
 </aside>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var links = document.querySelectorAll("ul li a");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
         var currentUrl = window.location.pathname;
+        var links = document.querySelectorAll(".menu-link");
 
-        links.forEach(function(link) {
-            if (link.getAttribute("href") === currentUrl) {
-                link.parentElement.classList.add("active");
+        links.forEach(function (link) {
+            var href = link.getAttribute("href");
+
+            if (href && currentUrl.startsWith(href)) {
+                var li = link.closest("li.menu-item");
+                if (li) {
+                    li.classList.add("active");
+
+                    // เปิดเมนูแม่ ถ้ามี
+                    var parentToggle = li.closest("ul.menu-sub");
+                    if (parentToggle) {
+                        var parentMenu = parentToggle.closest("li.menu-item");
+                        if (parentMenu) {
+                            parentMenu.classList.add("open", "active");
+                        }
+                    }
+                }
             }
         });
     });
-    </script>
+</script>

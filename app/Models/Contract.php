@@ -18,10 +18,14 @@ class Contract extends Model
 
     public function room()
     {
-        return $this->hasMany('App\Models\Room', 'ref_room_id', 'id');
+        return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
     }
     public function renter()
     {
         return $this->hasOne('App\Models\Renter', 'id', 'ref_renter_id');
+    }
+    public function room_for_rent()
+    {
+        return $this->hasOne('App\Models\RoomForRent', 'id', 'ref_room_for_rent_id');
     }
 }

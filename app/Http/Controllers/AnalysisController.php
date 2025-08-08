@@ -37,7 +37,8 @@ class AnalysisController extends Controller
      */
     public function monthly_rent(Request $request)
     {
-        return view('analysis/analysis-monthlyRent');
+        $data['summary'] = $this->summary(session("branch_id"));
+        return view('analysis/analysis-monthlyRent', $data);
     }
     public function income_expense(Request $request)
     {

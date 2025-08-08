@@ -13,15 +13,37 @@ use App\Models\RentBill;
 use App\Models\Receipt;
 use App\Models\Renter;
 use App\Models\Contract;
+use Carbon\Carbon;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function summary($branch_id)
     {
+        if(!$branch_id){
+            $branch_id = session("branch_id");
+        }
+        $lastMonth = Carbon::now()->subMonth();
         $confirm_by_employee = Receipt::with('payment_list')
                                         ->whereHas('invoice', function ($q) {
-                                            $q->where('ref_status_id', 2);
+                                            $q->where('ref_status_id', '!=', 5);
+                                        })
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('ref_type_id', 1)
+                                        ->get()
+                                        ->sum(function ($receipt) {
+                                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                                        });
+
+        $all_receipt_last_month = Receipt::with('payment_list')
+                                        ->whereHas('invoice', function ($q) use ($lastMonth) {
+                                            $q->where('year', $lastMonth->year)
+                                                ->where('month', $lastMonth->month);
+                                        })
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
                                         })
                                         ->where('ref_type_id', 1)
                                         ->get()
@@ -31,14 +53,21 @@ class Controller extends BaseController
 
         $confirm_by_ceo = Receipt::with('payment_list')->whereHas('invoice', function ($q) {
                                             $q->where('ref_status_id', 5);
-                                        })->where('ref_type_id', 1)->get()->sum('total_amount');
+                                        })
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('ref_type_id', 1)->get()->sum('total_amount');
 
         $confirm_by_ceo_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
                                                 ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])->where('ref_status_id', 5)
                                                 ->where('ref_type_id', 1)->get()->sum('total_amount');
 
-        $overdue_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
-                                                ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])->where('ref_status_id', 7)
+        $all_rent_bill_last_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y', strtotime('-1 month')))[0])
+                                                ->whereHas('room_for_rent.room.floor.building', function ($query) use ($branch_id) {
+                                                    $query->where('ref_branch_id', $branch_id);
+                                                })
+                                                ->where('year', explode('-', date('m-Y', strtotime('-1 month')))[1])
                                                 ->where('ref_type_id', 1)->get()->sum('total_amount');
                             // ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                             // ->where('rent_bills.ref_status_id', 5)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
@@ -47,6 +76,9 @@ class Controller extends BaseController
                         ->whereHas('invoice', function ($q) {
                             $q->where('ref_status_id', 2)
                                 ->where('payment_channel', 1);
+                        })
+                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                            $query->where('ref_branch_id', $branch_id);
                         })
                         ->where('ref_type_id', 1)
                         ->get()
@@ -58,6 +90,9 @@ class Controller extends BaseController
                             ->whereHas('invoice', function ($q) {
                                 $q->where('ref_status_id', 2)
                                     ->where('payment_channel', 2);
+                            })
+                            ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                $query->where('ref_branch_id', $branch_id);
                             })
                             ->where('ref_type_id', 1)
                             ->get()
@@ -88,7 +123,10 @@ class Controller extends BaseController
         //                                 ->distinct('rooms.id')
         //                                 ->count();
         
-        $all_booking_room = Room::where('rooms.status', 1)->count();
+        $all_booking_room = Room::whereHas('floor.building', function ($query) use ($branch_id) {
+                                    $query->where('ref_branch_id', $branch_id);
+                                    })
+                                    ->where('rooms.status', 1)->count();
 
 
         $all_room = Room::join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
@@ -112,10 +150,12 @@ class Controller extends BaseController
         if ($all_room > 0) {
             $data['percent'] = number_format((100/$all_room)*$all_booking_room, 2); // อัตราเข้าพัก
         }
+        $data['all_receipt_last_month'] = number_format($all_receipt_last_month);
         $data['confirm_by_employee'] = number_format($confirm_by_employee,2).' บาท'; // ชำระเงินโดยพนักงาน
         $data['confirm_by_ceo'] = number_format($confirm_by_ceo,2).' บาท'; // ชำระเงินโดยผู้บริหาร
         $data['confirm_by_ceo_this_month'] = number_format($confirm_by_ceo_this_month); // ชำระเงินโดยผู้บริหาร
-        $data['overdue_this_month'] = number_format($overdue_this_month); // ชำระเงินโดยผู้บริหาร
+        $data['all_rent_bill_last_month'] = number_format($all_rent_bill_last_month); // ชำระเงินโดยผู้บริหาร
+        $data['overdue_this_month'] = number_format($all_rent_bill_last_month-$all_receipt_last_month); // ชำระเงินโดยผู้บริหาร
         $data['confirm_by_employee_confirm_by_ceo'] = number_format($confirm_by_employee + $confirm_by_ceo,2).' บาท'; // ชำระเงินหลังคอนเฟิร์ม
         $data['transfer'] = number_format($transfer,2).' บาท'; // เงินโอน
         $data['cash'] = number_format($cash,2).' บาท'; // เงินสด

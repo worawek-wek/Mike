@@ -208,7 +208,7 @@
                     <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
                 </td>
                 <td width="80%" style="padding: 0px 40px;">
-                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="note">หมายเหตุ(Note) สวัสดีชาวโลก</div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>

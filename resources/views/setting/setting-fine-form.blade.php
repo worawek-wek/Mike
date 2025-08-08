@@ -7,7 +7,7 @@
     </div>
     <div class="col-sm-10 col-8">
         <label for="defaultSelect" class="form-label">กำหนดค่าปรับรายวัน</label>
-        <input type="text" name="fine_day" class="form-control" value="{{ @$fine->fine_day }}">
+        <input type="number" name="fine_day" class="form-control" value="{{ @$fine->fine_day }}">
     </div>
     <div class="col-sm-2 col-4">
         <label for="defaultSelect" class="form-label">&nbsp;</label>
@@ -23,7 +23,7 @@
     </div> --}}
     <div class="col-sm-4 col-8">
         <label for="defaultSelect" class="form-label">มีค่าปรับสูงสุด</label>
-        <input type="text" name="maximum_fine" class="form-control" value="{{ @$fine->maximum_fine }}">
+        <input type="number" name="maximum_fine" class="form-control" value="{{ @$fine->maximum_fine }}">
     </div>
     <div class="col-sm-2 col-4">
         <label for="defaultSelect" class="form-label">&nbsp;</label>

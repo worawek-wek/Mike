@@ -48,7 +48,7 @@ class UserController extends Controller
 
         $data['page_url'] = 'register';
         $data['page'] = 'พนักงาน';
-        $data['position'] = Position::get();
+        $data['position'] = Position::whereIn('id', [1,2])->get();
         // $data['title'] = 'Profile';
         
         return view('register/index', $data);

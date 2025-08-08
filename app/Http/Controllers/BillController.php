@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
+use App\Models\Meter;
 use App\Models\IncomeExpenses;
 use App\Models\User;
+use App\Models\RoomHasService;
+use App\Models\Service;
+use App\Models\Discount;
 use App\Models\Contract;
 use App\Models\Receipt;
 use App\Models\PaymentList;
@@ -53,7 +57,20 @@ class BillController extends Controller
         $request['limit'] = 9999999;
         $request['re'] = 1;
         $request['ref_status_id'] = 2;
-        $data['list_data'] = $this->datatable($request);
+        $data['list_data'] = Receipt::orderBy('rooms.name','ASC')
+                                ->whereHas('invoice', function ($q) {
+                                            $q->where('ref_status_id', '!=', 5);
+                                        })
+                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                ->where('buildings.ref_branch_id', session("branch_id"))
+                                ->where('receipts.ref_type_id', 1)
+                                ->distinct('receipts.id')
+                                ->select('receipts.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent')
+                                ->paginate();
+
         return view('bill/waiting-for-confirmation', $data);
     }
     
@@ -124,6 +141,11 @@ class BillController extends Controller
             $rent_bill->water_amount = $request->water_amount;
             $rent_bill->water_unit = $request->water_unit;
             
+            $pay_list = PaymentList::find($request->payment_list_id);
+            $pay_list->unit  =  $request->water_unit;
+            $pay_list->price  =  $request->water_amount;
+            $pay_list->save();
+
             $amount = PaymentList::where('ref_payment_id', $rent_bill->id)->where('document_type', 1)->where('discount', 0)->sum('price') - PaymentList::where('ref_payment_id', $rent_bill->id)->where('document_type', 1)->where('discount', 1)->sum('price');
             
             $total = Room::find($request->ref_room_id)->rent;
@@ -137,6 +159,7 @@ class BillController extends Controller
                         $pay_list->ref_payment_id  =  $rent_bill->id;
                         $pay_list->document_type  =  1; // RentBill ใบแจ้งหนี้, ใบแจ้งชำระเงิน
                         $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
+                        $pay_list->new_list_from_incomplate  =  1;
                         $pay_list->save();
                         
                         $total = $this->calculate_total($total, $request->payment_sd_list['discount'][$key], $request->payment_sd_list['price'][$key]);
@@ -158,12 +181,16 @@ class BillController extends Controller
         }
         //
     }
-    public function payment_bill(Request $request)
+     // ชำระบิล
+    public function payment_bill(Request $request) // ชำระบิล
     {
         try{
             // return $request;
             // return $this->generateInvoiceCode();
             $rent_bill = RentBill::find($request->id);
+            if($request->fine_paid_at){
+                $rent_bill->fine_paid_at = date('Y-m-d');
+            }
             // $rent_bill->payment_channel = $request->payment_channel;
             // $rent_bill->water_amount = $request->water_amount;
             // $rent_bill->water_unit = $request->water_unit;
@@ -173,6 +200,14 @@ class BillController extends Controller
             $image_name = "";
             if($request->file('evidence_of_money_transfer')){
                 // return 3;
+                    $request->validate([
+                        'evidence_of_money_transfer' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    ],[
+                        'evidence_of_money_transfer.required' => 'กรุณาเลือกรูปภาพ',
+                        'evidence_of_money_transfer.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                        'evidence_of_money_transfer.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                        'evidence_of_money_transfer.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                    ]);
                 $file = $request->file('evidence_of_money_transfer');
                 $nameExtension = $file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
@@ -273,6 +308,7 @@ class BillController extends Controller
             }
             $rent_bill->total = $rent_bill->total_amount;
             $rent_bill->payment_channel = $request->payment_channel;
+            $rent_bill->ref_status_id = 2;
 
             $rent_bill->save();
             
@@ -321,14 +357,35 @@ class BillController extends Controller
         $data['invoice'] = $invoice;
         $data['contract'] = $contract;
         $data['bank'] = Bank::get();
+        $data['days'] = [
+            'Sunday'    => 'อาทิตย์',
+            'Monday'    => 'จันทร์',
+            'Tuesday'   => 'อังคาร',
+            'Wednesday' => 'พุธ',
+            'Thursday'  => 'พฤหัสบดี',
+            'Friday'    => 'ศุกร์',
+            'Saturday'  => 'เสาร์',
+        ];
+        
+        $prevMonth = (int)$invoice->month - 1;
+        $prevYear = (int)$invoice->year;
+
+        if ($prevMonth < 1) {
+            $prevMonth = 12;
+            $prevYear -= 1;
+        }
+
+        $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+        
+        $data['meterPrevious'] = Meter::where('ref_room_id', $contract->ref_room_id)->where('month', $prevMonth)->where('year', $prevYear)->first();
 
         if($invoice->ref_status_id == 3){
             return view('bill/incomplete', $data);
         }
-        if($invoice->ref_status_id == 7){
+        // if($invoice->ref_status_id == 7){
             return view('bill/payment', $data);
-        }
-        return view('bill/invoice', $data);
+        // }
+        // return view('bill/invoice', $data);
     }
     public function bill_summary()
     {
@@ -336,8 +393,10 @@ class BillController extends Controller
     }
     public function change_status_bill(Request $request, $id)
     {
-        // return $request;
         try{
+            if($request->status == 3){
+                PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->delete();
+            }
             if($id == 'all'){
                 $insert = RentBill::where('ref_status_id', 2);
                 $insert->update(['ref_status_id' => $request->status]);
@@ -347,6 +406,36 @@ class BillController extends Controller
 
             $insert = RentBill::whereIn('id', explode(',', $id));
             $insert->update(['ref_status_id' => $request->status]);
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        //
+    }
+    public function delete_receipt(Request $request, $id)
+    {
+        // return $request;
+        try{
+                $re_del = Receipt::find($id);
+
+                PaymentList::where('ref_payment_id', $re_del->id)->where('document_type', 2)->delete();
+
+                $re_del?->delete();
+                
+                $rent_bill = RentBill::find($re_del->ref_rent_bill_id);
+                // if(count($rent_bill->receipt) == 0){
+                   $rent_bill->ref_status_id = 7;
+                   $rent_bill->save();
+                   
+                    // DB::commit();
+                    // return [ 'rent_bill_id' => $rent_bill->id ];
+                // }
+
+                DB::commit();
+                return true;
 
             DB::commit();
             return true;
@@ -390,56 +479,59 @@ class BillController extends Controller
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent', 'renters.phone')
+                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone')
                                 ->get();
         $branch = Branch::find(session("branch_id"));
-        $data = 
-        [
-            [
-                $branch->name
-            ],
-            [
-                "บิลค่าเช่าห้องเดือน".date('m-Y', strtotime('-1 month'))
-            ],
-            [
-                "ห้อง",
-                "ค่าเช่าห้อง",
-                "ค่าน้ำประปา",
-                "ค่าไฟฟ้า",
-                "ค่าเช่าเฟอร์นิเจอร์",
-                "ค่าที่จอดรถยนต์",
-                "ค่าที่จอดมอเตอร์ไซค์",
-                "ส่วนกลาง",
-                "ค่าห้องพนักงาน",
-                "จดค่าน้ำผิด",
-                "หัก ภาษี",
-                "รวม",
-                "หมายเหตุ",
-                "มิเตอร์น้ำก่อน",
-                "มิเตอร์น้ำหลัง",
-                "มิเตอร์ไฟฟ้าก่อน",
-                "มิเตอร์ไฟฟ้าหลัง",
-                "ชื่อ",
-                "ที่อยู่",
-                "เลขประจำตัวผู้เสียภาษี",
-                "สำนักงานสาขา",
-                "เบอร์โทร"
-            ]
+
+        $service = Service::where('ref_branch_id', session("branch_id"))
+                            ->pluck('name')
+                            ->toArray();
+        $service_price = Service::where('ref_branch_id', session("branch_id"))
+                            ->pluck('price')
+                            ->toArray();
+
+        $data_1 = [
+            "ห้อง",
+            "ค่าเช่าห้อง",
+            "ค่าน้ำประปา",
+            "ค่าไฟฟ้า",
         ];
+        $data_2 = [
+            "รวม",
+            "หมายเหตุ",
+            "มิเตอร์น้ำก่อน",
+            "มิเตอร์น้ำหลัง",
+            "มิเตอร์ไฟฟ้าก่อน",
+            "มิเตอร์ไฟฟ้าหลัง",
+            "ชื่อ",
+            "ที่อยู่",
+            "เลขประจำตัวผู้เสียภาษี",
+            "สำนักงานสาขา",
+            "เบอร์โทร"
+        ];
+
+        $data =  [
+                    [
+                        $branch->name
+                    ],
+                    [
+                        "บิลค่าเช่าห้องเดือน".date('m-Y', strtotime('-1 month'))
+                    ],
+                    array_merge($data_1, $service, $data_2)
+
+                ];
         // return $data;
         foreach($results as $row){
-            $data[] = [
+            // foreach($service_id as $ser_id){
+            //     RoomHasService::where('ref_room_id', $row->room_id)->where('ref_service_id', $ser_id)->first();
+            // }
+            $data_list = [
                         $row->room_name,
                         $row->rent,
                         $row->water_amount,
                         $row->electricity_amount,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
+            ];
+            $data_list_2 = [
                         number_format($row->total_amount),
                         0,
                         0,
@@ -451,8 +543,9 @@ class BillController extends Controller
                         $row->id_card_number,
                         "",
                         $row->phone
-                        
             ];
+            
+            $data[] = array_merge($data_list, $service_price, $data_list_2);
         }
 
         $spreadsheet = new Spreadsheet();

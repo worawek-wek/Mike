@@ -49,7 +49,7 @@
                 <td class="text-center">
                     {{ date('d/m/Y', strtotime($row->created_at)) }}
                 </td>
-                <td class="text-center">
+                <td class="text-center d-write">
                     <a href="javascript:void(0)" class="btn btn-label-success waves-effect" onclick="printPdfReceipt({{$row->id}})">
                         <span class="ti-sm ti ti-printer me-2"></span>{{ $row->receipt_number }}
                     </a>

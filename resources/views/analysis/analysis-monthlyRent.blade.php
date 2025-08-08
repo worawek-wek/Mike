@@ -40,7 +40,7 @@
                                                 วิเคราะห์ค่าเช่ารายเดือน
                                             </h4>
                                         </div>
-                                        <div class="col-sm-3">
+                                        {{-- <div class="col-sm-3">
                                             <div class="input-group input-group-merge">
                                                 <span id="basic-icon-default-fullname2" class="input-group-text"><i
                                                         class="ti ti-calendar"></i></span>
@@ -48,7 +48,7 @@
                                                     placeholder="John Doe" aria-label="John Doe"
                                                     aria-describedby="basic-icon-default-fullname2">
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -57,64 +57,55 @@
                             <!-- วิเคราะห์รายรับค่าเช่ารายเดือน -->
                             <div class="col-sm-8">
                                 <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between">
+                                    {{-- <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">วิเคราะห์รายรับค่าเช่ารายเดือน</h5>
                                             <small class="text-muted">เดือนพฤษภาคม 2024</small>
+                                        </div>
+                                    </div> --}}
+                                    <div class="card-header d-flex justify-content-between">
+                                        <div class="card-title mb-0">
+                                            <h5 class="mb-0">วิเคราะห์รายรับค่าเช่ารายเดือน</h5>
+                                            <small class="text-muted">
+                                                @php
+                                                    \Carbon\Carbon::setLocale('th');
+                                                    $thaiDate = \Carbon\Carbon::now()->subMonth()->translatedFormat('F Y');
+                                                @endphp
+                                                <h4>{{ $thaiDate }}</h4>
+                                            </small>
                                         </div>
                                     </div>
                                     <div class="card-body">
                                         <ul class="p-0 m-0">
                                             <li class="d-flex mb-3">
                                                 <div class="avatar flex-shrink-0 me-4">
-                                                    <span class="avatar-initial rounded bg-light-danger"><i
+                                                    <span class="avatar-initial rounded bg-light-success"><i
                                                             class="ti ti-building-bank ti-26px"></i></span>
                                                 </div>
                                                 <div
                                                     class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                     <div class="me-2">
-                                                        <h6 class="mb-0 fw-normal">ชำระผ่านการโอนเงิน</h6>
-                                                        <small class="text-muted fw-normal d-block">
-                                                            80 ห้อง
-                                                        </small>
+                                                        <h6 class="mb-0 fw">ผู้เช่าชำระค่าเช่าแล้ว</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-danger mb-0">5,401 บาท</h6>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="d-flex mb-3">
-                                                <div class="avatar flex-shrink-0 me-4">
-                                                    <span class="avatar-initial rounded bg-light-success"><i
-                                                            class="ti ti-currency-dollar ti-26px"></i></span>
-                                                </div>
-                                                <div
-                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                                    <div class="me-2">
-                                                        <h6 class="mb-0 fw-normal">ชำระด้วยเงินสด</h6>
-                                                        <small class="text-muted fw-normal d-block">
-                                                            45 ห้อง
-                                                        </small>
-                                                    </div>
-                                                    <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0">17,871 บาท</h6>
+                                                        <h6 class="text-light-success mb-0">{{ $summary['all_receipt_last_month'] }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>
                                         </ul>
                                         <div class="border-2 border-light border-top my-3"></div>
-                                        <h2 class="text-center fw-semibold mb-0"><span class="h5">รวม
-                                            </span>933,584<span class="h5"> บาท</span></h2>
+                                        <h2 class="text-center fw-semibold mb-0"><span class="h5">รวม&nbsp;
+                                            </span>{{ $summary['all_receipt_last_month'] }}<span class="h5"> บาท</span></h2>
                                         <div class="border-2 border-light border-bottom my-3"></div>
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <h5>ผู้เช่าค้างชำระค่าเช่า</h5>
-                                            <h6 class="text-danger text-end">รวมเป็นเงิน 910,312 บาท</h6>
+                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] }} บาท</h6>
                                         </div>
                                         <div class="card card-body bg-light-primary border-0 shadow-none py-5">
                                             <h2 class="text-center fw-semibold mb-0 text-white"><span
                                                     class="h5 text-white">รวมสุทธิ
-                                                </span>933,584<span class="h5 text-white"> บาท</span></h2>
+                                                </span>{{ $summary['all_rent_bill_last_month'] }}<span class="h5 text-white"> บาท</span></h2>
                                         </div>
                                     </div>
                                 </div>
@@ -140,27 +131,15 @@
                                 <div class="card h-100">
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
-                                            <h5 class="mb-0">สรุปรายรับค่าเช่ารายเดือน มิถุนายน/2023 - พฤษภาคม/2024</h5>
+                                            <h5 class="mb-0" id="income-summary-title">สรุปรายรับค่าเช่ารายเดือน มกราคม/{{ date('Y') }} - ธันวาคม/{{ date('Y') }}</h5>
                                         </div>
-                                            {{-- <div class="input-group input-group-merge">
-                                                <span class="input-group-text" id="basic-addon-search31"><i
-                                                        class="ti ti-calendar-event"></i></span>
-                                                <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                            </div> --}}
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect">ปี</label>
-                                            
-                                            <select id="yearSelect" class="form-control"></select>
-
-                                                <script>
-                                                const yearSelect = document.getElementById("yearSelect");
-                                                const currentYear = new Date().getFullYear();
-
-                                                for (let year = currentYear; year >= 2020; year--) {
-                                                    let option = new Option(year, year);
-                                                    yearSelect.add(option);
-                                                }
-                                                </script>
+                                        <div style="display: flex;align-items: center;gap: 10px;">
+                                            <label for="year">ปี:</label>
+                                            <select onchange="onYearChange(this)" name="year" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default">
+                                                @for ($year = date('Y'); $year >= 2000; $year--)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -193,10 +172,11 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
+        
     var options = {
-        series: [72, 28],
-        labels: ['โอนเงิน', 'เงินสด'],
-        colors: ['#FF9494', '#BCE29E'],
+        series: [60, 30, 10],
+        labels: ['ลูกค้าจ่ายตรงเวลา', 'จ่ายล่าช้าแบบนัดเวลา', 'จ่ายละช้าแบบไม่ได้นัดเวลา'],
+        colors: ['#BCE29E', '#ffb975', '#FF9494'],
         chart: {
             type: 'donut',
             height: '450px'
@@ -328,68 +308,118 @@
         ]
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart01"), options);
-    chart.render();
+    var donutChart = new ApexCharts(document.querySelector("#chart01"), options);
+    donutChart.render();
     </script>
     <script>
-    var options = {
-        series: [{
-            data: [400, 100, 220, 260, 180, 110, 40, 150, 180, 250, 320, 0]
-        }],
-        chart: {
-            type: 'bar',
-            height: 380,
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 8,
-                horizontal: false,
-                columnWidth: '20px',
-                startingShape: 'rounded',
-            },
-        },
-        dataLabels: {
-            enabled: false
-        },
-        colors: ['#BCE29E'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11', '12'],
-        },
-        yaxis: {
-            title: {
-                text: '฿ (บาท)',
-                style: {
-                    fontSize: '12px',
-                    fontFamily: 'IBM plex sans thai',
-                    fontWeight: 600,
+            let chart = null; // Global ตัวแปรกราฟ
+
+        // ฟังก์ชันสร้างกราฟ (เรียกแค่ครั้งเดียวตอนโหลดหน้า)
+        function initChart() {
+            const options = {
+                series: [{ data: [] }], // เริ่มต้นไม่มีข้อมูล
+                chart: {
+                    type: 'bar',
+                    height: 380
                 },
-            }
-        },
-        fill: {
-            opacity: 1
-        },
-        tooltip: {
-            y: {
-                formatter: function(val) {
-                    return "฿ " + val
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        horizontal: false,
+                        columnWidth: '20px',
+                        startingShape: 'rounded',
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                colors: ['#BCE29E'],
+                grid: {
+                    borderColor: '#ececed',
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    padding: {
+                        top: -20
+                    }
+                },
+                xaxis: {
+                    categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+                },
+                yaxis: {
+                    title: {
+                        text: '฿ (บาท)',
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'IBM plex sans thai',
+                            fontWeight: 600,
+                        },
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return "฿ " + val
+                        }
+                    }
                 }
+            };
+
+            chart = new ApexCharts(document.querySelector("#chart02"), options);
+            chart.render();
+        }
+
+        // ฟังก์ชันอัปเดตข้อมูลในกราฟแบบเร็ว
+        function renderChart(data) {
+            if (chart) {
+                chart.updateSeries([{ data: data }]); // ✅ อัปเดตข้อมูลกราฟ
             }
         }
-    };
 
-    var chart = new ApexCharts(document.querySelector("#chart02"), options);
-    chart.render();
+        // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+        function loadData(pages){
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    renderChart(data); // อัปเดต chart ด้วยข้อมูลใหม่
+                }
+            });
+        }
+
+        // เมื่อเลือกปีจาก dropdown
+        function onYearChange(selectElement) {
+            const year = selectElement.value;
+
+            // อัปเดตหัวข้อรายปี
+            const titleElement = document.getElementById("income-summary-title");
+            titleElement.textContent = `สรุปรายรับค่าเช่ารายเดือน มกราคม/${year} - ธันวาคม/${year}`;
+
+            // โหลดข้อมูลใหม่
+            loadData("dashboard/monthly-rent-income");
+        }
+
+        // ตัวแปร global
+        var searchData = {};
+        var page = "dashboard/monthly-rent-income";
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        document.addEventListener("DOMContentLoaded", function() {
+            initChart();     // 🔁 สร้างกราฟเปล่าไว้ก่อน
+            loadData(page);  // 📦 โหลดข้อมูลจริงผ่าน AJAX
+        });
     </script>
 </body>
 

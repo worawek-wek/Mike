@@ -66,4 +66,12 @@ class RentBill extends Model
 
         return $billAmount - $paidAmount;
     }
+    public function getTotalPaidAmountAttribute()
+    {
+        $this->loadMissing('receipt.payment_list');
+
+        return $this->receipt->sum(function ($receipt) {
+            return $receipt->total_amount;
+        });
+    }
 }

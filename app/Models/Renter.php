@@ -31,6 +31,10 @@ class Renter extends Model
         return $this->belongsTo(\App\Models\Subdistrict::class, 'ref_subdistrict_id');
     }
 
+    public function branch()
+    {
+        return $this->hasOne('App\Models\Branch', 'id', 'ref_branch_id');
+    }
     public function room_for_rent()
     {
         return $this->hasOne('App\Models\RoomForRents', 'ref_renter_id', 'id');
@@ -41,6 +45,19 @@ class Renter extends Model
         return $this->hasOne(\App\Models\Vehicle::class, 'ref_renter_id', 'id');
     }
 
+    public function vehicles()
+    {
+        return $this->hasMany(\App\Models\Vehicle::class, 'ref_renter_id', 'id');
+    }
+    
+    public function fullName()
+    {
+        $prefix = $this->prefix ?? '';
+        $name = $this->name ?? '';
+        $surname = $this->surname ?? '';
+
+        return trim("{$prefix} {$name} {$surname}");
+    }
 
     public function fullThaiAddress()
     {

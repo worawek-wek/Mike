@@ -176,22 +176,62 @@
             </script>
         <div></div>
         <div></div>
-        <div class="col-sm-6">
+        {{-- <div class="col-sm-6">
             <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท)</label>
             <input type="text" name="contract[1][security_deposit]" class="form-control" id="security_deposit" placeholder="" value="" required/>
+        </div> --}}
+        <div class="row" id="deposit-list">
+            <div class="col-md-12 deposit-item mb-2">
+                <input type="hidden" name="contract[1][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
+                <div class="col-md-12">
+                    <label class="form-label">เงินประกันห้อง (บาท)</label>
+                    <input type="number" name="contract[1][deposit][0][security_deposit]" class="form-control" placeholder="เงินประกันห้อง (บาท)" required />
+                </div>
+            </div>
         </div>
-        <div class="col-sm-6 d-flex align-items-end pb-1">
-            <button
-                id="add_expenses"
-                class="btn btn-sm buttons-collection btn-warning waves-effect waves-light me-2"
-                tabindex="0" aria-controls="DataTables_Table_0"
-                type="button" aria-haspopup="dialog"
-                aria-expanded="false">
-                <span>
-                <i class="ti ti-plus"></i> เพิ่มรายการเงินประกัน</span>
+            <!-- ปุ่มเพิ่มรายการ -->
+        <div class="col-sm-12 text-end mb-3">
+            <button type="button" id="add_expenses" class="btn btn-sm btn-warning">
+                <i class="ti ti-plus"></i> เพิ่มรายการเงินประกัน
             </button>
         </div>
         <div></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    let depositIndex = 1;
+
+    // กดเพิ่มรายการใหม่
+    $('#add_expenses').on('click', function () {
+      const html = `
+        <div class="col-md-12 deposit-item mb-2">
+          <div class="row">
+            <div class="col-md-6">
+              <label class="form-label">ชื่อรายการ</label>
+              <input type="text" name="contract[1][deposit][${depositIndex}][title]" class="form-control" placeholder="เช่น เงินประกันคีย์การ์ด" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">จำนวนเงิน (บาท)</label>
+              <input type="number" name="contract[1][deposit][${depositIndex}][security_deposit]" class="form-control" required />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-danger btn-sm remove-expense">
+                ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      $('#deposit-list').append(html);
+      depositIndex++;
+    });
+
+    // กดลบ
+    $('#deposit-list').on('click', '.remove-expense', function () {
+      $(this).closest('.deposit-item').remove();
+    });
+  });
+</script>
 
         <!-- Container where new items will be appended -->
         <div id="expenses-list"></div>

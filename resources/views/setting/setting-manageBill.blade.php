@@ -85,7 +85,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-12">
-                                                    <label for="" class="form-label">ชื่อบริษัท/ชื่อเต็ม<spanclass="text-danger">*</span></label>
+                                                    <label for="" class="form-label">ชื่อบริษัท/ชื่อเต็ม<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" id="company_name" name="company_name" placeholder="" value="{{@$data->company_name}}" required />
                                                 </div>
                                                 <div class="col-sm-12">
@@ -239,8 +239,17 @@
         });
     });
     function check_add() {
-        var formData = new FormData($("#form_submit")[0]);
-        event.preventDefault(); 
+        var form = document.getElementById("form_submit");
+
+        // ตรวจสอบความถูกต้องของฟอร์ม
+        if (!form.checkValidity()) {
+            form.reportValidity(); // แสดงข้อความเตือน
+            console.log('ฟอร์มไม่ถูกต้อง');
+            return;
+        }
+
+        var formData = new FormData(form);
+
         Swal.fire({
             title: 'ยืนยันการดำเนินการ?',
             text: 'คุณต้องการแก้ไขรายการตั้งค่าบิลใช่หรือไม่?',
@@ -248,14 +257,13 @@
             showCancelButton: true,
             confirmButtonText: 'ตกลง',
             cancelButtonText: 'ยกเลิก',
-            showDenyButton: false,
             didOpen: () => {
                 Swal.getConfirmButton().focus();
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: 'setting/manage-bill', 
+                    url: 'setting/manage-bill',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -269,10 +277,11 @@
                         console.error('เกิดข้อผิดพลาด:', error);
                     }
                 });
-            } else if (result.isDismissed) {
             }
         });
     }
+
+
     const fullToolbar = [
         [{
                 font: []

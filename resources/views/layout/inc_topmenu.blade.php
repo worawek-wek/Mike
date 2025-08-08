@@ -1,3 +1,14 @@
+
+@if (in_array(Auth::user()->user_has_branch->position->id, [3,4]))
+    <style>
+        .d-write {
+            pointer-events: none;       /* ปิดการคลิก */
+            opacity: 0.5;               /* ทำให้ดูจาง */
+            background-color: #f5f5f5;  /* สีพื้นคล้าย disabled */
+            color: #888; 
+        }
+    </style>
+@endif
 <nav
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
             id="layout-navbar">

@@ -248,27 +248,27 @@
                                                                     <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
                                                                 </div>
                                                     
-                                                    {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
+                                                        {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
+                                                    </div>
+                                                            <div class="row mt-2" id="expenses-split-container">
+                                                            </div>
+                                                    <script>
+                                                        document.getElementById('checksplit').addEventListener('change', function() {
+                                                            document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
+                                                            document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
+                                                            document.getElementById('totalpayfull').style.display = this.checked ? 'none' : 'block';
+                                                            $('.payment_list_title').attr('required', true);
+                                                        });
+
+                                                        document.getElementById('payfull').addEventListener('change', function() {
+                                                            document.getElementById('divsplit').style.display = this.checked ? 'none' : 'block';
+                                                            document.getElementById('totalsplit').style.display = this.checked ? 'none' : 'block';
+                                                            document.getElementById('totalpayfull').style.display = this.checked ? 'block' : 'none';
+                                                            $('.payment_list_title').removeAttr('required');
+
+                                                        });
+                                                    </script>
                                                 </div>
-                                                        <div class="row mt-2" id="expenses-split-container">
-                                                        </div>
-                                                <script>
-                                                    document.getElementById('checksplit').addEventListener('change', function() {
-                                                        document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
-                                                        document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
-                                                        document.getElementById('totalpayfull').style.display = this.checked ? 'none' : 'block';
-                                                        $('.payment_list_title').attr('required', true);
-                                                    });
-
-                                                    document.getElementById('payfull').addEventListener('change', function() {
-                                                        document.getElementById('divsplit').style.display = this.checked ? 'none' : 'block';
-                                                        document.getElementById('totalsplit').style.display = this.checked ? 'none' : 'block';
-                                                        document.getElementById('totalpayfull').style.display = this.checked ? 'block' : 'none';
-                                                        $('.payment_list_title').removeAttr('required');
-
-                                                    });
-                                                </script>
-                                            </div>
                                             </div>
                                         </div>
 
@@ -302,7 +302,6 @@
                                                                 @foreach ($move_bank as $move_r_bank)
                                                                     <option value="{{ $move_r_bank->id }}">{{ $move_r_bank->bank.' '.$move_r_bank->bank_account_name }}</option>
                                                                 @endforeach
-
                                                         </div>
                                                         <div class="col-sm-4 mb-2">
                                                             <input type="hidden" name="">
@@ -317,7 +316,7 @@
                                                             </div>
                                                         <div class="col-sm-10 mt-3">
                                                             <label for="paymentReceipt">แนบหลักฐานการโอน</label>
-                                                            <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt">
+                                                            <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt" accept="image/*">
                                                             <div class="preview-container">
                                                                 <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                                                             </div>
@@ -692,6 +691,18 @@
                                 <div class="mt-4 text-end col-12">
                                     
                                     <button
+                                            id="add_meter"
+                                            style="padding-right: 14px;padding-left: 14px;"
+                                            class="btn btn-sm buttons-collection btn-info waves-effect waves-light me-2"
+                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                            type="button" aria-haspopup="dialog"
+                                            aria-expanded="false"
+                                            onclick="editMeter()"
+                                            >
+                                        <span>
+                                        <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
+                                    </button>
+                                    <button
                                             id="add_discount"
                                             style="padding-right: 14px;padding-left: 14px;"
                                             class="btn btn-sm buttons-collection btn-danger waves-effect waves-light me-2"
@@ -712,82 +723,13 @@
                                         <i class="ti ti-plus"></i> เพิ่มรายการ</span>
                                     </button>
                                 </div>
-                                    {{-- <button
-                                            id="add_discount"
-                                            style="padding-right: 14px;padding-left: 14px;"
-                                            class="btn btn-sm buttons-collection btn-info waves-effect waves-light me-2"
-                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                            type="button" aria-haspopup="dialog"
-                                            aria-expanded="false">
-                                        <span>
-                                        <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
-                                    </button> --}}
                                     <style>
                                         .bg-lob {
                                             background-color: rgb(252 228 228);   
                                         }
                                     </style>
                                     <script>
-                                        function calculate_2Price() {
-                                            let total = 0;
-
-                                            $('#discount-table2 tbody tr').each(function () {
-                                                const priceInput = $(this).find('input[name="payment_list[price][]"]');
-                                                const price = parseFloat(priceInput.val());
-
-                                                if (!isNaN(price)) {
-                                                    if (priceInput.hasClass('discount-value')) {
-                                                        total += price;
-                                                    } else {
-                                                        total -= price;
-                                                    }
-                                                }
-                                            });
-
-                                            $('.total-price_2').text(
-                                                total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                            );
-                                        }
-
-                                        function addRow(title = '', price = '', isDiscount = false, id_tr = "") {
-                                            const discountClass = isDiscount ? 'price_increase' : 'discount-value';
-                                            const trBackground = isDiscount ? 'bg-lob' : '';
-
-                                            const html = `
-                                                <tr id="tr${id_tr}" class='${trBackground}'>
-                                                    <td>
-                                                        <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
-                                                    </td>
-                                                    <td class="text-end d-flex gap-1">
-                                                        <input type="number" name="payment_list[price][]" class="form-control calculate_2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน">
-                                                        <button type="button" class="btn btn-sm btn-danger btn-remove-row">
-                                                            ลบ
-                                                        </button>
-                                                    </td>
-                                                </tr>`;
-                                            $('#discount-table2 tbody').append(html);
-                                            calculate_2Price();
-                                        }
-
-                                        $('#add_discount').click(() => addRow('ส่วนลด', '', true));
-                                        $('#add_expenses').click(() => addRow());
-
-                                        // คำนวณเมื่อมีการพิมพ์ชื่อหรือจำนวน
-                                        $(document).on('input', '.payment_list_title, .calculate_2', function () {
-                                            calculate_2Price();
-                                        });
-
-                                        // ลบเฉพาะแถวที่หัวข้อเป็น "ส่วนลด"
-                                        $(document).on('click', '.btn-remove-row', function () {
-                                            const row = $(this).closest('tr');
-                                            const title = row.find('input[name="payment_list[title][]"]').val()?.trim();
-
-                                                row.remove();
-                                                calculate_2Price();
-                                        });
-
-                                        // เรียกใช้ตอนโหลด
-                                        calculate_2Price();
+                                        ////////////////////////////////////////////////////
                                     </script>
 
                                 {{-- /////////////////////////////// --}}
@@ -948,8 +890,148 @@
                                         </button>
                                     </div>
                                 </form>
+
                                 {{-- /////////////////////////////// --}}
                                 <script>
+                                    function calculate_2Price() {
+                                        let total = 0;
+
+                                        $('#discount-table2 tbody tr').each(function () {
+                                            const priceInput = $(this).find('input[name="payment_list[price][]"]');
+                                            const price = parseFloat(priceInput.val());
+
+                                            if (!isNaN(price)) {
+                                                // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
+                                                if (priceInput.hasClass('discount-value')) {
+                                                    total -= price;
+                                                } else {
+                                                    // รายการปกติ บวกเพิ่ม
+                                                    total += price;
+                                                }
+                                            }
+                                        });
+
+                                        $('.total-price_2').text(
+                                            total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        );
+                                    }
+
+                                    function addRow(title = '', price = '', isDiscount = false) {
+                                        const discountClass = isDiscount ? 'discount-value' : 'price_increase';
+                                        const trBackground = isDiscount ? 'bg-lob' : '';
+
+                                        const html = `
+                                            <tr class="${trBackground}">
+                                                <td>
+                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
+                                                </td>
+                                                <td class="text-end d-flex gap-1">
+                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน" oninput="calculate_2Price()">
+                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
+                                                </td>
+                                            </tr>`;
+                                        $('#discount-table2 tbody').append(html);
+                                        calculate_2Price();
+                                    }
+
+                                    // กดเพิ่มส่วนลด
+                                    $('#add_discount').click(() => addRow('ส่วนลด', '', true));
+
+                                    // กดเพิ่มรายการปกติ
+                                    $('#add_expenses').click(() => addRow('', '', false));
+
+                                    // กดเพิ่มรายการค่าน้ำค่าไฟฟ้าสุดท้าย
+                                    function addWaterElectric() {
+                                        // ดึงค่ามิเตอร์น้ำ
+                                        const waterOld = parseFloat(document.querySelector('.water-old')?.value) || 0;
+                                        const waterNew = parseFloat(document.querySelector('.water-new')?.value) || 0;
+                                        const waterUsed = Math.max(waterNew - waterOld, 0);
+                                        const waterPricePerUnit = 20; // ใส่ราคาต่อหน่วยจริง
+                                        const waterPrice = waterUsed * waterPricePerUnit;
+
+                                        // ดึงค่ามิเตอร์ไฟฟ้า
+                                        const electricOld = parseFloat(document.querySelector('.electric-old')?.value) || 0;
+                                        const electricNew = parseFloat(document.querySelector('.electric-new')?.value) || 0;
+                                        const electricUsed = Math.max(electricNew - electricOld, 0);
+                                        const electricPricePerUnit = 5; // ใส่ราคาต่อหน่วยจริง
+                                        const electricPrice = electricUsed * electricPricePerUnit;
+
+                                        var modalEl = document.getElementById('move-out-edit-meter');
+                                        var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                        if (modalInstance) {
+                                            modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                        }
+                                        // เพิ่มรายการลงในตาราง
+                                        if (waterUsed > 0) {
+                                            addRow(`ค่าน้ำ (${waterNew} - ${waterOld} = ${waterUsed} ยูนิต)`, waterPrice.toFixed(2), false);
+                                        }
+                                        if (electricUsed > 0) {
+                                            addRow(`ค่าไฟฟ้า (${electricNew} - ${electricOld} = ${electricUsed} ยูนิต)`, electricPrice.toFixed(2), false);
+                                        }
+                                    }
+
+                                    // ลบแถวรายการ
+                                    $(document).on('click', '.btn-remove-row', function () {
+                                        $(this).closest('tr').remove();
+                                        calculate_2Price();
+                                    });
+
+                                    // คำนวณราคาเมื่อพิมพ์ค่า
+                                    $(document).on('input', '.calculate_2', function () {
+                                        calculate_2Price();
+                                    });
+
+                                    // เรียกคำนวณตอนโหลดหน้า
+                                    $(document).ready(function () {
+                                        calculate_2Price();
+                                    });
+                                    
+                                    function calculateUsedRow(row) {
+                                        // สำหรับน้ำ
+                                        const waterOld = row.querySelector('.water-old');
+                                        const waterNew = row.querySelector('.water-new');
+                                        const waterUsed = row.querySelector('.water-used');
+
+                                        if (waterOld && waterNew && waterUsed) {
+                                            const old = parseFloat(waterOld.value) || 0;
+                                            const _new = parseFloat(waterNew.value) || 0;
+                                            const used = _new - old;
+                                            waterUsed.value = used >= 0 ? used : 0;
+                                        }
+
+                                        // สำหรับไฟฟ้า
+                                        const electricOld = row.querySelector('.electric-old');
+                                        const electricNew = row.querySelector('.electric-new');
+                                        const electricUsed = row.querySelector('.electric-used');
+
+                                        if (electricOld && electricNew && electricUsed) {
+                                            const old = parseFloat(electricOld.value) || 0;
+                                            const _new = parseFloat(electricNew.value) || 0;
+                                            const used = _new - old;
+                                            electricUsed.value = used >= 0 ? used : 0;
+                                        }
+                                    }
+
+                                    function calculateUsed(input) {
+                                        const row = input.closest('tr');
+                                        calculateUsedRow(row);
+                                    }
+
+                                    function editMeter() {
+                                        const moveOutEditMeter = new bootstrap.Modal(document.getElementById('move-out-edit-meter'));
+                                        moveOutEditMeter.show();
+                                        $('.water-old').val('{{ intval(@$move_invoice_5->water_unit) }}');
+                                        $('.electric-old').val('{{ intval(@$move_invoice_5->electricity_unit) }}');
+                                        $('.water-new').val('{{ intval(@$room->meterCurrent->water_unit) }}');
+                                        $('.electric-new').val('{{ intval(@$room->meterCurrent->electricity_unit) }}');
+
+                                       document.querySelectorAll('tr').forEach(row => {
+                                            calculateUsedRow(row);
+                                        });
+                                        
+                                        // calculateUsed();
+                                        // $('#view-edit-meter').html($('#v-edit-meter').html());
+                                    }
                                     $('#move_out_submit').on('submit', function(event) {
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {
@@ -960,7 +1042,6 @@
                                         if(total_amount < 0){
                                             return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
                                         }
-                                        return alert(456);
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
                                             text: 'คุณต้องการ ย้ายออก หรือไม่?',
@@ -993,9 +1074,22 @@
                                                             Swal.fire('ย้ายออกเรียบร้อยแล้ว', '', 'success');
                                                         }
                                                     },
-                                                    error: function(error) {
-                                                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                                                        console.error('เกิดข้อผิดพลาด:', error);
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
                                                     }
                                                 });
                                             } else if (result.isDismissed) {
@@ -1085,9 +1179,22 @@
                                                             get_move_out()
                                                         }
                                                     },
-                                                    error: function(error) {
-                                                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                                                        console.error('เกิดข้อผิดพลาด:', error);
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
                                                     }
                                                 });
                                             } else if (result.isDismissed) {

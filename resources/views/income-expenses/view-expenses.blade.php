@@ -67,32 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (count($income_expenses->payment_list) > 0)
-                    @foreach ($income_expenses->payment_list as $key => $payment_list_item)
-                        <tr>
-                            {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
-                            <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
-                                {{ $payment_list_item->title }}
-                            </td>
-                            <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
-                            @if ($key == 1)
-                                <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
-                                    <span id="text_water_amount">
-                                        {{ number_format($payment_list_item->price) }}
-                                    </span>
-                            @else
-                                @if ($payment_list_item->discount == 1)
-                                    {{ number_format(0-$payment_list_item->price) }}
-                                    <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
-                                @else
-                                    {{ number_format($payment_list_item->price) }}
-                                    <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
-                                @endif
-                            @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                @elseif(count($income_expenses->payment_list) > 0)
+                @if (@$income_expenses->receipt->payment_list)
                     @foreach ($income_expenses->receipt->payment_list as $key => $payment_list_item)
                         <tr>
                             {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
@@ -117,7 +92,6 @@
                             </td>
                         </tr>
                     @endforeach
-                @else
                 @endif
             </tbody>
             <tfoot>

@@ -35,17 +35,19 @@
                     </span>
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button type="button" class="btn btn-outline-info nav-link" 
-                    role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
-                    <span>
-                        <i class="ti-md ti ti-report-money"></i>
-                        <b class="dam">
-                        ชำระเงิน
-                        </b>
-                    </span>
-                    </button>
-                </li>
+                @if ($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price') > 0)
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="btn btn-outline-info nav-link" 
+                        role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
+                        <span>
+                            <i class="ti-md ti ti-report-money"></i>
+                            <b class="dam">
+                            ชำระเงิน
+                            </b>
+                        </span>
+                        </button>
+                    </li>
+                @endif
             </ul>
         </div>
         <div class="tab-content" style="box-shadow: unset;padding:0px">
@@ -75,13 +77,12 @@
 
                                 {{ $payment_list_item->title }}
 
-                            @if ($key == 1)
-                                {{ number_format($payment_list_item->unit) }} = {{ $payment_list_item->unit-0 }} ยูนิต)
-                                    
+                            @if (strpos($payment_list_item->title, 'Water rate') !== false)
+                                {{ number_format($payment_list_item->unit) }} = {{ $payment_list_item->unit-$meterPrevious->water_unit }} ยูนิต)
                             @endif
                             </td>
                             <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
-                            @if ($key == 1)
+                            @if ($payment_list_item->unit > 0)
                                 <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                     <span id="text_water_amount">
                                         {{ $payment_list_item->price }}
@@ -111,19 +112,120 @@
                         
             <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
                 <div>
-                    <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
+                    <button type="button" class="btn btn-primary waves-effect" onclick="printPdfReceipt({{ $invoice->id }})">
                         <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
                     </button>
                 </div>
-                <div>
-                    @if (count($invoice->receipt) == 0)
-                        <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกบิล')">
+                    @if ($invoice->ref_status_id == 7 & count($invoice->receipt) == 0)
+                        <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกใบแจ้งหนี้')">
                             <span>
                                 <i class="ti-md ti ti-x"></i>
-                                <b class="dam">ยกเลิกบิล</b>
+                                ยกเลิกใบแจ้งหนี้
                             </span>
                         </button>
                     @endif
+                    @foreach ($invoice->receipt as $key => $item_receipt)
+                        
+                            <table class="table table-detail table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th width="50%" style="vertical-align: middle;font-weight: 500;">สถานะบิล</th>
+                                        <th style="vertical-align: middle; font-weight: 500;">
+                                            <div style="display: flex; align-items: center; gap: 4px;">
+                                                <i class="ti ti-checkbox text-success" style="font-size: 34px"></i>
+                                                <div>
+                                                    <span class="text-success">ชำระเงิน (ผ่านเคาน์เตอร์หอพัก)</span><br>
+                                                    <span style="font-weight: 500; font-size: smaller;">
+                                                        เมื่อ {{ date('d/m/Y , H:i น.', strtotime($item_receipt->created_at)) }} โดย {{ $item_receipt->user->name }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {{-- <span class="text-danger">ค้างชำระ</span><br> --}}
+                                        </th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td> วันที่รับชำระเงิน </td>
+                                        <td>
+                                        @php
+                                            $date = new DateTime(date('Y-m-d', strtotime($item_receipt->created_at)));
+                                            $englishDay = $date->format('l');
+                                            
+                                        @endphp
+                                            {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($item_receipt->created_at)) !!}</td>
+                                    </tr>
+                                    <tr>
+                                        <td> ช่องทางการชำระเงิน </td>
+                                        <td>{{ $item_receipt->payment_channel == 1 ? "เงินสด": "โอนเงิน"; }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-detail table-bordered mt-4">
+                                <thead>
+                                    <tr>
+                                        <th width="70%" style="vertical-align: middle;font-weight: 500;">รายการ</th>
+                                        <th style="vertical-align: middle;font-weight: 500;">
+                                            จำนวนเงิน (บาท)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        @php
+                                            $amount = 0;
+                                        @endphp
+                                    @foreach ($item_receipt->payment_list as $key => $item_payment_list)
+                                        <tr>
+                                            <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                                {{ $item_payment_list->title }}
+                                                @if($item_payment_list->unit > 0 && $key == 1)    
+                                                    {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - $meterPrevious->unit }} ยูนิต)
+                                                @endif
+                                            </td>
+
+                                                @if ($item_payment_list->discount == 1)
+                                                    @php
+                                                        $amount -= $item_payment_list->price;
+                                                    @endphp
+                                                    <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+
+                                                @else
+                                                    @php    
+                                                    $amount += $item_payment_list->price;
+                                                    @endphp
+                                                    <td>{{ number_format($item_payment_list->price) }}</td>
+
+                                                @endif
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>รวม</th>
+                                        <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                                        {{ number_format($amount) }}
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <div class="modal-footer rounded-0 justify-content-start mt-2 pb-0">
+                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdfReceipt({{$item_receipt->id}})"><span
+                                        class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
+                            </div>
+                            @if ($key+1 < count($invoice->receipt))
+                                <hr class="mb-4">
+                            @endif
+                            @if ($invoice->ref_status_id != 5)
+                                <button class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $item_receipt->id }},{{$invoice->id}})">
+                                    <span>
+                                        <i class="ti-md ti ti-x"></i>
+                                        ยกเลิกใบเสร็จ
+                                    </span>
+                                </button>
+                            @endif
+                    @endforeach
+                </div>
                 </div>
             </div>
           </div>
@@ -141,7 +243,7 @@
     <input type="hidden" name="id" value="{{$invoice->id}}">
         {{-- ////////////////////////////////////////////////// --}}
         <div class="tab-content" style="box-shadow: unset;padding:0px">
-            <div class="tab-pane fade show" id="navs-pills-top-contract" role="tabpanel">
+            <div class="tab-pane fade show px-4" id="navs-pills-top-contract" role="tabpanel">
                 <div class="tab-content" style="box-shadow: unset;padding:0px">
                         </h4>
                         <div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
@@ -191,14 +293,33 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $invoice->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
-                                                            </td>
-                                                            <td class="text-end">
-                                                                <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price') }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
-                                                            </td>
-                                                        </tr>
+                                                        @if ($invoice->fine_paid_at < date('Y-m-d') & $invoice->room_for_rent->room->fine_day > 0)
+                                                        <input type="hidden" name="fine_paid_at" value="1">
+                                                            <tr>
+                                                                <td style="display: flex; align-items: center;">
+                                                                    ค่าปรับ เกินชำระ
+                                                                    {{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days }}
+                                                                    วัน
+                                                                    <input type="hidden" name="payment_list[title][]"
+                                                                    value="ค่าปรับ เกินชำระ
+                                                                    {{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days }}
+                                                                    วัน">
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$invoice->room_for_rent->room->fine_day }}
+                                                                    <input type="hidden" name="payment_list[price][]" class="calculate_2"
+                                                                    value="{{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$invoice->room_for_rent->room->fine_day }}">
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                            <tr>
+                                                                <td>
+                                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $invoice->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price') }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                </td>
+                                                            </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
@@ -281,7 +402,9 @@
                                                         calculate_2Price();
                                                     });
                                                 }
-
+                                                setTimeout(() => {
+                                                    calculate_2Price();
+                                                }, 1000);
                                                 function calculate_2Price() { 
                                                     const inputs = document.querySelectorAll('.calculate_2');  // เลือกทุก input ที่มี class="calculate"
                                                     let total = 0;
@@ -382,7 +505,7 @@
                                             </div>
                                         <div class="col-sm-10 mt-3">
                                             <label for="paymentReceipt">แนบหลักฐานการโอน</label>
-                                            <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt">
+                                            <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt" accept="image/*">
                                             <div class="preview-container">
                                                 <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                                             </div>
@@ -390,8 +513,14 @@
                                     </div>
                         
                                     <div class="col-sm-11 mt-2">
-                                        <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท</b>
-                                        <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                                         @if (count($invoice->receipt) == 0)
+                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท</b>
+                                        @endif
+                                            <b id="totalsplit" 
+                                                @if (count($invoice->receipt) == 0)
+                                                    style="display: none"
+                                                @endif
+                                            >ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
                                     </div>
                                 </div>
                             </div>
@@ -553,9 +682,22 @@
                                 Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {

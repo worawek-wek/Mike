@@ -116,7 +116,7 @@
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                    <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer">
+                    <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
                     <div class="preview-container">
                         <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                     </div>

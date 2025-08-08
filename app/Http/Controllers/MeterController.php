@@ -56,6 +56,22 @@ class MeterController extends Controller
         //     // ถ้าการส่ง request ล้มเหลว
         //     return $response->status(); // แสดง status code
         // }
+        
+        // // ตัดอันที่ซ้ำออก
+        // Meter::selectRaw('MIN(id) as id, ref_room_id, month, year')
+        //             ->groupBy('ref_room_id', 'month', 'year')
+        //             ->get()
+        //             ->each(function ($ro) {
+        //                 Meter::where('ref_room_id', $ro->ref_room_id)
+        //                     ->where('month', $ro->month)
+        //                     ->where('year', $ro->year)
+        //                     ->where('id', '!=', $ro->id)
+        //             ->delete();
+        // });
+        // DB::commit();
+        // return 123;
+        // // ตัดอันที่ซ้ำออก
+        
         $branch = Branch::where('ip_meter','!=','')->get();
 
         // /////////////////////////////////
@@ -188,6 +204,25 @@ class MeterController extends Controller
 
         return view('meter/index', $data);
     }
+    public function change_meter(Request $request, $id)
+    {
+        // return $request->meter_before_change[$request->ref_reason_id];
+        $meter = Meter::find($id);
+        $meter->meter_before_change  =  $request->meter_before_change[$request->ref_reason_id];
+        $meter->start_value_of_new_meter  =  $request->start_value_of_new_meter[$request->ref_reason_id];
+        $meter->water_unit  =  $request->start_value_of_new_meter[$request->ref_reason_id];
+        $meter->ref_reason_id  =  $request->ref_reason_id;
+        $meter->save();
+
+        DB::commit();
+        return true;
+    }
+    public function get_water_meter_unit($id)
+    {
+        $meter = Meter::find($id);
+        return (int) $meter->water_unit;
+    }
+    
     public function update_meter(Request $request)
     {
         $dataArray = $request->meter;
@@ -247,23 +282,22 @@ class MeterController extends Controller
                         ->Where('meters.month', $month)->Where('meters.year', $year)
                         ->where('ref_branch_id',session("branch_id"))
                         ->with([
-                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
                             'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
                         ])
-                        // ->WhereHas('room_for_rent', function ($query) {
-                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
-                        // })
-                        ->select('rooms.*', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        ->select('rooms.*',
+                                'meters.water_unit',
+                                'meters.meter_before_change',
+                                'meters.start_value_of_new_meter',
+                                'meters.electricity_unit',
+                                DB::raw("
+                                    CASE meters.ref_reason_id
+                                        WHEN 1 THEN 'มิเตอร์เต็ม'
+                                        WHEN 2 THEN 'เปลี่ยนมิเตอร์'
+                                        ELSE ''
+                                    END as reason_name
+                                "),
+                                'meters.id as meters_id');
 
-        // if(@$request->search){
-        // $results = $results->orWhere(function ($query) use ($request) {
-        //             $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', COALESCE(renters.surname, '')) LIKE ?", ["%{$request->search}%"])
-        //                 ->orWhere('rooms.name','LIKE','%'.$request->search.'%');
-        //         });
-        // }
-        // if($request->building != "all"){
-        // $results = $results->Where('room_for_rents.ref_building_id', $request->building);
-        // }
         
         if ($request->building != "all") {
             // return 456;
@@ -386,11 +420,11 @@ class MeterController extends Controller
         // return $data;
         foreach($results as $key=>$row){
             $data[] = [
-                        intval($row->floor_name),
-                        intval($row->room_name),
-                        intval($row->meterPrevious->electricity_unit),
-                        intval($row->electricity_unit),
-                        intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit),
+                        $row->floor_name,
+                        $row->room_name,
+                        (string) intval(optional($row->meterPrevious)->electricity_unit),
+                        (string) intval($row->electricity_unit),
+                        (string) (intval($row->electricity_unit ?? 0) - intval(optional($row->meterPrevious)->electricity_unit ?? 0)),
             ];
         }
 
@@ -471,11 +505,11 @@ class MeterController extends Controller
         // return $data;
         foreach($results as $key=>$row){
             $data[] = [
-                        intval($row->floor_name),
-                        intval($row->room_name),
-                        intval($row->meterPrevious->water_unit),
-                        intval($row->water_unit),
-                        intval($row->water_unit) - intval($row->meterPrevious->water_unit),
+                        $row->floor_name,
+                        $row->room_name,
+                        (string) intval(optional($row->meterPrevious)->water_unit),
+                        (string) intval($row->water_unit),
+                        (string) (intval($row->water_unit ?? 0) - intval(optional($row->meterPrevious)->water_unit ?? 0)),
             ];
         }
 
@@ -544,22 +578,22 @@ class MeterController extends Controller
 
             $water_unit_used = "0";
             $ele_unit_used = "0";
-            if(intval($row->water_unit) - intval($row->meterPrevious->water_unit) != 0){
-                $water_unit_used = intval($row->water_unit) - intval($row->meterPrevious->water_unit);
+            if(intval($row->water_unit) - intval(@$row->meterPrevious->water_unit) != 0){
+                $water_unit_used = intval($row->water_unit) - intval(@$row->meterPrevious->water_unit);
             }
-            if(intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit) != 0){
-                $ele_unit_used = intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit);
+            if(intval($row->electricity_unit) - intval(@$row->meterPrevious->electricity_unit) != 0){
+                $ele_unit_used = intval($row->electricity_unit) - intval(@$row->meterPrevious->electricity_unit);
             }
 
             $data[] = [
                         $row->floor_name,
                         $row->room_name,
-                        intval($row->meterPrevious->water_unit),
-                        intval($row->water_unit),
-                        $water_unit_used,
-                        intval($row->meterPrevious->electricity_unit),
-                        intval($row->electricity_unit),
-                        $ele_unit_used,
+                        (string) (@$row->meterPrevious->water_unit),
+                        (string) ($row->water_unit),
+                        (string) $water_unit_used,
+                        (string) (@$row->meterPrevious->electricity_unit),
+                        (string) ($row->electricity_unit),
+                        (string) $ele_unit_used,
             ];
         }
 

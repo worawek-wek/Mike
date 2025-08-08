@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                         </div>
-                        <table class="table table-detail border-dbdade" id="discount-table2">
+                        <table class="table table-detail border-dbdade" id="discount-table22">
                             <thead>
                                 <tr>
                                     <th>รายการ</th>
@@ -63,6 +63,8 @@
                                 </tr>
                             </thead>
                             <tbody>
+                            @if (count($receipt_security_deposit) > 0)
+
                                 <tr>
                                     <td>
                                         ค่าเงินประกันห้อง
@@ -76,21 +78,37 @@
                                             }
                                         @endphp
                                         {{-- {{ number_format($invoice->room_for_rent->room->rent) }} --}}
-                                        <input type="number" name="payment_list[price][]" class="form-control calculate" value="{{ (int) $receipt_amount_total }}" placeholder="จำนวนเงิน" max="{{ $receipt_amount_total }}" oninput="calculatePrice()">
+                                        <input type="number" name="payment_list[price][]" class="form-control calculateP" value="{{ (int) $receipt_amount_total }}" placeholder="จำนวนเงิน" max="{{ $receipt_amount_total }}" oninput="calculatePPrice()">
                                     </td>
                                 </tr>
-                            @if (count($receipt_security_deposit) == 0)
-                                <tr style="background-color: #e6e6e6">
-                                    <td>
-                                        หักจากค่าจองห้องพัก
-                                        <input name="payment_list[title][]" type="hidden" value="หักจากค่าจองห้องพัก">
-                                        <input name="discount" type="hidden" value="1">
-                                    </td>
-                                    <td class="text-end">
-                                        {{-- {{ number_format($invoice->room_for_rent->room->rent) }} --}}
-                                        <input type="number" name="payment_list[price][]" class="form-control calculate discount_price" value="{{ (int) $receipt_reservation->amount }}" placeholder="จำนวนเงิน" max="{{ $receipt_reservation->amount }}" oninput="calculatePrice()" readonly>
-                                    </td>
-                                </tr>
+                            @else
+                                @foreach ($rent_bill->payment_list as $bill_list)
+                                    <tr 
+                                    @if ($bill_list['discount'] == 1)
+                                         style="background-color: #e6e6e6"
+                                    @endif
+                                    >
+                                        <td>
+                                            {{ $bill_list['title'] }}
+                                            <input name="payment_list[title][]" type="hidden" value="{{ $bill_list['title'] }}">
+                                        </td>
+                                        <td class="text-end">
+                                            {{-- {{ number_format($invoice->room_for_rent->room->rent) }} --}}
+                                            <input type="number" name="payment_list[price][]" class="form-control calculateP
+                                            @if ($bill_list['discount'] == 1)
+                                                discount_price
+                                            "
+                                                readonly
+                                            @else
+                                            "
+                                            @endif
+                                            value="{{ (int) $bill_list['price'] }}" placeholder="จำนวนเงิน" max="" oninput="calculatePPrice()">
+                                            {{-- @if ($bill_list['discount'] == 1) --}}
+                                                <input name="payment_list[discount][]" type="hidden" value="{{ $bill_list['discount'] }}">
+                                            {{-- @endif --}}
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @endif
                             </tbody>
                             <tfoot>
@@ -174,7 +192,7 @@
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                    <input type="file" class="form-control mb-2" id="evidence_of_money_transfer" name="evidence_of_money_transfer">
+                    <input type="file" class="form-control mb-2" id="evidence_of_money_transfer" name="evidence_of_money_transfer" accept="image/*">
                     <div class="preview-container">
                         <img id="preview_evidence_of_money_transfer" src="" alt="Preview 1" style="display: none; width:30%">
                     </div>
@@ -224,9 +242,9 @@
         $('#checksplit2').on('change', function () {
             if (this.checked) {
                 $('#divsplit2').show();
-                $('#totalsplit').show();
-                $('#totalpayfull2').hide();
-                calculatePrice();
+                // $('#totalsplit').show();
+                $('#totalpayfull2').show();
+                calculatePPrice();
             }
         });
         $(document).ready(function() {
@@ -236,7 +254,7 @@
         $('#payfull2').on('change', function () {
             if (this.checked) {
                 $('#divsplit2').hide();
-                $('#totalsplit').hide();
+                // $('#totalsplit').hide();
                 $('#totalpayfull2').show();
                 $('.total-price').html("{{ number_format($receipt_amount) }}");
                 $('.total-price').val("{{ $contract->security_deposit }}");
@@ -284,41 +302,20 @@
             });
         }
         handleFileInput('evidence_of_money_transfer', 'preview_evidence_of_money_transfer');
-        calculatePrice();
-        
-        // document.getElementById('add_discount2').addEventListener('click', function() {
-        //     const tableBody = document.querySelector('#discount-table2 tbody');
-        //     const newRow = document.createElement('tr');
-        //     newRow.style.backgroundColor = 'rgb(252 228 228)'; // Set background color
-            
-        //     newRow.innerHTML = `
-        //         <td>
-        //             <input name="payment_list_discount[title][]" type="text" class="form-control" placeholder="หัวข้อส่วนลด" required />
-        //         </td>
-        //         <td class="text-end">
-        //             <div style="display: flex; align-items: center; gap: 10px;">
-        //                 <input name="payment_list_discount[price][]" type="number" class="form-control calculate discount_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
-        //                 <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
-        //             </div>
-        //         </td>
-        //     `;
-            
-        //     tableBody.appendChild(newRow);
-        //     addRemoveEvent(newRow);
-        // });
+        calculatePPrice();
 
         document.getElementById('add_expenses2').addEventListener('click', function() {
-            const tableBody = document.querySelector('#discount-table2 tbody');
+            const tableBody = document.querySelector('#discount-table22 tbody');
             const newRow = document.createElement('tr');
             newRow.style.backgroundColor = 'rgb(255 240 225)'; // Set background color
-            console.log(newRow);
+            // console.log(newRow);
             newRow.innerHTML = `
                 <td>
                     <input name="payment_list[title][]" type="text" class="form-control" placeholder="หัวข้อรายการ" required />
                 </td>
                 <td class="text-end">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="payment_list[price][]" type="number" class="form-control calculate add_expenses2_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                        <input name="payment_list[price][]" type="number" class="form-control calculateP add_expenses2_price" oninput="calculatePPrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                         <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
                     </div>
                 </td>
@@ -331,15 +328,16 @@
         function addRemoveEvent(row) {
             row.querySelector('.remove-row').addEventListener('click', function() {
                 row.remove();
-                calculatePrice();
+                calculatePPrice();
             });
         }
         
-        function calculatePrice() { 
-            const inputs = document.querySelectorAll('.calculate');  // เลือกทุก input ที่มี class="calculate"
+        function calculatePPrice() { 
+            const inputs = document.querySelectorAll('.calculateP');  // เลือกทุก input ที่มี class="calculateP"
             let total = 0;
 
-            inputs.forEach(input => {
+            inputs.forEach((input, index) => {
+                console.log(`  ➤ HTML:`, input.outerHTML); // <<< ดู HTML element เต็ม
                 // ลบเครื่องหมายจุลภาคจากค่าที่รับมา
                 let value = input.value.replace(/,/g, ''); 
                 
@@ -355,8 +353,9 @@
                         }
                     }
                 }
+                console.log(value);
             });
-            console.log(total);
+            // console.log(total);
             $('.total-price').html(total.toLocaleString());
             $('.total-price').val(total);
 

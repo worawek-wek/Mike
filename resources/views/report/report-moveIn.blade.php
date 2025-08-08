@@ -177,154 +177,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table class="datatables-products table dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-                                                style="width: 1396px;">
-                                                <thead class="border-top">
-                                                    <tr class=" table-info">
-                                                        <th class="text-center" style="padding: 0 50px;">
-                                                            ห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            วันที่
-                                                        </th>
-                                                        <th class="text-center" style="width: 57px;">
-                                                            โดย
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ช่องทาง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าประกันห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            หักค่ามัดจำจอง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวม
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="odd text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                    <tr class="odd text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                    <tr class="odd text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span>10/02/2024</span>
-                                                        </td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>เงินสด</span></td>
-                                                        <td><span>7,000</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>7,000</span></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            
+                                            
+                                            <div id="loadData">
+
                                             </div>
                                             <div style="width: 1%;"></div>
                                         </div>
@@ -429,7 +285,80 @@
     </div>
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+<script>
+    var page = "{{$page_url}}/datatable";
+    var searchData = {};
+    loadData(page);
+    
+    function loadData(pages){
+        
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+            var inputValue = $(this).val(); // ดึงค่า value ของ input
+            
+            searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+        });
 
+        // alert(page);
+        page = pages;
+        $.ajax({
+            type: "GET",
+            url: pages,
+            data: searchData,
+            success: function(data) {
+                $("#loadData").html(data);
+            }
+        });
+        // alert(page);
+    }
+    
+        function printPdf() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                url: '/pdf/{{$page_url}}',
+                type: 'GET',
+                data: searchData,
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+        function exportExcel() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // แปลงเป็น query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // สร้าง URL พร้อมพารามิเตอร์
+            const targetUrl = `/{{$page_url}}/excel?${queryString}`;
+
+            // เปิด URL ใหม่ (แท็บใหม่)
+            window.open(targetUrl, '_blank');
+        }
+</script>
 </body>
 
 </html>

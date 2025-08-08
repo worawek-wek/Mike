@@ -57,7 +57,7 @@
                 <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
                     {{ date('d/m/Y', strtotime($row->work_start_date)) }}
                 </td>
-                <td class="text-center">
+                <td class="text-center d-write">
                     @php 
                     $ref_position_id_edit = 2;
                     $branch_check = \App\Models\UserHasBranch::where(["ref_branch_id"=>session("branch_id"), "ref_user_id"=>Auth::id()])->first();
@@ -86,7 +86,7 @@
                 <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
                     {{ $row->remark }} 
                 </td>
-                <td class="table-report__action text-center" style="font-size: 12px;">
+                <td class="table-report__action text-center d-write" style="font-size: 12px;">
                     <div class="flex justify-center items-center">
                         <a class="flex items-center text-danger" href="javascript:;" onclick='Delete({{$row->user_has_branch->id}})'>
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp; ลบ

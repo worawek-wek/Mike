@@ -2,6 +2,13 @@
 {{-- @php
     $id = []
 @endphp --}}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+
+<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+
 @foreach ($rent_bill_s as $key => $rent_bill)
 
 <input name="insert[{{ $key }}][ref_room_id]" type="hidden" value="{{ $rent_bill->ref_room_id }}">
@@ -9,7 +16,7 @@
 <input name="insert[{{ $key }}][ref_contract_id]" type="hidden" value="{{ $rent_bill->contract_id }}">
 <input name="insert[{{ $key }}][ref_renter_id]" type="hidden" value="{{ $rent_bill->ref_renter_id }}">
 <input name="insert[{{ $key }}][ref_type_id]" type="hidden" value="3">
-<input name="insert[{{ $key }}][amount]" class="total-price" type="hidden">
+<input name="insert[{{ $key }}][amount]" class="total-price-lhai" type="hidden">
 
 <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">
     {{ number_format($rent_bill->deposit) }}
@@ -55,7 +62,7 @@
                                     <td class="text-end">
                                         {{-- {{ number_format($rent_bill->room_for_rent->room->rent) }} --}}
                                         {{ number_format($rent_bill->deposit) }}
-                                        <input type="hidden" name="insert[{{ $key }}][payment_list][price][]" value="{{ $rent_bill->deposit }}">
+                                        <input type="hidden" name="insert[{{ $key }}][payment_list][price][]" class="calculateLhai" value="{{ $rent_bill->deposit }}">
 
                                     </td>
                                 </tr>
@@ -63,8 +70,8 @@
                             <tfoot>
                                 <tr>
                                     <th>รวม</th>
-                                    <th class="text-end mb-0 fw-bold total-price">
-                                        0
+                                    <th class="text-end mb-0 fw-bold">
+                                        {{ number_format($rent_bill->deposit) }}
                                     </th>
                                 </tr>
                             </tfoot>
@@ -80,24 +87,24 @@
         <div class="flex-grow-1 ms-3 g-3 row">
             <b class="text-black">ช่องทางการชำระเงิน</b> <br>
             <div class="col-sm-11">
-                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
-                <label class="form-check-label" for="reservation_payByCash"> เงินสด </label>
+                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByCashLhai" value="1" checked>
+                <label class="form-check-label" for="reservation_payByCashLhai"> เงินสด </label>
             </div>
 
-            <div id="paymentChanel_Res2">
+            <div id="paymentChanel_ResLhai2">
                 <div class="col-sm-6 mb-2">
-                    <label for="payment_date">วันที่ชำระเงิน</label>
-                    <input type="text" name="insert_single[payment_date]" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                    <label for="payment_date_lhai">วันที่ชำระเงิน</label>
+                    <input type="text" name="insert_single[payment_date]" class="form-control" placeholder="" id="payment_date_lhai" autocomplete="off" value="{{date('d/m/Y')}}"/>
                 </div>
             </div>
 
             <div class="col-sm-11">
-                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
-                <label class="form-check-label" for="reservation_payByTransfer"> โอนเงิน </label>
+                <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByTransferLhai" value="2">
+                <label class="form-check-label" for="reservation_payByTransferLhai"> โอนเงิน </label>
             </div>
 
             <!-- แสดงเมื่อเลือก โอนเงิน -->
-            <div id="paymentChanel_Res" style="display:none;">
+            <div id="paymentChanel_ResLhai" style="display:none;">
                 <div class="col-sm-6 mb-2">
                     <label>เลือกบัญชีธนาคาร</label><span class="text-danger"> *</span>
                     <select class="select2 form-select mb-2" name="insert_single[ref_bank_id]" id="select2RenterReservation">
@@ -111,12 +118,12 @@
                     <input type="time" name="insert_single[transfer_time]" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
                 </div>
                 <div class="col-sm-6 mb-2">
-                    <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                    <input type="text" name="insert_single[payment_date2]" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                    <label for="payment_date_lhai2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                    <input type="text" name="insert_single[payment_date]" class="form-control" placeholder="" id="payment_date_lhai2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                    <input type="file" name="insert_single[evidence_of_money_transfer]" class="form-control mb-2" id="evidence_of_money_transfer">
+                    <input type="file" name="insert_single[evidence_of_money_transfer]" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
                     <div class="preview-container">
                         <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                     </div>
@@ -125,10 +132,10 @@
 
 
             <div class="col-sm-11 mt-3">
-                <b id="totalpayfull2">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">
+                <b id="totalpayfull2">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price-lhai">
                     0
                 </span> &nbsp;บาท</b>
-                <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price-lhai_2">0</span> &nbsp;บาท</b>
             </div>
         </div>
     </div>
@@ -136,56 +143,56 @@
 
   <script>
     
-        $('#payment_date').datepicker({
+        $('#payment_date_lhai').datepicker({
             format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
             todayBtn: "linked",   // เพิ่มปุ่มวันนี้
             clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
             autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
         })
-        $('#payment_date2').datepicker({
+        $('#payment_date_lhai2').datepicker({
             format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
             todayBtn: "linked",   // เพิ่มปุ่มวันนี้
             clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
             autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
         })
-        $('#checksplit2').on('change', function () {
-            if (this.checked) {
-                $('#divsplit2').show();
-                $('#totalsplit').show();
-                calculatePrice();
-            }
-        });
-        $(document).ready(function() {
-            $('.total-price').html("{{ number_format($rent_bill->deposit) }}");
-            $('.total-price').val("{{ $rent_bill->deposit }}");
-        });
-        $('.reservation_payment_channel').on('change', function() {
-            const paymentChannel = $('.reservation_payment_channel:checked').val();
+        // $('#checksplit2').on('change', function () {
+        //     if (this.checked) {
+        //         $('#divsplit2').show();
+        //         $('#totalsplit').show();
+        //         calculateLhaiPrice();
+        //     }
+        // });
+        // $(document).ready(function() {
+        //     $('.total-price-lhai').html("{{ number_format($rent_bill->deposit) }}");
+        //     $('.total-price-lhai').val("{{ $rent_bill->deposit }}");
+        // });
+        $('.reservation_payment_channel_Lhai').on('change', function() {
+            const paymentChannelLhai = $('.reservation_payment_channel_Lhai:checked').val();
 
-            if (paymentChannel === '2') {
+            if (paymentChannelLhai === '2') {
                 // แสดงช่องโอนเงิน
-                $('#paymentChanel_Res').show();
-                $('#paymentChanel_Res2').hide();
+                $('#paymentChanel_ResLhai').show();
+                $('#paymentChanel_ResLhai2').hide();
 
                 // ใส่ required
                 $('#ref_bank_id').attr('required', true);
                 $('#transfer_time').attr('required', true);
-                $('#payment_date2').attr('required', true);
+                $('#payment_date_lhai2').attr('required', true);
             } else {
                 // แสดงช่องเงินสด
-                $('#paymentChanel_Res').hide();
-                $('#paymentChanel_Res2').show();
+                $('#paymentChanel_ResLhai').hide();
+                $('#paymentChanel_ResLhai2').show();
 
                 // เอา required ออก
                 $('#ref_bank_id').removeAttr('required');
                 $('#transfer_time').removeAttr('required');
-                $('#payment_date2').removeAttr('required');
+                $('#payment_date_lhai2').removeAttr('required');
             }
         });
 
         // ให้รันตอนโหลดหน้าด้วย (กรณีมีค่า checked อยู่แล้ว)
         $(document).ready(function() {
-            $('.reservation_payment_channel:checked').trigger('change');
+            $('.reservation_payment_channel_Lhai:checked').trigger('change');
         });
 
         function handleFileInput(fileInputId, previewId) {
@@ -211,7 +218,7 @@
         }
         handleFileInput('evidence_of_money_transfer', 'preview1');
 
-        calculatePrice();
+        calculateLhaiPrice();
         
         document.getElementById('add_discount2').addEventListener('click', function() {
             const tableBody = document.querySelector('#discount-table2 tbody');
@@ -224,7 +231,7 @@
                 </td>
                 <td class="text-end">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="discount_price" type="number" class="form-control calculate discount_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                        <input name="discount_lhai_price" type="number" class="form-control calculateLhai discount_lhai_price" oninput="calculateLhaiPrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                         <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
                     </div>
                 </td>
@@ -245,7 +252,7 @@
                 </td>
                 <td class="text-end">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="expenses_price" type="number" class="form-control calculate add_expenses2_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                        <input name="expenses_price" type="number" class="form-control calculateLhai add_expenses2_price" oninput="calculateLhaiPrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                         <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
                     </div>
                 </td>
@@ -258,12 +265,12 @@
         function addRemoveEvent(row) {
             row.querySelector('.remove-row').addEventListener('click', function() {
                 row.remove();
-                calculatePrice();
+                calculateLhaiPrice();
             });
         }
         
-        function calculatePrice() { 
-            const inputs = document.querySelectorAll('.calculate');  // เลือกทุก input ที่มี class="calculate"
+        function calculateLhaiPrice() { 
+            const inputs = document.querySelectorAll('.calculateLhai');  // เลือกทุก input ที่มี class="calculateLhai"
             let total = 0;
 
             inputs.forEach(input => {
@@ -271,12 +278,12 @@
                 let value = input.value.replace(/,/g, ''); 
                 
                 if (value.trim() !== "" && !isNaN(value)) {
-                    // ตรวจสอบว่า input มี class="discount_price" หรือไม่
-                    if (input.classList.contains('discount_price')) {
-                        // ถ้ามี class="discount_price", ลบค่าออกจาก total
+                    // ตรวจสอบว่า input มี class="discount_lhai_price" หรือไม่
+                    if (input.classList.contains('discount_lhai_price')) {
+                        // ถ้ามี class="discount_lhai_price", ลบค่าออกจาก total
                         total -= parseFloat(value.replace(/[^0-9.-]+/g, ""));
                     } else {
-                        // ถ้าไม่มี class="discount_price", เพิ่มค่าเข้าไปใน total
+                        // ถ้าไม่มี class="discount_lhai_price", เพิ่มค่าเข้าไปใน total
                         if (!isNaN(value) && value.trim() !== "") {
                             total += parseFloat(value);
                         }
@@ -284,11 +291,11 @@
                 }
             });
             console.log(total);
-            $('.total-price').html(total.toLocaleString());
-            $('.total-price').val(total);
+            $('.total-price-lhai').html(total.toLocaleString());
+            $('.total-price-lhai').val(total);
 
-            // อัปเดตค่า total ใน span#total-price
-            // document.getElementById('total-price').innerText = total.toLocaleString();
+            // อัปเดตค่า total ใน span#total-price-lhai
+            // document.getElementById('total-price-lhai').innerText = total.toLocaleString();
         }
         $('#select2RenterReservation').select2();
 

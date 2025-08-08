@@ -63,7 +63,11 @@
                                                                     <i class="ti ti-check ti-26px"></i>
                                                                 </span>
                                                             </div>
-                                                            <h4 class="mb-0 me-2 text-success">มีการจองทั้งหมด 1 การจอง
+                                                            <h4 class="mb-0 me-2 text-success">มีการจองทั้งหมด
+                                                                <span id="all-booking">
+
+                                                                </span> 
+                                                                 การจอง
                                                             </h4>
                                                         </div>
                                                     </div>
@@ -100,8 +104,8 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select name="DataTables_Table_0_length"
-                                                                aria-controls="DataTables_Table_0" class="form-select">
+                                                            <select name="limit" onchange='loadData("{{$page_url}}/datatable")'
+                                                                aria-controls="DataTables_Table_0" class="form-select p_search">
                                                                 <option value="7">7</option>
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
@@ -118,14 +122,15 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input type="month" name="month" class="form-control p_search" onchange='loadData("{{$page_url}}/datatable")' value="{{ date('Y-m') }}">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
 
                                                             <button
                                                                 class="btn btn-secondary add-new btn-label-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
-                                                                type="button">
+                                                                type="button"
+                                                                onclick="printPdf()">
                                                                 <span>
                                                                     <i class="ti ti-file-upload me-0 me-sm-1"></i>
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
@@ -137,7 +142,8 @@
                                                                     class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="exportExcel()">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -147,216 +153,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table class="datatables-products table dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-                                                style="width: 1396px;">
-                                                <thead class="border-top">
-                                                    <tr class=" table-info">
-                                                        <th class="text-center" tabindex="0" style="width: 40px;">
-                                                            ห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ชื่อผู้จอง</th>
-                                                        <th class="text-center" style="width: 123px;">
-                                                            หมายเลขการจอง</th>
-                                                        <th class="text-center">
-                                                            วันที่จอง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            วันที่เข้าพัก</th>
-                                                        <th class="text-center">
-                                                            ช่องทาง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รับจองโดย
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่ามัดจำ
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวม
-                                                        </th>
-                                                        <th class="text-center">
-                                                            สถานะ
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="odd">
-                                                        
-                                                        <td class="text-center">A101</td>
-                                                        <td class="text-center"><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td class="text-center"><span>202405000109</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>เงินสด</span></td>
-                                                        <td class="text-center"><span>นิชกานต์</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span class="badge bg-label-success"
-                                                                text-capitalized="">จองแล้ว</span></td>
-                                                        <!-- <td class="text-center">
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="even">
-                                                        
-                                                        <td class="text-center">A101</td>
-                                                        <td class="text-center"><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td class="text-center"><span>202405000109</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>เงินสด</span></td>
-                                                        <td class="text-center"><span>นิชกานต์</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span class="badge bg-label-success"
-                                                                text-capitalized="">จองแล้ว</span></td>
-                                                        <!-- <td class="text-center">
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="odd">
-                                                        
-                                                        <td class="text-center">A101</td>
-                                                        <td class="text-center"><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td class="text-center"><span>202405000109</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>เงินสด</span></td>
-                                                        <td class="text-center"><span>นิชกานต์</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span class="badge bg-label-success"
-                                                                text-capitalized="">จองแล้ว</span></td>
-                                                        <!-- <td class="text-center">
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                    <tr class="even">
-                                                        
-                                                        <td class="text-center">A101</td>
-                                                        <td class="text-center"><span class="text-truncate">นางสาว มาลินี ประเทศา</span>
-                                                        </td>
-                                                        <td class="text-center"><span>202405000109</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>25/04/2022</span></td>
-                                                        <td class="text-center"><span>เงินสด</span></td>
-                                                        <td class="text-center"><span>นิชกานต์</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span>2,500</span></td>
-                                                        <td class="text-center"><span class="badge bg-label-danger"
-                                                                text-capitalized="">ยกเลิก</span></td>
-                                                        <!-- <td class="text-center">
-                                                            <div class="d-inline-block text-nowrap"><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                        class="ti ti-edit ti-md"></i></button><button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow"
-                                                                    data-bs-toggle="dropdown"><i
-                                                                        class="ti ti-dots-vertical ti-md"></i></button>
-                                                                <div class="dropdown-menu dropdown-menu-end m-0"><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">View</a><a
-                                                                        href="javascript:0;"
-                                                                        class="dropdown-item">Suspend</a></div>
-                                                            </div>
-                                                        </td> -->
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            <div id="loadData">
+
                                             </div>
                                             <div style="width: 1%;"></div>
                                         </div>
@@ -385,8 +183,83 @@
         <div class="drag-target"></div>
     </div>
     <!-- / Layout wrapper -->
-    @include('layout/inc_js')
+    <iframe id="print-iframe" style="display: none;"></iframe>    
 
+    @include('layout/inc_js')
+    <script>
+        var page = "{{$page_url}}/datatable";
+        var searchData = {};
+        loadData(page);
+        
+        function loadData(pages){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
+
+            // alert(page);
+            page = pages;
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    $("#loadData").html(data);
+                }
+            });
+            // alert(page);
+        }
+        
+        function printPdf() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                url: '/pdf/{{$page_url}}',
+                type: 'GET',
+                data: searchData,
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+        function exportExcel() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // แปลงเป็น query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // สร้าง URL พร้อมพารามิเตอร์
+            const targetUrl = `/{{$page_url}}/excel?${queryString}`;
+
+            // เปิด URL ใหม่ (แท็บใหม่)
+            window.open(targetUrl, '_blank');
+        }
+    </script>
 </body>
 
 </html>

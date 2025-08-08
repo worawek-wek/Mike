@@ -16,7 +16,7 @@
                     <button class="edit-rent btn btn-danger waves-effect waves-light me-md-2 mb-2 mb-md-0"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteServiceModal"
-                            onclick="deleteService()"
+                            onclick="formDeleteService()"
                             disabled>
                         <i class="ti ti-trash ti-xs"></i>ลบค่าบริการหลายห้อง
                     </button>

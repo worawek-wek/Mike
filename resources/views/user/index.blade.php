@@ -39,7 +39,6 @@
 }
 </style>
 
-
 <body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
@@ -109,7 +108,7 @@
                                                     <div class="col-md-8 flex text-end" style="padding-right: unset !important;">
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;"
-                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2"
+                                                                class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false"  
@@ -121,7 +120,7 @@
                                                         </button>
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
-                                                                class="btn btn-success buttons-collection  btn-info waves-effect waves-light"
+                                                                class="btn btn-success buttons-collection  btn-info waves-effect waves-light d-write"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addserviceModal">
@@ -129,7 +128,7 @@
                                                         </button>
                                                         <button
                                                                 style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
-                                                                class="btn btn-primary buttons-collection  btn-info waves-effect waves-light"
+                                                                class="btn btn-primary buttons-collection  btn-info waves-effect waves-light d-write"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button" aria-haspopup="dialog"
                                                                 aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addserviceModal_2">
@@ -231,11 +230,11 @@
                             </div>
                             <div class="col-sm-6">
                                 <label for="" class="form-label">เบอร์โทรศัพท์<span class="text-danger"> *</span></label>
-                                <input name="phone" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" required/>
+                                <input name="phone" type="tel" class="form-control" placeholder="เบอร์โทรศัพท์" oninput="this.value=this.value.slice(0,10);" pattern="^\d{9,10}$" required/>
                             </div>
                             <div class="col-sm-6">
                                 <label for="email_2" class="form-label">อีเมล</label><span class="text-danger"> *</span>
-                                <input name="email" id="email_2" type="name" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
+                                <input name="email" id="email_2" type="email" class="form-control" placeholder="อีเมล" oninput="check_have_email(this.value)" required/>
                                 <span class="text-danger pt-4" id="Cant_Use" style="display: none;">Email นี้ถูกใช้แล้ว</span>
                             </div>
                             <div class="col-sm-6">
@@ -286,7 +285,7 @@
 
                                 function validatePassword(){
                                     if(password.value != confirm_password.value) {
-                                        confirm_password.setCustomValidity("Passwords Don't Match");
+                                        confirm_password.setCustomValidity("โปรดกรอกรหัสผ่านให้ตรงกัน");
                                     } else {
                                         confirm_password.setCustomValidity('');
                                     }
@@ -312,7 +311,7 @@
         </div>
     </div>
     <div class="modal fade modalHeadDecor" id="insurance" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" id="view">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document" id="view">
             
         </div>
     </div>

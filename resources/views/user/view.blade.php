@@ -20,7 +20,7 @@
                       </li>
                       <li class="nav-item" role="presentation">
                         <button
-                            class="buttons-collection btn-label-warning waves-effect waves-light nav-link" 
+                            class="buttons-collection btn-label-warning waves-effect waves-light nav-link d-write" 
                             role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-edit" aria-controls="navs-pills-top-edit" aria-selected="false" tabindex="-1">
                             <span>
                                 <i class="ti ti-pencil"></i> แก้ไข
@@ -41,9 +41,9 @@
                                             <li class="d-flex align-items-center mb-3">
                                             <i class="ti ti-user text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">ชื่อ:</span> <span>{{ $user->name }}</span>
                                             </li>
-                                            <li class="d-flex align-items-center mb-3">
+                                            {{-- <li class="d-flex align-items-center mb-3">
                                             <i class="ti ti-check text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">สถานะ:</span> <span class="text-success">พนักงาน</span>
-                                            </li>
+                                            </li> --}}
                                             <li class="d-flex align-items-center mb-3">
                                             <i class="ti ti-crown text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">ตำแหน่ง:</span> <span>{{ $user->user_has_branch->position->position_name }}</span>
                                             </li>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <label for="" class="form-label">เบอร์โทรศัพท์</label>
-                                    <input name="phone" value="{{ $user->phone }}" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" />
+                                    <input name="phone" value="{{ $user->phone }}" type="number" class="form-control" placeholder="เบอร์โทรศัพท์" oninput="this.value=this.value.slice(0,10);"/>
                                 </div>
                                 <div class="col-sm-6">
                                     <label for="" class="form-label">อีเมล</label>
@@ -146,7 +146,7 @@
 
                                     function validatePassword2(){
                                         if(password2.value != confirm_password2.value) {
-                                            confirm_password2.setCustomValidity("Passwords Don't Match");
+                                            confirm_password2.setCustomValidity("โปรดกรอกรหัสผ่านให้ตรงกัน");
                                         } else {
                                             confirm_password2.setCustomValidity('');
                                         }
@@ -162,6 +162,125 @@
                                     <textarea name="remark" class="form-control"></textarea>
                                 </div>
                             </div>
+                            <div class="col-sm-12 text-start">
+                                <h5 class="border-bottom pb-3 text-warning">
+                                    <i class="ti ti-pencil"></i> Permission
+                                </h5>
+                            </div>
+                            <div class="row g-3 p-4">
+                                <div class="col-md-4">
+                                    <div class="card card-action mb-4">
+                                        <div class="card-header collapsed">
+                                        <div class="card-action-title">Collapsible Card</div>
+                                        <div class="card-action-element">
+                                            <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="javascript:void(0);" class="card-collapsible"
+                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
+                                                ></a>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <div class="collapse">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
+                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
+                                            </p>
+                                            <p class="card-text d-flex align-items-center gap-1">
+                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
+                                            action.
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card card-action mb-4">
+                                        <div class="card-header">
+                                        <div class="card-action-title">Collapsible Card</div>
+                                        <div class="card-action-element">
+                                            <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="javascript:void(0);" class="card-collapsible"
+                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
+                                                ></a>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <div class="collapse show">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
+                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
+                                            </p>
+                                            <p class="card-text d-flex align-items-center gap-1">
+                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
+                                            action.
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card card-action mb-4">
+                                        <div class="card-header">
+                                        <div class="card-action-title">Collapsible Card</div>
+                                        <div class="card-action-element">
+                                            <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="javascript:void(0);" class="card-collapsible"
+                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
+                                                ></a>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <div class="collapse show">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
+                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
+                                            </p>
+                                            <p class="card-text d-flex align-items-center gap-1">
+                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
+                                            action.
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card card-action mb-4">
+                                        <div class="card-header">
+                                        <div class="card-action-title">Collapsible Card</div>
+                                        <div class="card-action-element">
+                                            <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="javascript:void(0);" class="card-collapsible"
+                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
+                                                ></a>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <div class="collapse show">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
+                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
+                                            </p>
+                                            <p class="card-text d-flex align-items-center gap-1">
+                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
+                                            action.
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="modal-footer rounded-0 justify-content-center">
                                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
                                 <button type="submit" class="btn btn-main">บันทึก</button>
@@ -175,6 +294,7 @@
     </div>
 </div>
 </div>
+    <script src="/assets/js/cards-actions.js"></script>
 <script>
     
     $('#edit_user').on('submit', function(event) {

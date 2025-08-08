@@ -1,100 +1,101 @@
 
 <div class="tab-pane fade show" id="pills-home" role="tabpanel"
 aria-labelledby="pills-home-tab" tabindex="0">
-<div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
-    <div class="row g-3 new_box" style="padding: 0px 30px;">
-        @foreach ($list_data as $key => $row)
-        
-        <div class="col-md-6 col-lg5" 
-                @if($row->status == 1 && $row->status_name == "ค้างชำระ")
-                    style="cursor: pointer" onclick="openReservation({{ $row->rent_bill_id }})"
-                @else
-                    style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})"
-                @endif
-            >
-            <div class="
+    <div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
+        <div class="row g-3 new_box" style="padding: 0px 30px;">
+            
+            @foreach ($list_data as $key => $row)
+            
+            <div class="col-md-6 col-lg5" 
                     @if($row->status == 1 && $row->status_name == "ค้างชำระ")
-                    card bg-label-info
-
+                        style="cursor: pointer" onclick="openReservation({{ $row->rent_bill_id }})"
                     @else
-                    card bg-label-{{ $status_room[$row->status_name] }} 
+                        style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})"
                     @endif
+                >
+                <div class="
+                        @if($row->status == 1 && $row->status_name == "ค้างชำระ")
+                        card bg-label-info
 
-                    card-check shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title" style="color: black"><b>{{ $row->room_name }}</b></h5>
-                        <p style="color: rgb(40, 40, 40);font-weight: 430;">
-                            @php
-                                $renter_name = $row->prefix.' '.$row->renter_name;
-                                if (strlen($renter_name) > 40) {
-                                    // echo substr($renter_name, 0, 40) . '...'; // ตัดให้เหลือ 10 ตัวอักษรแล้วเพิ่ม "..."
-                                }else{
-                                    // echo $renter_name;
-                                }
-                                echo $renter_name;
+                        @else
+                        card bg-label-{{ $status_room[$row->status_name] }} 
+                        @endif
 
-                            @endphp
-                    </p>
-                    @if($row->status == 1 && $row->status_name == "ค้างชำระ")
-                        <div class="text-info h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            ห้องจอง<span class="text-danger">(ค้างชำระ)</span>
+                        card-check shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color: black"><b>{{ $row->room_name }}</b></h5>
+                            <p style="color: rgb(40, 40, 40);font-weight: 430;">
+                                @php
+                                    $renter_name = $row->prefix.' '.$row->renter_name;
+                                    if (strlen($renter_name) > 40) {
+                                        // echo substr($renter_name, 0, 40) . '...'; // ตัดให้เหลือ 10 ตัวอักษรแล้วเพิ่ม "..."
+                                    }else{
+                                        // echo $renter_name;
+                                    }
+                                    echo $renter_name;
+
+                                @endphp
+                        </p>
+                        @if($row->status == 1 && $row->status_name == "ค้างชำระ")
+                            <div class="text-info h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                                ห้องจอง<span class="text-danger">(ค้างชำระ)</span>
+                            </div>
+                        @else
+                        <div class="text-{{ $status_room[$row->status_name] }} h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                            {{ $row->status_name }}
                         </div>
-                    @else
-                    <div class="text-{{ $status_room[$row->status_name] }} h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                        {{ $row->status_name }}
+                        @endif
                     </div>
-                    @endif
                 </div>
             </div>
+            @endforeach
+            
+            {{-- <div class="col-md-6 col-lg5">
+                <div class="card bg-label-success card-check shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color: black"><b>A104</b></h5>
+                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
+                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                            ชำระเงินแล้ว
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg5">
+                <div class="card bg-label-success card-check shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color: black"><b>A105</b></h5>
+                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
+                        <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                            ชำระเงินแล้ว
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg5">
+                <div class="card bg-lightGray card-check shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color: black"><b>A106</b></h5>
+                            <p>ไม่มีผู้เช่า</p>
+                        <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                            ห้องว่าง
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg5">
+                <div class="card bg-label-danger card-check shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color: black"><b>A110</b></h5>
+                            <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
+                        <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                            ค้างชำระ
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
         </div>
-        @endforeach
-        
-        {{-- <div class="col-md-6 col-lg5">
-            <div class="card bg-label-success card-check shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title" style="color: black"><b>A104</b></h5>
-                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                        ชำระเงินแล้ว
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg5">
-            <div class="card bg-label-success card-check shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title" style="color: black"><b>A105</b></h5>
-                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                    <div class="text-success h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                        ชำระเงินแล้ว
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg5">
-            <div class="card bg-lightGray card-check shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title" style="color: black"><b>A106</b></h5>
-                        <p>ไม่มีผู้เช่า</p>
-                    <div class="h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                        ห้องว่าง
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg5">
-            <div class="card bg-label-danger card-check shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title" style="color: black"><b>A110</b></h5>
-                        <p style="color: rgb(40, 40, 40);font-weight: 430;">นางสาว มาลินี ประเทศา</p>
-                    <div class="text-danger h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                        ค้างชำระ
-                    </div>
-                </div>
-            </div>
-        </div> --}}
     </div>
-</div>
 </div>
 <div class="tab-pane fade show" id="pills-profile" role="tabpanel"
 aria-labelledby="pills-profile-tab" tabindex="0">

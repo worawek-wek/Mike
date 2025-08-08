@@ -23,7 +23,7 @@
             </div>
             <div class="col-sm-6">
                 <label for="contract_date" class="form-label">วันที่ทำสัญญา</label>
-                <input type="text" name="contract_date" class="form-control" placeholder="" id="contract_date" value="{{ date('d/m/Y', strtotime('+1 day')) }}" required autocomplete="off"/>
+                <input type="text" name="contract_date" class="form-control" placeholder="" id="contract_date" value="{{ date('d/m/Y') }}" required autocomplete="off"/>
             </div>
             <div class="col-sm-6">
                 <label class="form-label">ระยะเวลาทำสัญญา(เดือน)</label>
@@ -43,9 +43,9 @@
         </h5>
         @foreach ($room_for_rent as $key => $item)
         @php
-            if(count($item->rent_bill_not_pay) > 0){
-                continue;
-            }
+            // if(count($item->rent_bill_not_pay) > 0){
+            //     continue;
+            // }
             $contract = \App\Models\Renter::leftJoin('contracts', 'renters.id', '=', 'contracts.ref_renter_id')
                         ->leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                         ->where('room_for_rents.ref_room_id', $item->ref_room_id)
@@ -69,8 +69,9 @@
         <div class="row g-3 p-4 pt-1">
             <h5 class="mt-3 mb-1 text-success">{{ $item->room->name }}</h5>
             <div class="col-sm-6">
+                <input type="hidden" name="contract[{{$key}}][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
                 <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท)</label>
-                <input type="text" name="contract[{{$key}}][security_deposit]" class="form-control" id="security_deposit" placeholder="" value=""/>
+                <input type="text" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control" id="security_deposit" placeholder="" value=""/>
             </div>
             {{-- <div class="col-sm-6 d-flex align-items-end pb-1">
                 <button

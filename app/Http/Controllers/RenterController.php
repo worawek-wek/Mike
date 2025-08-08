@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Room;
 use App\Models\Position;
 use App\Models\Branch;
 use App\Models\Renter;
-use App\Models\Schedule;
-use App\Models\Leave;
-use App\Models\UserLeave;
-use App\Models\News;
+use App\Models\RoomForRents;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -28,18 +27,22 @@ class RenterController extends Controller
     {
         $data['page_url'] = 'renter';
         $data['page_url2'] = 'renter/current';
+        $data['page_url3'] = 'renter/old';
         return view('renter/index', $data);
     }
     public function current_datatable(Request $request)
     {
-        $results = Renter::whereHas('room_for_rent.room', function ($query) {
-            $query->whereIn('status', [2,3]);
-        })
-        ->distinct('renters.id');
+        $results = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
+                            ->where('renters.ref_branch_id', session("branch_id"))
+                            ->whereIn('rooms.status', [1,2]);
+                            // ->whereHas('room_for_rent.room', function ($query) {
+                            //     $query->whereIn('status', [1,2]);
+                            // });
         if(@$request->search){
 
             if(@$request->search_type == 1){ // ชื่อ - นามสกุล
-                $results = $results->where('renters.prefix','LIKE','%'.$request->search.'%')->orWhere('renters.name','LIKE','%'.$request->search.'%')->orWhere('renters.surname','LIKE','%'.$request->search.'%');
+                $results = $results->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', COALESCE(renters.surname, '')) LIKE ?", ["%{$request->search}%"]);
             }
             if(@$request->search_type == 2){ // เบอร์โทรศัพท์
                 $results = $results->where('renters.phone','LIKE','%'.$request->search.'%');
@@ -53,11 +56,10 @@ class RenterController extends Controller
                 $results = $results->WhereHas('vehicle', function ($q) use ($request) {
                     $q->where('car_registration', 'LIKE', '%' . $request->search . '%');
                 });
-            }else{
+            }
+            if(@$request->search_type == ''){
                 $results = $results->where(function ($query) use ($request) {
-                    $query->where('renters.prefix','LIKE','%'.$request->search.'%')
-                        ->orWhere('renters.name','LIKE','%'.$request->search.'%')
-                        ->orWhere('renters.surname','LIKE','%'.$request->search.'%')
+                    $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', COALESCE(renters.surname, '')) LIKE ?", ["%{$request->search}%"])
                         ->orWhere('renters.phone','LIKE','%'.$request->search.'%')
                         ->orWhereHas('room_for_rent.room', function ($q) use ($request) {
                             $q->where('name', 'LIKE', '%' . $request->search . '%');
@@ -82,48 +84,44 @@ class RenterController extends Controller
     }
     public function old_datatable(Request $request)
     {
-        $results = Renter::whereHas('room_for_rent', function ($q) {
-                                        $q->whereHas('room', function ($q2) {
-                                            $q2->whereIn('status', [0]);
-                                        });
-                                    })
-                                // ->with('room_for_rent.room')
-                                ->distinct('renters.id');
-        // $results = Receipt::orderBy('olds.id','DESC')
-        //                         // ->join('room_for_rents', 'olds.ref_room_for_rent_id', '=', 'room_for_rents.id')
-        //                         ->join('renters', 'olds.ref_renter_id', '=', 'renters.id')
-        //                         ->join('rooms', 'olds.ref_room_id', '=', 'rooms.id')
-        //                         ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-        //                         ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-        //                         ->where('buildings.ref_branch_id', session("branch_id"))
-        //                         // ->where('olds.ref_status_id', '!=', 3)
-        //                         ->distinct('olds.id')
-        //                         ->select('olds.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
-        
-        // if(@$request->search){
-        //     $results = $results->Where(function ($query) use ($request) {
-        //                             $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
-        //                                 ->orWhere('rooms.name','LIKE','%'.$request->search.'%')
-        //                                 ->orWhere('olds.old_number','LIKE','%'.$request->search.'%');
-        //                         });
-        // }
-        // // if(@$request->ref_status_id != "all"){
-        // //     $results = $results->Where('olds.ref_status_id', $request->ref_status_id);
-        // // }
-        // if(@$request->ref_type_id != "all"){
-        //     $results = $results->Where('olds.ref_type_id', $request->ref_type_id);
-        // }
-        // if(@$request->month_from){
+        $results = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                            ->where('renters.ref_branch_id', session("branch_id"))
+                            ->whereHas('room_for_rent.room', function ($query) {
+                                $query->whereIn('status', [0]);
+                            });
+        if(@$request->search){
+
+            if(@$request->search_type == 1){ // ชื่อ - นามสกุล
+                $results = $results->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', COALESCE(renters.surname, '')) LIKE ?", ["%{$request->search}%"]);
+            }
+            if(@$request->search_type == 2){ // เบอร์โทรศัพท์
+                $results = $results->where('renters.phone','LIKE','%'.$request->search.'%');
+            }
+            if(@$request->search_type == 3){ // ตามห้อง
+                $results = $results->WhereHas('room_for_rent.room', function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search . '%');
+                });
+            }
+            if(@$request->search_type == 4){ // ค้นหาตามทะเบียนรถ
+                $results = $results->WhereHas('vehicle', function ($q) use ($request) {
+                    $q->where('car_registration', 'LIKE', '%' . $request->search . '%');
+                });
+            }
             
-        //     $monthFrom = $request->month_from; // format: YYYY-MM
-        //     $monthTo = $request->month_to;     // format: YYYY-MM
-
-        //     // สร้างช่วงวันที่เต็ม (เริ่มต้นเดือน ถึง สิ้นเดือน)
-        //     $startDate = Carbon::parse($monthFrom)->startOfMonth()->toDateString(); // 2025-06-01
-        //     $endDate = Carbon::parse($monthTo)->endOfMonth()->toDateString();       // 2025-06-30
-
-        //     $results = $results->whereBetween('olds.created_at', [$startDate, $endDate]);
-        // }
+            if(@$request->search_type == ''){
+                $results = $results->where(function ($query) use ($request) {
+                    $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', COALESCE(renters.surname, '')) LIKE ?", ["%{$request->search}%"])
+                        ->orWhere('renters.phone','LIKE','%'.$request->search.'%')
+                        ->orWhereHas('room_for_rent.room', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', '%' . $request->search . '%');
+                        })
+                        ->orWhereHas('vehicle', function ($q) use ($request) {
+                            $q->where('car_registration', 'LIKE', '%' . $request->search . '%');
+                        });
+                });
+            }
+            
+        }
         
 
         $limit = 15;
@@ -147,14 +145,15 @@ class RenterController extends Controller
         return view('renter/old-table', $data);
     }
 
-    public function exportExcel()
+    public function exportExcel($status = null)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
-        $results = Renter::whereHas('room_for_rent.room', function ($query) {
-            $query->whereIn('status', [2,3]);
-        })->distinct('renters.id')->get();
+        $results = Renter::where('renters.ref_branch_id', session("branch_id"))
+                           ->whereHas('room_for_rent.room', function ($query) use ($status) {
+                                $query->whereIn('status', explode(',', $status));
+                            })->get();
         $data = 
         [
             ['ข้อมูลผู้เช่าปัจจุบัน'],
@@ -173,15 +172,30 @@ class RenterController extends Controller
             ]
         ];
         foreach($results as $key=>$row){
+             if(@$row->room_for_rent->room->contract->contract_date){
+                    $contractDate = $row->room_for_rent->room->contract->contract_date;
+                    $contract_date_text = date('d/m/Y', strtotime($contractDate));
+                    $period = $row->room_for_rent->room->contract->period;
+                    $endDate = null;
+
+                    if ($contractDate && $period) {
+                        $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
+                    }
+
+                    $endDate ?? '-';
+            }else{
+                    $endDate ?? '-';
+                    $contract_date_text = '-';
+            }
             $data[] = [
                         $key+1,
                         $row->prefix.' '.$row->name.' '.$row->surname,
                         $row->room_for_rent->room->name,
                         $row->phone,
-                        "รถยนต์ ก 1234",
-                        date('d/m/Y', strtotime($row->room_for_rent->date_stay)),
-                        date('d/m/Y', strtotime("+6 months", strtotime($row->room_for_rent->date_stay))),
-                        6,
+                        @$row->vehicle->car_registration ?? '-',
+                        $contract_date_text,
+                        $endDate,
+                        $row->room_for_rent->room->contract->period ?? '-',
 
                         
             ];
@@ -198,5 +212,30 @@ class RenterController extends Controller
         $writer = new WriterXlsx($spreadsheet);
         $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
         return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+    }
+    
+    public function destroy($renter_id, $room_id)
+    {
+        try{
+            // $RoomForRents = RoomForRents::get();
+            // foreach ($RoomForRents as $RoomFor) {
+            //     $renter = Renter::find($RoomFor->ref_renter_id);
+            //     if (!$renter) {
+            //         RoomForRents::destroy($RoomFor->id);
+            //     }
+            // }
+            // DB::commit();
+            // return 1;
+
+            Renter::destroy($renter_id);
+            RoomForRents::where('ref_renter_id',$renter_id)->where('ref_room_id', $room_id)->delete();
+            Vehicle::where('ref_renter_id', $renter_id)->delete();
+            
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+        //
     }
 }

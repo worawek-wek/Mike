@@ -37,6 +37,8 @@ class DashboardController extends Controller
      */
     public function index(Request $request, $id = null)
     {
+        // return $lastMonth = Carbon::now()->subMonth()->year;
+        // return session("branch_id");
         if(!is_null($id)){
             session(["branch_id" => $id]);
             return redirect('dashboard');
@@ -60,27 +62,6 @@ class DashboardController extends Controller
     }
     public function datatable(Request $request)
     {
-        $year = $request->input('year', now()->year);
-
-        $invoiceByMonth = \App\Models\RentBill::with('payment_list')
-            ->whereYear('updated_at', $year)
-            ->get()
-            ->groupBy(function ($item) {
-                return (int) $item->updated_at->format('m');
-            })
-            ->map(function ($group) {
-                return $group->sum('total_amount');
-            });
-        $monthlyTotals = collect(range(1, 12))->map(function ($month) use ($invoiceByMonth) {
-            return $invoiceByMonth->get($month, 0);
-        });
-
-        // return response()->json($monthlyTotals->values());
-        // // ผลลัพธ์: [1 => xxx, 2 => yyy, ..., 12 => zzz]
-        //     return 12354;
-
-        // return view('dashboard/table', $data);
-
         $results = RentBill::orderBy('id','DESC')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
@@ -110,6 +91,25 @@ class DashboardController extends Controller
         $data['list_data'] = $results;
 
         return view('dashboard/table', $data);
+    }
+    public function monthly_rent_income(Request $request)
+    {
+        $year = $request->input('year', now()->year);
+
+        $invoiceByMonth = \App\Models\RentBill::with('payment_list')
+            ->whereYear('updated_at', $year)
+            ->get()
+            ->groupBy(function ($item) {
+                return (int) $item->updated_at->format('m');
+            })
+            ->map(function ($group) {
+                return $group->sum('total_amount');
+            });
+        $monthlyTotals = collect(range(1, 12))->map(function ($month) use ($invoiceByMonth) {
+            return $invoiceByMonth->get($month, 0);
+        });
+
+        return response()->json($monthlyTotals->values());
     }
     public function change_password_form()
     {

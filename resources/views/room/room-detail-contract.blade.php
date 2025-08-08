@@ -4,7 +4,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0" style="color: black;">ข้อมูลสัญญา</h5>
-            <button type="button" class="btn btn-warning" onclick="edit_contract()">
+            <button type="button" class="btn btn-warning" onclick="edit_contract({{ $contract->contract_id }})">
                 <span>
                     <i class="ti ti-pencil"></i> แก้ไขข้อมูลสัญญา
                 </span>
@@ -166,6 +166,90 @@
         </div>
         
     @endforeach   
+    
+        <div class="p-4" style="border: 1px solid #59d57a;border-radius: 5px;">
+        <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt_jong->receipt_number }}</span></p>
+            <table class="table table-detail table-bordered">
+                <thead>
+                    <tr>
+                        <td width="50%">
+                            <span style="color: black; font-weight: 500;">รายละเอียดหัวบิล</span> <br>
+                            {{ $contract->full_name }} <br>
+                            เลขประจำตัวผู้เสียภาษี {{ $contract->id_card_number }} <br>
+                            โทร {{ $contract->phone }}
+                        </td>
+                        <td style="color: black;">
+                                    @php
+                                        $date = new DateTime(date('Y-m-d', strtotime($receipt_jong->created_at)));
+                                        $englishDay = $date->format('l');
+                                        
+                                    @endphp
+                                        <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($receipt_jong->created_at)) !!}<br>
+                                        <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; {{ $receipt_jong->payment_channel == 1 ? "เงินสด": "โอนเงิน"; }}<br>
+                                        <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $receipt_jong->user->name }}<br>
+                                        &nbsp;
+                        </td>
+                        
+                    </tr>
+                </thead>
+            </table>
+            <table class="table table-detail table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th width="70%" style="vertical-align: middle;font-weight: 500;">รายการ</th>
+                        <th style="vertical-align: middle;font-weight: 500;">
+                            จำนวนเงิน (บาท)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $amount = 0;
+                    @endphp
+                    @foreach ($receipt_jong->payment_list as $item_payment_list)
+                    <tr>
+                        <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
+                            {{ $item_payment_list->title }}
+                            @if($item_payment_list->unit > 0 && $key == 1)    
+                                {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
+                            @endif
+                        </td>
+
+                            @if ($item_payment_list->discount == 1)
+                                @php
+                                    $amount -= $item_payment_list->price;
+                                @endphp
+                                <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+
+                            @else
+                                @php    
+                                $amount += $item_payment_list->price;
+                                @endphp
+                                <td>{{ number_format($item_payment_list->price) }}</td>
+                            @endif
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>รวม</th>
+                        <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                        {{ number_format($amount) }}
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            {{--  --}}
+            <div class="modal-footer rounded-0 justify-content-start mt-2 pb-0">
+                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{$receipt_jong->id}})"><span
+                        class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
+            </div>
+            {{--  --}}
+            {{-- @if ($key+1 < count($receipt))
+                <hr class="mb-4">
+            @endif --}}
+            {{--  --}}
+        </div>
 <iframe id="print-iframe" style="display: none;"></iframe>                   
 <script>
     function printPdf(id) {
