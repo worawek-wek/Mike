@@ -152,6 +152,13 @@ class ReportController extends Controller
 
         $data['paid'] = number_format($paid).' บาท';
         $data['overdue'] = number_format($overdue).' บาท';
+        $data['transfer'] = $this->summary(session("branch_id"))['transfer'];
+        $data['cash'] = $this->summary(session("branch_id"))['cash'];
+        
+        // foreach ($values as $value) {
+        //         $percent = ($value / $total) * 100;
+        //         echo number_format($value, 2) . " = " . number_format($percent, 2) . "%<br>";
+        //     }
 
         return $data;
     }

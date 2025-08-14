@@ -73,28 +73,22 @@ class Controller extends BaseController
                             // ->where('rent_bills.ref_status_id', 5)->sum(DB::raw('rent_bills.electricity_amount + rent_bills.water_amount + rooms.rent'));
         
         $cash = Receipt::with('payment_list')
-                        ->whereHas('invoice', function ($q) {
-                            $q->where('ref_status_id', 2)
-                                ->where('payment_channel', 1);
-                        })
                         ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                             $query->where('ref_branch_id', $branch_id);
                         })
                         ->where('ref_type_id', 1)
+                        ->where('payment_channel', 1)
                         ->get()
                         ->sum(function ($receipt) {
                             return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
                         });
         
         $transfer = Receipt::with('payment_list')
-                            ->whereHas('invoice', function ($q) {
-                                $q->where('ref_status_id', 2)
-                                    ->where('payment_channel', 2);
-                            })
                             ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                 $query->where('ref_branch_id', $branch_id);
                             })
                             ->where('ref_type_id', 1)
+                            ->where('payment_channel', 2)
                             ->get()
                             ->sum(function ($receipt) {
                                 return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่

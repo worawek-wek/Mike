@@ -110,7 +110,7 @@
                                                             data-series="48" data-progress_variant="true"></div>
                                                         <div class="me-2">
                                                             <h6 class="mb-1">เงินสดคอนเฟิร์มแล้ว</h6>
-                                                            <small id="cash_onfirmed">0</small>
+                                                            <small id="cash">0</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -262,8 +262,9 @@
                 success: function(data) {
                     $('#paid').html(data.paid);
                     $('#overdue').html(data.overdue);
-                    $('#cash_waiting_for_confirmation').html(data.cash_waiting_for_confirmation);
+                    $('#cash_waiting_for_confirmation').html(data.cash);
                     $('#cash_onfirmed').html(data.cash_onfirmed);
+                    $('#cash').html(data.cash);
                     $('#transfer').html(data.transfer);
                 }
             });

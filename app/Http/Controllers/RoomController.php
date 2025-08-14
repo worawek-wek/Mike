@@ -1322,6 +1322,8 @@ class RoomController extends Controller
                 }
                 $vehi = new Vehicle();
                 $vehi->ref_renter_id = $renter->id;
+                $vehi->ref_room_for_rent_id = $r_t_r->id;
+                $vehi->ref_room_id = $request->room_id;
                 $vehi->ref_type_id = $vehicle['ref_type_id'];
                 $vehi->car_registration = $vehicle['car_registration'];
                 $vehi->detail = $vehicle['detail'];

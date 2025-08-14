@@ -41,8 +41,12 @@ class VehicleController extends Controller
                                 $query->where('ref_branch_id', session("branch_id"));
                                 // $query->whereIn('status', [2]);
                             })
-                            ->whereHas('renter.room_for_rent.room', function ($query) {
+                            ->whereHas('room_for_rent.room', function ($query) {
                                 $query->whereIn('rooms.status', [2]);
+                                // $query->whereIn('status', [2]);
+                            })
+                            ->whereHas('room_for_rent', function ($query) {
+                                $query->whereIn('status', [1]);
                                 // $query->whereIn('status', [2]);
                             });
                             // ->where('buildings.ref_branch_id', session("branch_id"))
@@ -87,9 +91,13 @@ class VehicleController extends Controller
                             ->whereHas('renter.room_for_rent.room.floor.building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             })
-                            ->whereHas('renter.room_for_rent.room', function ($query) {
-                                $query->whereIn('rooms.status', [0]);
+                            ->whereHas('room_for_rent', function ($query) {
+                                $query->whereIn('status', [0]);
+                                // $query->whereIn('status', [2]);
                             });
+                            // ->whereHas('renter.room_for_rent.room', function ($query) {
+                            //     $query->whereIn('rooms.status', [0]);
+                            // });
 
         if (@$request->car_registration) {
             $results = $results->where('vehicles.car_registration', 'LIKE', '%' . $request->car_registration . '%');
@@ -172,7 +180,7 @@ class VehicleController extends Controller
 
         // บันทึกไฟล์
         $writer = new Xlsx($spreadsheet);
-        return $writer->save('vehicle_report.xlsx');
+        $writer->save('vehicle_report.xlsx');
         // ตัวอย่างข้อมูล
         
         return $results = Room::whereIn('status', [2])

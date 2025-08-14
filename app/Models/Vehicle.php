@@ -20,6 +20,10 @@ class Vehicle extends Model
     {
         return $this->hasOne('App\Models\Renter', 'id', 'ref_renter_id');
     }
+    public function room_for_rent()
+    {
+        return $this->hasOne('App\Models\RoomForRents', 'id', 'ref_room_for_rent_id');
+    }
     public function type()
     {
         return $this->hasOne('App\Models\VehicleType', 'id', 'ref_type_id');
