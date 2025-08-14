@@ -108,7 +108,7 @@
                                                 <div class="card card-border-shadow-danger">
                                                     <div class="card-body">
                                                         <div class="d-flex align-items-center pb-1">
-                                                            <div class="avatar me-2">
+                                                            <div class="avatar me-2" style="cursor: unset;">
                                                             <span class="avatar-initial rounded bg-label-danger"><i class="ti ti-alert-octagon ti-md"></i></span>
                                                             </div>
                                                             <h4 class="ms-1 mb-0 text-danger">{{ $summary['all_overdue'] }} ห้อง</h4>

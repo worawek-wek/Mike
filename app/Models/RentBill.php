@@ -20,6 +20,10 @@ class RentBill extends Model
     {
         return $this->hasOne('App\Models\User', 'id', 'ref_user_id');
     }
+    public function room()
+    {
+        return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
+    }
     public function room_for_rent()
     {
         return $this->hasOne('App\Models\RoomForRents', 'id', 'ref_room_for_rent_id');

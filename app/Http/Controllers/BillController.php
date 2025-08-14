@@ -327,6 +327,7 @@ class BillController extends Controller
             $expenses->branch  =  0;
             $expenses->phone  =  $receipt->room->renter_phone;
             $expenses->remark  =  0;
+            $expenses->ref_receipt_id  =  $receipt->id;
             $expenses->ref_user_id  =  Auth::id();
             $expenses->ref_branch_id  =  session("branch_id");
             $expenses->save();
@@ -478,6 +479,7 @@ class BillController extends Controller
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
+                                ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
                                 ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone')
                                 ->get();
@@ -575,6 +577,7 @@ class BillController extends Controller
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
+                                ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
                                 ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent')
                                 ->get();

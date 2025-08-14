@@ -63,14 +63,24 @@ class PDFController extends Controller
 
         return view('pdf/invoice', $data);
     }
+    // พิมพ์หลายห้อง
     public function invoice_many($invoice_id)
     {
         
         // $invoice = RentBill::first();
         $data['setting_bill'] = Setting_bill::first();
-        $receipt_many = Receipt::get();
-        $data['receipt_many'] = $receipt_many;
+        $invoice_many = Rentbill::whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
+                                ->where('ref_type_id', 1)
+                                ->where('ref_status_id', '!=', 3)
+                                ->with('room_for_rent.renter')->get();
         $data['branch'] = Branch::find(session("branch_id"));
+        foreach ($invoice_many as $invoice) {
+            $invoice->thai_total_amount = $this->convertToThaiBaht($invoice->total_amount);
+        }
+        $data['invoice_many'] = $invoice_many;
+
         // $data['renter'] = Renter::find($invoice->room_for_rent->ref_renter_id);
         // $data['amount_thai'] = $this->convertToThaiBaht($invoice->total_amount);
 
@@ -121,6 +131,7 @@ class PDFController extends Controller
 
         return view('pdf/invoice-all', $data);
     }
+    // พิมพ์ ใบสรุปรายรับรายจ่าย
     public function income_expenses_all(Request $request, $invoice_id)
     {
         $results = IncomeExpenses::where('ref_branch_id', session("branch_id"))->orderBy('id','DESC');
@@ -168,10 +179,13 @@ class PDFController extends Controller
 
     public function checkCarPDF($status)
     {
-        $results = Renter::where('ref_branch_id', session("branch_id"))
-                            ->whereHas('room_for_rent.room', function ($query) use ($status) {
-                                $query->whereIn('status', explode(',', $status));
-                            })->whereHas('vehicle')->with('vehicle')->orderBy('id', 'DESC')->get();
+        $data['name_branch'] = Branch::find(session("branch_id"))->name;
+        $results = Room::whereIn('status', [2])
+                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+                        ->whereHas('floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })
+                        ->get();
         $data['list_data'] = $results;
         return view('pdf/checkcar', $data);
     }

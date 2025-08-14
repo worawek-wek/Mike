@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Room;
 use App\Models\Vehicle;
 use App\Models\VehicleType;
 use App\Models\Branch;
@@ -35,22 +36,28 @@ class VehicleController extends Controller
     public function current_datatable(Request $request)
     {
         $results = Vehicle::orderBy('vehicles.id','DESC')
-                            ->join('renters', 'vehicles.ref_renter_id', '=', 'renters.id')
-                            ->join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                             ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
-                            ->whereIn('rooms.status', [1,2])
-                            ->groupBy('vehicles.id')
-                            ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ');
+                            ->whereHas('renter.room_for_rent.room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                                // $query->whereIn('status', [2]);
+                            })
+                            ->whereHas('renter.room_for_rent.room', function ($query) {
+                                $query->whereIn('rooms.status', [2]);
+                                // $query->whereIn('status', [2]);
+                            });
+                            // ->where('buildings.ref_branch_id', session("branch_id"))
+                            // ->whereIn('rooms.status', [2])
+                            // ->groupBy('vehicles.id');
+                            // ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(vehicle_types.name) as type_name ');
 
         if (@$request->car_registration) {
             $results = $results->where('vehicles.car_registration', 'LIKE', '%' . $request->car_registration . '%');
         }
         if (@$request->room) {
-            $results = $results->where('rooms.name', 'LIKE', '%' . $request->room . '%');
+            $results = $results->whereHas('renter.room_for_rent.room', function ($query) use ($request) {
+                                $query->where('name', 'LIKE', '%' . $request->room . '%');
+                                // $query->whereIn('status', [2]);
+                            });
         }
         if (@$request->ref_type_id != "all") {
             $results = $results->where('vehicles.ref_type_id', $request->ref_type_id);
@@ -76,16 +83,13 @@ class VehicleController extends Controller
     public function old_datatable(Request $request)
     {
         $results = Vehicle::orderBy('vehicles.id','DESC')
-                            ->join('renters', 'vehicles.ref_renter_id', '=', 'renters.id')
-                            ->join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                             ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
-                            ->where('rooms.status', 0)
-                            ->groupBy('vehicles.id')
-                            ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ');
+                            ->whereHas('renter.room_for_rent.room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            })
+                            ->whereHas('renter.room_for_rent.room', function ($query) {
+                                $query->whereIn('rooms.status', [0]);
+                            });
 
         if (@$request->car_registration) {
             $results = $results->where('vehicles.car_registration', 'LIKE', '%' . $request->car_registration . '%');
@@ -116,19 +120,67 @@ class VehicleController extends Controller
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        $results = Room::whereIn('status', [2])
+                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+                        ->whereHas('floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })
+                        ->get();
+        // หัวตาราง
+        $sheet->fromArray([
+            [ 'ข้อมูลยานพาหนะ ' . session('branch_name') ], // แถวแรก เป็นชื่อสาขา
+            [], // แถวว่าง
+            [ "วันที่เพิ่มข้อมูล", "เลขห้อง", "ผู้เช่า", "ประเภทรถ", "ทะเบียนรถ", "รายละเอียดรถ", "หมายเหตุ" ] // แถวหัวคอลัมน์
+        ], null, 'A1');
+
+        $rowNum = 4; // เริ่มเขียนข้อมูลแถวที่ 4
+
+        foreach ($results as $room) {
+            foreach ($room->room_for_rent_s as $rentData) {
+                $renter = $rentData->renter;
+                $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
+                $vehicles = $renter->vehicles ?? [];
+
+                if (!empty($vehicles)) {
+                    foreach ($vehicles as $vehicle) {
+                        $sheet->fromArray([
+                            $rentData->created_at->format('Y-m-d'), // วันที่เพิ่มข้อมูล
+                            $room->name,                             // เลขห้อง
+                            $renterName,                             // ผู้เช่า
+                            $vehicle->ref_type_id,                   // ประเภทรถ
+                            $vehicle->car_registration,             // ทะเบียนรถ
+                            $vehicle->detail,                        // รายละเอียดรถ
+                            $vehicle->remark                         // หมายเหตุ
+                        ], null, 'A' . $rowNum);
+                        $rowNum++;
+                    }
+                } else {
+                    // ถ้าไม่มีรถ
+                    $sheet->fromArray([
+                        $rentData->created_at->format('Y-m-d'),
+                        $room->name,
+                        $renterName,
+                        '',
+                        '',
+                        '',
+                        ''
+                    ], null, 'A' . $rowNum);
+                    $rowNum++;
+                }
+            }
+        }
+
+        // บันทึกไฟล์
+        $writer = new Xlsx($spreadsheet);
+        return $writer->save('vehicle_report.xlsx');
         // ตัวอย่างข้อมูล
-        $results = Vehicle::orderBy('vehicles.id','DESC')
-                            ->join('renters', 'vehicles.ref_renter_id', '=', 'renters.id')
-                            ->join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                            ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
-                            ->whereIn('rooms.status', [1,2])
-                            ->groupBy('vehicles.id')
-                            ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ')
-                            ->get();
+        
+        return $results = Room::whereIn('status', [2])
+                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+                        ->whereHas('floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })
+                        ->get();
 
         $branch = Branch::find(session("branch_id"));
 
@@ -154,9 +206,9 @@ class VehicleController extends Controller
         foreach($results as $row){
             $data[] = [
                         date('d/m/Y',strtotime($row->created_at)),
-                        $row->room_name,
-                        $row->renter_name,
-                        $row->type_name,
+                        $row->renter->room_for_rent->room->name,
+                        $row->renter->prefix.' '.$row->renter->name.' '.$row->renter->surname,
+                        $row->type->name,
                         $row->car_registration,
                         $row->detail,
                         $row->remark
@@ -182,17 +234,13 @@ class VehicleController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
-        $results = Vehicle::orderBy('vehicles.id','DESC')
-                            ->join('renters', 'vehicles.ref_renter_id', '=', 'renters.id')
-                            ->join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
-                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                            ->join('vehicle_types', 'vehicles.ref_type_id', '=', 'vehicle_types.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
+        
+        $results = Room::where('status', $status)
                             ->whereIn('rooms.status', [0])
-                            ->groupBy('vehicles.id')
-                            ->selectRaw('vehicles.id, MAX(vehicles.created_at) as created_at, MAX(vehicles.car_registration) as car_registration, MAX(vehicles.detail) as detail, MAX(vehicles.remark) as remark, MAX(vehicles.ref_renter_id) as ref_renter_id, MAX(renters.prefix) as prefix, MAX(CONCAT(renters.name, " ", COALESCE(renters.surname, ""))) as renter_name, MAX(rooms.name) as room_name, MAX(vehicle_types.name) as type_name ')
+                            ->whereHas('room_for_rents.renter.vehicle')->with('room_for_rents.renter.vehicle')->orderBy('id', 'DESC')
+                            ->whereHas('floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            })
                             ->get();
 
         $branch = Branch::find(session("branch_id"));
@@ -219,9 +267,9 @@ class VehicleController extends Controller
         foreach($results as $row){
             $data[] = [
                         date('d/m/Y',strtotime($row->created_at)),
-                        $row->room_name,
-                        $row->renter_name,
-                        $row->type_name,
+                        $row->renter->room_for_rent->room->name,
+                        $row->renter->prefix.' '.$row->renter->name.' '.$row->renter->surname,
+                        $row->type->name,
                         $row->car_registration,
                         $row->detail,
                         $row->remark

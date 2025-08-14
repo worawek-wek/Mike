@@ -124,7 +124,7 @@ class Controller extends BaseController
         //                                 ->count();
         
         $all_booking_room = Room::whereHas('floor.building', function ($query) use ($branch_id) {
-                                    $query->where('ref_branch_id', $branch_id);
+                                        $query->where('ref_branch_id', $branch_id);
                                     })
                                     ->where('rooms.status', 1)->count();
 
@@ -133,9 +133,10 @@ class Controller extends BaseController
                             ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                             ->where('buildings.ref_branch_id', $branch_id)->count();
 
-        $vacant_room = Room::join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                            ->where('buildings.ref_branch_id', $branch_id)->count();
+        $vacant_room = Room::whereHas('floor.building', function ($query) use ($branch_id) {
+                                $query->where('ref_branch_id', $branch_id);
+                            })
+                            ->where('status', 0)->count();
 
         $all_overdue = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
@@ -164,7 +165,7 @@ class Controller extends BaseController
         $data['all_renter'] = $all_renter; // ผู้เช่า
         $data['all_booking_room'] = $all_booking_room; // ห้องจอง
         $data['all_overdue'] = $all_overdue; // ห้องค้างชำระ
-        $data['vacant_room'] = $all_room - $all_booking_room; // ห้องว่าง
+        $data['vacant_room'] = $vacant_room; // ห้องว่าง
         return $data;
     }
 }

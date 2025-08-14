@@ -70,8 +70,8 @@
             <h5 class="mt-3 mb-1 text-success">{{ $item->room->name }}</h5>
             <div class="col-sm-6">
                 <input type="hidden" name="contract[{{$key}}][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
-                <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท)</label>
-                <input type="text" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control" id="security_deposit" placeholder="" value=""/>
+                <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท) <span class="text-danger">*</span></label>
+                <input type="number" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control" id="security_deposit" placeholder="" value="" required/>
             </div>
             {{-- <div class="col-sm-6 d-flex align-items-end pb-1">
                 <button

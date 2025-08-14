@@ -162,7 +162,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="printPdfCheckCar([1,2])">
+                                                        onclick="printPdfCheckCar([2])">
                                                         <span>
                                                             <i class="ti ti-file-upload"></i> 
                                                             พิมพ์เอกสารเช็ครถ

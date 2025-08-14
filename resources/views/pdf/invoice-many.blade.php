@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: flex-start;
         }
-        .receipt {
+        .invoice {
             background: white;
             padding: 15px;
             width: 210mm;
@@ -129,7 +129,7 @@
                 padding: 0;
                 -webkit-print-color-adjust: exact;
             }
-            .receipt {
+            .invoice {
                 width: 100%;
                 max-width: 100%;
                 box-sizing: border-box;
@@ -141,182 +141,177 @@
     </style>
 </head>
 <body>
-    <div class="receipt">
-        @foreach ($receipt_many as $receipt)
-            <div class="header">ใบเสร็จรับเงิน (Receipt)</div>
-            <table class="table-info">
+    <div class="invoice">
+
+        @foreach ($invoice_many as $invoice)
+
+        <div class="header">ใบแจ้งหนี้ (Invoice)</div>
+        <table class="table-info">
+            <tr>
+                <td>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
+                    {{ $setting_bill->address }}<br>
+                    โทร. {{ $setting_bill->phone }}<br>
+                    <strong>ลูกค้า (Customer)</strong><br>
+                    {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }}<br>
+                    {{ $invoice->room_for_rent->renter->address.' '.$invoice->room_for_rent->renter->fullThaiAddress() }}<br>
+                    เลขประจำตัวผู้เสียภาษี {{ $invoice->room_for_rent->renter->id_card_number }}<br>
+                    โทร {{ $invoice->room_for_rent->renter->phone }}
+                </td>
+                <td style="text-align: right;">
+                    <strong>ต้นฉบับ (Original)</strong><br>
+                    เลขที่(ID) {{ $invoice->invoice_number }}<br>
+                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice->created_at)) }}<br>
+                    ห้อง(Room) {{ $invoice->room_for_rent->room->name }}<br>
+                    พนักงาน(Staff) {{ $invoice->user->name }}<br>
+                </td>
+            </tr>
+        </table>
+        <div class="full-width">
+            <table class="table">
                 <tr>
-                    <td>
-                        <strong>{{ $setting_bill->company_name }}</strong><br>
-                        {{ $setting_bill->address }}<br>
-                        โทร. {{ $setting_bill->phone }}<br>
-                        <strong>ลูกค้า (Customer)</strong><br>
-                        {{ @$receipt->renter->prefix.' '.@$receipt->renter->name.' '.@$receipt->renter->surname }}<br>
-                        {{ @$receipt->renter->address.' '.@$receipt->renter->fullThaiAddress() }}<br>
-                        เลขประจำตัวผู้เสียภาษี {{ $receipt->renter->id_card_number }}<br>
-                        โทร {{ $receipt->renter->phone }}
-                    </td>
-                    <td style="text-align: right;">
-                        <strong>ต้นฉบับ (Original)</strong><br>
-                        เลขที่(ID) {{ $receipt->receipt_number }}<br>
-                        วันที่(Date) {{ date('d/m/Y',strtotime($receipt->payment_date)) }}<br>
-                        ห้อง(Room) {{ $receipt->room->name }}<br>
-                        พนักงาน(Staff) {{ $receipt->user->name }}<br>
-                        เลขที่อ้างอิง(Ref) {{ $receipt->invoice->invoice_number }}
-                    </td>
+                    <th width="1px">ลำดับ(#)</th>
+                    <th>รายการชำระ (Description)</th>
+                    <th>ราคา (Price)</th>
                 </tr>
-            </table>
-            <div class="full-width">
-                <table class="table">
+                @foreach ($invoice->payment_list as $key => $item_payment_list)
+                    @php
+                        $pd_5px = "";
+                        if ($loop->first){
+                            $pd_5px = "pdt-5px";
+                        }
+                        if ($loop->last){
+                            $pd_5px .= " pdb-5px";
+                        }
+                    @endphp
                     <tr>
-                        <th width="1px">ลำดับ(#)</th>
-                        <th>รายการชำระ (Description)</th>
-                        <th>ราคา (Price)</th>
+                        <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
+                        <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
+                            @if($item_payment_list->unit > 0 && $key == 1)    
+                                {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
+                            @endif
+                        </td>
+                        <td class="{{ $pd_5px }}">{{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
                     </tr>
-                    @foreach ($receipt->payment_list as $key => $item_payment_list)
-                        @php
-                            $pd_5px = "";
-                            if ($loop->first){
-                                $pd_5px = "pdt-5px";
-                            }
-                            if ($loop->last){
-                                $pd_5px .= " pdb-5px";
-                            }
-                        @endphp
-                        <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
-                            <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
-                                @if($item_payment_list->unit > 0 && $key == 1)    
-                                    {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
-                                @endif
-                            </td>
-                            <td class="{{ $pd_5px }}">{{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
-                        </tr>
-                    @endforeach
-                </table>
-            </div>
-            <table class="total-table">
-                <tr style="vertical-align: top;">
-                    <td style="font-size: large;">
-                        {{-- (@php    
-                            $number = number_format($receipt->total_amount, 2, '.', '');
-                            [$int, $dec] = explode('.', $number);
-
-                            $result = $this->readThaiNumber($int) . 'บาท';
-
-                            if ($dec == '00') {
-                                $result .= 'ถ้วน';
-                            } else {
-                                $result .= $this->readThaiNumber($dec) . 'สตางค์';
-                            }
-                        @endphp) --}}
-                    </td>
-                    <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                    <td style="font-size: large;">
-                        {{ number_format($receipt->total_amount) }} บาท
-                    </td>
-                </tr>
+                @endforeach
             </table>
-            <div class="note">หมายเหตุ(Note) </div>
-            <div class="signature">
-                <div class="signature-line">
-                    <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
-                </div>
-                <div class="signature-line">
-                    <span>( ................................................. )</span>
-                </div>
-            </div>
+        </div>
+        <table class="total-table">
+            <tr style="vertical-align: top;">
+                <td style="font-size: large;">({{ $invoice->thai_total_amount }})</td>
+                <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
+                <td style="font-size: large;">
+                    {{ number_format($invoice->total_amount) }} บาท
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td width="150px" style="padding-top: 5px;">
+                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
+                </td>
+                <td width="80%" style="padding: 0px 40px;">
+                    <div class="note">หมายเหตุ(Note)</div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        @if(count($invoice->payment_list) < 4)
+            <hr style="border: 1px dashed #404040;margin:10px 0;">
+        @else
+            <div style="page-break-before: always;"></div>
+            <div>&nbsp;</div>
+        @endif
 
-            @if(count($receipt->payment_list) < 4)
-                <hr style="border: 1px dashed #404040;margin:10px 0;">
-            @else
-                <div style="page-break-before: always;"></div>
-                <div>&nbsp;</div>
-            @endif
-
-            <div class="header">ใบเสร็จรับเงิน (Receipt)</div>
-            <table class="table-info">
+        <div class="header">ใบแจ้งหนี้ (Invoice)</div>
+        <table class="table-info">
+            <tr>
+                <td>
+                    <strong>{{ $setting_bill->company_name }}</strong><br>
+                    {{ $setting_bill->address }}<br>
+                    โทร. {{ $setting_bill->phone }}<br>
+                    <strong>ลูกค้า (Customer)</strong><br>
+                    {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }}<br>
+                    {{ $invoice->room_for_rent->renter->address.' '.$invoice->room_for_rent->renter->fullThaiAddress() }}<br>
+                    เลขประจำตัวผู้เสียภาษี {{ $invoice->room_for_rent->renter->id_card_number }}<br>
+                    โทร {{ $invoice->room_for_rent->renter->phone }}
+                </td>
+                <td style="text-align: right;">
+                    <strong>สำเนา (Copy)</strong><br>
+                    เลขที่(ID) {{ $invoice->invoice_number }}<br>
+                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice->created_at)) }}<br>
+                    ห้อง(Room) {{ $invoice->room_for_rent->room->name }}<br>
+                    พนักงาน(Staff) {{ $invoice->user->name }}<br>
+                </td>
+            </tr>
+        </table>
+        <div class="full-width">
+            <table class="table">
                 <tr>
-                    <td>
-                        <strong>{{ $setting_bill->company_name }}</strong><br>
-                        {{ $setting_bill->address }}<br>
-                        โทร. {{ $setting_bill->phone }}<br>
-                        <strong>ลูกค้า (Customer)</strong><br>
-                        {{ $receipt->renter->prefix.' '.$receipt->renter->name.' '.$receipt->renter->surname }}<br>
-                        {{ $receipt->renter->address.' '.$receipt->renter->fullThaiAddress() }}<br>
-                        เลขประจำตัวผู้เสียภาษี {{ $receipt->renter->id_card_number }}<br>
-                        โทร {{ $receipt->renter->phone }}
-                    </td>
-                    <td style="text-align: right;">
-                        <strong>สำเนา (Copy)</strong><br>
-                        เลขที่(ID) {{ $receipt->receipt_number }}<br>
-                        วันที่(Date) {{ date('d/m/Y',strtotime($receipt->payment_date)) }}<br>
-                        ห้อง(Room) {{ $receipt->room->name }}<br>
-                        พนักงาน(Staff) {{ $receipt->user->name }}<br>
-                        เลขที่อ้างอิง(Ref) {{ $receipt->invoice->invoice_number }}
-                    </td>
+                    <th width="1px">ลำดับ(#)</th>
+                    <th>รายการชำระ (Description)</th>
+                    <th>ราคา (Price)</th>
                 </tr>
-            </table>
-            <div class="full-width">
-                <table class="table">
+                @foreach ($invoice->payment_list as $key => $item_payment_list)
+                    @php
+                        $pd_5px = "";
+                        if ($loop->first){
+                            $pd_5px = "pdt-5px";
+                        }
+                        if ($loop->last){
+                            $pd_5px .= " pdb-5px";
+                        }
+                    @endphp
                     <tr>
-                        <th width="1px">ลำดับ(#)</th>
-                        <th>รายการชำระ (Description)</th>
-                        <th>ราคา (Price)</th>
+                        <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
+                        <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
+                            @if($item_payment_list->unit > 0 && $key == 1)    
+                                {{ $item_payment_list->unit }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
+                            @endif
+                        </td>
+                        <td class="{{ $pd_5px }}">{{ (number_format($item_payment_list->discount) == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
                     </tr>
-                    @foreach ($receipt->payment_list as $key => $item_payment_list)
-                        @php
-                            $pd_5px = "";
-                            if ($loop->first){
-                                $pd_5px = "pdt-5px";
-                            }
-                            if ($loop->last){
-                                $pd_5px .= " pdb-5px";
-                            }
-                        @endphp
-                        <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
-                            <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
-                                @if($item_payment_list->unit > 0 && $key == 1)    
-                                    {{ $item_payment_list->unit }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
-                                @endif
-                            </td>
-                            <td class="{{ $pd_5px }}">{{ (number_format($item_payment_list->discount) == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
-                        </tr>
-                    @endforeach
-                </table>
-            </div>
-            <table class="total-table">
-                <tr style="vertical-align: top;">
-                    <td style="font-size: large;">
-                        {{-- (@php    
-                            $number = number_format($receipt->total_amount, 2, '.', '');
-                            [$int, $dec] = explode('.', $number);
-
-                            $result = $this->readThaiNumber($int) . 'บาท';
-
-                            if ($dec == '00') {
-                                $result .= 'ถ้วน';
-                            } else {
-                                $result .= $this->readThaiNumber($dec) . 'สตางค์';
-                            }
-                        @endphp) --}}
-                    </td>
-                    <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                    <td style="font-size: large;">
-                        {{ number_format($receipt->total_amount) }} บาท
-                    </td>
-                </tr>
+                @endforeach
             </table>
-            <div class="note">หมายเหตุ (Note):</div>
-            <div class="signature">
-                <div class="signature-line">
-                    <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
-                </div>
-                <div class="signature-line">
-                    <span>( ................................................. )</span>
-                </div>
-            </div>
+        </div>
+        <table class="total-table">
+            <tr style="vertical-align: top;">
+                <td style="font-size: large;">({{ $invoice->thai_total_amount }})</td>
+                <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
+                <td style="font-size: large;">
+                    {{ number_format($invoice->total_amount) }} บาท
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td width="150px" style="padding-top: 5px;">
+                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
+                </td>
+                <td width="80%" style="padding: 0px 40px;">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        @if (!$loop->last)
+            <div style="page-break-before: always;"></div>
+            <div>&nbsp;</div>
+        @endif
         @endforeach
     </div>
 </body>

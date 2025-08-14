@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
 
@@ -35,7 +36,9 @@ class RenterController extends Controller
         $results = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                             ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                             ->where('renters.ref_branch_id', session("branch_id"))
-                            ->whereIn('rooms.status', [1,2]);
+                            ->whereIn('rooms.status', [2])
+                            ->whereIn('room_for_rents.status', [1])
+                            ->select('renters.*', 'rooms.name as room_name');
                             // ->whereHas('room_for_rent.room', function ($query) {
                             //     $query->whereIn('status', [1,2]);
                             // });
@@ -85,10 +88,11 @@ class RenterController extends Controller
     public function old_datatable(Request $request)
     {
         $results = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                             ->where('renters.ref_branch_id', session("branch_id"))
-                            ->whereHas('room_for_rent.room', function ($query) {
-                                $query->whereIn('status', [0]);
-                            });
+                            // ->whereIn('rooms.status', [0])
+                            ->whereIn('room_for_rents.status', [0])
+                            ->select('renters.*', 'rooms.name as room_name');
         if(@$request->search){
 
             if(@$request->search_type == 1){ // ชื่อ - นามสกุล
@@ -149,11 +153,96 @@ class RenterController extends Controller
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        // ตัวอย่างข้อมูล
-        $results = Renter::where('renters.ref_branch_id', session("branch_id"))
-                           ->whereHas('room_for_rent.room', function ($query) use ($status) {
-                                $query->whereIn('status', explode(',', $status));
-                            })->get();
+        $results = Room::whereIn('status', [2])
+                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+                        ->whereHas('floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })
+                        ->get();
+        $sheet->fromArray([
+            ['ข้อมูลผู้เช่าปัจจุบัน'],
+            ['ข้อมูลผู้เช่าปัจจุบัน วันที่ '.date('d/m/Y')],
+            ["ลำดับ","ชื่อผู้เช่า","ห้อง","เบอร์ติดต่อ","ยานพาหนะ","วันที่เข้าพัก","วันสิ้นสุดสัญญาเช่า","อายุสัญญา"]
+        ], null, 'A1');
+
+        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A2:H2');
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $rowNum = 4; // แถวเริ่มเขียน
+        $counter = 1;
+
+        foreach ($results as $room) {
+            foreach ($room->room_for_rent_s as $rentData) {
+                $renter = $rentData->renter;
+                $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
+                $phone = $renter->phone;
+                $vehicles = $renter->vehicles ?? [];
+
+
+                $endDate = '-';
+                if(@$room->contract->contract_date){
+                        $contractDate = $room->contract->contract_date;
+                        $contract_date_text = date('d/m/Y', strtotime($contractDate));
+                        $period = $room->contract->period;
+                        $endDate = null;
+
+                        if ($contractDate && $period) {
+                            $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
+                        }
+
+                }else{
+                    $endDate = '-';
+                    $contract_date_text = '-';
+                }
+                        
+                $vehicleCount = max(1, count($vehicles)); // ถ้าไม่มีรถก็ 1 แถว
+
+                // Merge cells สำหรับ ลำดับ, ชื่อผู้เช่า, ห้อง, เบอร์ติดต่อ
+                $mergeStart = $rowNum;
+                $mergeEnd = $rowNum + $vehicleCount - 1;
+                $sheet->mergeCells("A{$mergeStart}:A{$mergeEnd}");
+                $sheet->mergeCells("B{$mergeStart}:B{$mergeEnd}");
+                $sheet->mergeCells("C{$mergeStart}:C{$mergeEnd}");
+                $sheet->mergeCells("D{$mergeStart}:D{$mergeEnd}");
+
+                // ใส่ข้อมูลในเซลล์ที่ merge
+                $sheet->setCellValue("A{$mergeStart}", $counter++);
+                $sheet->setCellValue("B{$mergeStart}", $renterName);
+                $sheet->setCellValue("C{$mergeStart}", $room->name);
+                $sheet->setCellValue("D{$mergeStart}", $phone);
+
+                if(!empty($vehicles)){
+                    foreach($vehicles as $vehicle){
+                        $sheet->setCellValue("E{$rowNum}", $vehicle->car_registration . ' (' . $vehicle->detail . ')');
+                        $sheet->setCellValue("F{$rowNum}", $contract_date_text);
+                        $sheet->setCellValue("G{$rowNum}", $endDate);
+                        $sheet->setCellValue("H{$rowNum}", $room->contract->period);
+
+                        $rowNum++;
+                    }
+                } else {
+                    $sheet->setCellValue("E{$rowNum}", '');
+                    $sheet->setCellValue("F{$rowNum}", $contract_date_text);
+                    $sheet->setCellValue("G{$rowNum}", $endDate);
+                    $sheet->setCellValue("H{$rowNum}", $room->contract->period);
+
+                    $rowNum++;
+                }
+            }
+        }
+
+        // ปรับความกว้างคอลัมน์อัตโนมัติ
+        foreach(range('A','H') as $col){
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new WriterXlsx($spreadsheet);
+        $filename = "ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx";
+        $writer->save("upload/export_excel/".$filename);
+
+        return redirect("upload/export_excel/".$filename);
+
         $data = 
         [
             ['ข้อมูลผู้เช่าปัจจุบัน'],
@@ -172,7 +261,26 @@ class RenterController extends Controller
             ]
         ];
         foreach($results as $key=>$row){
-             if(@$row->room_for_rent->room->contract->contract_date){
+            // $endDate = "";
+            //  if(@$row->room_for_rent->room->contract->contract_date){
+            //     // return 1;
+            //         $contractDate = $row->room_for_rent->room->contract->contract_date;
+            //         $contract_date_text = date('d/m/Y', strtotime($contractDate));
+            //         $period = $row->room_for_rent->room->contract->period;
+            //         $endDate = null;
+
+            //         if ($contractDate && $period) {
+            //             $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
+            //         }
+
+            //         $endDate ?? '-';
+            // }else{
+            //         $endDate ?? '-';
+            //         $contract_date_text = '-';
+            // }
+
+            $endDate = '-';
+            if(@$row->room_for_rent->room->contract->contract_date){
                     $contractDate = $row->room_for_rent->room->contract->contract_date;
                     $contract_date_text = date('d/m/Y', strtotime($contractDate));
                     $period = $row->room_for_rent->room->contract->period;
@@ -182,10 +290,9 @@ class RenterController extends Controller
                         $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
                     }
 
-                    $endDate ?? '-';
             }else{
-                    $endDate ?? '-';
-                    $contract_date_text = '-';
+                $endDate = '-';
+                $contract_date_text = '-';
             }
             $data[] = [
                         $key+1,

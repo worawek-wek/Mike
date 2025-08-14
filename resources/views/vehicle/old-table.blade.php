@@ -31,13 +31,13 @@
                     {{ date('d/m/Y',strtotime($row->created_at)) }}
                 </td>
                 <td class="text-center">
-                    {{ $row->room_name }}
+                    {{ $row->renter->room_for_rent->room->name ?? '-' }}
                 </td>
                 <td class="text-center">
-                    {{ $row->renter_name }}
+                    {{ $row->renter->prefix ?? '' }} {{ $row->renter->name ?? '' }} {{ $row->renter->surname ?? '' }}
                 </td>
                 <td class="text-center">
-                    {{ $row->type_name }}
+                    {{ $row->type->name }}
                 </td>
                 <td class="text-center">
                     {{ $row->car_registration }}

@@ -2,6 +2,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 @php
     $thaiNames = [
         "กิตติ", "วราภรณ์", "อนันต์", "ศศิธร", "ธนพล", "พิชชา", "ศุภชัย", "นฤมล", "ธนวัฒน์", "อารยา",
@@ -50,30 +51,30 @@
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label>
-            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="{{ $renter_edit->name ?? $thaiNames[array_rand($thaiNames)] }}"/>
+            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="ชื่อจริง" value="{{ @$renter_edit->name }}"/>
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
-            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $renter_edit->surname ?? $thaiSurnames[array_rand($thaiSurnames)] }}" />
+            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->surname }}" />
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label>
-            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="{{ $renter_edit->phone ?? "0".rand(900000000, 999999999) }}"/>
+            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->phone }}"/>
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label>
-            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ $renter_edit->id_card_number ?? rand(9000000000000, 9999999999999) }}"/>
+            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="หมายเลขบัตรประชาชน" value="{{ @$renter_edit->id_card_number }}"/>
         </div>
         <div class="col-sm-12">
             <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
-            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="{{ $renter_edit->address ?? rand(1, 99)."/".rand(1, 99) }}"/>
+            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="{{ @$renter_edit->address }}"/>
         </div>
         <div class="col-sm-4">
             <label>เลือกจังหวัด</label>
             <select name="ref_province_id" id="select2BasicAddRenter" required>
                 <option selected disabled hidden value="">เลือกจังหวัด</option>
                 @foreach ($province as $pro)
-                    <option value="{{ $pro->id }}" @if ($pro->id == 2) selected @endif>{{ $pro->name_in_thai }}</option>
+                    <option value="{{ $pro->id }}" @if ($pro->id == @$renter_edit->ref_province_id) selected @endif>{{ $pro->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
@@ -82,7 +83,7 @@
             <select name="ref_district_id" id="select2DistrictAddRenter" required>
                 <option selected disabled hidden value="">เลือกอำเภอ</option>
                 @foreach ($district as $dis)
-                    <option value="{{ $dis->id }}" @if ($dis->id == 53) selected @endif>{{ $dis->name_in_thai }}</option>
+                    <option value="{{ $dis->id }}" @if ($dis->id == @$renter_edit->ref_district_id) selected @endif>{{ $dis->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
@@ -91,17 +92,17 @@
             <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter" required>
                 <option selected disabled hidden value="">เลือกตำบล</option>
                 @foreach ($subdistrict as $sub_dis)
-                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == 176) selected @endif>{{ $sub_dis->name_in_thai }}</option>
+                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == @$renter_edit->ref_subdistrict_id) selected @endif>{{ $sub_dis->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
         <div class="col-sm-6">
             <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="10540" />
+            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="{{ @$renter_edit->zipcode }}" />
         </div>
         <div class="col-sm-12">
-            <label for="bs-datepicker-format" class="form-label">วันเดือนปีเกิดผู้จอง</label>
-            <input type="text" name="birthdate" class="form-control" id="bs-datepicker-format" placeholder="วัน/เดือน/ปี" required value="24/04/2025"/>
+            <label for="birthdate" class="form-label">วันเดือนปีเกิดผู้จอง</label>
+            <input type="text" name="birthdate" class="form-control" id="add_birthdate" placeholder="วัน/เดือน/ปี" required value="{{ @$renter_edit->birthdate != null ? date('d/m/Y', strtotime($renter_edit->birthdate)) : ''; }}" autocomplete="off"/>
         </div>
         {{-- <div class="col-sm-6">
             <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label>
@@ -182,6 +183,7 @@
         </button>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -304,5 +306,13 @@
                 });
             }
         });
+        
+    });
+</script>
+<script>
+    $('#add_birthdate').datepicker({
+        format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+        autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+        todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
     });
 </script>

@@ -1,93 +1,95 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
-    <title>รายรับรายจ่าย</title>
+    <title>รายงานเช็ครถยนต์</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
             font-size: 12px;
         }
-
         table {
             border-collapse: collapse;
             width: 100%;
         }
-
-        th,
-        td {
+        th, td {
             border: 1px solid black;
             padding: 4px;
             text-align: center;
             vertical-align: middle;
         }
-
-        .no-border {
-            border: none;
-        }
-
-        .summary-table td {
-            text-align: left;
-            padding-left: 8px;
-        }
-
-        .summary-label {
-            font-weight: bold;
-        }
-
         .header-title {
             font-weight: bold;
             font-size: 14px;
-            padding-bottom: 4px;
-        }
-
-        .text-center {
-            text-align: center;
         }
     </style>
 </head>
-
 <body>
-    @php
-        $name_room = 'หอพักคร เจริญใจ';
-    @endphp
 
-    <div class="text-center" style="margin-bottom:10px;">
-        <div class="header-title">เอกสารเช็ครถยนต์ {{ @$name_room }}</div>
-        <div class="header-title">วันที่ _______/_______/_______</div>
-    </div>
+<div style="text-align:center;margin-bottom:10px;">
+    <div class="header-title">เอกสารเช็ครถยนต์ {{ @$name_branch }}</div>
+    <div class="header-title">วันที่ {{ date('d/m/Y') }}</div>
+</div>
 
-    <!-- ตารางข้อมูล -->
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th class="text-center" style="width: 50px;">ทะเบียนรถ</th>
-                <th class="text-center" style="width: 50px;">ห้องพัก</th>
-                <th class="text-center" style="width: 150px;">รายละเอียดรถ</th>
-                <th class="text-center" style="width: 150px;">เลขสติ๊กเกอร์</th>
-                <th class="text-center" style="width: 50px;">23.00 น.</th>
-                <th class="text-center" style="width: 50px;">3.00 น.</th>
-                <th class="text-center" style="width: 50px;">6.00 น.</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php 
-            $count = @$list_data->count();
-            $check_count = 25 - $count;
-            @endphp
-            @foreach ($list_data as $key => $row)
-                <tr class="odd">
-                    <td>{{@$row->vehicle->car_registration ?? '-'}}</td>
-                    <td>{{ @$row->room_for_rent->room->name }}</td>
-                    <td>{{@$row->vehicle->detail ?? '-'}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+<table>
+    <thead>
+        <tr>
+            <th style="width: 50px;">ทะเบียนรถ</th>
+            <th style="width: 50px;">ห้องพัก</th>
+            <th style="width: 150px;">รายละเอียดรถ</th>
+            <th style="width: 150px;">เลขสติ๊กเกอร์</th>
+            <th style="width: 50px;">23.00 น.</th>
+            <th style="width: 50px;">3.00 น.</th>
+            <th style="width: 50px;">6.00 น.</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php
+            $max_rows = 25; // กำหนดจำนวนแถวทั้งหมดในหน้า
+            $current_rows = 0;
+        @endphp
+
+        @foreach ($list_data as $room)
+            @foreach ($room->room_for_rent_s as $rent)
+                @php
+                    $vehicles = $rent->renter->vehicles ?? [];
+                    $rowspan = count($vehicles) > 0 ? count($vehicles) : 1;
+                @endphp
+
+                @if (count($vehicles) > 0)
+                    @foreach ($vehicles as $v_index => $vehicle)
+                        <tr>
+                            <td>{{ $vehicle->car_registration }}</td>
+
+                            @if ($v_index == 0)
+                                <td rowspan="{{ $rowspan }}">{{ $room->name }}</td>
+                            @endif
+
+                            <td>{{ $vehicle->detail }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        @php $current_rows++; @endphp
+                    @endforeach
+                @else
+                    <tr>
+                        <td>-</td>
+                        <td>{{ $room->name }}</td>
+                        <td>-</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    @php $current_rows++; @endphp
+                @endif
             @endforeach
-            @for($i=0;$i<$check_count;$i++)
+        @endforeach
+
+        {{-- เติมแถวว่างให้ครบ 25 แถว --}}
+        @for ($i = $current_rows; $i < $max_rows; $i++)
             <tr>
                 <td>&nbsp;</td>
                 <td></td>
@@ -97,10 +99,9 @@
                 <td></td>
                 <td></td>
             </tr>
-            @endfor
-        </tbody>
-    </table>
+        @endfor
+    </tbody>
+</table>
 
 </body>
-
 </html>

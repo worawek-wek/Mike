@@ -1,3 +1,19 @@
+@php
+    $thaiMonths = [
+        1 => 'มกราคม',
+        2 => 'กุมภาพันธ์',
+        3 => 'มีนาคม',
+        4 => 'เมษายน',
+        5 => 'พฤษภาคม',
+        6 => 'มิถุนายน',
+        7 => 'กรกฎาคม',
+        8 => 'สิงหาคม',
+        9 => 'กันยายน',
+        10 => 'ตุลาคม',
+        11 => 'พฤศจิกายน',
+        12 => 'ธันวาคม',
+    ];
+@endphp
 <table class="datatables-basic table dataTable no-footer dtr-column"
 id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
 <thead class="border-top">
@@ -30,12 +46,12 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
         <td class="control" tabindex="0" style="display: none;">
         </td>
         <td class="text-center">{{ $list_data->firstItem()+$key }}</td>
-        <td class="text-center"><span class="text-truncate">{{ $row->prefix.' '.$row->renter_name }}</span>
+        <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent->renter->prefix.' '.$row->room_for_rent->renter->name }}</span>
         </td>
-        <td class="text-center">{{ $row->room_name }}</td>
-        <td class="text-center">กันยายน, ตุลาคม</td>
-        <td class="text-center text-danger">{{ number_format($row->rent+$row->electricity_amount+$row->water_amount) }}</td>
-        <td class="text-center">{{ number_format($row->rent+$row->electricity_amount+$row->water_amount) }}</td>
+        <td class="text-center">{{ $row->room_for_rent->room->name }}</td>
+        <td class="text-center">{{ $thaiMonths[$row->month] }}</td>
+        <td class="text-center text-danger">{{ number_format($row->total_amount) }}</td>
+        <td class="text-center">{{ number_format($row->total_amount) }}</td>
         {{-- <td class="text-center">
             <div class="d-inline-block text-nowrap">
                 <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light">

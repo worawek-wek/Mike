@@ -64,7 +64,7 @@
                         <td class="text-center">
                             {{ $row->prefix.' '.$row->name.' '.$row->surname }}
                         </td>
-                        <td class="text-center">{{ @$row->room_for_rent->room->name ?? '-' }}
+                        <td class="text-center">{{ @$row->room_name ?? '-' }}
                         </td>
                         <td class="text-center">{{ $row->phone }}
                         </td>

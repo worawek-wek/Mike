@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 <style>
     .bootstrap-tagsinput {
       width: 100%;
@@ -69,11 +71,11 @@
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span></label>
-            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="" required/>
+            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="{{ $thaiNames[array_rand($thaiNames)] }}" required/>
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
-            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="" />
+            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $thaiNames[array_rand($thaiSurnames)] }}" />
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label><span class="text-danger">*</span></label>
@@ -120,8 +122,9 @@
         </div>
         <div class="col-sm-6">
             <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label><span class="text-danger">*</span>
-            <input type="text" name="booking_date" value="" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" required/>
+            <input type="text" name="booking_date" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" value="{{ date('d/m/Y') }}" required/>
         </div>
+        
         <div class="col-sm-6">
             <label for="exampleFormControlInput12" class="form-label">ช่องทางการจอง</label>
             <input type="text" name="booking_channel" class="form-control" id="exampleFormControlInput12" placeholder="ช่องทางการจอง" value="จองโดยตรงกับที่พัก" />
@@ -137,10 +140,9 @@
     <div class="row g-3 p-4 pt-1">
         <div class="col-sm-6">
             <label for="exampleFormControlInput13" class="form-label">วันที่เข้าพัก</label><span class="text-danger">*</span>
-            <input type="text" name="date_stay" class="form-control" id="exampleFormControlInput13" placeholder="วัน/เดือน/ปี" value="" required/>
+            <input type="text" name="date_stay" class="form-control" id="exampleFormControlInput13" placeholder="วัน/เดือน/ปี" value="{{ date('d/m/Y') }}" required/>
         </div>
-        
-        <b class="text-black">รูปแบบการเลือกห้อง</b> <br><span class="text-danger">*</span>
+        <b class="text-black">รูปแบบการเลือกห้อง <span class="text-danger">*</span></b><br>
         <div class="col-sm-2">
             <input name="select_channel" class="form-check-input" type="radio" id="defaultRadio1" value="1" checked onclick="toggleSelectFields()">
             <label class="form-check-label ms-1" for="defaultRadio1"> พิมพ์ชื่อห้อง </label>
@@ -152,7 +154,7 @@
         <div></div>
         <div class="col-sm-12" id="selectForm">
             {{-- <textarea name="room_text" class="form-control user-tags" id="room_text" placeholder="พิมพ์ชื่อห้องและกด Enter" required></textarea> --}}
-            <input name="room_text" class="form-control user-tags" data-role="tagsinput" id="room_text" placeholder="พิมพ์ชื่อห้องและกด Enter" required>
+            <input name="room_text" class="form-control user-tags" data-role="tagsinput" id="room_text" placeholder="พิมพ์ชื่อห้องและกด Enter">
         </div>
         <div class="col-sm-7 selectForm2" style="display: none;">
             <label for="exampleFormControlInput14" class="form-label">เลือกห้อง</label>
@@ -262,7 +264,7 @@
             $('#ref_bank_id').attr('required', true);
             $('#transfer_time').attr('required', true);
             $('#select_date2').attr('required', true);
-            $('#room_text').attr('required', true);
+            // $('#room_text').attr('required', true);
             
         } else {
             selectForm.style.display = 'none';
@@ -270,7 +272,7 @@
             $('#ref_bank_id').removeAttr('required');
             $('#transfer_time').removeAttr('required');
             $('#select_date2').removeAttr('required')
-            $('#room_text').removeAttr('required');
+            // $('#room_text').removeAttr('required');
         }
     }
     function room_in_building_selected(buildingClass) {
@@ -342,11 +344,31 @@
         </div>
         <div class="col-sm-12">
             <label for="exampleFormControlInput33" class="form-label">วันที่รับชำระเงิน</label><span class="text-danger">*</span>
-            <input type="text" name="payment_received_date" class="form-control" id="exampleFormControlInput33" placeholder="วัน/เดือน/ปี" value="" required/>
+            <input type="text" name="payment_received_date" class="form-control" id="exampleFormControlInput33" placeholder="วัน/เดือน/ปี" value="{{ date('d/m/Y') }}" required/>
         </div>
     </div>
 </div>
 <script>
+    
+        $('#bs-datepicker-format2').datepicker({
+            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
+            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
+            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
+            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
+        })
+        $('#exampleFormControlInput13').datepicker({
+            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
+            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
+            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
+            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
+        })
+        $('#exampleFormControlInput33').datepicker({
+            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
+            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
+            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
+            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
+        })
+        
     $(document).ready(function() {
         $('#select2Basic').on('change', function () {
             const provinceId = $(this).val();

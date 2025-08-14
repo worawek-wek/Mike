@@ -438,7 +438,7 @@
                     </div>
                     <div class="modal-footer rounded-0 justify-content-center">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" class="btn btn-main">บันทึก</button>
+                        <button type="submit" id="submit_insert_contract" class="btn btn-main" disabled >บันทึก</button>
                     </div>
                 </form>
             </div>
@@ -470,7 +470,7 @@
                     </div>
                     <div class="modal-footer rounded-0 justify-content-center">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" class="btn btn-main">บันทึก</button>
+                        <button type="submit" id="submit_reservation_form_all" class="btn btn-main" disabled>บันทึก</button>
                     </div>
                 </form>
             </div>
@@ -815,15 +815,17 @@
         function get_room_rental_reservation(id){ // Show form ชำระค่าจอง หลายห้อง
             if(id == 'no'){
                 $("#room-rental-reservation").html('');
+                $('#submit_reservation_form_all').prop('disabled', true);
+                return false;
             }
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-rental-reservation/"+id,
                 success: function(data) {
 
-                    $('#select2RenterReservation').select2();
-
                     $("#room-rental-reservation").html(data);
+                    $('#submit_reservation_form_all').prop('disabled', false);
+
                 }
             });
         }
@@ -902,11 +904,11 @@
                                 });
 
                     setTimeout(() => {
-                        $('#bs-datepicker-format').datepicker({
-                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-                        });
+                        // $('#bs-datepicker-format').datepicker({
+                        //     format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                        //     autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                        //     todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                        // });
                         $('#bs-datepicker-format2').datepicker({
                             format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
                             autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
@@ -936,6 +938,7 @@
                 success: function(data) {
                     $("#formRoomRentalContract").html(data);
                     document.getElementById('loadingOverlay').style.display = 'none';
+                    $('#submit_insert_contract').prop('disabled', true);
                     
                     $('#select2Renter').select2({
                         placeholder: 'เลือกข้อมูลจากผู้เช่า',
@@ -961,11 +964,19 @@
             });
         }
         function get_room_rental_contract(id){
+            
+            if(id == 'no'){
+                $("#room-rental-contract").html('');
+                $('#submit_insert_contract').prop('disabled', true);
+                return false;
+            }
+
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-rental-contract/"+id,
                 success: function(data) {
                     $("#room-rental-contract").html(data);
+                $('#submit_insert_contract').prop('disabled', false);
                 }
             });
         }
@@ -1053,11 +1064,19 @@
                 // ถ้าฟอร์มไม่ถูกต้อง
                 this.reportValidity();
                 return console.log('ฟอร์มไม่ถูกต้อง');
+                
             }
+            
             const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
 
             if($('#check_selected').val() == 0 && selectChannel == 2){
                 return Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
+            }
+            let roomText = $('#room_text').val().trim();
+
+            if (selectChannel == '1' && roomText === '') {
+                Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
+                return false;
             }
             // return alert(123);
             Swal.fire({
@@ -1267,6 +1286,8 @@
                                 Swal.fire('เพิ่มสัญญาเรียบร้อยแล้ว', '', 'success').then((result) => {
                                     location.reload();
                                 });
+                                summary()
+
                                 // $('#room-rental-contract').html('');
                             }
                         },
@@ -1336,6 +1357,7 @@
                                 Swal.fire('ชำระเงิน เรียบร้อยแล้ว', '', 'success');
                                 loadData(page);
                                 get_contract();
+                                summary()
                             }
                         },
                         error: function (xhr) {
@@ -1400,6 +1422,7 @@
 
                                 Swal.fire('อัพโหลดรูปก่อนย้ายออก เรียบร้อยแล้ว', '', 'success');
                                 loadData(page);
+                                summary()
                                 var room_has_asset_id = $('#room_has_asset_id').val();
                                 $('#id_image_move_out'+room_has_asset_id).html(response.button);
                             }
@@ -1469,6 +1492,7 @@
                                     location.reload();
                                 });
                                 loadData(page);
+                                summary()
                             }
                         },
                         error: function (xhr) {
@@ -1536,6 +1560,7 @@
                                     location.reload();
                                 });
                                 loadData(page);
+                                summary()
                             }
                         },
                         error: function (xhr) {

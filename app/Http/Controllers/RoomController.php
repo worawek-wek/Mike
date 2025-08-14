@@ -158,6 +158,7 @@ class RoomController extends Controller
         }
         
         $room_for_rent = RoomForRents::leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
+                                                    ->where('room_for_rents.status', 1)
                                                     ->where('room_for_rents.ref_room_id', $id)
                                                     ->select('room_for_rents.*','room_for_rents.id as room_for_rent_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
                                                     ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
@@ -166,6 +167,7 @@ class RoomController extends Controller
         $data['renter'] = Renter::orderBy('room_for_rents.id','asc')
                                     ->leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                                     ->where('room_for_rents.ref_room_id', $id)
+                                    ->where('room_for_rents.status', 1)
                                     ->select('renters.*', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
                                     ->get();
 
@@ -610,6 +612,8 @@ class RoomController extends Controller
             $room = Room::find($request->id);
             $room->status = 0;
             $room->save();
+            
+            RoomForRents::where('ref_room_id', $request->id)->where('ref_renter_id', $request->ref_renter_id)->update(['status' => 0]);
 
             if($request->type_move_out == 2){
                     $up_renter = Renter::find($request->ref_renter_id);
@@ -818,6 +822,7 @@ class RoomController extends Controller
                 SELECT MIN(r2.updated_at)
                 FROM room_for_rents r2
                 WHERE r2.ref_room_id = r1.ref_room_id
+                AND r2.status = 1
             )');
 
         $results = Room::orderBy('rooms.name', 'ASC')
@@ -826,6 +831,7 @@ class RoomController extends Controller
                         })
                         ->leftJoinSub($latestRoomForRent, 'room_for_rents', function ($join) {
                             $join->on('rooms.id', '=', 'room_for_rents.ref_room_id');
+                                    // ->where('room_for_rents.status', 1);
                         })
                         ->leftJoin('contracts', 'rooms.id', '=', 'contracts.ref_room_id')
                         ->leftJoin('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
@@ -1053,6 +1059,7 @@ class RoomController extends Controller
                 $r_b_room->water_unit  =  (int)$meter->water_unit;
                 $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_water;
                 $r_b_room->invoice_number =  $this->generateInvoiceCode();
+                $r_b_room->ref_room_id =  $row['ref_room_id'];
                 $r_b_room->ref_contract_id =  $contract->id;
                 $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
                 $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
@@ -1068,6 +1075,7 @@ class RoomController extends Controller
                 $r_b->water_unit  =  0;
                 $r_b->water_amount  =  0;
                 $r_b->invoice_number  =  $this->generateInvoiceCode();
+                $r_b->ref_room_id =  $row['ref_room_id'];
                 $r_b->ref_contract_id =  $contract->id;
                 $r_b->ref_status_id =  7; // 7 = ค้างชำระ
                 $r_b->ref_type_id =  2; // 2 = ค่าประกันห้อง
@@ -1260,7 +1268,7 @@ class RoomController extends Controller
     {
         // $booking_date = Carbon::createFromFormat('d/m/Y', $request->booking_date)->format('Y-m-d');
         // $date_stay = Carbon::createFromFormat('d/m/Y', $request->date_stay)->format('Y-m-d');
-        // $payment_received_date = Carbon::createFromFormat('d/m/Y', $request->date_stay)->format('Y-m-d');
+        $birthdate = Carbon::createFromFormat('d/m/Y', $request->birthdate)->format('Y-m-d');
         $room = Room::find($request->room_id);
         // return $request;
         $room_for_rent = RoomForRents::where('ref_room_id', $request->room_id)->latest()->first();
@@ -1287,6 +1295,7 @@ class RoomController extends Controller
                 $renter->ref_subdistrict_id  =  $request->ref_subdistrict_id;
                 $renter->ref_district_id  =  $request->ref_district_id;
                 $renter->ref_province_id  =  $request->ref_province_id;
+                $renter->birthdate  =  $birthdate;
                 $renter->zipcode  =  $request->zipcode;
                 $renter->booking_date  =  $room_for_rent->renter->booking_date;
                 $renter->booking_channel  =  $room_for_rent->renter->booking_channel;
@@ -1418,6 +1427,7 @@ class RoomController extends Controller
                             $r_b->water_amount  =  0;
                             $r_b->total  =  $request->deposit;
                             $r_b->invoice_number  =  $this->generateInvoiceCode();
+                            $r_b->ref_room_id =  $r_n->id;
                             $r_b->ref_status_id =  7; //  3 = ไม่สมบูรณ์
                             $r_b->ref_type_id =  3;  //  3 ค่าจอง
                             $r_b->ref_user_id =  Auth::id();
@@ -1474,6 +1484,7 @@ class RoomController extends Controller
                             $r_b->water_amount  =  0;
                             $r_b->total  =  $request->deposit;
                             $r_b->invoice_number  =  $this->generateInvoiceCode();
+                            $r_b->ref_room_id =  $room;
                             $r_b->ref_status_id =  7; //  3 = ไม่สมบูรณ์
                             $r_b->ref_type_id =  3;  //  3 ค่าจอง
                             $r_b->ref_user_id =  Auth::id();
@@ -1511,6 +1522,27 @@ class RoomController extends Controller
         }
         //
     }
+    // public function generateInvoiceCode()
+    // {
+    //     $year = Carbon::now()->format('Y');   // 2024
+    //     $month = Carbon::now()->format('m');  // 01-12
+
+    //     $yearMonth = $year . $month;
+
+    //     // ใช้ lock เพื่อป้องกัน race condition
+    //     return DB::transaction(function () use ($year, $month, $yearMonth) {
+    //         $latestInvoice = RentBill::where('year', $year)
+    //                                 ->where('month', $month)
+    //                                 ->lockForUpdate()   // lock row
+    //                                 ->latest('id')
+    //                                 ->first();
+
+    //         $sequence = $latestInvoice ? (int)substr($latestInvoice->invoice_number, -6) + 1 : 1;
+    //         $sequenceCode = str_pad($sequence, 6, '0', STR_PAD_LEFT);
+
+    //         return 'INV' . $yearMonth . $sequenceCode;
+    //     });
+    // }
     public function generateInvoiceCode()
     {
         // Get the current year and month

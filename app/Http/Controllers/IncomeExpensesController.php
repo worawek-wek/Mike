@@ -32,8 +32,8 @@ class IncomeExpensesController extends Controller
                                 $query->where('ref_branch_id', session("branch_id"));
                             })->get();
         $data['category'] = Category::get();
-        $income = IncomeExpenses::where('type', 1)->sum('amount');
-        $expenses = IncomeExpenses::where('type', 2)->sum('amount');
+        $income = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 1)->sum('amount');
+        $expenses = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 2)->sum('amount');
         $data['income'] = $income;
         $data['expenses'] = $expenses;
         $data['total'] = $income-$expenses;
@@ -92,23 +92,24 @@ class IncomeExpensesController extends Controller
     {
         $date = Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
         try{
-            $expenses = new IncomeExpenses;
-            $expenses->type  =  $request->type;
-            $expenses->label  =  $request->label;
-            $expenses->amount  =  $request->amount ?? 0;
-            $expenses->date  =  $date;
-            $expenses->ref_category_id  =  $request->ref_category_id ?? 1;
-            $expenses->ref_room_id  =  $request->ref_room_id;
-            $expenses->name  =  $request->name;
-            $expenses->address  =  $request->address;
-            $expenses->id_card_number  =  $request->id_card_number;
-            $expenses->branch  =  $request->branch;
-            $expenses->phone  =  $request->phone;
-            $expenses->remark  =  $request->remark;
-            $expenses->ref_branch_id  =  session("branch_id");
+            // 1 เพิ่ม รายรับรายจ่าย
+            $insert_income_expenses = new IncomeExpenses;
+            $insert_income_expenses->type  =  $request->type;
+            $insert_income_expenses->label  =  $request->label;
+            $insert_income_expenses->amount  =  $request->amount ?? 0;
+            $insert_income_expenses->date  =  $date;
+            $insert_income_expenses->ref_category_id  =  $request->ref_category_id ?? 1;
+            $insert_income_expenses->ref_room_id  =  $request->ref_room_id;
+            $insert_income_expenses->name  =  $request->name;
+            $insert_income_expenses->address  =  $request->address;
+            $insert_income_expenses->id_card_number  =  $request->id_card_number;
+            $insert_income_expenses->branch  =  $request->branch;
+            $insert_income_expenses->phone  =  $request->phone;
+            $insert_income_expenses->remark  =  $request->remark;
+            $insert_income_expenses->ref_branch_id  =  session("branch_id");
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // return $request->file('proof_of_payment');
+            // 1.1 อัพโหลดรูปภาพ หลักฐานการจ่ายเงิน
             if($request->file('proof_of_payment')){
                 // return 123;
                 $file = $request->file('proof_of_payment');
@@ -117,25 +118,25 @@ class IncomeExpensesController extends Controller
                 $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
                 $path = "upload/expenses/";
                 $proof_of_payment = $img_name.rand().'.'.$extension;
-                $expenses->proof_of_payment = $proof_of_payment;
+                $insert_income_expenses->proof_of_payment = $proof_of_payment;
             }
-            // return 999;
+            // 1.2 อัพโหลดรูปภาพ ใบสำคัญจ่าย
             if($request->file('payment_voucher')){
-                // return 123;
                 $file = $request->file('payment_voucher');
                 $nameExtension = $file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
                 $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
                 $path = "upload/expenses/";
                 $payment_voucher = $img_name.rand().'.'.$extension;
-                $expenses->payment_voucher = $payment_voucher;
+                $insert_income_expenses->payment_voucher = $payment_voucher;
             }
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            $expenses->ref_user_id  =  Auth::id();
-            $expenses->save();
+            $insert_income_expenses->ref_user_id  =  Auth::id();
+            $insert_income_expenses->save();
             
+            // ถ้ามีการเพิ่มรายการ รับเงิน (ที่เป็นตาราง)
             if(@$request->payment_sd_list['title']){
-                
+                // 2. เพิ่มใบเสร็จรับเงิน
                 $receipt = new Receipt;
                 $receipt->receipt_number =  $this->generateReceiptCode();
                 $receipt->ref_room_id  =  $request->ref_room_id;
@@ -153,18 +154,19 @@ class IncomeExpensesController extends Controller
                 $receipt->ref_user_id =  Auth::id();
                 $receipt->save();
                 
-                $expenses->ref_receipt_id  =  $receipt->id;
-                $expenses->save(); 
+                $insert_income_expenses->ref_receipt_id  =  $receipt->id;
+                $insert_income_expenses->save(); 
 
                 foreach($request->payment_sd_list['title'] as $key => $payment_sd_list_title){
+                    // // 2.1 เพิ่ม รายการ ใบเสร็จรับเงิน
+                    // $pay_list = new IncomeList;
+                    // $pay_list->title  =  $payment_sd_list_title;
+                    // $pay_list->price  =  $request->payment_sd_list['price'][$key];
+                    // $pay_list->ref_payment_id  =  $insert_income_expenses->id;
+                    // $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
+                    // $pay_list->save();
 
-                    $pay_list = new IncomeList;
-                    $pay_list->title  =  $payment_sd_list_title;
-                    $pay_list->price  =  $request->payment_sd_list['price'][$key];
-                    $pay_list->ref_payment_id  =  $expenses->id;
-                    $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
-                    $pay_list->save();
-                    
+                    // 2.2 เพิ่ม รายการ ใบเสร็จรับเงิน
                     $pay_list = new PaymentList;
                     $pay_list->title  =  $payment_sd_list_title;
                     $pay_list->price  =  $request->payment_sd_list['price'][$key];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Room;
 use App\Models\Position;
 use App\Models\Branch;
 use App\Models\Work_shift;
@@ -50,10 +51,18 @@ class DashboardController extends Controller
     }
     public function overdue(Request $request)
     {
-        $all_overdue_payment = RentBill::where('rent_bills.ref_status_id', 7)
-                                        ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                                        ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                                        ->sum(DB::raw('rooms.rent + rent_bills.electricity_amount + rent_bills.water_amount'));
+        $all_overdue_payment = RentBill::with('payment_list')
+                                        // ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                        // ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
+                                        // ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                        // ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                        // ->where('buildings.ref_branch_id', session("branch_id"))
+                                        ->whereHas('room_for_rent.room.floor.building', function ($query) {
+                                            $query->where('ref_branch_id', session("branch_id"));
+                                        })
+                                        ->where('rent_bills.ref_status_id', 7)
+                                        ->get()
+                                        ->sum('total_amount'); // ใช้ accessor ในการ sum
 
         $data['page_url'] = 'dashboard';
         $data['summary'] = $this->summary(session("branch_id"));
@@ -62,26 +71,32 @@ class DashboardController extends Controller
     }
     public function datatable(Request $request)
     {
-        $results = RentBill::orderBy('id','DESC')
-                                ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                                ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                                ->Where('rent_bills.ref_status_id', 7)
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
+        return $results = Room::with([
+                                'room_for_rent.rent_bills.payment_list',
+                                'room_for_rent.rent_bills.receipt.payment_list',
+                                'floor.building'
+                        ])
+                        ->whereHas('floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })
+                        ->whereHas('room_for_rent.rent_bills', function ($query) {
+                            // $query->where('ref_status_id', 7);
+                        })
+                        ->paginate($request->limit ?? 15);
         
-        if(@$request->search){
-            $results = $results->Where(function ($query) use ($request) {
-                                    $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
-                                        ->orWhere('rooms.name','LIKE','%'.$request->search.'%');
-                                });
-        }
+        // if(@$request->search){
+        //     $results = $results->Where(function ($query) use ($request) {
+        //                             $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
+        //                                 ->orWhere('rooms.name','LIKE','%'.$request->search.'%');
+        //                         });
+        // }
 
         $limit = 15;
         if(@$request['limit']){
             $limit = $request['limit'];
         }
-        // $data['prefix'] = [ 1 => 'บริษัท', 2 => 'นาย', 3 => 'นางสาว', 4 => 'นาง'];
-        $results = $results->paginate($limit);
+        // // $data['prefix'] = [ 1 => 'บริษัท', 2 => 'นาย', 3 => 'นางสาว', 4 => 'นาง'];
+        // $results = $results->paginate($limit);
         // return $results->items();
         // dd($results);
         $data['list_data'] = $results->appends(request()->query());
