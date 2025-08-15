@@ -112,7 +112,7 @@
                         
             <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
                 <div>
-                    <button type="button" class="btn btn-primary waves-effect" onclick="printPdfReceipt({{ $invoice->id }})">
+                    <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
                         <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
                     </button>
                 </div>

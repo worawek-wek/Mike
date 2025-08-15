@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Receipt;
 use App\Models\Position;
 use App\Models\Branch;
 use App\Models\Work_shift;
@@ -44,19 +45,30 @@ class DashboardController extends Controller
             session(["branch_id" => $id]);
             return redirect('dashboard');
         }
+
+
         $data['page_url'] = 'dashboard';
-        $data['summary'] = $this->summary(session("branch_id"));
+        $summary = $this->summary(session("branch_id"));
+        // return $summary['all_receipt_late'];
+        $total = $summary['all_receipt_on_time'] + $summary['all_receipt_late_with_appointment'] + $summary['all_receipt_late'];
+
+        if ($total > 0) {
+            $percent_on_time = ($summary['all_receipt_on_time'] / $total) * 100;
+            $percent_late_with_appointment = ($summary['all_receipt_late_with_appointment'] / $total) * 100;
+            $percent_late = ($summary['all_receipt_late'] / $total) * 100;
+        } else {
+            $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
+        }
+        $data['percent_on_time'] = $percent_on_time;
+        $data['percent_late_with_appointment'] = $percent_late_with_appointment;
+        $data['percent_late'] = $percent_late;
+        $data['summary'] = $summary;
 
         return view('dashboard/index', $data);
     }
     public function overdue(Request $request)
     {
         $all_overdue_payment = RentBill::with('payment_list')
-                                        // ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                                        // ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
-                                        // ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                        // ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                        // ->where('buildings.ref_branch_id', session("branch_id"))
                                         ->whereHas('room_for_rent.room.floor.building', function ($query) {
                                             $query->where('ref_branch_id', session("branch_id"));
                                         })
@@ -71,17 +83,21 @@ class DashboardController extends Controller
     }
     public function datatable(Request $request)
     {
-        return $results = Room::with([
-                                'room_for_rent.rent_bills.payment_list',
-                                'room_for_rent.rent_bills.receipt.payment_list',
-                                'floor.building'
+        $results = Room::with([
+                                'rent_bill_247.payment_list',
+                                'room_for_rent_main.renter',
+                                'rent_bill_247.receipt.payment_list'
                         ])
                         ->whereHas('floor.building', function ($query) {
                             $query->where('ref_branch_id', session("branch_id"));
                         })
-                        ->whereHas('room_for_rent.rent_bills', function ($query) {
-                            // $query->where('ref_status_id', 7);
+                        ->whereHas('rent_bill', function ($query) {
+                            $query->whereIn('ref_status_id', [2,4,7]);
                         })
+                        ->distinct('rooms.id')
+                        // ->whereHas('rent_bills', function ($query) {
+                            // $query->where('ref_status_id', 7);
+                        // })
                         ->paginate($request->limit ?? 15);
         
         // if(@$request->search){
@@ -111,15 +127,22 @@ class DashboardController extends Controller
     {
         $year = $request->input('year', now()->year);
 
-        $invoiceByMonth = \App\Models\RentBill::with('payment_list')
-            ->whereYear('updated_at', $year)
-            ->get()
-            ->groupBy(function ($item) {
-                return (int) $item->updated_at->format('m');
-            })
-            ->map(function ($group) {
-                return $group->sum('total_amount');
-            });
+        $invoiceByMonth = \App\Models\Receipt::whereHas('room.floor.building', function ($query) {
+                                                    $query->where('ref_branch_id', session("branch_id"));
+                                                })
+                                                ->whereHas('invoice', function ($query) {
+                                                    $query->where('ref_status_id', 5);
+                                                })
+                                                ->with('payment_list')
+                                                ->where('ref_type_id', 1)
+                                                ->whereYear('updated_at', $year)
+                                                ->get()
+                                                ->groupBy(function ($item) {
+                                                    return (int) $item->updated_at->format('m');
+                                                })
+                                                ->map(function ($group) {
+                                                    return $group->sum('total_amount');
+                                                });
         $monthlyTotals = collect(range(1, 12))->map(function ($month) use ($invoiceByMonth) {
             return $invoiceByMonth->get($month, 0);
         });

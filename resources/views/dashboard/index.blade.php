@@ -137,7 +137,7 @@
                                             <small class="text-muted">
                                                 @php
                                                     \Carbon\Carbon::setLocale('th');
-                                                    $thaiDate = \Carbon\Carbon::now()->subMonth()->translatedFormat('F Y');
+                                                    $thaiDate = \Carbon\Carbon::now()->translatedFormat('F Y');
                                                 @endphp
                                                 <h4>{{ $thaiDate }}</h4>
                                             </small>
@@ -168,7 +168,7 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <h5>ผู้เช่าค้างชำระค่าเช่า</h5>
-                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] }} บาท</h6>
+                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] < 0 ? 0 : $summary['overdue_this_month'] }} บาท</h6>
                                         </div>
                                         <div class="card card-body bg-light-primary border-0 shadow-none py-5">
                                             <h2 class="text-center fw-semibold mb-0 text-white"><span
@@ -242,8 +242,8 @@
     <script>
         
     var options = {
-        series: [60, 30, 10],
-        labels: ['ลูกค้าจ่ายตรงเวลา', 'จ่ายล่าช้าแบบนัดเวลา', 'จ่ายละช้าแบบไม่ได้นัดเวลา'],
+        series: [{{ $percent_on_time ?? 0 }}, {{ $percent_late_with_appointment ?? 0 }}, {{ $percent_late ?? 0 }}],
+        labels: ['ลูกค้าจ่ายตรงเวลา', 'จ่ายล่าช้าแบบนัดเวลา', 'จ่ายล่าช้าแบบไม่ได้นัดเวลา'],
         colors: ['#BCE29E', '#ffb975', '#FF9494'],
         chart: {
             type: 'donut',
@@ -298,7 +298,7 @@
                             fontWeight: 600,
                             label: 'ภาพรวมรายได้',
                             formatter: function(w) {
-                                return '72%';
+                                return '100%';
                             }
                         }
                     }

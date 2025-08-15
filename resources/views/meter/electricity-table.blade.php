@@ -31,7 +31,7 @@
                 </td>
                 <td class="text-center">
                     
-                @if($row->status == 1 && count($row->room_for_rent->rent_bill_not_pay) > 0)
+                @if($row->status == 1 && count($row->room_for_rent->rent_bill_not_pay ?? []) > 0)
                     <span class="badge bg-info m-auto" style="font-size: small;" text-capitalized="">ห้องจอง<span class="text-danger">(ค้างชำระ)</span></span></td>
                 @else
                     <span class="badge bg-label-{{ $row->room_status->color }} m-auto" text-capitalized="" style="font-size: small;">

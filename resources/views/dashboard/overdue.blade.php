@@ -121,7 +121,7 @@
                                                 <div class="card card-border-shadow-danger" style="background-color: #f8eae4;">
                                                     <div class="card-body">
                                                         <div class="d-flex align-items-center mb-2 pb-1">
-                                                            <h4 class="ms-1 mb-0 text-danger">{{ number_format($all_overdue_payment) }}</h4>
+                                                            <h4 class="ms-1 mb-0 text-danger">{{ $summary['outstanding_balance'] }}</h4>
                                                         </div>
                                                         <p class="mb-1">รวมยอดค้างชำระทั้งหมด</p>
                                                     </div>

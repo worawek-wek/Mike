@@ -40,10 +40,40 @@ class Receipt extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 2);
     }
+    public function payment_list_fine()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 1)->where('document_type', 2);
+    }
+    public function payment_list_not_fine()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 0)->where('document_type', 2);
+    }
+    // public function getTotalFineAmountAttribute()
+    // {
+    //     return $this->payment_list->where('fine', 1)->sum('price');
+    // }
     public function getTotalAmountAttribute()
     {
 
         $lists = $this->payment_list; // ใช้ attribute ที่ถูกโหลดแล้ว
+
+        $total = $lists->where('discount', 0)->sum('price');
+        $discount = $lists->where('discount', 1)->sum('price');
+
+        return $total - $discount;
+    }
+    public function getTotalFineAmountAttribute()
+    {
+        $lists = $this->payment_list_fine; // ใช้ความสัมพันธ์ fine=1
+
+        $total = $lists->where('discount', 0)->sum('price');
+        $discount = $lists->where('discount', 1)->sum('price');
+
+        return $total - $discount;
+    }
+    public function getTotalNotFineAmountAttribute()
+    {
+        $lists = $this->payment_list_not_fine;
 
         $total = $lists->where('discount', 0)->sum('price');
         $discount = $lists->where('discount', 1)->sum('price');

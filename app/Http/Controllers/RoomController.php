@@ -613,7 +613,10 @@ class RoomController extends Controller
             $room->status = 0;
             $room->save();
             
-            RoomForRents::where('ref_room_id', $request->id)->where('ref_renter_id', $request->ref_renter_id)->update(['status' => 0]);
+            RoomForRents::where('ref_room_id', $request->id)->update(['status' => 0]);
+            $invoice = RentBill::where('ref_room_id', $request->id)->where('ref_status_id', 3)->first();
+            RentBill::destroy($invoice->id);
+            PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
 
             if($request->type_move_out == 2){
                     $up_renter = Renter::find($request->ref_renter_id);
@@ -1271,7 +1274,7 @@ class RoomController extends Controller
         $birthdate = Carbon::createFromFormat('d/m/Y', $request->birthdate)->format('Y-m-d');
         $room = Room::find($request->room_id);
         // return $request;
-        $room_for_rent = RoomForRents::where('ref_room_id', $request->room_id)->latest()->first();
+        $room_for_rent = RoomForRents::where('ref_room_id', $request->room_id)->where('ref_renter_id', $request->renter_id)->first();
 
         try{
             
@@ -1301,7 +1304,10 @@ class RoomController extends Controller
                 $renter->booking_channel  =  $room_for_rent->renter->booking_channel;
                 $renter->save();
 
+            $room_for_rent_id = $room_for_rent->id;
+
             if(!$request->renter_id){
+
                 $r_t_r = new RoomForRents;
                 $r_t_r->date_stay  =  $room_for_rent->payment_received_date;
                 $r_t_r->ref_room_id  =  $request->room_id;
@@ -1314,6 +1320,8 @@ class RoomController extends Controller
                 $r_t_r->payment_method  =  $room_for_rent->payment_method;
                 $r_t_r->payment_received_date  =  $room_for_rent->payment_received_date;
                 $r_t_r->save();
+
+                $room_for_rent_id = $r_t_r->id;
             }
             // return $request->vehicles;
             foreach($request->vehicles as $vehicle){
@@ -1322,7 +1330,7 @@ class RoomController extends Controller
                 }
                 $vehi = new Vehicle();
                 $vehi->ref_renter_id = $renter->id;
-                $vehi->ref_room_for_rent_id = $r_t_r->id;
+                $vehi->ref_room_for_rent_id = $room_for_rent_id;
                 $vehi->ref_room_id = $request->room_id;
                 $vehi->ref_type_id = $vehicle['ref_type_id'];
                 $vehi->car_registration = $vehicle['car_registration'];

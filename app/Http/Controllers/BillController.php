@@ -85,7 +85,7 @@ class BillController extends Controller
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
+                                ->select('rent_bills.*', 'rent_bills.id as rent_bill_id', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
         
         if(@$request->search){
             $results = $results->Where(function ($query) use ($request) {
@@ -122,6 +122,15 @@ class BillController extends Controller
 
         $results = $results->paginate($limit);
 
+        foreach ($results as $res) {
+            $total_fine = 0;
+            $receipt = Receipt::where('ref_rent_bill_id', $res->rent_bill_id)->get();
+            foreach ($receipt as $rec) {
+                $total_fine += $rec->payment_list_fine->sum('price');
+            }
+            $res->total_fine = $total_fine; // ค่าปรับทั้งหมดของ ใบแจ้งหนี้ นี้
+            // $res['totalFine'] = $res->receipt->payment_list_fine()->where('fine', 1)->sum('price');
+        }
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();
         $data['query']['limit'] = $limit;
@@ -185,6 +194,7 @@ class BillController extends Controller
     public function payment_bill(Request $request) // ชำระบิล
     {
         try{
+            $room = Room::find($request->ref_room_id);
             // return $request;
             // return $this->generateInvoiceCode();
             $rent_bill = RentBill::find($request->id);
@@ -216,7 +226,11 @@ class BillController extends Controller
                 $image_name = $img_name.rand().'.'.$extension;
             }
             // return 2;
-            
+            $branch = Branch::find(session("branch_id"));
+
+            $todayDay = Carbon::now()->day; // วันที่ปัจจุบัน เช่น 14
+            $payment_end_date = (int) $branch->payment_end_date; // วันที่ที่เก็บไว้ เช่น 10
+
             if($request->payment_channel == 1){
                 $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
             }else{
@@ -237,6 +251,14 @@ class BillController extends Controller
             $receipt->ref_type_id  =  $request->ref_type_id;
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
+
+            if ($todayDay > $payment_end_date) {
+                if($room->fine_day > 0){
+                    $receipt->payment_on_time  =  2;
+                }else{
+                    $receipt->payment_on_time  =  3;
+                }
+            }
             $receipt->save();
             
             
@@ -253,6 +275,9 @@ class BillController extends Controller
                     $pay_list->ref_payment_id  =  $receipt->id;
                     $pay_list->document_type  =  2;
                     $pay_list->discount  =  $payment_list->discount;
+                    if ($payment_list->title && str_contains($payment_list->title, 'ค่าปรับ')) {
+                        $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม
+                    }
                     $pay_list->save();
                     
                     $total = $this->calculate_total($total, $payment_list->discount, $payment_list->price);
@@ -268,6 +293,11 @@ class BillController extends Controller
                         $pay_list->ref_payment_id  =  $receipt->id;
                         $pay_list->document_type  =  2; // Receipt ใบเสร็จรับเงิน
                         $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
+
+                        if ($payment_sd_list_title && str_contains($payment_sd_list_title, 'ค่าปรับ')) {
+                            $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม
+                        }
+
                         $pay_list->save();
 
                         // $pay_list = new PaymentList;
@@ -293,6 +323,11 @@ class BillController extends Controller
                     $pay_list->price  =  $request->payment_list['price'][$key];
                     $pay_list->ref_payment_id  =  $receipt->id;
                     $pay_list->document_type  =  2;
+
+                    if ($payment_list_title && str_contains($payment_list_title, 'ค่าปรับ')) {
+                        $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม
+                    }
+
                     $pay_list->save();
                 }
 

@@ -20,6 +20,14 @@ class Room extends Model
     {
         return $this->belongsTo(Floor::class, 'ref_floor_id');
     }
+    public function rent_bill()
+    {
+        return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id');
+    }
+    public function rent_bill_247() // บิลค้างชำระ
+    {
+        return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id')->whereIn('ref_status_id', [2,4,7]);
+    }
     public function room_status()
     {
         return $this->hasOne('App\Models\StatusRoom', 'id', 'status');
@@ -27,6 +35,12 @@ class Room extends Model
     public function contract()
     {
         return $this->hasOne('App\Models\Contract', 'ref_room_id', 'id');
+    }
+    public function room_for_rent_main()
+    {
+        return $this->hasOne(RoomForRents::class, 'ref_room_id', 'id')
+                    ->where('status', 1)
+                    ->latest('id');
     }
     public function room_for_rent()
     {
