@@ -111,7 +111,7 @@
                                                             <div class="avatar me-2" style="cursor: unset;">
                                                             <span class="avatar-initial rounded bg-label-danger"><i class="ti ti-alert-octagon ti-md"></i></span>
                                                             </div>
-                                                            <h4 class="ms-1 mb-0 text-danger">{{ $summary['all_overdue'] }} ห้อง</h4>
+                                                            <h4 class="ms-1 mb-0 text-danger">{{ $summary['overdueCount'] }} ห้อง</h4>
                                                         </div>
                                                         <p class="mb-1">ห้องที่ค้างชำระ</p>
                                                     </div>
@@ -149,7 +149,7 @@
                                         <div class="col-lg-4 mt-4">
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
-                                                <select name="" class="form-select ms-2 me-2" style="width:100px">
+                                                <select  onchange='loadData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_search" style="width:100px">
                                                     <option value="10">10</option>
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>

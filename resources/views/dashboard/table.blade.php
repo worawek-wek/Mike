@@ -42,53 +42,25 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
 </thead>
 <tbody>
     @foreach ($list_data as $key => $row)
+    @php
+        // ยอดที่จ่ายแล้ว เฉพาะ payment_list_not_fine
+        $paidAmount = $row->receipts->flatMap->payment_list_not_fine->sum('price');
+        // ยอดค้างชำระ
+        $balance = $row->total_amount - $paidAmount;
+    @endphp
     <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }})">
         <td class="control" tabindex="0" style="display: none;">
         </td>
         <td class="text-center">{{ $list_data->firstItem()+$key }}</td>
-        <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent_main->renter->prefix.' '.$row->room_for_rent_main->renter->name.' '.$row->room_for_rent_main->renter->surname }}</span>
+        <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent->renter->prefix.' '.$row->room_for_rent->renter->name.' '.$row->room_for_rent->renter->surname }}</span>
         </td>
-        <td class="text-center">{{ $row->name }}</td>
+        <td class="text-center">{{ $row->room->name }}</td>
         {{-- <td class="text-center">{{ $thaiMonths[$row->month] }}</td> --}}
         <td class="text-center text-danger">
-            @php
-                $outstanding = 0;
-                $total_amount = 0;
-                $receipt_total_amount = 0;
-            // ยอดเรียกเก็บเงินทั้งหมด
-            foreach ($row->rent_bill_247 as $bill){
-                foreach ($bill->payment_list as $payment_list){
-                    if($payment_list->discount == 0){
-                        $total_amount += $payment_list->price;
-                    }else{
-                        $total_amount -= $payment_list->price;
-                    }
-
-                }
-            }
-            // ยอดชำระเงินที่ไม่รวมค่าปรับทั้งหมด
-            foreach ($row->rent_bill_247 as $bill){
-                foreach ($bill->receipt as $receipt){
-                    foreach ($receipt->payment_list as $receipt_payment_list){
-                        if($receipt_payment_list->fine == 1){
-                            continue;
-                        }
-                        if($receipt_payment_list->discount == 0){
-                            $receipt_total_amount += $receipt_payment_list->price;
-                        }else{
-                            $receipt_total_amount -= $receipt_payment_list->price;
-                        }
-                    }
-                }
-            }
-            echo number_format($total_amount - $receipt_total_amount);
-
-            @endphp
-            
-            {{-- {{ number_format($row->total_amount) }} --}}
+            {{ number_format($balance) }}
         
         </td>
-        <td class="text-center">{{ number_format($total_amount) }}</td>
+        <td class="text-center">{{ number_format($row->total_amount) }}</td>
         {{-- <td class="text-center">
             <div class="d-inline-block text-nowrap">
                 <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light">

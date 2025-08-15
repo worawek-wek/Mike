@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 DB::beginTransaction();
 
 class DashboardController extends Controller
@@ -83,43 +84,36 @@ class DashboardController extends Controller
     }
     public function datatable(Request $request)
     {
-        $results = Room::with([
-                                'rent_bill_247.payment_list',
-                                'room_for_rent_main.renter',
-                                'rent_bill_247.receipt.payment_list'
-                        ])
-                        ->whereHas('floor.building', function ($query) {
-                            $query->where('ref_branch_id', session("branch_id"));
-                        })
-                        ->whereHas('rent_bill', function ($query) {
-                            $query->whereIn('ref_status_id', [2,4,7]);
-                        })
-                        ->distinct('rooms.id')
-                        // ->whereHas('rent_bills', function ($query) {
-                            // $query->where('ref_status_id', 7);
-                        // })
-                        ->paginate($request->limit ?? 15);
         
-        // if(@$request->search){
-        //     $results = $results->Where(function ($query) use ($request) {
-        //                             $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
-        //                                 ->orWhere('rooms.name','LIKE','%'.$request->search.'%');
-        //                         });
-        // }
+        $perPage = $request->limit ?? 15;
+        $page = Paginator::resolveCurrentPage('page');
 
-        $limit = 15;
-        if(@$request['limit']){
-            $limit = $request['limit'];
-        }
-        // // $data['prefix'] = [ 1 => 'บริษัท', 2 => 'นาย', 3 => 'นางสาว', 4 => 'นาง'];
-        // $results = $results->paginate($limit);
-        // return $results->items();
-        // dd($results);
-        $data['list_data'] = $results->appends(request()->query());
+        $overdueBills = RentBill::with(['receipts.payment_list_not_fine', 'room.floor.building'])
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                    })
+                                    ->whereIn('ref_status_id', [2, 4, 7])
+                                    ->get() // ดึงก่อน
+                                    ->filter(function ($bill) {
+                                        $paidAmount = $bill->receipts->flatMap->payment_list_not_fine->sum('price');
+                                        return $paidAmount < $bill->total_amount; // ยอดค้างชำระ
+                                    })
+                                    ->values();
+
+        // ทำ paginate หลังจาก filter
+        $page = request()->get('page', 1);
+        $perPage = $request->limit ?? 15;
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $overdueBills->forPage($page, $perPage),
+            $overdueBills->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        $data['list_data'] = $paginated;
         $data['query'] = request()->query();
-        $data['query']['limit'] = $limit;
-
-        $data['list_data'] = $results;
+        $data['query']['limit'] = $request->limit ?? 15;
 
         return view('dashboard/table', $data);
     }

@@ -209,15 +209,29 @@ class Controller extends BaseController
                                 $query->where('ref_branch_id', $branch_id);
                             })
                             ->where('status', 0)->count();
-
+// บิลค่าเช่าทั้งหมด
         $all_overdue = RentBill::join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
                                 ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', $branch_id)
-                                ->whereIn('rent_bills.ref_status_id', [2,4,7])
-                                ->distinct('rooms.id')
+                                ->whereIn('rent_bills.ref_status_id', [2, 4, 7])
+                                ->distinct()
+                                ->count('rooms.id'); // ✅ ใช้ count กับคอลัมน์ตรง ๆ
+// บิลค่าเช่าทั้งหมด
+
+// บิลค่าเช่าค้างชำระทั้งหมด               
+        $overdueCount = RentBill::with('receipts.payment_list_not_fine')
+                                ->whereHas('room_for_rent.room.floor.building', function ($query) use ($branch_id) {
+                                    $query->where('ref_branch_id', $branch_id);
+                                })
+                                ->whereIn('ref_status_id', [2, 4, 7])
+                                ->get()
+                                ->filter(function ($bill) {
+                                    return $bill->total_paid_amount < $bill->total_amount;
+                                })
                                 ->count();
+// บิลค่าเช่าค้างชำระทั้งหมด               
 
         $data['percent'] = 0; // อัตราเข้าพัก
         if ($all_room > 0) {
@@ -243,6 +257,7 @@ class Controller extends BaseController
         $data['all_renter'] = $all_renter; // ผู้เช่า
         $data['all_booking_room'] = $all_booking_room; // ห้องจอง
         $data['all_overdue'] = $all_overdue; // ห้องค้างชำระ
+        $data['overdueCount'] = $overdueCount; // ห้องค้างชำระ
         $data['vacant_room'] = $vacant_room; // ห้องว่าง
         $data['all_receipt_on_time'] = $all_receipt_on_time; // ห้องว่าง
         $data['all_receipt_late_with_appointment'] = $all_receipt_late_with_appointment; // ห้องว่าง

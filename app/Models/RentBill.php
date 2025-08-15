@@ -32,9 +32,18 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\AdditionalCosts', 'ref_rent_bill_id', 'id');
     }
-    public function receipt()
+    public function receipts()
     {
-        return $this->hasMany('App\Models\Receipt', 'ref_rent_bill_id', 'id');
+        return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id');
+    }
+
+    public function getTotalPaidAmountAttribute()
+    {
+        return $this->receipts->sum(function ($receipt) {
+            $total = $receipt->payment_list_not_fine->where('discount', 0)->sum('price');
+            $discount = $receipt->payment_list_not_fine->where('discount', 1)->sum('price');
+            return $total - $discount;
+        });
     }
     public function status()
     {
@@ -69,13 +78,5 @@ class RentBill extends Model
         });
 
         return $billAmount - $paidAmount;
-    }
-    public function getTotalPaidAmountAttribute()
-    {
-        $this->loadMissing('receipt.payment_list');
-
-        return $this->receipt->sum(function ($receipt) {
-            return $receipt->total_amount;
-        });
     }
 }

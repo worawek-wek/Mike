@@ -168,7 +168,7 @@
                                                     <h5 class="text-white card-title mb-0">มีห้องที่ค้างชำระ</h5>
                                                     <p class="text-white mb-2">จำนวน</p>
                                                     <div style="display: flex;align-items: center;gap: 10px;">
-                                                        <h4 class="text-white mr-2 my-auto">{{ $summary['all_overdue'] }} ห้อง</h4>
+                                                        <h4 class="text-white mr-2 my-auto">{{ $summary['overdueCount'] }} ห้อง</h4>
                                                         @if ($summary['all_overdue'] > 0)
                                                             <a href="dashboard/overdue" class="btn bg-label-warning text-black">รายละเอียด</a>
                                                         @endif
