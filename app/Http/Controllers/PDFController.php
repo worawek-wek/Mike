@@ -180,8 +180,27 @@ class PDFController extends Controller
     public function checkCarPDF($status)
     {
         $data['name_branch'] = Branch::find(session("branch_id"))->name;
-        $results = Room::whereIn('status', [2])
-                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+        
+        // กำหนดสถานะตาม status
+        if ($status == '0') {
+            // ผู้เช่าเก่า
+            $roomStatus = [0];
+            $roomForRentStatus = [0];
+        } else {
+            // ผู้เช่าปัจจุบัน
+            $roomStatus = [2];
+            $roomForRentStatus = [1];
+        }
+        
+        $results = Room::whereIn('status', $roomStatus)
+                        ->whereHas('room_for_rent_s', function($query) use ($roomForRentStatus) {
+                            $query->whereIn('status', $roomForRentStatus);
+                        })
+                        ->whereHas('room_for_rent_s.renter.vehicles')
+                        ->with(['room_for_rent_s' => function($query) use ($roomForRentStatus) {
+                            $query->whereIn('status', $roomForRentStatus);
+                        }, 'room_for_rent_s.renter.vehicles'])
+                        ->orderBy('id', 'DESC')
                         ->whereHas('floor.building', function ($query) {
                             $query->where('ref_branch_id', session("branch_id"));
                         })

@@ -153,15 +153,37 @@ class RenterController extends Controller
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $results = Room::whereIn('status', [2])
-                        ->whereHas('room_for_rent_s.renter.vehicles')->with('room_for_rent_s.renter.vehicles')->orderBy('id', 'DESC')
+        
+        // กำหนดสถานะและข้อความตาม status
+        if ($status == '0') {
+            // ผู้เช่าเก่า
+            $roomStatus = [0];
+            $roomForRentStatus = [0];
+            $titleText = 'ผู้เช่าเก่า';
+        } else {
+            // ผู้เช่าปัจจุบัน
+            $roomStatus = [2];
+            $roomForRentStatus = [1];
+            $titleText = 'ผู้เช่าปัจจุบัน';
+        }
+        
+        $results = Room::whereIn('status', $roomStatus)
+                        ->whereHas('room_for_rent_s', function($query) use ($roomForRentStatus) {
+                            $query->whereIn('status', $roomForRentStatus);
+                        })
+                        ->whereHas('room_for_rent_s.renter.vehicles')
+                        ->with(['room_for_rent_s' => function($query) use ($roomForRentStatus) {
+                            $query->whereIn('status', $roomForRentStatus);
+                        }, 'room_for_rent_s.renter.vehicles'])
+                        ->orderBy('id', 'DESC')
                         ->whereHas('floor.building', function ($query) {
                             $query->where('ref_branch_id', session("branch_id"));
                         })
                         ->get();
+                        
         $sheet->fromArray([
-            ['ข้อมูลผู้เช่าปัจจุบัน'],
-            ['ข้อมูลผู้เช่าปัจจุบัน วันที่ '.date('d/m/Y')],
+            ['ข้อมูล' . $titleText],
+            ['ข้อมูล' . $titleText . ' วันที่ '.date('d/m/Y')],
             ["ลำดับ","ชื่อผู้เช่า","ห้อง","เบอร์ติดต่อ","ยานพาหนะ","วันที่เข้าพัก","วันสิ้นสุดสัญญาเช่า","อายุสัญญา"]
         ], null, 'A1');
 
