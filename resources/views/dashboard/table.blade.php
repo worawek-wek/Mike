@@ -44,7 +44,7 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
     @foreach ($list_data as $key => $row)
     @php
         // ยอดที่จ่ายแล้ว เฉพาะ payment_list_not_fine
-        $paidAmount = $row->receipts->flatMap->payment_list_not_fine->sum('price');
+        $paidAmount = $row->receipt->flatMap->payment_list_not_fine->sum('price');
         // ยอดค้างชำระ
         $balance = $row->total_amount - $paidAmount;
     @endphp

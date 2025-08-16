@@ -88,14 +88,14 @@ class DashboardController extends Controller
         $perPage = $request->limit ?? 15;
         $page = Paginator::resolveCurrentPage('page');
 
-        $overdueBills = RentBill::with(['receipts.payment_list_not_fine', 'room.floor.building'])
+        $overdueBills = RentBill::with(['receipt.payment_list_not_fine', 'room.floor.building'])
                                     ->whereHas('room.floor.building', function ($query) {
                                         $query->where('ref_branch_id', session('branch_id'));
                                     })
                                     ->whereIn('ref_status_id', [2, 4, 7])
                                     ->get() // ดึงก่อน
                                     ->filter(function ($bill) {
-                                        $paidAmount = $bill->receipts->flatMap->payment_list_not_fine->sum('price');
+                                        $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
                                         return $paidAmount < $bill->total_amount; // ยอดค้างชำระ
                                     })
                                     ->values();

@@ -35,7 +35,7 @@
                     </span>
                     </button>
                 </li>
-                @if ($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price') > 0)
+                @if ($invoice->total_amount - $invoice->total_paid_amount > 0)
                     <li class="nav-item" role="presentation">
                         <button type="button" class="btn btn-outline-info nav-link" 
                         role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
@@ -317,7 +317,7 @@
                                                                     <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $invoice->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price') }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->total_paid_amount }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
                                                                 </td>
                                                             </tr>
                                                     </tbody>
@@ -514,7 +514,7 @@
                         
                                     <div class="col-sm-11 mt-2">
                                          @if (count($invoice->receipt) == 0)
-                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท</b>
+                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->total_paid_amount) }}</span> &nbsp;บาท</b>
                                         @endif
                                             <b id="totalsplit" 
                                                 @if (count($invoice->receipt) == 0)
@@ -573,7 +573,7 @@
                             togglePaymentFields();
                         </script>
 
-                        <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($invoice->total_amount - $invoice->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท
+                        <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($invoice->total_amount - $invoice->total_paid_amount) }}</span> &nbsp;บาท
                         
                         
                         <div class="modal-footer d-flex justify-content-between rounded-0">

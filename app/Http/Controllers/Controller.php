@@ -221,16 +221,25 @@ class Controller extends BaseController
 // บิลค่าเช่าทั้งหมด
 
 // บิลค่าเช่าค้างชำระทั้งหมด               
-        $overdueCount = RentBill::with('receipts.payment_list_not_fine')
+        $overdueData = RentBill::with('receipt.payment_list_not_fine', 'room_for_rent.room')
                                 ->whereHas('room_for_rent.room.floor.building', function ($query) use ($branch_id) {
                                     $query->where('ref_branch_id', $branch_id);
                                 })
                                 ->whereIn('ref_status_id', [2, 4, 7])
                                 ->get()
                                 ->filter(function ($bill) {
-                                    return $bill->total_paid_amount < $bill->total_amount;
-                                })
-                                ->count();
+                                    $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
+                                    return $paidAmount < $bill->total_amount;
+                                });
+
+        // นับจำนวนห้องไม่ซ้ำ
+        $overdueRoomCount = $overdueData->pluck('room_for_rent.room.id')->unique()->count();
+
+        // รวมยอดค้างชำระทั้งหมด
+        $overdueTotalAmount = $overdueData->sum(function ($bill) {
+            $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
+            return $bill->total_amount - $paidAmount;
+        });
 // บิลค่าเช่าค้างชำระทั้งหมด               
 
         $data['percent'] = 0; // อัตราเข้าพัก
@@ -257,7 +266,8 @@ class Controller extends BaseController
         $data['all_renter'] = $all_renter; // ผู้เช่า
         $data['all_booking_room'] = $all_booking_room; // ห้องจอง
         $data['all_overdue'] = $all_overdue; // ห้องค้างชำระ
-        $data['overdueCount'] = $overdueCount; // ห้องค้างชำระ
+        $data['overdueRoomCount'] = $overdueRoomCount; // จำนวนห้องค้างชำระ
+        $data['overdueTotalAmount'] = $overdueTotalAmount; // รวมยอดค้างชำระทั้งหมด
         $data['vacant_room'] = $vacant_room; // ห้องว่าง
         $data['all_receipt_on_time'] = $all_receipt_on_time; // ห้องว่าง
         $data['all_receipt_late_with_appointment'] = $all_receipt_late_with_appointment; // ห้องว่าง

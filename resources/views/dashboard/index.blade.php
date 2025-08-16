@@ -38,8 +38,8 @@
                                     <div class="card-body text-nowrap">
                                       <h5 class="text-white card-title mb-0">มีห้องที่ค้างชำระ</h5>
                                       <p class="text-white mb-2">จำนวน</p>
-                                      <h4 class="text-white mb-2">{{ $summary['all_overdue'] }} ห้อง</h4>
-                                      @if ($summary['all_overdue'] > 0)
+                                      <h4 class="text-white mb-2">{{ $summary['overdueRoomCount'] }} ห้อง</h4>
+                                      @if ($summary['overdueRoomCount'] > 0)
                                           <a href="dashboard/overdue" class="btn bg-label-warning text-black">รายละเอียด</a>
                                       @endif
                                     </div>
@@ -92,7 +92,7 @@
                                     <div class="col-md-3 col-6">
                                       <div class="d-flex align-items-center">
                                         <div class="avatar flex-shrink-0 me-3"
-                                        @if ($summary['all_overdue'] > 0)
+                                        @if ($summary['overdueRoomCount'] > 0)
                                             style="width: 2.8rem;height: 2.8rem;"
                                             onclick="location.href='/dashboard/overdue';"
                                         @else
@@ -104,7 +104,7 @@
                                             </span>
                                         </div>
                                         <div class="card-info">
-                                          <h5 class="mb-0">{{ $summary['all_overdue'] }} ห้อง</h5>
+                                          <h5 class="mb-0">{{ $summary['overdueRoomCount'] }} ห้อง</h5>
                                           <small>ค้างชำระ</small>
                                         </div>
                                       </div>

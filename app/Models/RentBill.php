@@ -32,14 +32,21 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\AdditionalCosts', 'ref_rent_bill_id', 'id');
     }
-    public function receipts()
+    public function receipt()
     {
         return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id');
     }
-
+    public function getTotalPaidIncludingFineAttribute()
+    {
+        return $this->receipt->sum(function ($receipt) {
+            $total = $receipt->payment_list->where('discount', 0)->sum('price');
+            $discount = $receipt->payment_list->where('discount', 1)->sum('price');
+            return $total - $discount;
+        });
+    }
     public function getTotalPaidAmountAttribute()
     {
-        return $this->receipts->sum(function ($receipt) {
+        return $this->receipt->sum(function ($receipt) {
             $total = $receipt->payment_list_not_fine->where('discount', 0)->sum('price');
             $discount = $receipt->payment_list_not_fine->where('discount', 1)->sum('price');
             return $total - $discount;
@@ -72,7 +79,7 @@ class RentBill extends Model
         $billAmount = $this->payment_list->where('discount', 0)->sum('price')
                     - $this->payment_list->where('discount', 1)->sum('price');
 
-        // รวมยอดที่จ่ายแล้วใน receipts
+        // รวมยอดที่จ่ายแล้วใน receipt
         $paidAmount = $this->receipt->sum(function ($receipt) {
             return $receipt->total_amount; // ต้องมี accessor นี้ใน Receipt
         });

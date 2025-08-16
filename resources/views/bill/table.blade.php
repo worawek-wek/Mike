@@ -13,10 +13,10 @@ aria-labelledby="pills-home-tab" tabindex="0">
                             }}
                             บาท
                             {{-- // total_amount ไม่ใช่ collomn ใน database แต่มาจาก Function ใน Model payment_list(), getTotalAmountAttribute() --}}
-                            @if (count(@$row->receipt) > 0 & $row->ref_status_id != 5)
-                                <br><span class="text-truncate badge rounded-pill text-black mt-1" style="background-color: white;">จ่ายแล้ว &nbsp;{{ number_format($row->total_paid_amount) }} บาท</span>
-                                @if ($row->total_paid_amount < $row->total_amount)
-                                    <br><span class="text-truncate badge rounded-pill bg-danger">ค้างจ่าย &nbsp;{{ number_format($row->total_amount - $row->total_paid_amount) }}</span>
+                            @if (count($row->receipt ?? []) > 0 & $row->ref_status_id != 5)
+                                <br><span class="text-truncate badge rounded-pill text-black mt-1" style="background-color: white;">จ่ายแล้ว &nbsp;{{ number_format($row->total_paid_including_fine) }} บาท</span>
+                                @if ($row->total_paid_including_fine < $row->total_amount)
+                                    <br><span class="text-truncate badge rounded-pill bg-danger">ค้างจ่าย &nbsp;{{ number_format($row->total_amount - $row->total_paid_including_fine) }}</span>
                                 @endif
                             @endif
                         </div>
@@ -80,15 +80,15 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                         {{$row_2->total_fine_amount}}
                          {{-- // total_amount ไม่ใช่ collomn ใน database แต่มาจาก Function ใน Model payment_list(), getTotalAmountAttribute() --}}
                     </span>
-                    @if (count(@$row_2->receipt) > 0 & $row_2->ref_status_id != 5)
-                        <br><span class="text-truncate text-success"> จ่ายแล้ว {{ number_format($row_2->total_paid_amount) }}</span>
-                        @if ($row_2->total_paid_amount < $row_2->total_amount)
-                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount + $row_2->total_fine - $row_2->total_paid_amount) }}</span>
+                    @if (count($row_2->receipt ?? []) > 0 & $row_2->ref_status_id != 5)
+                        <br><span class="text-truncate text-success"> จ่ายแล้ว {{ number_format($row_2->total_paid_including_fine) }}</span>
+                        @if ($row_2->total_paid_including_fine < $row_2->total_amount)
+                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount + $row_2->total_fine - $row_2->total_paid_including_fine) }}</span>
                         @endif
                     @endif
                 </td>
                 <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')">
-                    @if (count(@$row_2->receipt) > 0 & $row_2->ref_status_id == 7)
+                    @if (count(@$row_2->receipt ?? []) > 0 & $row_2->ref_status_id == 7)
                         <span class="badge bg-danger py-1" aria-expanded="false" text-capitalized="" style="font-size: unset;">
                         <i class="ti ti-mail ti-md me-2"></i>
                         ค้างชำระ</span>

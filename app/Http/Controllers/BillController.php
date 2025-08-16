@@ -386,8 +386,9 @@ class BillController extends Controller
     }
     public function invoice($id)
     {
+        
         $data['page_url'] = 'bill';
-        $invoice = RentBill::find($id);
+        $invoice = RentBill::with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->find($id);
         $contract = Contract::find($invoice->ref_contract_id);
         $data['expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
         $data['invoice'] = $invoice;
@@ -516,16 +517,14 @@ class BillController extends Controller
                                 ->where('rent_bills.ref_type_id', 1)
                                 ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone')
+                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.phone')
                                 ->get();
         $branch = Branch::find(session("branch_id"));
 
         $service = Service::where('ref_branch_id', session("branch_id"))
                             ->pluck('name')
                             ->toArray();
-        $service_price = Service::where('ref_branch_id', session("branch_id"))
-                            ->pluck('price')
-                            ->toArray();
+        
 
         $data_1 = [
             "ห้อง",
@@ -565,7 +564,7 @@ class BillController extends Controller
             $data_list = [
                         $row->room_name,
                         $row->rent,
-                        $row->water_amount,
+                        (string) $row->water_amount,
                         $row->electricity_amount,
             ];
             $data_list_2 = [
@@ -582,6 +581,15 @@ class BillController extends Controller
                         $row->phone
             ];
             
+            $service_price = Service::where('services.ref_branch_id', session('branch_id'))
+                                            ->leftJoin('room_has_services', function ($join) use ($row) {
+                                                $join->on('services.id', '=', 'room_has_services.ref_service_id')
+                                                    ->where('room_has_services.ref_room_id', $row->room_id);
+                                            })
+                                            ->selectRaw('COALESCE(room_has_services.price, 0) as price')
+                                            ->pluck('price')
+                                            ->toArray();
+
             $data[] = array_merge($data_list, $service_price, $data_list_2);
         }
 
