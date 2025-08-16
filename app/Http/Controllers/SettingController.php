@@ -1071,6 +1071,11 @@ class SettingController extends Controller
     public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร
     {
         try{
+            // Validate required field
+            if (empty($request->email)) {
+                return "กรุณากรอกอีเมลหรือเบอร์โทรศัพท์เพื่อค้นหา";
+            }
+            
             // $user = User::where('email', $request->email)->first();
             $email_check = $request->email;
             $user = User::where(function ($query) use ($email_check) {
@@ -1106,6 +1111,23 @@ class SettingController extends Controller
     public function insert_user_to_branch(Request $request) // สร้าง บุคลากร ด้วยตนเอง
     {
         try{
+            // Validate required fields
+            if (empty($request->name)) {
+                return "กรุณากรอกชื่อพนักงาน";
+            }
+            if (empty($request->salary)) {
+                return "กรุณากรอกเงินเดือน";
+            }
+            if (empty($request->phone)) {
+                return "กรุณากรอกเบอร์โทรศัพท์";
+            }
+            if (empty($request->email)) {
+                return "กรุณากรอกอีเมล";
+            }
+            if (empty($request->password)) {
+                return "กรุณากรอกรหัสผ่าน";
+            }
+            
             $work_start_date = null;
             if($request->work_start_date){
                 $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');

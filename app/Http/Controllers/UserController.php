@@ -376,8 +376,13 @@ class UserController extends Controller
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        // ตัวอย่างข้อมูล
-        $results = User::orderBy('id','DESC')->get();
+        // ดึงข้อมูลผู้ใช้เฉพาะสาขาปัจจุบัน (ป้องกันข้อมูลซ้ำ)
+        $results = User::join('user_has_branchs', 'users.id', '=', 'user_has_branchs.ref_user_id')
+                      ->where('user_has_branchs.ref_branch_id', session('branch_id'))
+                      ->select('users.*')
+                      ->distinct()
+                      ->orderBy('users.id','DESC')
+                      ->get();
         $data = 
         [
             ['ข้อมูลผู้ใช้งาน'],
