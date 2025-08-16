@@ -615,9 +615,10 @@ class RoomController extends Controller
             
             RoomForRents::where('ref_room_id', $request->id)->update(['status' => 0]);
             $invoice = RentBill::where('ref_room_id', $request->id)->where('ref_status_id', 3)->first();
-            RentBill::destroy($invoice->id);
-            PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
-
+            if(@$invoice){
+                RentBill::destroy($invoice->id);
+                PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
+            }
             if($request->type_move_out == 2){
                     $up_renter = Renter::find($request->ref_renter_id);
                     $up_renter->blacklist_detail  =  "ผู้เช่าหนี";
