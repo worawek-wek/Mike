@@ -43,7 +43,7 @@ class IncomeExpenses extends Model
     // ความสัมพันธ์ใหม่ (จาก ref_payment_id => ref_receipt_id)
     public function receipt_payment_list()
     {
-        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'ref_receipt_id');
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'ref_receipt_id')->where('document_type', 2);
     }
     // ✅ ใช้ตัวนี้เป็นค่า default
     public function getTotalAmountAttribute()

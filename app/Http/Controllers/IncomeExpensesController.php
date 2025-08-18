@@ -61,12 +61,12 @@ class IncomeExpensesController extends Controller
             $results = $results->Where('type', $request->type);
         }
 
-        if(@$request->from_month){
-            $to_month = 2000-01;
-            if(@$request->to_month){
-                $to_month = $request->to_month;
+        if(@$request->from_month || $request->to_month){
+            $from_month = "2000-01";
+            if(@$request->from_month){
+                $from_month = $request->from_month;
             }
-            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$request->from_month, $to_month]);
+            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$from_month, $request->to_month]);
         }
         // if(@$request->to_month){
         //     $results = $results->WhereDate('date', '<=', $request->to_month);
@@ -111,6 +111,14 @@ class IncomeExpensesController extends Controller
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // 1.1 อัพโหลดรูปภาพ หลักฐานการจ่ายเงิน
             if($request->file('proof_of_payment')){
+                    $request->validate([
+                        'proof_of_payment' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    ],[
+                        'proof_of_payment.required' => 'กรุณาเลือกรูปภาพ',
+                        'proof_of_payment.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                        'proof_of_payment.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                        'proof_of_payment.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                    ]);
                 // return 123;
                 $file = $request->file('proof_of_payment');
                 $nameExtension = $file->getClientOriginalName();
@@ -122,6 +130,14 @@ class IncomeExpensesController extends Controller
             }
             // 1.2 อัพโหลดรูปภาพ ใบสำคัญจ่าย
             if($request->file('payment_voucher')){
+                    $request->validate([
+                        'payment_voucher' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    ],[
+                        'payment_voucher.required' => 'กรุณาเลือกรูปภาพ',
+                        'payment_voucher.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                        'payment_voucher.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                        'payment_voucher.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                    ]);
                 $file = $request->file('payment_voucher');
                 $nameExtension = $file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
@@ -214,14 +230,7 @@ class IncomeExpensesController extends Controller
     }
     public function summary_IE()
     {
-        $income = IncomeExpenses::with('payment_list')->where('ref_branch_id', session("branch_id"))->where('type', 1)->get()->sum('total_amount') + IncomeExpenses::with('receipt_payment_list')->where('ref_branch_id', session("branch_id"))->where('type', 1)->get()
-                                                                                                                                                                        ->sum(function ($item) {
-                                                                                                                                                                            return $item->getTotalFromPaymentList();
-                                                                                                                                                                        });
-        $expenses = IncomeExpenses::where('type', 2)->where('ref_branch_id', session("branch_id"))->sum('amount');
-        $data['income'] = $income;
-        $data['expenses'] = $expenses;
-        $data['total'] = $income-$expenses;
+        $data = $this->summary_calculate();
 
         return view('income-expenses/summary', $data);
     }
@@ -249,12 +258,12 @@ class IncomeExpensesController extends Controller
             $results = $results->Where('type', $request->type);
         }
 
-        if(@$request->from_month){
-            $to_month = 2000-01;
-            if(@$request->to_month){
-                $to_month = $request->to_month;
+        if(@$request->from_month || $request->to_month){
+            $from_month = "2000-01";
+            if(@$request->from_month){
+                $from_month = $request->from_month;
             }
-            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$request->from_month, $to_month]);
+            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$from_month, $request->to_month]);
         }
 
         $results = $results->get();
@@ -276,13 +285,19 @@ class IncomeExpensesController extends Controller
             ]
         ];
         foreach($results as $key=>$row){
+            if ($row->type == 2){
+                $amount = '-'.number_format($row->amount);    
+            }else{
+                $amount = number_format($row->receipt->total_amount ?? $row->total_amount);  
+            }
+
             $data[] = [
                         $key+1,
                         date('d/m/Y',strtotime($row->date)),
                         @$row->label,
                         @$row->room->name,
                         @$row->category->name,
-                        number_format($row->amount,2),
+                        $amount,
                         $row->user->name,
 
                         

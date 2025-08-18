@@ -93,6 +93,8 @@ Route::middleware('auth')->group(function() {
         Route::get('report/move-in/datatable', 'move_in_datatable')->name('report.move-in-datatable');    //////////////////////////
         Route::get('report/move-out', 'move_out')->name('report.move_out');    //////////////////////////
         Route::get('report/bad-debt', 'badDebt')->name('report.bad_debt');    //////////////////////////
+        Route::get('report/bad-debt/datatable', 'badDebt_datatable')->name('report.bad-debt-datatable');    //////////////////////////
+        Route::get('report/bad-debt/export/excel', 'badDebt_export_excel')->name('room.export_excel');    //////////////////////////
         Route::get('report/monthly-booking', 'monthly_booking')->name('report.monthly_booking');    //////////////////////////
         Route::get('report/monthly-booking/datatable', 'monthly_booking_datatable')->name('report.monthly_booking-datatable');    //////////////////////////
         Route::get('report/monthly-booking/excel', 'monthly_booking_excel')->name('report.monthly_booking-excel');    //////////////////////////

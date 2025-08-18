@@ -57,15 +57,15 @@
         </tr>
         <tr>
             <td>รายรับทั้งหมด</td>
-            <td colspan="6">603,321</td>
+            <td colspan="6">{{ number_format($income,2) }}</td>
         </tr>
         <tr>
             <td>รายจ่ายทั้งหมด</td>
-            <td colspan="6">-33,000</td>
+            <td colspan="6">{{ number_format($expenses,2) }}</td>
         </tr>
         <tr>
             <td>รวมทั้งหมด</td>
-            <td colspan="6">570,321</td>
+            <td colspan="6">{{ number_format($total,2) }}</td>
         </tr>
     </table>
 

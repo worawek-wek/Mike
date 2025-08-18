@@ -280,7 +280,7 @@
                         </div>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput2" class="form-label">จำนวนเงิน (บาท) <span class="text-danger">*</span></label>
-                            <input name="amount" type="text" class="form-control" id="exampleFormControlInput2" placeholder="จำนวนเงิน (บาท)" />
+                            <input name="amount" type="number" class="form-control" id="exampleFormControlInput2" placeholder="จำนวนเงิน (บาท)" />
                         </div>
                         <div class="col-sm-12">
                             <label for="bs-datepicker-format" class="form-label">วันที่ <span class="text-danger">*</span></label>
@@ -310,11 +310,11 @@
                         </div>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput5" class="form-label">หลักฐานการจ่ายเงิน</label>
-                            <input name="proof_of_payment" class="form-control" type="file" id="exampleFormControlInput5" />
+                            <input name="proof_of_payment" class="form-control" type="file" id="exampleFormControlInput5" accept="image/*" />
                         </div>
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput6" class="form-label">ใบสำคัญจ่าย</label>
-                            <input name="payment_voucher" class="form-control" type="file" id="exampleFormControlInput6" />
+                            <input name="payment_voucher" class="form-control" type="file" id="exampleFormControlInput6" accept="image/*" />
                         </div>
                     </div>
                 </div>
@@ -572,9 +572,22 @@
                                 loadData(page);
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {
@@ -619,9 +632,22 @@
                                 loadData(page);
                             }
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
                         }
                     });
                 } else if (result.isDismissed) {

@@ -60,6 +60,19 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1);
     }
+    public function payment_water()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าน้ำ%');
+    }
+
+    public function payment_electricity()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าไฟฟ้า%');
+    }
     public function getTotalAmountAttribute()
     {
 

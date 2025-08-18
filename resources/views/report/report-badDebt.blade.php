@@ -80,7 +80,7 @@
                                                             <div class="badge rounded bg-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">4 ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">{{ $count_room }} ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -90,7 +90,7 @@
                                                             <div class="badge rounded bg-info me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-info">39,461 บาท</h5>
+                                                                <h5 class="mb-0 text-info">{{ number_format($totalAmount) }} บาท</h5>
                                                                 <small>รวมจํานวนเงินที่ต้องเก็บเพิ่มจากผู้เช่า</small>
                                                             </div>
                                                         </div>
@@ -122,8 +122,8 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select name="DataTables_Table_0_length"
-                                                                aria-controls="DataTables_Table_0" class="form-select">
+                                                            <select onchange='loadData("{{$page_url}}/datatable")' name="limit"
+                                                                aria-controls="DataTables_Table_0" class="form-select p_search">
                                                                 <option value="7">7</option>
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
@@ -140,10 +140,10 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input name="month" type="month" onchange='loadData("{{$page_url}}/datatable")' class="form-control p_search" id="exampleFormControlInput1" placeholder=""  value="{{ date('Y-m') }}" />
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
-                                                            <button
+                                                            {{-- <button
                                                                 class="btn btn-outline-dark me-2 ms-sm-0 waves-effect border-dark"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button">
@@ -152,7 +152,7 @@
                                                                     <span class="d-none d-sm-inline-block">ยกเลิกหนี้สูญ
                                                                     </span>
                                                                 </span>
-                                                            </button>
+                                                            </button> --}}
                                                             <button
                                                                 class="btn btn-secondary add-new btn-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
@@ -168,7 +168,9 @@
                                                                     class="btn btn-success buttons-collection  btn-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="export_excel()"
+                                                                    >
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -178,233 +180,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table class="datatables-products table dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-                                                style="width: 1396px;">
-                                                <thead class="border-top">
-                                                    <tr class=" table-info">
-                                                        <th class="text-center" style="padding: 0 50px;">
-                                                            ห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รอบบิล
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าเช่าห้อง</th>
-                                                        <th class="text-center">
-                                                            ค่าน้ำ
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าไฟ</th>
-                                                        <th class="text-center">
-                                                            ชำระแล้ว
-                                                        </th>
-                                                        <th class="text-center">
-                                                            คืยเงินประกัน
-                                                        </th>
-                                                        <th class="text-center">
-                                                            แจ้งหนี้โดย
-                                                        </th>
-                                                        <th class="text-center">
-                                                            วันที่
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวมหนี้สูญ
-                                                        </th>
-                                                    <tr>
-                                                <thead>
-                                                <tbody>
-                                                    <tr class="odd">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="even">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="odd">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="even">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="odd">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="even">
-                                                        <td class="sorting_1">A101</td>
-                                                        <td><span class="text-truncate">3</span>
-                                                        </td>
-                                                        <td><span>3,500</span></td>
-                                                        <td><span>100</span></td>
-                                                        <td><span>2,786</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>02/05/2024</span></td>
-                                                        <td><span>15,722</span></td>
-                                                        <td>
-                                                            <div class="d-inline-block text-nowrap">
-                                                                <button
-                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#viewModal"><i
-                                                                        class="ti ti-eye ti-md"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            <div id="loadData">
+
                                             </div>
                                             <div style="width: 1%;"></div>
                                         </div>
@@ -513,3 +290,44 @@
 </body>
 
 </html>
+<script>
+        var page = "{{$page_url}}/datatable";
+        var searchData = {};
+        loadData(page);
+        
+        function loadData(pages){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
+
+            // alert(page);
+            page = pages;
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    $("#loadData").html(data);
+                }
+            });
+            // alert(page);
+        }
+        
+        function export_excel() {
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // สร้าง query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // เปิดลิงก์พร้อม query string ในแท็บใหม่
+            window.open('{{$page_url}}/export/excel?' + queryString, '_blank');
+        }
+</script>

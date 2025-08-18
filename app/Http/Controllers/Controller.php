@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
 use App\Models\Room;
 use App\Models\RoomForRents;
+use App\Models\IncomeExpenses;
 use App\Models\RentBill;
 use App\Models\Receipt;
 use App\Models\Renter;
@@ -272,6 +273,19 @@ class Controller extends BaseController
         $data['all_receipt_on_time'] = $all_receipt_on_time; // ห้องว่าง
         $data['all_receipt_late_with_appointment'] = $all_receipt_late_with_appointment; // ห้องว่าง
         $data['all_receipt_late'] = $all_receipt_late; // ห้องว่าง
+        return $data;
+    }
+    
+    public function summary_calculate()
+    {
+        $income = IncomeExpenses::with('receipt_payment_list')->where('ref_branch_id', session("branch_id"))->where('type', 1)->get()
+                                    ->sum(function ($item) {
+                                        return $item->getTotalFromPaymentList();
+                                    });
+        $expenses = IncomeExpenses::where('type', 2)->where('ref_branch_id', session("branch_id"))->sum('amount');
+        $data['income'] = $income;
+        $data['expenses'] = $expenses;
+        $data['total'] = $income-$expenses;
         return $data;
     }
 }

@@ -53,72 +53,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <!-- วิเคราะห์รายรับค่าเช่ารายเดือน -->
-                            <div class="col-sm-5">
-                                <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-0">รายได้แยกตามประเภท</h5>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect">ปี</label>
-                                            
-                                            <select id="yearSelect" class="form-control"></select>
-
-                                                <script>
-                                                const yearSelect = document.getElementById("yearSelect");
-                                                const currentYear = new Date().getFullYear();
-
-                                                for (let year = currentYear; year >= 2020; year--) {
-                                                    let option2 = new Option(year, year);
-                                                    yearSelect.add(option2);
-                                                }
-                                                </script>
-                                        </div>
-                                        {{-- <div class="btn-group">
-                                            <button type="button"
-                                                class="btn btn-label-secondary waves-effect">เดือนปัจจุบัน</button>
-                                            <button type="button"
-                                                class="btn btn-label-secondary dropdown-toggle dropdown-toggle-split waves-effect"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="visually-hidden">Toggle Dropdown</span>
-                                            </button>
-                                            <ul class="dropdown-menu" style="">
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">January</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">February</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">March</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">April</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">May</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">June</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">July</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">August</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">September</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">October</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">November</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">December</a></li>
-                                            </ul>
-                                        </div> --}}
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="chart01"></div>
-                                    </div>
-                                </div>
-                            </div>
                             <!-- รายได้แยกตามประเภทการชำระ -->
-                            <div class="col-sm-7 d-flex align-items-stretch">
+                            <div class="col-sm-12 d-flex align-items-stretch">
                                 <div class="card mb-3 w-100">
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
@@ -151,74 +87,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <!-- วิเคราะห์รายรับค่าเช่ารายเดือน -->
-                            <div class="col-sm-5">
-                                <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-0">รายจ่ายแยกตามประเภท</h5>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect3">ปี</label>
-                                            
-                                            <select id="yearSelect3" class="form-control"></select>
-
-                                                <script>
-                                                const yearSelect3 = document.getElementById("yearSelect3");
-                                                const currentYear3 = new Date().getFullYear();
-
-                                                for (let year = currentYear3; year >= 2020; year--) {
-                                                    let option2 = new Option(year, year);
-                                                    yearSelect3.add(option2);
-                                                }
-                                                </script>
-                                        </div>
-                                        {{-- <div class="btn-group">
-                                            <button type="button"
-                                                class="btn btn-label-secondary waves-effect">เดือนปัจจุบัน</button>
-                                            <select id="yearSelect3" class="form-control"></select>
-                                            <button type="button"
-                                                class="btn btn-label-secondary dropdown-toggle dropdown-toggle-split waves-effect"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="visually-hidden">Toggle Dropdown</span>
-                                            </button>
-                                            <ul class="dropdown-menu" style="">
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">January</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">February</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">March</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">April</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">May</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">June</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">July</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">August</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">September</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">October</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">November</a></li>
-                                                <li><a class="dropdown-item waves-effect"
-                                                        href="javascript:void(0);">December</a></li>
-                                            </ul>
-                                        </div> --}}
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="chart03"></div>
-                                    </div>
-                                </div>
-                            </div>
                             <!-- รายได้แยกตามประเภทการชำระ -->
-                            <div class="col-sm-7 d-flex align-items-stretch">
+                            <div class="col-sm-12 d-flex align-items-stretch">
                                 <div class="card mb-3 w-100">
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
@@ -438,7 +308,7 @@
     <script>
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110]
+            data: [400, 100, 220, 260, 180, 110, 400, 100, 220, 260, 180, 110]
         }],
         chart: {
             type: 'bar',
@@ -468,7 +338,7 @@
             }
         },
         xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6'],
+            categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
         },
         yaxis: {
             title: {
@@ -491,6 +361,53 @@
             }
         }
     };
+
+        // ฟังก์ชันอัปเดตข้อมูลในกราฟแบบเร็ว
+        function renderChart(data) {
+            if (chart) {
+                chart.updateSeries([{ data: data }]); // ✅ อัปเดตข้อมูลกราฟ
+            }
+        }
+
+        // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+        function loadData(pages){
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    renderChart(data); // อัปเดต chart ด้วยข้อมูลใหม่
+                }
+            });
+        }
+
+        // เมื่อเลือกปีจาก dropdown
+        function onYearChange(selectElement) {
+            const year = selectElement.value;
+
+            // อัปเดตหัวข้อรายปี
+            const titleElement = document.getElementById("income-summary-title");
+            titleElement.textContent = `สรุปรายรับค่าเช่ารายเดือน มกราคม/${year} - ธันวาคม/${year}`;
+
+            // โหลดข้อมูลใหม่
+            loadData("/dashboard/monthly-rent-income");
+        }
+
+        // ตัวแปร global
+        var searchData = {};
+        var page = "/dashboard/monthly-rent-income";
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        document.addEventListener("DOMContentLoaded", function() {
+            initChart();     // 🔁 สร้างกราฟเปล่าไว้ก่อน
+            loadData(page);  // 📦 โหลดข้อมูลจริงผ่าน AJAX
+        });
 
     var chart = new ApexCharts(document.querySelector("#chart02"), options);
     chart.render();
@@ -643,7 +560,7 @@
     <script>
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110]
+            data: [400, 100, 220, 260, 180, 110, 400, 100, 220, 260, 180, 110]
         }],
         chart: {
             type: 'bar',
@@ -673,7 +590,7 @@
             }
         },
         xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6'],
+            categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
         },
         yaxis: {
             title: {

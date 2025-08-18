@@ -195,7 +195,172 @@ class ReportController extends Controller
     }
     public function badDebt(Request $request)
     {
-        return view('report/report-badDebt');
+        $data['count_room'] = RentBill::orderBy('rooms.name', 'ASC')
+                                        ->join('room_for_rents', function ($join) {
+                                            $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                                ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
+                                        })
+                                        ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                                        ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                        ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                        ->where('buildings.ref_branch_id', session("branch_id"))
+                                        ->where('rent_bills.ref_type_id', 1)
+                                        ->where('rent_bills.ref_status_id', '!=', 5)
+                                        ->where('room_for_rents.move_out_type', 2)
+                                        ->distinct('rent_bills.id')
+                                        ->count('rent_bills.id');
+                                        
+        $data['totalAmount'] = RentBill::orderBy('rooms.name', 'ASC')
+                                        ->join('room_for_rents', function ($join) {
+                                            $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                                ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
+                                        })
+                                        ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                                        ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                        ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                        ->where('buildings.ref_branch_id', session("branch_id"))
+                                        ->where('rent_bills.ref_type_id', 1)
+                                        ->where('rent_bills.ref_status_id', '!=', 5)
+                                        ->where('room_for_rents.move_out_type', 2)
+                                        ->select(
+                                            'rent_bills.*',
+                                            'room_for_rents.payment_method as payment_method',
+                                            'room_for_rents.date_stay as date_stay',
+                                            'rooms.name as room_name',
+                                            'rooms.rent'
+                                        )
+                                        ->with('payment_list') // โหลดความสัมพันธ์เพื่อใช้ accessor
+                                        ->get()
+                                        ->sum(function ($bill) {
+                                            return $bill->total_amount; // ใช้ accessor ที่คุณเขียนไว้
+                                        });
+
+        $data['page_url'] = 'report/bad-debt';
+        return view('report/report-badDebt', $data);
+    }
+    public function badDebt_datatable(Request $request)
+    {
+        // $receipt = Receipt:;
+        $results = RentBill::orderBy('rooms.name', 'ASC')
+                            ->join('room_for_rents', function ($join) {
+                                $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                    ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
+                            })
+                            ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                            ->where('buildings.ref_branch_id', session("branch_id"))
+                            ->where('rent_bills.ref_type_id', 1)
+                            ->where('rent_bills.ref_status_id', '!=', 5)
+                            ->where('room_for_rents.move_out_type', 2)
+                            ->select(
+                                'rent_bills.*',
+                                'room_for_rents.payment_method as payment_method',
+                                'room_for_rents.date_stay as date_stay',
+                                'rooms.name as room_name',
+                                'rooms.rent'
+                            )
+                            ->with('payment_water')
+                            ->distinct('rent_bills.id');
+
+                        // ตรวจสอบว่า $request->month มีค่าและอยู่ในรูปแบบที่ถูกต้อง
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }
+
+                        // จัดการเรื่อง limit
+        $limit = $request->limit ?? 15;
+
+        $results = $results->paginate($limit);
+
+        $data['list_data'] = $results->appends(request()->query());
+        $data['query'] = request()->query();
+        $data['query']['limit'] = $limit;
+
+        $data['list_data'] = $results;
+        
+        return view('report/report-badDebt-table', $data);
+    }
+    public function badDebt_export_excel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $results = RentBill::orderBy('rooms.name', 'ASC')
+                            ->join('room_for_rents', function ($join) {
+                                $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                    ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
+                            })
+                            ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                            ->where('buildings.ref_branch_id', session("branch_id"))
+                            ->where('rent_bills.ref_type_id', 1)
+                            ->where('rent_bills.ref_status_id', '!=', 5)
+                            ->where('room_for_rents.move_out_type', 2)
+                            ->select(
+                                'rent_bills.*',
+                                'room_for_rents.payment_method as payment_method',
+                                'room_for_rents.date_stay as date_stay',
+                                'rooms.name as room_name',
+                                'rooms.rent'
+                            )
+                            ->with('payment_water')
+                            ->distinct('rent_bills.id');
+
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }
+
+
+        $results = $results->get();
+        
+        $data = 
+        [
+            [
+                'รายงานหนี้สูญ วันที่ '.date('d/m/Y')
+            ],
+            [
+                "ห้อง",
+                "รอบบิล",
+                "ค่าเช่าห้อง",
+                "ค่าน้ำ",
+                "ค่าไฟ",
+                "ชำระแล้ว",
+                "คืนเงินประกัน",
+                "แจ้งหนี้โดย",
+                "วันที่",
+            ]
+        ];
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $key+1,
+                        $row->room_name,
+                        $row->month.'/'.$row->year,
+                        $row->rent,
+                        $row->payment_water->price,
+                        $row->payment_electricity->price,
+                        0,
+                        0,
+                        date('d/m/Y',strtotime($row->created_at)),
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/รายงานหนี้สูญ.xlsx");
+        return redirect("upload/export_excel/รายงานหนี้สูญ.xlsx");
     }
     public function monthly_booking(Request $request)
     {

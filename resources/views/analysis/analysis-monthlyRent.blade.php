@@ -174,8 +174,8 @@
     <script>
         
     var options = {
-        series: [60, 30, 10],
-        labels: ['ลูกค้าจ่ายตรงเวลา', 'จ่ายล่าช้าแบบนัดเวลา', 'จ่ายละช้าแบบไม่ได้นัดเวลา'],
+        series: [{{ $percent_on_time ?? 0 }}, {{ $percent_late_with_appointment ?? 0 }}, {{ $percent_late ?? 0 }}],
+        labels: ['ลูกค้าจ่ายตรงเวลา', 'จ่ายล่าช้าแบบนัดเวลา', 'จ่ายล่าช้าแบบไม่ได้นัดเวลา'],
         colors: ['#BCE29E', '#ffb975', '#FF9494'],
         chart: {
             type: 'donut',
@@ -230,7 +230,7 @@
                             fontWeight: 600,
                             label: 'ภาพรวมรายได้',
                             formatter: function(w) {
-                                return '72%';
+                                return '100%';
                             }
                         }
                     }

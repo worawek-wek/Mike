@@ -136,15 +136,18 @@ class PDFController extends Controller
     {
         $results = IncomeExpenses::where('ref_branch_id', session("branch_id"))->orderBy('id','DESC');
         
-        if(@$request->from_month){
-            $to_month = 2000-01;
-            if(@$request->to_month){
-                $to_month = $request->to_month;
+        if(@$request->from_month || $request->to_month){
+            $from_month = "2000-01";
+            if(@$request->from_month){
+                $from_month = $request->from_month;
             }
-            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$request->from_month, $to_month]);
+            $results = $results->whereRaw("DATE_FORMAT(date, '%Y-%m') BETWEEN ? AND ?", [$from_month, $request->to_month]);
         }
 
+
         $results = $results->get(); 
+
+        $data = $this->summary_calculate();
         
         $thaiMonths = [
             'January' => 'มกราคม',

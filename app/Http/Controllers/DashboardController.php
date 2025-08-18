@@ -60,9 +60,9 @@ class DashboardController extends Controller
         } else {
             $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
         }
-        $data['percent_on_time'] = $percent_on_time;
-        $data['percent_late_with_appointment'] = $percent_late_with_appointment;
-        $data['percent_late'] = $percent_late;
+        $data['percent_on_time'] = number_format($percent_on_time);
+        $data['percent_late_with_appointment'] = number_format($percent_late_with_appointment);
+        $data['percent_late'] = number_format($percent_late);
         $data['summary'] = $summary;
 
         return view('dashboard/index', $data);

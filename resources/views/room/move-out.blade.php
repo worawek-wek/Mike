@@ -21,8 +21,8 @@
                                 <table class="table table-detail table-bordered">
                                     <thead>
                                         <tr>
-                                            <th width="50%" style="vertical-align: middle;font-weight: 500;">วันที่ทำสัญญา : 03/06/2024</th>
-                                            <th width="50%" style="vertical-align: middle;font-weight: 500;">วันที่สิ้นสุดสัญญา : 28/06/2024</th>
+                                            <th width="50%" style="vertical-align: middle;font-weight: 500;">วันที่ทำสัญญา : {{ date('d/m/Y', strtotime($move_contract->contract_date)) }}</th>
+                                            <th width="50%" style="vertical-align: middle;font-weight: 500;">วันที่สิ้นสุดสัญญา : {{ date('d/m/Y', strtotime("+{$move_contract->period} months", strtotime($move_contract->contract_date))) }}</th>
                                             
                                         </tr>
                                     </thead>
@@ -34,6 +34,7 @@
                                     </tbody>
                                 </table>
                                 <div class="row">
+                                    
                                     <ul class="nav nav-pills nav-fill p-4" role="tablist">
                                         <li class="nav-item pe-4">
                                             <button type="button" class="nav-link btn-warning active" id="meter_water" role="tab"

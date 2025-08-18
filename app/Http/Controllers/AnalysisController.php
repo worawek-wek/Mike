@@ -37,12 +37,43 @@ class AnalysisController extends Controller
      */
     public function monthly_rent(Request $request)
     {
-        $data['summary'] = $this->summary(session("branch_id"));
+        $summary = $this->summary(session("branch_id"));
+        // return $summary['all_receipt_late'];
+        $total = $summary['all_receipt_on_time'] + $summary['all_receipt_late_with_appointment'] + $summary['all_receipt_late'];
+
+        if ($total > 0) {
+            $percent_on_time = ($summary['all_receipt_on_time'] / $total) * 100;
+            $percent_late_with_appointment = ($summary['all_receipt_late_with_appointment'] / $total) * 100;
+            $percent_late = ($summary['all_receipt_late'] / $total) * 100;
+        } else {
+            $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
+        }
+        $data['percent_on_time'] = number_format($percent_on_time);
+        $data['percent_late_with_appointment'] = number_format($percent_late_with_appointment);
+        $data['percent_late'] = number_format($percent_late);
+        $data['summary'] = $summary;
+        
         return view('analysis/analysis-monthlyRent', $data);
     }
     public function income_expense(Request $request)
     {
-        return view('analysis/analysis-incomeExpense');
+        $summary = $this->summary(session("branch_id"));
+        // return $summary['all_receipt_late'];
+        $total = $summary['all_receipt_on_time'] + $summary['all_receipt_late_with_appointment'] + $summary['all_receipt_late'];
+
+        if ($total > 0) {
+            $percent_on_time = ($summary['all_receipt_on_time'] / $total) * 100;
+            $percent_late_with_appointment = ($summary['all_receipt_late_with_appointment'] / $total) * 100;
+            $percent_late = ($summary['all_receipt_late'] / $total) * 100;
+        } else {
+            $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
+        }
+        $data['percent_on_time'] = number_format($percent_on_time);
+        $data['percent_late_with_appointment'] = number_format($percent_late_with_appointment);
+        $data['percent_late'] = number_format($percent_late);
+        $data['summary'] = $summary;
+
+        return view('analysis/analysis-incomeExpense', $data);
     }
     public function water(Request $request)
     {
