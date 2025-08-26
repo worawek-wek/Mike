@@ -429,7 +429,7 @@ class BillController extends Controller
             $data['fine_invoice_price'] = $fine_invoice->price;
         }
         $invoice_fine = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
-        $data['fine_price'] = $invoice_fine->price;
+        $data['fine_price'] = $invoice_fine->price ?? 0;
         if(@$receipt){
             foreach($receipt as $rec){
                 $fine = PaymentList::where('ref_payment_id', $rec->id)->where('document_type', 2)->where('fine', 1)->first();
