@@ -50,7 +50,7 @@
                 @endif 
                 </span></td>
                 <td class="text-center"><span>{{  $row->user->name }}</span></td>
-                <td class="text-center"><span>{{ $row->amount }}</span></td>
+                <td class="text-center"><span>{{ $row->deposit }}</span></td>
                 <td class="text-center"><span>{{ $row->amount }}</span></td>
                 <td class="text-center"><span class="badge bg-label-success"
                         text-capitalized="">จองแล้ว</span></td>

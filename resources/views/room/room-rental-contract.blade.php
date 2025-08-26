@@ -64,7 +64,7 @@
 
         @endphp
 
-        <div class="row g-3 p-4 pt-1" id="contractRoom{{$item->id}}">
+        <div class="row g-3 p-4 pt-1 contractRoom" id="contractRoom{{$item->id}}">
         <input type="hidden" name="contract[{{$key}}][ref_room_for_rent_id]" value="{{ $item->id }}">
         <input type="hidden" name="contract[{{$key}}][ref_room_id]" value="{{ $item->ref_room_id }}">
             <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
@@ -153,6 +153,10 @@
 </script>
 <script>
     function deleteContractRoom(id){
-        $("#contractRoom"+id).remove();
+        if ($('.contractRoom').length > 1) {
+            $("#contractRoom"+id).remove();
+        } else {
+            Swal.fire('ไม่สามารถลบได้', 'การทำสัญญาต้องมีอย่างน้อย 1 ห้อง', 'warning');
+        }
     }
 </script>

@@ -41,6 +41,9 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
     </tr>
 </thead>
 <tbody>
+    @php
+        $i = 0;
+    @endphp
     @foreach ($list_data as $key => $row)
     @php
         // ยอดที่จ่ายแล้ว เฉพาะ payment_list_not_fine
@@ -51,7 +54,7 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
     <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }})">
         <td class="control" tabindex="0" style="display: none;">
         </td>
-        <td class="text-center">{{ $list_data->firstItem()+$key }}</td>
+        <td class="text-center">{{ $list_data->firstItem()+$i }}</td>
         <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent->renter->prefix.' '.$row->room_for_rent->renter->name.' '.$row->room_for_rent->renter->surname }}</span>
         </td>
         <td class="text-center">{{ $row->room->name }}</td>
@@ -69,6 +72,9 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
             </div>
         </td> --}}
     </tr>
+        @php
+            $i++;
+        @endphp
     @endforeach
 </tbody>
 </table>

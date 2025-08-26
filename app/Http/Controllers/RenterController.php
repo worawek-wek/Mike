@@ -38,7 +38,7 @@ class RenterController extends Controller
                             ->where('renters.ref_branch_id', session("branch_id"))
                             ->whereIn('rooms.status', [2])
                             ->whereIn('room_for_rents.status', [1])
-                            ->select('renters.*', 'rooms.name as room_name');
+                            ->select('renters.*', 'rooms.name as room_name', 'rooms.id as room_id');
                             // ->whereHas('room_for_rent.room', function ($query) {
                             //     $query->whereIn('status', [1,2]);
                             // });

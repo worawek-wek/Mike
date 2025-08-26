@@ -412,6 +412,7 @@ class ReportController extends Controller
                                 'renters.booking_date',
                                 'room_for_rents.payment_method as payment_method',
                                 'room_for_rents.date_stay as date_stay',
+                                'room_for_rents.deposit as deposit',
                                 'rooms.name as room_name',
                                 'rooms.rent'
                             )

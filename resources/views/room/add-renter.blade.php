@@ -43,10 +43,10 @@
             <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
             <select name="prefix" class="form-select" id="exampleFormControlSelect1"
                 aria-label="Default select example">
-                <option value="บริษัท" selected>บริษัท</option>
-                <option value="นาย">นาย</option>
-                <option value="นางสาว">นางสาว</option>
-                <option value="นาง">นาง</option>
+                <option @if ($renter_edit->prefix == 'บริษัท') selected @endif value="บริษัท" selected>บริษัท</option>
+                <option @if ($renter_edit->prefix == 'นาย') selected @endif  value="นาย">นาย</option>
+                <option @if ($renter_edit->prefix == 'นางสาว') selected @endif  value="นางสาว">นางสาว</option>
+                <option @if ($renter_edit->prefix == 'นาง') selected @endif  value="นาง">นาง</option>
             </select>
         </div>
         <div class="col-sm-5">

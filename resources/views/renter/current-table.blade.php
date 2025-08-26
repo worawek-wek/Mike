@@ -69,7 +69,10 @@
                         <td class="text-center">{{ $row->phone }}
                         </td>
                         <td class="text-center">
-                            {{@$row->vehicle->car_registration ?? '-'}}
+                            @php
+                                echo @App\Models\Vehicle::where('ref_room_id', $row->room_id)->first()->car_registration;
+                            @endphp
+                            {{-- {{@$row->vehicle->car_registration ?? '-'}} --}}
                         </td>
                         <td class="text-center">
                             @if(@$row->room_for_rent->room->contract->contract_date)
