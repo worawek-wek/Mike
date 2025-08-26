@@ -592,9 +592,9 @@ class BillController extends Controller
             "ค่าเช่าห้อง",
             "ค่าน้ำประปา",
             "ค่าไฟฟ้า",
-            "ค่าปรับ",
         ];
         $data_2 = [
+            "ค่าปรับ",
             "รวม",
             "หมายเหตุ",
             "มิเตอร์น้ำก่อน",
@@ -629,15 +629,15 @@ class BillController extends Controller
                         $row->rent,
                         (string) $row->water_amount,
                         $row->electricity_amount,
-                        $fine->price,
             ];
             $data_list_2 = [
+                        $fine->price ?? "0",
                         number_format($row->total_amount),
-                        0,
-                        0,
-                        $row->water_unit,
-                        0,
-                        $row->electricity_unit,
+                        "0",
+                        "0",
+                        $row->water_unit == 0 ? "0":$row->water_unit,
+                        "0",
+                        $row->electricity_unit ?? "0",
                         $row->renter_name,
                         @$row->room_for_rent->renter->fullThaiAddress(),
                         $row->id_card_number,
