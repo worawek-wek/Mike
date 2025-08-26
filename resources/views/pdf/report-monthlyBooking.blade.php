@@ -21,6 +21,7 @@
             padding: 4px;
             text-align: center;
             vertical-align: middle;
+            font-size: 8px;
         }
 
         .no-border {
@@ -56,9 +57,9 @@
             <th class="text-center" tabindex="0" style="width: 40px;">
                 ห้อง
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 70px;">
                 ชื่อผู้จอง</th>
-            <th class="text-center" style="width: 123px;">
+            <th class="text-center" style="width: 70px;">
                 หมายเลขการจอง</th>
             <th class="text-center">
                 วันที่จอง
@@ -68,7 +69,7 @@
             <th class="text-center">
                 ช่องทาง
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 70px;">
                 รับจองโดย
             </th>
             <th class="text-center">

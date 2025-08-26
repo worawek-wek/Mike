@@ -8,7 +8,6 @@
     <title>Dashboard - CRM | Vuexy - Bootstrap Admin Template</title>
 
 </head>
-
 <style>
 .table th {
     font-size: 15px;
@@ -17,6 +16,7 @@
 .table td {
     padding-top: 14px;
     padding-bottom: 14px;
+    text-align: center;
 }
 .modalHeadDecor .modal-header {
     padding: 0;
@@ -70,38 +70,38 @@
                                             <div class="col-sm-12">
                                                 <h4 class="mb-0">
                                                     <i class="tf-icons ti ti-chart-pie-3 text-main ti-md"></i>
-                                                    รายงานหนี้สูญ
+                                                    รายงานย้ายออก
                                                 </h4>
                                             </div>
                                             <div class="col-sm-12">
                                                 <div class="row justify-content-center py-4">
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-primary me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">{{ $count_room }} ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">5 ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-info me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-danger me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-info">{{ number_format($totalAmount) }} บาท</h5>
-                                                                <small>รวมจํานวนเงินที่ต้องเก็บเพิ่มจากผู้เช่า</small>
+                                                                <h5 class="mb-0 text-danger">17,242 บาท</h5>
+                                                                <small>รวมจำนวนเงินที่คืนผู้เช่า</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-success me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-success me-3 p-2"><i
                                                                     class="ti ti-currency-dollar ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-success">0 บาท</h5>
-                                                                <small>รวมจํานวนเงินที่ต้องคืนให้ผู้เช่า</small>
+                                                                <h5 class="mb-0 text-success">0 บาท</h5>
+                                                                <small>รวมที่เก็บจากผู้เช่าเพิ่ม</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -122,8 +122,8 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select onchange='loadData("{{$page_url}}/datatable")' name="limit"
-                                                                aria-controls="DataTables_Table_0" class="form-select p_search">
+                                                            <select name="DataTables_Table_0_length"
+                                                                aria-controls="DataTables_Table_0" class="form-select">
                                                                 <option value="7">7</option>
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
@@ -140,24 +140,13 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input name="month" type="month" onchange='loadData("{{$page_url}}/datatable")' class="form-control p_search" id="exampleFormControlInput1" placeholder=""  value="{{ date('Y-m') }}" />
+                                                            <input type="date" class="form-control">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
-                                                            {{-- <button
-                                                                class="btn btn-outline-dark me-2 ms-sm-0 waves-effect border-dark"
+                                                            <button
+                                                                class="btn btn-secondary add-new btn-label-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button">
-                                                                <span>
-                                                                    <i class="ti ti-file-export me-0 me-sm-1"></i>
-                                                                    <span class="d-none d-sm-inline-block">ยกเลิกหนี้สูญ
-                                                                    </span>
-                                                                </span>
-                                                            </button> --}}
-                                                            <button
-                                                                class="btn btn-secondary add-new btn-primary me-2 ms-sm-0 waves-effect waves-light"
-                                                                tabindex="0" aria-controls="DataTables_Table_0"
-                                                                type="button"
-                                                                onclick="printPdf()">
                                                                 <span>
                                                                     <i class="ti ti-file-upload me-0 me-sm-1"></i>
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
@@ -166,12 +155,10 @@
                                                             </button>
                                                             <div class="btn-group">
                                                                 <button
-                                                                    class="btn btn-success buttons-collection  btn-warning waves-effect waves-light"
+                                                                    class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false"
-                                                                    onclick="export_excel()"
-                                                                    >
+                                                                    aria-expanded="false">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -181,9 +168,103 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="loadData">
-
-                                            </div>
+                                            <table class="datatables-products table dataTable no-footer dtr-column"
+                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
+                                                style="width: 1396px;">
+                                                <thead class="border-top">
+                                                    <tr class=" table-info">
+                                                        <th style="width: 50px;">
+                                                            ห้อง
+                                                        </th>
+                                                        <th class="text-center">
+                                                            รอบบิล</th>
+                                                        <th style="width: 109px;" class="text-center">
+                                                            วันที่รับชำระเงิน
+                                                        </th>
+                                                        <th class="text-center">
+                                                            รับชำระโดย
+                                                        </th>
+                                                        <th class="text-center">
+                                                            ค่าเช่าห้อง
+                                                        </th>
+                                                        <th class="text-center">
+                                                            คืนเงินประกันห้อง
+                                                        </th>
+                                                        <th class="text-center">
+                                                            รวม
+                                                        </th>
+                                                        <th style="width: 87px;" class="text-center">
+                                                            จัดการ
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="odd text-center">
+                                                        <td class="  control" tabindex="0" style="display: none;">
+                                                        </td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        <td class="sorting_1">A212</td>
+                                                        <td><span>06/2024</span></td>
+                                                        <td><span>09/07/2024</span></td>
+                                                        <td><span>นิชกานต์</span></td>
+                                                        <td><span>4,209</span></td>
+                                                        <td><span>0</span></td>
+                                                        <td><span class="text-danger">4,209</span></td>
+                                                        <td><button
+                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
+                                                                    class="ti ti-printer ti-md"></i></button></td>
+                                                    </tr>
+                                                    <tr class="even text-center">
+                                                        <td class="  control" tabindex="0" style="display: none;">
+                                                        </td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        <td class="sorting_1">A606</td>
+                                                        <td><span>06/2024</span></td>
+                                                        <td><span>02/07/2024</span></td>
+                                                        <td><span>นิชกานต์</span></td>
+                                                        <td><span>5,740</span></td>
+                                                        <td><span>-7,000</span></td>
+                                                        <td><span class="text-danger">-1,260</span></td>
+                                                        <td><button
+                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
+                                                                    class="ti ti-printer ti-md"></i></button></td>
+                                                    </tr>
+                                                    <tr class="odd text-center">
+                                                        <td class="  control" tabindex="0" style="display: none;">
+                                                        </td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        <td class="sorting_1">A502</td>
+                                                        <td><span>06/2024</span></td>
+                                                        <td><span>02/07/2024</span></td>
+                                                        <td><span>นิชกานต์</span></td>
+                                                        <td><span>4,001</span></td>
+                                                        <td><span>-700</span></td>
+                                                        <td><span class="text-danger">3,301</span></td>
+                                                        <td><button
+                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
+                                                                    class="ti ti-printer ti-md"></i></button></td>
+                                                    </tr>
+                                                    <tr class="even text-center">
+                                                        <td class="  control" tabindex="0" style="display: none;">
+                                                        </td>
+                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
+                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        <td class="sorting_1">A605</td>
+                                                        <td><span>06/2024</span></td>
+                                                        <td><span>02/07/2024</span></td>
+                                                        <td><span>นิชกานต์</span></td>
+                                                        <td><span>5,364</span></td>
+                                                        <td><span>-7,000</span></td>
+                                                        <td><span class="text-danger">-1636</span></td>
+                                                        <td><button
+                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
+                                                                    class="ti ti-printer ti-md"></i></button></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                             <div style="width: 1%;"></div>
                                         </div>
                                     </div>
@@ -285,79 +366,8 @@
             </div>
         </div>
     </div>
-    <iframe id="print-iframe" style="display: none;"></iframe>    
-    <!-- / Layout wrapper -->
     @include('layout/inc_js')
 
 </body>
 
 </html>
-<script>
-        var page = "{{$page_url}}/datatable";
-        var searchData = {};
-        loadData(page);
-        
-        function loadData(pages){
-            
-            $('.p_search').each(function() {
-                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
-                var inputValue = $(this).val(); // ดึงค่า value ของ input
-                
-                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
-            });
-
-            // alert(page);
-            page = pages;
-            $.ajax({
-                type: "GET",
-                url: pages,
-                data: searchData,
-                success: function(data) {
-                    $("#loadData").html(data);
-                }
-            });
-            // alert(page);
-        }
-        function printPdf() {
-
-            $('.p_search').each(function () {
-                var inputName = $(this).attr('name');
-                var inputValue = $(this).val();
-                searchData[inputName] = inputValue;
-            });
-
-            $.ajax({
-                url: '/pdf/{{$page_url}}',
-                type: 'GET',
-                data: searchData,
-                success: function(html) {
-                    const iframe = document.getElementById('print-iframe');
-                    const doc = iframe.contentWindow.document;
-                    doc.open();
-                    doc.write(html);
-                    doc.close();
-                    iframe.onload = function () {
-                        iframe.contentWindow.focus();
-                        iframe.contentWindow.print();
-                    };
-                },
-                error: function(xhr) {
-                    alert('เกิดข้อผิดพลาด');
-                    console.error(xhr.responseText);
-                }
-            });
-        }
-        function export_excel() {
-            $('.p_search').each(function () {
-                var inputName = $(this).attr('name');
-                var inputValue = $(this).val();
-                searchData[inputName] = inputValue;
-            });
-
-            // สร้าง query string
-            const queryString = new URLSearchParams(searchData).toString();
-
-            // เปิดลิงก์พร้อม query string ในแท็บใหม่
-            window.open('{{$page_url}}/export/excel?' + queryString, '_blank');
-        }
-</script>

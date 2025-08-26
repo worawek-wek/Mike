@@ -79,7 +79,7 @@
                                                             <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">5 ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">4 ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -172,37 +172,36 @@
                                                 style="width: 1396px;">
                                                 <thead class="border-top">
                                                     <tr class=" table-info">
-                                                        <th style="width: 50px;">
+                                                        <th class="text-center" style="width: 50px;">
                                                             ห้อง
                                                         </th>
-                                                        <th>
+                                                        <th class="text-center">
                                                             รอบบิล</th>
                                                         <th style="width: 109px;">
                                                             วันที่รับชำระเงิน
                                                         </th>
-                                                        <th>
+                                                        <th class="text-center">
                                                             รับชำระโดย
                                                         </th>
-                                                        <th>
+                                                        <th class="text-center">
                                                             ค่าเช่าห้อง
                                                         </th>
-                                                        <th>
+                                                        <th class="text-center">
                                                             คืนเงินประกันห้อง
                                                         </th>
-                                                        <th>
+                                                        <th class="text-center">
                                                             รวม
                                                         </th>
-                                                        <th style="width: 87px;">
+                                                        <th class="text-center" style="width: 87px;">
                                                             จัดการ
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr class="odd text-center">
+                                                    {{-- <tr class="odd text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        
                                                         <td class="sorting_1">A212</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>09/07/2024</span></td>
@@ -217,8 +216,7 @@
                                                     <tr class="even text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        
                                                         <td class="sorting_1">A606</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>
@@ -233,8 +231,7 @@
                                                     <tr class="odd text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        
                                                         <td class="sorting_1">A502</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>
@@ -249,8 +246,7 @@
                                                     <tr class="even text-center">
                                                         <td class="  control" tabindex="0" style="display: none;">
                                                         </td>
-                                                        {{-- <td class="  dt-checkboxes-cell"><input type="checkbox"
-                                                                class="dt-checkboxes form-check-input"></td> --}}
+                                                        
                                                         <td class="sorting_1">A605</td>
                                                         <td><span>06/2024</span></td>
                                                         <td><span>02/07/2024</span></td>
@@ -261,67 +257,15 @@
                                                         <td><button
                                                                 class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
                                                                     class="ti ti-printer ti-md"></i></button></td>
+                                                    </tr> --}}
+                                                    <tr>
+                                                        <td colspan="20" class="text-center text-muted py-4">
+                                                            <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                                                            ไม่พบข้อมูล
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_info" id="DataTables_Table_0_info"
-                                                        role="status" aria-live="polite">Displaying 1 to 7 of 100
-                                                        entries</div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_paginate paging_simple_numbers"
-                                                        id="DataTables_Table_0_paginate">
-                                                        <ul class="pagination">
-                                                            <li class="paginate_button page-item previous disabled"
-                                                                id="DataTables_Table_0_previous"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="previous" tabindex="-1"
-                                                                    class="page-link"><i
-                                                                        class="ti ti-chevron-left ti-sm"></i></a>
-                                                            </li>
-                                                            <li class="paginate_button page-item active"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    aria-current="page" data-dt-idx="0" tabindex="0"
-                                                                    class="page-link">1</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="1" tabindex="0" class="page-link">2</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="2" tabindex="0" class="page-link">3</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="3" tabindex="0" class="page-link">4</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="4" tabindex="0" class="page-link">5</a>
-                                                            </li>
-                                                            <li class="paginate_button page-item disabled"
-                                                                id="DataTables_Table_0_ellipsis"><a
-                                                                    aria-controls="DataTables_Table_0"
-                                                                    aria-disabled="true" role="link"
-                                                                    data-dt-idx="ellipsis" tabindex="-1"
-                                                                    class="page-link">…</a></li>
-                                                            <li class="paginate_button page-item "><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="14" tabindex="0"
-                                                                    class="page-link">15</a></li>
-                                                            <li class="paginate_button page-item next"
-                                                                id="DataTables_Table_0_next"><a href="#"
-                                                                    aria-controls="DataTables_Table_0" role="link"
-                                                                    data-dt-idx="next" tabindex="0" class="page-link"><i
-                                                                        class="ti ti-chevron-right ti-sm"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div style="width: 1%;"></div>
                                         </div>
                                     </div>

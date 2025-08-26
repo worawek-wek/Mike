@@ -42,8 +42,40 @@ class BillController extends Controller
         //     $ru->total = $ru->total_amount;
         //     $ru->save();
         // }
+        $invoice = RentBill::where('ref_status_id', '!=', 5)->where('ref_type_id', 1)->with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->get();
+        foreach($invoice as $inv){
 
-        // DB::commit();
+                $createdDay = \Carbon\Carbon::parse($inv->created_at)->day;
+                $month_year = date('Y-m', strtotime($inv->created_at));
+
+                // if ($createdDay > $inv->room_for_rent->room->start_fine_day) {
+                //     $month_year = date('Y-m', strtotime('+1 month', strtotime($inv->created_at)));
+                // }
+
+            if (date_create(date('Y-m-d')) >= date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT))  &  $inv->room_for_rent->room->fine_day > 0){
+
+                $title = "ค่าปรับ เกินชำระ ".date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days.' วัน';
+                $price = date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$inv->room_for_rent->room->fine_day;
+                
+                $price = min($price, $inv->room->maximum_fine);
+
+                $fine = PaymentList::where('ref_payment_id', $inv->id)->where('document_type', 1)->where('fine', 1)->first();
+                if($fine){
+                    $pay_list = PaymentList::find($fine->id); // สร้างรายการ ค่าห้อง
+                }else{
+                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                    $pay_list->ref_payment_id  =  $inv->id;
+                    $pay_list->document_type  =  1;
+                    $pay_list->fine  =  1;
+                }
+                    $pay_list->title  =  $title;
+                    $pay_list->price  =  $price;
+                    $pay_list->save();                    
+            }
+            // return 123;
+        }
+
+        DB::commit();
 
         $data['page_url'] = 'bill';
         $data['status_rent_bill'] = StatusRentBill::get();
@@ -276,7 +308,7 @@ class BillController extends Controller
                     $pay_list->document_type  =  2;
                     $pay_list->discount  =  $payment_list->discount;
                     if ($payment_list->title && str_contains($payment_list->title, 'ค่าปรับ')) {
-                        $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม
+                        $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ
                     }
                     $pay_list->save();
                     
@@ -323,6 +355,7 @@ class BillController extends Controller
                     $pay_list->price  =  $request->payment_list['price'][$key];
                     $pay_list->ref_payment_id  =  $receipt->id;
                     $pay_list->document_type  =  2;
+                    $pay_list->discount  =  $request->payment_list['discount'][$key];
 
                     if ($payment_list_title && str_contains($payment_list_title, 'ค่าปรับ')) {
                         $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม
@@ -389,6 +422,22 @@ class BillController extends Controller
         
         $data['page_url'] = 'bill';
         $invoice = RentBill::with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->find($id);
+        $receipt = Receipt::where('ref_rent_bill_id', $id)->get();
+        $fine_invoice = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
+        $data['fine_invoice_price'] = 0;
+        if(@$fine_invoice){
+            $data['fine_invoice_price'] = $fine_invoice->price;
+        }
+        $invoice_fine = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
+        $data['fine_price'] = $invoice_fine->price;
+        if(@$receipt){
+            foreach($receipt as $rec){
+                $fine = PaymentList::where('ref_payment_id', $rec->id)->where('document_type', 2)->where('fine', 1)->first();
+                if(@$fine){
+                    $data['fine_price'] = $invoice_fine->price - $fine->price;
+                }
+            }
+        }
         $contract = Contract::find($invoice->ref_contract_id);
         $data['expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
         $data['invoice'] = $invoice;
@@ -435,14 +484,26 @@ class BillController extends Controller
                 PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->delete();
             }
             if($id == 'all'){
-                $insert = RentBill::where('ref_status_id', 2);
-                $insert->update(['ref_status_id' => $request->status]);
+                $bills = RentBill::with(['receipt.payment_list', 'payment_list'])
+                                    ->where('ref_status_id', 2)
+                                    ->get();
+
+                foreach ($bills as $bill) {
+                    if ($bill->total_paid_including_fine >= $bill->total_amount) {
+                        foreach ($bills as $bill) {
+                            if ($bill->total_paid_including_fine >= $bill->total_amount) {
+                                $bill->ref_status_id = $request->status;
+                                $bill->save();
+                            }
+                        }
+                    }
+                }
                 DB::commit();
                 return true;
             }
 
-            $insert = RentBill::whereIn('id', explode(',', $id));
-            $insert->update(['ref_status_id' => $request->status]);
+            $update = RentBill::whereIn('id', explode(',', $id));
+            $update->update(['ref_status_id' => $request->status]);
 
             DB::commit();
             return true;
@@ -515,7 +576,7 @@ class BillController extends Controller
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', '!=', 3)
+                                // ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
                                 ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.phone')
                                 ->get();
@@ -531,6 +592,7 @@ class BillController extends Controller
             "ค่าเช่าห้อง",
             "ค่าน้ำประปา",
             "ค่าไฟฟ้า",
+            "ค่าปรับ",
         ];
         $data_2 = [
             "รวม",
@@ -551,13 +613,14 @@ class BillController extends Controller
                         $branch->name
                     ],
                     [
-                        "บิลค่าเช่าห้องเดือน".date('m-Y', strtotime('-1 month'))
+                        "บิลค่าเช่าห้องเดือน".date('m-Y')
                     ],
                     array_merge($data_1, $service, $data_2)
 
                 ];
         // return $data;
         foreach($results as $row){
+            $fine = PaymentList::where('ref_payment_id', $row->id)->where('document_type', 1)->where('fine', 1)->first();
             // foreach($service_id as $ser_id){
             //     RoomHasService::where('ref_room_id', $row->room_id)->where('ref_service_id', $ser_id)->first();
             // }
@@ -566,6 +629,7 @@ class BillController extends Controller
                         $row->rent,
                         (string) $row->water_amount,
                         $row->electricity_amount,
+                        $fine->price,
             ];
             $data_list_2 = [
                         number_format($row->total_amount),

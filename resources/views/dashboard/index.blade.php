@@ -153,10 +153,40 @@
                                                 <div
                                                     class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                     <div class="me-2">
-                                                        <h6 class="mb-0 fw">ผู้เช่าชำระค่าเช่าแล้ว</h6>
+                                                        <h6 class="mb-0 fw">ลูกค้าจ่ายตรงเวลา</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0">{{ $summary['all_receipt_last_month'] }} บาท</h6>
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_on_time']) }} บาท</h6>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex mb-3">
+                                                <div class="avatar flex-shrink-0 me-4">
+                                                    <span class="avatar-initial rounded bg-light-success" style="background-color: #ffb975 !important;"><i
+                                                            class="ti ti-building-bank ti-26px"></i></span>
+                                                </div>
+                                                <div
+                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                    <div class="me-2">
+                                                        <h6 class="mb-0 fw">จ่ายล่าช้าแบบนัดเวลา</h6>
+                                                    </div>
+                                                    <div class="user-progress">
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_late_with_appointment']) }} บาท</h6>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex mb-3">
+                                                <div class="avatar flex-shrink-0 me-4">
+                                                    <span class="avatar-initial rounded bg-light-danger"><i
+                                                            class="ti ti-building-bank ti-26px"></i></span>
+                                                </div>
+                                                <div
+                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                    <div class="me-2">
+                                                        <h6 class="mb-0 fw">จ่ายล่าช้าแบบไม่ได้นัดเวลา</h6>
+                                                    </div>
+                                                    <div class="user-progress">
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_late']) }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>
@@ -298,7 +328,7 @@
                             fontWeight: 600,
                             label: 'ภาพรวมรายได้',
                             formatter: function(w) {
-                                return '100%';
+                                return '{{ $persen_overview }}%';
                             }
                         }
                     }

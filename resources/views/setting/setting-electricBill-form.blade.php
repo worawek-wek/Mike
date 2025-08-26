@@ -75,14 +75,14 @@
     <div class="mb-2 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">คิดตามจริง</label>
         <div class="col-8 col-md-8">
-            <input class="form-control" name="ele_baht_per_unit_2" type="number" id="html5-text-input" value="{{ @$electric_bill->ele_baht_per_unit }}">
+            <input class="form-control" name="ele_baht_per_unit_2" type="number" id="html5-text-input" value="{{ number_format($electric_bill->ele_baht_per_unit ?? 0) }}">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท/ยูนิต</label>
     </div>
     <div class="mb-4 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">ขั้นต่ำ</label>
         <div class="col-8 col-md-8">
-            <input name="minimum_ele_bill" class="form-control" type="number" id="html5-text-input" value="{{ @$electric_bill->minimum_ele_bill }}">
+            <input name="minimum_ele_bill" class="form-control" type="number" id="html5-text-input" value="{{ number_format($electric_bill->minimum_ele_bill ?? 0) }}">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท</label>
     </div>
@@ -91,7 +91,7 @@
     <div class="mb-4 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">คิดตามจริง</label>
         <div class="col-8 col-md-8">
-            <input name="ele_baht_per_unit" class="form-control" type="number" value="{{ @$electric_bill->ele_baht_per_unit }}" step="any" id="html5-text-input">
+            <input name="ele_baht_per_unit" class="form-control" type="number" value="{{ number_format($electric_bill->ele_baht_per_unit ?? 0) }}" id="html5-text-input">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท/ยูนิต</label>
     </div>

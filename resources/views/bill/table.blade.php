@@ -82,8 +82,8 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                     </span>
                     @if (count($row_2->receipt ?? []) > 0 & $row_2->ref_status_id != 5)
                         <br><span class="text-truncate text-success"> จ่ายแล้ว {{ number_format($row_2->total_paid_including_fine) }}</span>
-                        @if ($row_2->total_paid_including_fine < $row_2->total_amount)
-                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount + $row_2->total_fine - $row_2->total_paid_including_fine) }}</span>
+                        @if ($row_2->total_not_discount_amount < $row_2->total_amount)
+                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount - $row_2->total_not_discount_amount) }}</span>
                         @endif
                     @endif
                 </td>

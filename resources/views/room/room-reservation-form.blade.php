@@ -112,7 +112,7 @@
                 </div>
                 <div class="col-sm-6 mb-2">
                     <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                    <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                    <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                 </div>
                 <div class="col-sm-10 mt-3">
                     <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>

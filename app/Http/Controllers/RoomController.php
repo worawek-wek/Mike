@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\IncomeExpenses;
 use App\Models\User;
+use App\Models\MoveOut;
 use App\Models\Branch;
 use App\Models\Receipt;
 use App\Models\PaymentList;
@@ -220,7 +221,7 @@ class RoomController extends Controller
         $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
-        $move_contract = Contract::find(@$move_invoice_5->ref_contract_id);
+        $move_contract = Contract::where('ref_room_id', $id)->orderBy('id','desc')->first();
         $data['move_contract'] = $move_contract;
         if(@$move_invoice_7){
             $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
@@ -516,12 +517,12 @@ class RoomController extends Controller
         // return $request->payment_date2;
         // return 456;
         try{
-
+            
             $image_name = "";
             if($request->payment_channel == 1){
-                $payment_date = Carbon::createFromFormat('d/m/Y', '24/06/2025')->format('Y-m-d');
+                $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
             }else{
-                $payment_date = Carbon::createFromFormat('d/m/Y', trim($request->payment_date2))->format('Y-m-d');
+                $payment_date = Carbon::createFromFormat('d/m/Y', trim($request->payment_date))->format('Y-m-d');
                 
                 if($request->file('evidence_of_money_transfer')){
                     $request->validate([
@@ -556,7 +557,6 @@ class RoomController extends Controller
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
             $receipt->save();
-            
             foreach($request->payment_list['title'] as $key => $payment_list_title){
                 $pay_list = new PaymentList;
                 $pay_list->title  =  $payment_list_title;
@@ -626,6 +626,7 @@ class RoomController extends Controller
                     $up_renter->blacklist_date  =  Carbon::now();
                     $up_renter->save();
             }
+            // new MoveOut();
 
             DB::commit();
             return true;
@@ -634,6 +635,7 @@ class RoomController extends Controller
             return false;
         }
     }
+//   ชำระ ค่าจองหลายห้อง
     public function insert_receipt_all(Request $request)
     {
         try{
@@ -1275,7 +1277,7 @@ class RoomController extends Controller
         $birthdate = Carbon::createFromFormat('d/m/Y', $request->birthdate)->format('Y-m-d');
         $room = Room::find($request->room_id);
         // return $request;
-        $room_for_rent = RoomForRents::where('ref_room_id', $request->room_id)->where('ref_renter_id', $request->renter_id)->first();
+        $room_for_rent = RoomForRents::where('ref_room_id', $request->room_id)->orderBy('id', 'desc')->first();
 
         try{
             
@@ -1294,6 +1296,7 @@ class RoomController extends Controller
                 $renter->name  =  $request->name;
                 $renter->surname  =  $request->surname;
                 $renter->phone  =  $request->phone;
+                $renter->salary  =  $request->salary;
                 $renter->id_card_number  =  $request->id_card_number;
                 $renter->address  =  $request->address;
                 $renter->ref_subdistrict_id  =  $request->ref_subdistrict_id;
@@ -1320,6 +1323,7 @@ class RoomController extends Controller
                 $r_t_r->deposit  =  $room_for_rent->deposit;
                 $r_t_r->payment_method  =  $room_for_rent->payment_method;
                 $r_t_r->payment_received_date  =  $room_for_rent->payment_received_date;
+                $r_t_r->status  =  1;
                 $r_t_r->save();
 
                 $room_for_rent_id = $r_t_r->id;
@@ -1526,7 +1530,8 @@ class RoomController extends Controller
 
             
             DB::commit();
-            return true;
+            return $renter->id;
+            // return true;
         } catch (QueryException $err) {
             DB::rollBack();
             return false;

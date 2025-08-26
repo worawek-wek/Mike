@@ -79,7 +79,7 @@
                                                             <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-enter ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">9 ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">{{ $sum_room }} ห้อง</h5>
                                                                 <small>ย้ายเข้าทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -99,7 +99,7 @@
                                                             <div class="badge rounded bg-label-success me-3 p-2"><i
                                                                     class="ti ti-currency-dollar ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-success">67,000 บาท</h5>
+                                                                <h5 class="mb-0 text-success">{{ number_format($sum['income']) }} บาท</h5>
                                                                 <small>รายรับทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -109,7 +109,7 @@
                                                             <div class="badge rounded bg-label-main me-3 p-2"><i
                                                                     class="ti ti-businessplan ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-main">65,000 บาท</h5>
+                                                                <h5 class="mb-0 text-main">{{ number_format($sum['income']) }} บาท</h5>
                                                                 <small>รวมสุทธิ</small>
                                                             </div>
                                                         </div>
@@ -149,13 +149,14 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input type="month" name="month" class="form-control p_search" onchange='loadData("{{$page_url}}/datatable")' value="{{ date('Y-m') }}">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
                                                             <button
                                                                 class="btn btn-secondary add-new btn-label-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
-                                                                type="button">
+                                                                type="button"
+                                                                onclick="printPdf()">
                                                                 <span>
                                                                     <i class="ti ti-file-upload me-0 me-sm-1"></i>
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
@@ -167,7 +168,8 @@
                                                                     class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="exportExcel()">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -177,7 +179,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
                                             
                                             <div id="loadData">
 
@@ -283,6 +284,7 @@
             </div>
         </div>
     </div>
+    <iframe id="print-iframe" style="display: none;"></iframe>    
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
 <script>

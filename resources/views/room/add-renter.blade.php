@@ -58,6 +58,11 @@
             <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->surname }}" />
         </div>
         <div class="col-sm-6">
+            <label for="exampleFormControlInput6" class="form-label">เงินเดือน</label>
+            <input type="number" name="salary" class="form-control" id="exampleFormControlInput6" placeholder="เงินเดือน" value="{{ @$renter_edit->salary }}"/>
+        </div>
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
             <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label>
             <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->phone }}"/>
         </div>
@@ -126,6 +131,11 @@
 
     <div class="row g-3 p-4 pt-1" id="vehicleContainer">
         @foreach ($vehicles as $key => $veh)
+        @php
+            if($veh->ref_room_id != $room->id){
+                continue;
+            }
+        @endphp
             <div class="vehicle-group row g-3 mb-2">
                 <div class="col-sm-2">
                     <label class="form-label">คันที่ {{ $key+1 }}</label>

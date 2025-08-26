@@ -108,6 +108,9 @@
                                             {{-- @endif --}}
                                         </td>
                                     </tr>
+                                    @php
+                                        break;
+                                    @endphp
                                 @endforeach
                             @endif
                             </tbody>

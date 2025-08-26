@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Contract;
 use App\Models\Receipt;
 use App\Models\Building;
 use App\Models\RentBill;
@@ -275,6 +276,85 @@ class PDFController extends Controller
         $data['list_data'] = $results;
 
         return view('pdf/report-viewOverview', $data);
+    }
+    public function report_rent_bill(Request $request)
+    {
+        $results = Receipt::orderBy('rooms.id','ASC')
+                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                ->where('buildings.ref_branch_id', session("branch_id"))
+                                ->where('rent_bills.ref_type_id', 1)
+                                ->where('rent_bills.ref_status_id', 5)
+                                ->distinct('receipts.id')
+                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+        
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }
+
+        $results = $results->get();
+
+        $data['list_data'] = $results;
+
+        return view('pdf/report-rentBill', $data);
+    }
+    public function report_move_in(Request $request)
+    {
+        $results = Contract::orderBy('id','ASC');
+
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+        }
+
+        $results = $results->get();
+
+        $data['list_data'] = $results;
+
+        return view('pdf/report-moveIn', $data);
+    }
+    public function report_bad_debt(Request $request)
+    {
+        $results = RentBill::orderBy('rooms.name', 'ASC')
+                            ->join('room_for_rents', function ($join) {
+                                $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
+                                    ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
+                            })
+                            ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                            ->where('buildings.ref_branch_id', session("branch_id"))
+                            ->where('rent_bills.ref_type_id', 1)
+                            ->where('rent_bills.ref_status_id', '!=', 5)
+                            ->where('room_for_rents.move_out_type', 2)
+                            ->select(
+                                'rent_bills.*',
+                                'room_for_rents.payment_method as payment_method',
+                                'room_for_rents.date_stay as date_stay',
+                                'rooms.name as room_name',
+                                'rooms.rent'
+                            )
+                            ->with('payment_water')
+                            ->distinct('rent_bills.id');
+
+                        // ตรวจสอบว่า $request->month มีค่าและอยู่ในรูปแบบที่ถูกต้อง
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }
+
+        $results = $results->get();
+
+        $data['list_data'] = $results;
+
+        return view('pdf/report-badDebt', $data);
     }
     
     // public function receipt()

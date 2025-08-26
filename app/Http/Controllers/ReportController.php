@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Room;
 use App\Models\Contract;
 use App\Models\Position;
 use App\Models\Branch;
 use App\Models\Receipt;
 use App\Models\RentBill;
-use App\Models\Leave;
-use App\Models\UserLeave;
-use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +76,7 @@ class ReportController extends Controller
 
         return view('report/report-viewOverview-table', $data);
     }
+    // รายงานบิลค่าเช่า
     public function rent_bill(Request $request)
     {
         $data['page_url'] = 'report/rent-bill';
@@ -132,12 +131,13 @@ class ReportController extends Controller
         }                    
         $paid = $paid->get()->sum(function($receipt) {
                                 return $receipt->total_amount;
-                            });
+                            });                    
+        // return $overdue = $paid->get()->sum->total_amount;
 
         ////////////////////////////////////////////////////////////////
 
         $overdue = RentBill::with('payment_list')
-                            ->where('ref_status_id', 7)
+                            ->where('ref_status_id', "!=", 3)
                             ->where('ref_type_id', 1);
                             
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
@@ -151,31 +151,54 @@ class ReportController extends Controller
                             });
 
         $data['paid'] = number_format($paid).' บาท';
-        $data['overdue'] = number_format($overdue).' บาท';
-        $data['transfer'] = $this->summary(session("branch_id"))['transfer'];
-        $data['cash'] = $this->summary(session("branch_id"))['cash'];
+        $data['overdue'] = number_format($overdue-$paid).' บาท';
+
+        $transfer = $this->summary(session("branch_id"), $month, $year)['transfer'];
+        $cash = $this->summary(session("branch_id"), $month, $year)['cash'];
+        $cash_wait_for_confirm = $this->summary(session("branch_id"), $month, $year)['cash_wait_for_confirm'];
+        
+        $total_all = $transfer + $cash + $cash_wait_for_confirm;
+
+        if($total_all > 0){
+            $percent_transfer = $total_all > 0 ? ($transfer / $total_all) * 100 : 0;
+            $percent_cash    = $total_all > 0 ? ($cash / $total_all) * 100 : 0;
+            $percent_cash_wait_for_confirm   = 100 - ($percent_transfer + $percent_cash);
+        }
+
+        $data['transfer'] = $transfer;
+        $data['cash'] = $cash;
+        $data['cash_wait_for_confirm'] = $cash_wait_for_confirm;
+
+        $data['percent_transfer'] = number_format($percent_transfer ?? 0);
+        $data['percent_cash'] = number_format($percent_cash ?? 0);
+        $data['percent_cash_wait_for_confirm'] = number_format($percent_cash_wait_for_confirm ?? 0);
         
         // foreach ($values as $value) {
         //         $percent = ($value / $total) * 100;
         //         echo number_format($value, 2) . " = " . number_format($percent, 2) . "%<br>";
         //     }
 
-        return $data;
+        return view('report/report-header', $data);
     }
     public function move_in(Request $request)
     {
         $data['page_url'] = 'report/move-in';
+        $data['sum'] = $this->summary_calculate();
+        $data['sum_room'] = Room::whereHas('floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })->where('status', 2)->count();
+
         return view('report/report-moveIn', $data);
     }
     public function move_in_datatable(Request $request)
     {
         $results = Contract::orderBy('id','ASC');
 
-        // if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
-        //     [$year, $month] = explode('-', $request->month);
-        //     $results = $results->where('year', $year)
-        //                     ->where('month', $month);
-        // }
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+        }
 
         $limit = $request->limit ?? 15;
 
@@ -415,74 +438,23 @@ class ReportController extends Controller
         return view('report/report-monthlyBooking-table', $data);
     }
     
-    public function view_overview_excel(Request $request)
+    public function rent_bill_excel(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
-        // สร้างหัวตาราง 2 แถว
-        $sheet->mergeCells('A1:A2')->setCellValue('A1', 'ห้อง');
-        $sheet->mergeCells('B1:H1')->setCellValue('B1', 'บิลค่าเช่าห้อง');
-        $sheet->mergeCells('I1:J1')->setCellValue('I1', 'บิลจองห้อง');
-        $sheet->mergeCells('K1:L1')->setCellValue('K1', 'บิลเงินประกัน');
-        $sheet->mergeCells('M1:N1')->setCellValue('M1', 'บิลย้ายออก');
-        $sheet->mergeCells('O1:O2')->setCellValue('O1', 'คืนเงินประกัน');
-
-        $sheet->setCellValue('B2', 'ค่าเช่าห้อง');
-        $sheet->setCellValue('C2', 'ค่าน้ำ');
-        $sheet->setCellValue('D2', 'ค่าไฟ');
-        $sheet->setCellValue('E2', 'ค่าที่จอดรถยนต์');
-        $sheet->setCellValue('F2', 'ค่าที่จอดรถมอเตอร์ไซค์');
-        $sheet->setCellValue('G2', 'ส่วนกลาง');
-        $sheet->setCellValue('H2', 'ค่าไฟเกิน');
-        $sheet->setCellValue('I2', 'ค่ามัดจำการจอง');
-        $sheet->setCellValue('J2', 'คืนมัดจำการจอง');
-        $sheet->setCellValue('K2', 'ค่าประกันห้อง');
-        $sheet->setCellValue('L2', 'หักค่ามัดจำจอง');
-        $sheet->setCellValue('M2', 'ค่าน้ำ');
-        $sheet->setCellValue('N2', 'ค่าไฟ');
-
-        // สไตล์หัวตาราง
-        $sheet->getStyle('A1:O2')->applyFromArray([
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
-            ],
-            'font' => ['bold' => true],
-        ]);
-
-        $sheet->getRowDimension(1)->setRowHeight(30);
-        $sheet->getRowDimension(2)->setRowHeight(25);
-        foreach (range('A', 'O') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        // ดึงข้อมูลจากฐานข้อมูล
-        $results = Receipt::orderBy('rooms.id','ASC')
-            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-            ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-            ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-            ->where('buildings.ref_branch_id', session("branch_id"))
-            ->where('rent_bills.ref_type_id', 1)
-            ->where('rent_bills.ref_status_id', 5)
-            ->distinct('rooms.id')
-            ->select(
-                'receipts.*',
-                'rent_bills.water_amount',
-                'rent_bills.electricity_amount',
-                'renters.prefix',
-                DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
-                'rooms.name as room_name',
-                'rooms.id as room_id',
-                'rooms.rent',
-                'renters.phone'
-            );
-
+        
+         $results = Receipt::orderBy('rooms.id','ASC')
+                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+                                ->where('buildings.ref_branch_id', session("branch_id"))
+                                ->where('rent_bills.ref_type_id', 1)
+                                ->where('rent_bills.ref_status_id', 5)
+                                ->distinct('receipts.id')
+                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+        
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
             $results = $results->where('rent_bills.year', $year)
@@ -490,37 +462,107 @@ class ReportController extends Controller
         }
 
         $results = $results->get();
+        
+        $data = 
+        [
+            [
+                "ห้อง",
+                "ชื่อผู้เช่า",
+                "เลขที่ใบเสร็จ",
+                "วันที่รับชำระ",
+                "ช่องทาง",
+                "รับชำระโดย",
+                "ค่าห้องเช่า",
+                "ค่าน้ำ",
+                "ค่าไฟ",
+                "ค่าที่จอด รถยนต์",
+                "ค่าที่จอด รถมอเตอร์ไซค์",
+                "ส่วนกลาง",
+                "รวม",
+                "สถานะ"
+            ]
+        ];
+        foreach($results as $key => $row){
+            $data[] = [
+                        $row->room_name,
+                        $row->renter_name,
+                        $row->receipt_number,
+                        date("d/m/Y" , strtotime($row->payment_date)),
+                        $row->payment_method == 1? "เงินสด" : "โอนเงิน",
+                        $row->user->name,
+                        $row->water_amount,
+                        $row->electricity_amount,
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        $row->total_amount,
+                        "ชำระแล้ว"
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/รายงานบิลค่าเช่า".date('m-Y', strtotime($request->month)).".xlsx");
+        return redirect("upload/export_excel/รายงานบิลค่าเช่า".date('m-Y', strtotime($request->month)).".xlsx");
+    }
+    public function move_in_excel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $results = Contract::orderBy('id','ASC');
 
-        // ใส่ข้อมูลเริ่มที่แถว 3
-        $rowIndex = 3;
-        foreach ($results as $row) {
-            $sheet->fromArray([
-                $row->room_name,
-                $row->rent,
-                $row->water_amount,
-                $row->electricity_amount,
-                0, // ค่าที่จอดรถยนต์
-                0, // ค่าที่จอดรถมอเตอร์ไซค์
-                0, // ส่วนกลาง
-                0, // ค่าไฟเกิน
-                0, // ค่ามัดจำการจอง
-                0, // คืนมัดจำ
-                0, // ค่าประกันห้อง
-                0, // หักค่ามัดจำจอง
-                0, // ค่าน้ำย้ายออก
-                0, // ค่าไฟย้ายออก
-                0  // คืนเงินประกัน
-            ], null, 'A' . $rowIndex++);
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
         }
 
-        // สร้างไฟล์
-        $fileName = "รายงานจองรายเดือน_" . date('m-Y', strtotime($request->month)) . ".xlsx";
-        $filePath = public_path("upload/export_excel/{$fileName}");
-
+        $results = $results->get();
+        
+        $data = 
+        [
+            [
+                "ห้อง",
+                "วันที่",
+                "โดย",
+                "ช่องทาง",
+                "ค่าประกันห้อง",
+                "หักค่ามัดจำจอง",
+                "รวม",
+            ]
+        ];
+        foreach($results as $key => $row){
+            $data[] = [
+                        $row->room->name,
+                        date('d/m/Y', strtotime($row->created_at)),
+                        $row->renter->room_for_rent->user->name,
+                        $row->renter->room_for_rent->payment_method == 1 ? 'เงินสด': 'โอนเงิน',
+                        $row->security_deposit,
+                        $row->renter->room_for_rent->deposit,
+                        $row->security_deposit+@$row->renter->room_for_rent->deposit
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save($filePath);
-
-        return redirect("upload/export_excel/{$fileName}");
+        $writer->save("upload/export_excel/รายงานย้ายเข้า".date('m-Y', strtotime($request->month)).".xlsx");
+        return redirect("upload/export_excel/รายงานย้ายเข้า".date('m-Y', strtotime($request->month)).".xlsx");
     }
     public function monthly_booking_excel(Request $request)
     {

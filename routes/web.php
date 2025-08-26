@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function() {
     Route::controller(AnalysisController::class)->group(function() {                    //////////////////////////
         Route::get('analysis/monthly-rent', 'monthly_rent')->name('analysis.monthly-rent');    //////////////////////////
         Route::get('analysis/income-expense', 'income_expense')->name('analysis.income-expense');    //////////////////////////
+        Route::get('analysis/income-expense/income', 'income')->name('analysis.income');    //////////////////////////
         Route::get('analysis/water', 'water')->name('analysis.water');    //////////////////////////
         Route::get('analysis/elect', 'elect')->name('analysis.elect');    //////////////////////////
         Route::get('analysis/meter', 'meter')->name('analysis.meter');    //////////////////////////
@@ -100,6 +101,8 @@ Route::middleware('auth')->group(function() {
         Route::get('report/monthly-booking/excel', 'monthly_booking_excel')->name('report.monthly_booking-excel');    //////////////////////////
         Route::get('report/view-overview/datatable', 'view_overview_datatable')->name('report.view-overview-datatable');    //////////////////////////
         Route::get('report/view-overview/excel', 'view_overview_excel')->name('report.view-overview-excel');    //////////////////////////
+        Route::get('report/rent-bill/excel', 'rent_bill_excel')->name('report.rent-bill-excel');    //////////////////////////
+        Route::get('report/move-in/excel', 'move_in_excel')->name('report.move-in-excel');    //////////////////////////
     });
     Route::controller(SettingController::class)->group(function() {                    //////////////////////////
 
@@ -220,6 +223,9 @@ Route::middleware('auth')->group(function() {
         Route::get('pdf/checkCarPDF/{status}', 'checkCarPDF')->name('pdf.checkCarPDF');
         Route::get('pdf/report/monthly-booking', 'report_monthly_booking')->name('pdf.report-monthly-booking');
         Route::get('pdf/report/view-overview', 'report_view_overview')->name('pdf.report-view-overview');
+        Route::get('pdf/report/rent-bill', 'report_rent_bill')->name('pdf.report-rent-bill');
+        Route::get('pdf/report/move-in', 'report_move_in')->name('pdf.report-move-in');
+        Route::get('pdf/report/bad-debt', 'report_bad_debt')->name('pdf.report-bad-debt');
     });
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////

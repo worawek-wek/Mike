@@ -11,7 +11,7 @@
             </div>
             <div class="col-sm-7">
                 <label for="exampleFormControlInput2" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-                <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $address }}" />
+                <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $renter->address.' '.$address }}" />
             </div>
             <div class="col-sm-6">
                 <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label>
@@ -27,7 +27,7 @@
             </div>
             <div class="col-sm-6">
                 <label class="form-label">ระยะเวลาทำสัญญา(เดือน)</label>
-                <input type="text" name="period" class="form-control" placeholder="" value="" required/>
+                <input type="number" name="period" class="form-control" placeholder="" value="" required/>
             </div>
             <div class="col-sm-6">
                 <label for="remark" class="form-label">หมายเหตุ</label>
@@ -64,10 +64,15 @@
 
         @endphp
 
+        <div class="row g-3 p-4 pt-1" id="contractRoom{{$item->id}}">
         <input type="hidden" name="contract[{{$key}}][ref_room_for_rent_id]" value="{{ $item->id }}">
         <input type="hidden" name="contract[{{$key}}][ref_room_id]" value="{{ $item->ref_room_id }}">
-        <div class="row g-3 p-4 pt-1">
-            <h5 class="mt-3 mb-1 text-success">{{ $item->room->name }}</h5>
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
+                <h5 class="text-success mb-0">{{ $item->room->name }}</h5>
+                <a href="javascript:void(0)" onclick="deleteContractRoom({{$item->id}})">
+                    <i class="fa fa-trash text-danger"></i>
+                </a>
+            </div>
             <div class="col-sm-6">
                 <input type="hidden" name="contract[{{$key}}][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
                 <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท) <span class="text-danger">*</span></label>
@@ -134,6 +139,9 @@
                 todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
             });
         </script>
+            @if (!$loop->last)
+                <hr>
+            @endif
         @endforeach
     </div>
 <script>
@@ -142,4 +150,9 @@
             autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
             todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
         });
+</script>
+<script>
+    function deleteContractRoom(id){
+        $("#contractRoom"+id).remove();
+    }
 </script>

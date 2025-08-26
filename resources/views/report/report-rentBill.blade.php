@@ -45,87 +45,8 @@
                         <div class="row ">
                             <div class="col-sm-12">
                                 <div class="card mb-3">
-                                    <div class="card-header">
-                                        <div class="row g-3 justify-content-between mb-4">
-                                            <div class="col-sm-12">
-                                                <h4 class="mb-0">
-                                                    <i class="tf-icons ti ti-chart-pie-3 text-main ti-md"></i>
-                                                    รายงานบิลค่าเช่า
-                                                </h4>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card card-border-shadow-success h-100">
-                                                    <div
-                                                        class="card-body d-flex justify-content-between align-items-center">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="card-icon me-3">
-                                                                <span class="badge bg-label-success rounded p-2">
-                                                                    <i class="ti ti-check ti-26px"></i>
-                                                                </span>
-                                                            </div>
-                                                            <h3 class="mb-0 me-2 text-success" id="paid">0 บาท</h3>
-                                                        </div>
-                                                        <div class="card-title mb-0">
-                                                            <p class="mb-0">ชำระแล้ว</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card card-border-shadow-danger bg-danger-subtle h-100">
-                                                    <div
-                                                        class="card-body d-flex justify-content-between align-items-center">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="card-icon me-3">
-                                                                <span class="badge bg-label-danger rounded p-2">
-                                                                    <i class="ti ti-x ti-26px"></i>
-                                                                </span>
-                                                            </div>
-                                                            <h3 class="mb-0 me-2 text-danger" id="overdue">0 บาท</h3>
-                                                        </div>
-                                                        <div class="card-title mb-0">
-                                                            <p class="mb-0">ยอดค้างชำระ</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div>
-                                            <h5 class="card-title">แยกตามการชำระ</h5>
-                                            <div class="row justify-content-center">
-                                                <div class="col-sm-3">
-                                                    <div class="d-flex mb-3 pb-1 align-items-center">
-                                                        <div class="chart-progress me-3" data-color="primary"
-                                                            data-series="72" data-progress_variant="true"></div>
-                                                        <div class="me-2">
-                                                            <h6 class="mb-1">เงินสดรอคอนเฟิร์ม</h6>
-                                                            <small id="cash_waiting_for_confirmation">0</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3">
-                                                    <div class="d-flex mb-3 pb-1 align-items-center">
-                                                        <div class="chart-progress me-3" data-color="success"
-                                                            data-series="48" data-progress_variant="true"></div>
-                                                        <div class="me-2">
-                                                            <h6 class="mb-1">เงินสดคอนเฟิร์มแล้ว</h6>
-                                                            <small id="cash">0</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3">
-                                                    <div class="d-flex mb-3 pb-1 align-items-center">
-                                                        <div class="chart-progress me-3" data-color="danger"
-                                                            data-series="15" data-progress_variant="true"></div>
-                                                        <div class="me-2">
-                                                            <h6 class="mb-1">ผ่านการโอนเงิน </h6>
-                                                            <small id="transfer">0 บาท</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="card-header" id="page_header">
+                                        
                                     </div>
                                     <div class="card-datatable table-responsive">
                                         <div id="DataTables_Table_0_wrapper"
@@ -165,7 +86,8 @@
                                                             <button
                                                                 class="btn btn-secondary add-new btn-label-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
-                                                                type="button">
+                                                                type="button"
+                                                                onclick="printPdf()">
                                                                 <span>
                                                                     <i class="ti ti-file-upload me-0 me-sm-1"></i>
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
@@ -177,7 +99,8 @@
                                                                     class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="exportExcel()">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -217,6 +140,7 @@
         <div class="drag-target"></div>
     </div>
     <!-- / Layout wrapper -->
+    <iframe id="print-iframe" style="display: none;"></iframe>    
     @include('layout/inc_js')
     <script>
         var page = "{{$page_url}}/datatable";
@@ -260,17 +184,57 @@
                 url: "{{ $page_url }}/summary",
                 data: searchData,
                 success: function(data) {
-                    $('#paid').html(data.paid);
-                    $('#overdue').html(data.overdue);
-                    $('#cash_waiting_for_confirmation').html(data.cash);
-                    $('#cash_onfirmed').html(data.cash_onfirmed);
-                    $('#cash').html(data.cash);
-                    $('#transfer').html(data.transfer);
+                    $('#page_header').html(data);
                 }
             });
         }
+        function printPdf() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                url: '/pdf/{{$page_url}}',
+                type: 'GET',
+                data: searchData,
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+        function exportExcel() {
+
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // แปลงเป็น query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // สร้าง URL พร้อมพารามิเตอร์
+            const targetUrl = `/{{$page_url}}/excel?${queryString}`;
+
+            // เปิด URL ใหม่ (แท็บใหม่)
+            window.open(targetUrl, '_blank');
+        }
     </script>
-    <script src="assets/js/app-academy-dashboard.js"></script>
 
 </body>
 

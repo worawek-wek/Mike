@@ -474,6 +474,7 @@
                         success: function(response) {
                             if(response == true){
                                 $('#insert_user')[0].reset();
+                                $('#text-check-user').html('');
                                 Swal.fire('เพิ่มพนักงานเรียบร้อยแล้ว', '', 'success');
                                 $('#addserviceModal').modal('hide');
                                 loadData(page);

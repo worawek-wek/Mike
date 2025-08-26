@@ -1097,7 +1097,7 @@ class SettingController extends Controller
             $uhb = new UserHasBranch;
             $uhb->ref_user_id  =  $user->id;
             $uhb->ref_branch_id  =  session("branch_id");
-            $uhb->ref_position_id  =  $ref_position_id ?? 1;
+            $uhb->ref_position_id  =  2;
             $uhb->save();
             
             DB::commit();

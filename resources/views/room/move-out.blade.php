@@ -903,7 +903,7 @@
 
                                             if (!isNaN(price)) {
                                                 // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
-                                                if (priceInput.hasClass('discount-value')) {
+                                                if (priceInput.hasClass('price_increase')) {
                                                     total -= price;
                                                 } else {
                                                     // รายการปกติ บวกเพิ่ม
@@ -918,7 +918,7 @@
                                     }
 
                                     function addRow(title = '', price = '', isDiscount = false) {
-                                        const discountClass = isDiscount ? 'discount-value' : 'price_increase';
+                                        const discountClass = isDiscount ? 'price_increase' : 'discount-value';
                                         const trBackground = isDiscount ? 'bg-lob' : '';
 
                                         const html = `

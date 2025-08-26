@@ -45,7 +45,8 @@ class VehicleController extends Controller
                             })
                             ->whereHas('room_for_rent', function ($query) {
                                 $query->whereIn('status', [1]);
-                            });
+                            })
+                            ->select('vehicles.*','vehicle_types.name');
 
         if (@$request->car_registration) {
             $results = $results->where('vehicles.car_registration', 'LIKE', '%' . $request->car_registration . '%');

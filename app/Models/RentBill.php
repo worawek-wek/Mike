@@ -36,7 +36,7 @@ class RentBill extends Model
     {
         return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id');
     }
-    public function getTotalPaidIncludingFineAttribute()
+    public function getTotalPaidIncludingFineAttribute()  // total_paid_including_fine
     {
         return $this->receipt->sum(function ($receipt) {
             $total = $receipt->payment_list->where('discount', 0)->sum('price');
@@ -50,6 +50,12 @@ class RentBill extends Model
             $total = $receipt->payment_list_not_fine->where('discount', 0)->sum('price');
             $discount = $receipt->payment_list_not_fine->where('discount', 1)->sum('price');
             return $total - $discount;
+        });
+    }
+    public function getTotalNotDiscountAmountAttribute()
+    {
+        return $this->receipt->sum(function ($receipt) {
+            return $receipt->payment_list->where('discount', 0)->sum('price');
         });
     }
     public function status()

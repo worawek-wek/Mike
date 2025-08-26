@@ -99,7 +99,7 @@
                                 @if ($key == 1)
                                     <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                         <span id="text_water_amount">
-                                            {{ $payment_list_item->price }}
+                                            {{ number_format($payment_list_item->price) }}
                                         </span>
                                 @else
                                     @if ($payment_list_item->discount == 1)

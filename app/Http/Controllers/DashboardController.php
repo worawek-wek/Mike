@@ -54,10 +54,12 @@ class DashboardController extends Controller
         $total = $summary['all_receipt_on_time'] + $summary['all_receipt_late_with_appointment'] + $summary['all_receipt_late'];
 
         if ($total > 0) {
+            $data['persen_overview'] = "100";
             $percent_on_time = ($summary['all_receipt_on_time'] / $total) * 100;
             $percent_late_with_appointment = ($summary['all_receipt_late_with_appointment'] / $total) * 100;
             $percent_late = ($summary['all_receipt_late'] / $total) * 100;
         } else {
+            $data['persen_overview'] = "0";
             $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
         }
         $data['percent_on_time'] = number_format($percent_on_time);

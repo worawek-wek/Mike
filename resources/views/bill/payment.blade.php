@@ -35,9 +35,9 @@
                     </span>
                     </button>
                 </li>
-                @if ($invoice->total_amount - $invoice->total_paid_amount > 0)
+                @if ($invoice->total_amount - $invoice->total_not_discount_amount > 0)
                     <li class="nav-item" role="presentation">
-                        <button type="button" class="btn btn-outline-info nav-link" 
+                        <button type="button" class="btn btn-outline-info nav-link"
                         role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
                         <span>
                             <i class="ti-md ti ti-report-money"></i>
@@ -85,7 +85,7 @@
                             @if ($payment_list_item->unit > 0)
                                 <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                     <span id="text_water_amount">
-                                        {{ $payment_list_item->price }}
+                                        {{ number_format($payment_list_item->price) }}
                                     </span>
                             @else
                                 @if ($payment_list_item->discount == 1)
@@ -293,7 +293,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @if ($invoice->fine_paid_at < date('Y-m-d') & $invoice->room_for_rent->room->fine_day > 0)
+                                                        @if ($fine_price > 0)
                                                         <input type="hidden" name="fine_paid_at" value="1">
                                                             <tr>
                                                                 <td style="display: flex; align-items: center;">
@@ -306,9 +306,10 @@
                                                                     วัน">
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    {{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$invoice->room_for_rent->room->fine_day }}
+                                                                    {{ number_format($fine_price) }}
                                                                     <input type="hidden" name="payment_list[price][]" class="calculate_2"
-                                                                    value="{{ date_diff(date_create(date('Y-m', strtotime($invoice->created_at)).'-'.str_pad($invoice->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$invoice->room_for_rent->room->fine_day }}">
+                                                                    value="{{ $fine_price }}">
+                                                                    <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 </td>
                                                             </tr>
                                                         @endif
@@ -317,7 +318,8 @@
                                                                     <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $invoice->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->total_paid_amount }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $invoice->total_not_discount_amount-$fine_price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                    <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 </td>
                                                             </tr>
                                                     </tbody>
@@ -367,6 +369,7 @@
                                                         <td class="text-end">
                                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                                 <input name="payment_list[price][]" type="number" class="form-control calculate_2 add_expenses2_price" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                                <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
                                                             </div>
                                                         </td>
@@ -387,6 +390,7 @@
                                                         <td class="text-end">
                                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                                 <input name="payment_list[price][]" type="number" class="form-control calculate_2 discount_price_2" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                                <input type="hidden" name="payment_list[discount][]" value="1">
                                                                 <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
                                                             </div>
                                                         </td>
@@ -514,7 +518,7 @@
                         
                                     <div class="col-sm-11 mt-2">
                                          @if (count($invoice->receipt) == 0)
-                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->total_paid_amount) }}</span> &nbsp;บาท</b>
+                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->total_amount - $invoice->total_not_discount_amount) }}</span> &nbsp;บาท</b>
                                         @endif
                                             <b id="totalsplit" 
                                                 @if (count($invoice->receipt) == 0)
@@ -573,7 +577,7 @@
                             togglePaymentFields();
                         </script>
 
-                        <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($invoice->total_amount - $invoice->total_paid_amount) }}</span> &nbsp;บาท
+                        <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($invoice->total_amount - $invoice->total_not_discount_amount ) }}</span> &nbsp;บาท
                         
                         
                         <div class="modal-footer d-flex justify-content-between rounded-0">

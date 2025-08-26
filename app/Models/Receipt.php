@@ -42,16 +42,12 @@ class Receipt extends Model
     }
     public function payment_list_fine()
     {
-        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 1)->where('document_type', 2);
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 5)->where('document_type', 2); // จริง ๆ ต้อง fine = 1
     }
     public function payment_list_not_fine()
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 0)->where('document_type', 2);
     }
-    // public function getTotalFineAmountAttribute()
-    // {
-    //     return $this->payment_list->where('fine', 1)->sum('price');
-    // }
     public function getTotalAmountAttribute()
     {
 
@@ -79,5 +75,9 @@ class Receipt extends Model
         $discount = $lists->where('discount', 1)->sum('price');
 
         return $total - $discount;
+    }
+    public function getTotalNotDiscountAmountAttribute()
+    {
+        return $this->payment_list->where('discount', 0)->sum('price');
     }
 }

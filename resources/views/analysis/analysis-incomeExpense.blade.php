@@ -40,7 +40,7 @@
                                                 วิเคราะห์รายรับ-รายจ่าย
                                             </h4>
                                         </div>
-                                        {{-- <div class="col-sm-3">
+                                        <div class="col-sm-3">
                                             <div class="input-group input-group-merge">
                                                 <span id="basic-icon-default-fullname2" class="input-group-text"><i
                                                         class="ti ti-calendar"></i></span>
@@ -48,11 +48,12 @@
                                                     placeholder="John Doe" aria-label="John Doe"
                                                     aria-describedby="basic-icon-default-fullname2">
                                             </div>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
                             <!-- รายได้แยกตามประเภทการชำระ -->
                             <div class="col-sm-12 d-flex align-items-stretch">
                                 <div class="card mb-3 w-100">
@@ -61,25 +62,20 @@
                                             <h5 class="mb-0">รายได้รวม</h5>
                                             <small class="text-muted"></small>
                                         </div>
-                                        {{-- <div class="input-group input-group-merge">
-                                                <span class="input-group-text" id="basic-addon-search31"><i
-                                                        class="ti ti-calendar-event"></i></span>
-                                                <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                            </div> --}}
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect2">ปี</label>
+                                                <label for="yearSelect">ปี</label>
                                             
-                                            <select id="yearSelect2" class="form-control"></select>
+                                            <select id="yearSelect" class="form-control"></select>
 
-                                            <script>
-                                                const yearSelect2 = document.getElementById("yearSelect2");
-                                                const currentYear2 = new Date().getFullYear();
+                                                <script>
+                                                const yearSelect = document.getElementById("yearSelect");
+                                                const currentYear = new Date().getFullYear();
 
-                                                for (let year = currentYear2; year >= 2020; year--) {
+                                                for (let year = currentYear; year >= 2020; year--) {
                                                     let option = new Option(year, year);
-                                                    yearSelect2.add(option);
+                                                    yearSelect.add(option);
                                                 }
-                                            </script>
+                                                </script>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -103,16 +99,16 @@
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <label for="yearSelect">ปี</label>
                                             
-                                            <select id="yearSelect4" class="form-control"></select>
+                                            <select id="yearSelect2" class="form-control"></select>
 
                                                 <script>
-                                                    const yearSelect4 = document.getElementById("yearSelect4");
-                                                    const currentYear4 = new Date().getFullYear();
+                                                const yearSelect2 = document.getElementById("yearSelect2");
+                                                const currentYear = new Date().getFullYear();
 
-                                                    for (let year = currentYear4; year >= 2020; year--) {
-                                                        let option2 = new Option(year, year);
-                                                        yearSelect4.add(option2);
-                                                    }
+                                                for (let year = currentYear; year >= 2020; year--) {
+                                                    let option2 = new Option(year, year);
+                                                    yearSelect2.add(option2);
+                                                }
                                                 </script>
                                         </div>
                                     </div>
@@ -122,29 +118,6 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="row">
-                            <div class="col-md-12 mb-4">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-0">รายได้และรายจ่ายรวม</h5>
-                                        </div>
-                                        <div style="display: flex;align-items: center;gap: 10px;">
-                                            <label for="year">ปี:</label>
-                                            <select onchange="onYearChange(this)" name="year" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default">
-                                                @for ($year = date('Y'); $year >= 2000; $year--)
-                                                    <option value="{{ $year }}">{{ $year }}</option>
-                                                @endfor
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="chart05"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div> --}}
                     </div>
                     <!-- / Content -->
 
@@ -167,6 +140,51 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
+        // config เริ่มต้น (ใส่ series เปล่าไปก่อน)
+        const chartOptions02 = {
+            chart: { type: 'bar', height: 380 },
+            plotOptions: { bar: { borderRadius: 8, columnWidth: '20px', startingShape: 'rounded' } },
+            dataLabels: { enabled: false },
+            colors: ['#FFDCA9'],
+            xaxis: { categories: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
+            yaxis: { title: { text: '฿ (บาท)', style: { fontSize: '12px', fontFamily: 'IBM plex sans thai', fontWeight: 600 } } },
+            tooltip: { y: { formatter: val => "฿ " + val } },
+            series: [{ data: [] }]
+        };
+
+        const chartOptions04 = {...chartOptions02, colors: ['#DBC4F0']};
+
+        // สร้าง chart instance
+        const chart02 = new ApexCharts(document.querySelector("#chart02"), chartOptions02);
+        chart02.render();
+
+        const chart04 = new ApexCharts(document.querySelector("#chart04"), chartOptions04);
+        chart04.render();
+
+        // ---- Ajax ดึงข้อมูล ----
+        $.ajax({
+            url: '{{$page_url}}/income', 
+            method: 'GET',
+            success: function(res) {
+                const data = res.seriesData; // array 12 ตัว
+                chart02.updateSeries([{ data: data }]);
+                chart04.updateSeries([{ data: data }]); // ตอนนี้ chart04 มี instance แล้ว
+            }
+        });
+
+        // chart แรก
+        // const chart02Options = JSON.parse(JSON.stringify(baseOptions));
+        // chart02Options.series = [{ data: [400, 100, 220, 260, 180, 110, 110, 110, 110, 110, 110, 110] }];
+        // chart02Options.colors = ['#FFDCA9'];
+        // new ApexCharts(document.querySelector("#chart02"), chart02Options).render();
+
+        // // chart สอง
+        // const chart04Options = JSON.parse(JSON.stringify(baseOptions));
+        // chart04Options.series = [{ data: [50, 70, 180, 200, 90, 60, 40, 120, 30, 70, 80, 150] }];
+        // chart04Options.colors = ['#DBC4F0'];
+        // new ApexCharts(document.querySelector("#chart04"), chart04Options).render();
+    </script>
+    {{-- <script>
     var options = {
         series: [72, 28],
         labels: ['โอนเงิน', 'เงินสด'],
@@ -304,11 +322,11 @@
 
     var chart = new ApexCharts(document.querySelector("#chart01"), options);
     chart.render();
-    </script>
-    <script>
+    </script> --}}
+    {{-- <script>
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110, 400, 100, 220, 260, 180, 110]
+            data: [400, 100, 220, 260, 180, 110, 110, 110, 110, 110, 110, 110]
         }],
         chart: {
             type: 'bar',
@@ -362,67 +380,14 @@
         }
     };
 
-        // ฟังก์ชันอัปเดตข้อมูลในกราฟแบบเร็ว
-        function renderChart(data) {
-            if (chart) {
-                chart.updateSeries([{ data: data }]); // ✅ อัปเดตข้อมูลกราฟ
-            }
-        }
-
-        // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
-        function loadData(pages){
-            $('.p_search').each(function() {
-                var inputName = $(this).attr('name');
-                var inputValue = $(this).val();
-                searchData[inputName] = inputValue;
-            });
-
-            $.ajax({
-                type: "GET",
-                url: pages,
-                data: searchData,
-                success: function(data) {
-                    renderChart(data); // อัปเดต chart ด้วยข้อมูลใหม่
-                }
-            });
-        }
-
-        // เมื่อเลือกปีจาก dropdown
-        function onYearChange(selectElement) {
-            const year = selectElement.value;
-
-            // อัปเดตหัวข้อรายปี
-            const titleElement = document.getElementById("income-summary-title");
-            titleElement.textContent = `สรุปรายรับค่าเช่ารายเดือน มกราคม/${year} - ธันวาคม/${year}`;
-
-            // โหลดข้อมูลใหม่
-            loadData("/dashboard/monthly-rent-income");
-        }
-
-        // ตัวแปร global
-        var searchData = {};
-        var page = "/dashboard/monthly-rent-income";
-
-        // เริ่มต้นเมื่อโหลดหน้า
-        document.addEventListener("DOMContentLoaded", function() {
-            initChart();     // 🔁 สร้างกราฟเปล่าไว้ก่อน
-            loadData(page);  // 📦 โหลดข้อมูลจริงผ่าน AJAX
-        });
-
     var chart = new ApexCharts(document.querySelector("#chart02"), options);
     chart.render();
-    </script>
-    <script>
+    </script> --}}
+    {{-- <script>
     var options = {
-        series: [100
-        // , 20, 20, 30
-    ],
-        labels: [''
-        // , 'Weather conditions', 'Federal Holidays', 'Damage during transit'
-    ],
-        colors: ['#28C76F'
-        // , '#56CA00', '#56CA0099', '#56CA0066'
-    ],
+        series: [30, 20, 20, 30],
+        labels: ['Incorrect address', 'Weather conditions', 'Federal Holidays', 'Damage during transit'],
+        colors: ['#28C76F', '#56CA00', '#56CA0099', '#56CA0066'],
         chart: {
             type: 'donut',
             height: '450px'
@@ -476,7 +441,7 @@
                             fontWeight: 600,
                             label: 'ภาพรวมรายได้',
                             formatter: function(w) {
-                                return '100%';
+                                return '72%';
                             }
                         }
                     }
@@ -556,11 +521,11 @@
 
     var chart = new ApexCharts(document.querySelector("#chart03"), options);
     chart.render();
-    </script>
-    <script>
+    </script> --}}
+    {{-- <script>
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110, 400, 100, 220, 260, 180, 110]
+            data: [400, 100, 220, 260, 180, 110, 110, 110, 110, 110, 110, 110]
         }],
         chart: {
             type: 'bar',
@@ -616,11 +581,11 @@
 
     var chart = new ApexCharts(document.querySelector("#chart04"), options);
     chart.render();
-    </script>
-    <script>
+    </script> --}}
+    {{-- <script>
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110, 40, 150, 180, 250, 320, 0]
+            data: [400, 100, 220, 260, 180, 110, 40, 150, 180, 250, 320, 100]
         }],
         chart: {
             type: 'bar',
@@ -678,7 +643,7 @@
 
     var chart = new ApexCharts(document.querySelector("#chart05"), options);
     chart.render();
-    </script>
+    </script> --}}
 </body>
 
 </html>

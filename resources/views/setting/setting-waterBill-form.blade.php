@@ -86,7 +86,7 @@
     <div class="mb-4 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">คิดตามจริง</label>
         <div class="col-8 col-md-8">
-            <input name="water_baht_per_unit" class="form-control" type="number" value="{{ @$water_bill->water_baht_per_unit }}" step="any" id="html5-text-input">
+            <input name="water_baht_per_unit" class="form-control" type="number" value="{{ number_format($water_bill->water_baht_per_unit ?? 0) }}" step="1" id="html5-text-input">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท/ยูนิต</label>
     </div>
@@ -95,14 +95,14 @@
     <div class="mb-2 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">คิดตามจริง</label>
         <div class="col-8 col-md-8">
-            <input name="water_baht_per_unit_2" class="form-control" type="number" id="html5-text-input" value="{{ @$water_bill->water_baht_per_unit }}">
+            <input name="water_baht_per_unit_2" class="form-control" type="number" id="html5-text-input" step="1" value="{{ number_format($water_bill->water_baht_per_unit ?? 0) }}">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท/ยูนิต</label>
     </div>
     <div class="mb-4 row gx-2">
         <label for="html5-text-input" class="col-md-2 col-form-label">ขั้นต่ำ</label>
         <div class="col-8 col-md-8">
-            <input name="minimum_water_bill" class="form-control" type="number" id="html5-text-input" value="{{ @$water_bill->minimum_water_bill }}">
+            <input name="minimum_water_bill" class="form-control" type="number" id="html5-text-input" step="1" value="{{ number_format($water_bill->minimum_water_bill ?? 0)}}">
         </div>
         <label for="html5-text-input" class="col-4 col-md-2 col-form-label">บาท</label>
     </div>

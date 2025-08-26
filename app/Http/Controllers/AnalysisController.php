@@ -72,8 +72,21 @@ class AnalysisController extends Controller
         $data['percent_late_with_appointment'] = number_format($percent_late_with_appointment);
         $data['percent_late'] = number_format($percent_late);
         $data['summary'] = $summary;
+        $data['page_url'] = "analysis/income-expense";
 
         return view('analysis/analysis-incomeExpense', $data);
+    }
+    public function income(Request $request)
+    {
+        $seriesData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            
+            $seriesData[] = rand(100, 999) ?? 0;
+        }
+
+        return response()->json([
+            'seriesData' => $seriesData
+        ]);
     }
     public function water(Request $request)
     {

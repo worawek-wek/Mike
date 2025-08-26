@@ -1098,7 +1098,7 @@
                         type: 'POST',
                         data: $(this).serialize(),
                         success: function(response) {
-                            if(response == true){
+                            if(response.message == null){
                                 
                                 var modalEl = document.getElementById('insertRenter');
                                 var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
@@ -1106,13 +1106,15 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insertRenter').modal('hide');
+                                $('#roomRentalReservation').modal('show');
+                                get_room_rental_reservation(response);
                                 $('#insert_renter')[0].reset();
                                 loadData(page);
                                 summary();
                                 // Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success');
                                 
                                 Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
-                                    location.reload();
+                                    // location.reload();
                                 });
                             }else{
                                 Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );

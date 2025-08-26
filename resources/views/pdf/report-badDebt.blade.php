@@ -1,3 +1,39 @@
+<style>
+    @media print {
+        body {
+            font-size: 10px;
+            margin: 10mm;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            font-size: 10px;
+            word-wrap: break-word;
+            border: 1px solid black;
+            padding: 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .text-truncate {
+            white-space: normal !important;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+    }
+       
+        .text-center {
+            text-align: center;
+        }
+    </style>
 <table class="datatables-products table dataTable no-footer dtr-column"
     id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
     <thead class="border-top">
@@ -5,28 +41,28 @@
             <th class="control  dtr-hidden" rowspan="1"
                 colspan="1" style="width: 0px; display: none;"
                 aria-label=""></th>
-            <th class="text-center" style="padding: 0 50px;">
+            <th class="text-center">
                 ห้อง
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 75px;">
                 ชื่อผู้เช่า
             </th>
-            <th class="text-center" style="width: 57px;">
+            <th class="text-center" style="width: 75px;">
                 เลขที่ใบเสร็จ
             </th>
-            <th class="text-center" style="width: 150px;">
+            <th class="text-center" style="width: 60px;">
                 วันที่รับชำระ
             </th>
-            <th class="text-nowrap text-center">
+            <th class="text-nowrap text-center" style="width: 35px;">
                 ช่องทาง
             </th>
-            <th class="text-nowrap text-center">
+            <th class="text-nowrap text-center" style="width: 65px;">
                 รับชำระโดย
             </th>
             {{-- <th class="text-center">
                 รวม
             </th> --}}
-            <th class="text-center" style="width: 100px;">
+            <th class="text-center" style="width: 35px;">
                 ค่าห้องเช่า
             </th>
             <th class="text-center">
@@ -63,7 +99,7 @@
                 <td><span class="text-truncate">{{ $row->renter_name }}</span>
                 </td>
                 <td><span>{{ $row->receipt_number }}</span></td>
-                <td style="padding: 0 22px;"><span>{{ date('d/m/Y', strtotime($row->payment_date)) }}</span></td>
+                <td><span>{{ date('d/m/Y', strtotime($row->payment_date)) }}</span></td>
                 <td><span>
                     @if ($row->payment_method == 1)
                         เงินสด
@@ -86,7 +122,7 @@
             @empty
 
                 <tr>
-                    <td colspan="20" class="text-center text-muted py-4">
+                    <td colspan="14" class="text-center text-muted py-4" style="padding-bottom:15px;">
                         <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
                         ไม่พบข้อมูล
                     </td>
@@ -95,4 +131,3 @@
             @endforelse
     </tbody>
 </table>
-    @include('layout/pagination')
