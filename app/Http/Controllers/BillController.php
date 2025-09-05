@@ -42,6 +42,11 @@ class BillController extends Controller
         //     $ru->total = $ru->total_amount;
         //     $ru->save();
         // }
+        // return Receipt::with('payment_list')->where('ref_status_id', 5)
+        //                                 ->whereHas('room.floor.building', function ($query) {
+        //                                     $query->where('ref_branch_id', session("branch_id"));
+        //                                 })
+        //                                 ->get();
         $invoice = RentBill::where('ref_status_id', '!=', 5)->where('ref_type_id', 1)->with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->get();
         foreach($invoice as $inv){
 
@@ -89,19 +94,25 @@ class BillController extends Controller
         $request['limit'] = 9999999;
         $request['re'] = 1;
         $request['ref_status_id'] = 2;
-        $data['list_data'] = Receipt::orderBy('rooms.name','ASC')
-                                ->whereHas('invoice', function ($q) {
-                                            $q->where('ref_status_id', '!=', 5);
+        // $data['list_data'] = RentBill::with('payment_list')
+        //                                 ->where('ref_status_id', '!=', 5)
+        //                                 ->whereHas('room.floor.building', function ($query) {
+        //                                     $query->where('ref_branch_id', session("branch_id"));
+        //                                 })
+        //                                 ->where('ref_type_id', 1)
+        //                                 ->get()
+        //                                 ->filter(function ($bill) {
+        //                                     return $bill->total_not_discount_amount >= $bill->total_amount;
+        //                                 });
+        $data['list_data'] = Receipt::with('payment_list')
+                                        ->where('ref_status_id', 2)
+                                        ->whereHas('room.floor.building', function ($query) {
+                                            $query->where('ref_branch_id', session("branch_id"));
                                         })
-                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                ->where('buildings.ref_branch_id', session("branch_id"))
-                                ->where('receipts.ref_type_id', 1)
-                                ->distinct('receipts.id')
-                                ->select('receipts.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent')
-                                ->paginate();
+                                        ->get()
+                                        ->filter(function ($bill) {
+                                            return $bill->total_amount;
+                                        });
 
         return view('bill/waiting-for-confirmation', $data);
     }
@@ -281,6 +292,7 @@ class BillController extends Controller
             $receipt->payment_date  =  $payment_date;
             $receipt->amount  =  $amount;
             $receipt->ref_type_id  =  $request->ref_type_id;
+            $receipt->ref_status_id  =  2;
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
 
@@ -299,9 +311,12 @@ class BillController extends Controller
             if($request->payment_format == 1){
                 // return $request->payment_sd_list['title'];
                 foreach($rent_bill->payment_list as $payment_list){
-
+                    $title = $payment_list->title;
+                    if (strpos($payment_list->title, 'Water rate') !== false){
+                        $title = $payment_list->title.number_format($payment_list->unit).' - '.($rent_bill->previous_water_unit).' = '.($payment_list->unit - ($rent_bill->previous_water_unit)).' ยูนิต)';
+                    }
                     $pay_list = new PaymentList;
-                    $pay_list->title  =  $payment_list->title;
+                    $pay_list->title  =  $title;
                     $pay_list->unit  =  $payment_list->unit;
                     $pay_list->price  =  $payment_list->price;
                     $pay_list->ref_payment_id  =  $receipt->id;
@@ -389,11 +404,11 @@ class BillController extends Controller
             $expenses->date  =  Carbon::now();
             $expenses->ref_room_id  =  $request->ref_room_id;
             $expenses->ref_category_id  =  0;
-            $expenses->name  =  $receipt->room->renter_name;
-            $expenses->address  =  $receipt->room->renter_address;
-            $expenses->id_card_number  =  $receipt->room->renter_id_card_number;
+            $expenses->name  =  $receipt->renter->fullName();
+            $expenses->address  =  $receipt->renter->fullThaiAddress();
+            $expenses->id_card_number  =  $receipt->renter->id_card_number;
             $expenses->branch  =  0;
-            $expenses->phone  =  $receipt->room->renter_phone;
+            $expenses->phone  =  $receipt->renter->phone;
             $expenses->remark  =  0;
             $expenses->ref_receipt_id  =  $receipt->id;
             $expenses->ref_user_id  =  Auth::id();
@@ -475,7 +490,10 @@ class BillController extends Controller
     }
     public function bill_summary()
     {
-        return $this->summary(session("branch_id"));
+        $summary = $this->summary(session("branch_id"));
+        $summary['cash_wait_for_confirm'] = number_format($summary['cash_wait_for_confirm']);
+        $summary['transfer'] = number_format($summary['transfer']);
+        return $summary;
     }
     public function change_status_bill(Request $request, $id)
     {
@@ -484,14 +502,15 @@ class BillController extends Controller
                 PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->delete();
             }
             if($id == 'all'){
+                Receipt::where('ref_status_id', 2)->update(['ref_status_id'=> 5]);
                 $bills = RentBill::with(['receipt.payment_list', 'payment_list'])
                                     ->where('ref_status_id', 2)
                                     ->get();
 
                 foreach ($bills as $bill) {
-                    if ($bill->total_paid_including_fine >= $bill->total_amount) {
+                    if ($bill->total_not_discount_amount >= $bill->total_amount) {
                         foreach ($bills as $bill) {
-                            if ($bill->total_paid_including_fine >= $bill->total_amount) {
+                            if ($bill->total_not_discount_amount >= $bill->total_amount) {
                                 $bill->ref_status_id = $request->status;
                                 $bill->save();
                             }

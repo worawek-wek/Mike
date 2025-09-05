@@ -1281,7 +1281,7 @@
                         data: $(this).serialize(),
                         success: function(response) {
                             if(response.success == true){
-                                $('#roomRentalContract').modal('hide');
+                                // $('#roomRentalContract').modal('hide');
                                 $('#insert_contract')[0].reset();
                                 loadData(page);
                                 summary();

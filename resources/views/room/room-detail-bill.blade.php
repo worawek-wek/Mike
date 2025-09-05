@@ -5,7 +5,7 @@
         <table class="table table-detail table-bordered">
             <thead>
                 <tr>
-                    <th width="50%" style="vertical-align: middle;font-weight: 500;">สถานะบิล</th>
+                    <th width="40%" style="vertical-align: middle;font-weight: 500;">สถานะบิล</th>
                     <th style="vertical-align: middle; font-weight: 500;">
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <i class="ti ti-checkbox text-success" style="font-size: 34px"></i>
@@ -55,9 +55,6 @@
                     <tr>
                         <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
                             {{ $item_payment_list->title }}
-                            @if($item_payment_list->unit > 0 && $key == 1)    
-                                {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
-                            @endif
                         </td>
 
                             @if ($item_payment_list->discount == 1)
@@ -89,10 +86,11 @@
             <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{$item_receipt->id}})"><span
                     class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
         </div>
-        @if ($key+1 < count($receipt))
+        @if(!$loop->last)
             <hr class="mb-4">
         @endif
-@endforeach      
+@endforeach    
+<div class="mb-3"></div>  
 <iframe id="print-iframe" style="display: none;"></iframe>                   
 <script>
     function printPdf(id) {

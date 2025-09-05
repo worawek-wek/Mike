@@ -90,11 +90,12 @@
                     </thead>
                     <tbody>
                         @foreach ($list_data as $key => $row_2)
-                            <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'detail')">
+                            {{-- <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'detail')"> --}}
+                            <tr class="odd">
                                 <td class="  dt-checkboxes-cell">
-                                    {{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}
-                                <td class="text-center">{{ $row_2->room_name }}</td>
-                                <td class="text-center"><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
+                                    {{ $key+1 }}
+                                <td class="text-center">{{ $row_2->room->name }}</td>
+                                <td class="text-center"><span class="text-truncate">{{ $row_2->renter->fullName() }}</span>
                                 </td>
                                 <td class="text-center">
                                     <span class="text-truncate">{{ number_format($row_2->total_amount) }}</span>

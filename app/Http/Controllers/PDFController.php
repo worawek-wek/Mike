@@ -64,6 +64,20 @@ class PDFController extends Controller
 
         return view('pdf/invoice', $data);
     }
+    public function overdue_invoice($room_id)
+    {
+        $data['setting_bill'] = Setting_bill::first();
+        $invoice = RentBill::where('ref_room_id', $room_id)->whereIn('ref_status_id', [2, 4, 7])->get();
+        $data['invoice'] = $invoice;
+        $data['branch'] = Branch::find(session("branch_id"));
+        $data['renter'] = Renter::find($invoice[0]->room_for_rent->ref_renter_id);
+        foreach($invoice as $inv){
+            $amount_thai[$inv->id] = $this->convertToThaiBaht($inv->total_amount);
+        }
+        $data['amount_thai'] = $amount_thai;
+
+        return view('pdf/invoice-overdue', $data);
+    }
     // พิมพ์หลายห้อง
     public function invoice_many($invoice_id)
     {

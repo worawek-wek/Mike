@@ -127,6 +127,8 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                 if ($row2->status != 0){
                     if($row2->status == 1 && $row2->rent_bill_status != 5){
                         $onclick = 'style="cursor: pointer" onclick="openReservation('.$row2->rent_bill_id.')"';
+                    }else if($row2->status == 1 && $row2->receipt_status_id != 5){
+
                     }else{
                         $onclick = 'style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view('.$row2->id.')"';
                     }
@@ -149,8 +151,10 @@ aria-labelledby="pills-profile-tab" tabindex="0">
             <td class="text-center"  {!! $onclick !!}>
                 @if($row2->status == 1 && $row2->rent_bill_status != 5)
                     <span class="badge bg-info" style="font-size: unset;" text-capitalized="">ห้องจอง<span class="text-danger">(ค้างชำระ)</span></span></td>
+                @elseif($row2->status == 1 && $row2->receipt_status_id != 5)
+                    <span class="badge bg-info" style="font-size: unset;" text-capitalized="">ห้องจอง<span class="text-warning">(รอคอนเฟิร์มบิล)</span></span></td>
                 @else
-                <span class="badge bg-{{ $status_room[$row2->status_name] }}" style="font-size: unset;" text-capitalized="">{{ $row2->status_name }}</span></td>
+                    <span class="badge bg-{{ $status_room[$row2->status_name] }}" style="font-size: unset;" text-capitalized="">{{ $row2->status_name }}</span></td>
                 @endif
         </tr>
         @endforeach

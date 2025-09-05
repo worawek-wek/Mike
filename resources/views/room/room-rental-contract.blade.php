@@ -46,6 +46,11 @@
             // if(count($item->rent_bill_not_pay) > 0){
             //     continue;
             // }
+            
+            $receipt = \App\Models\Receipt::where('ref_room_id', $item->ref_room_id)->where('ref_type_id', 3)->orderBy('id','DESC')->first();
+            if($receipt->ref_status_id != 5){
+               continue; 
+            }
             $contract = \App\Models\Renter::leftJoin('contracts', 'renters.id', '=', 'contracts.ref_renter_id')
                         ->leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                         ->where('room_for_rents.ref_room_id', $item->ref_room_id)
@@ -60,7 +65,7 @@
                         )
                         ->orderByDesc('contracts.created_at')
                         ->first();
-        $receipt = \App\Models\Receipt::where('ref_room_id', $item->ref_room_id)->where('ref_type_id', 3)->orderBy('id','DESC')->first();
+        $meter = \App\Models\Meter::where('ref_room_id', $item->ref_room_id)->orderBy('id','DESC')->first();
 
         @endphp
 
@@ -129,6 +134,15 @@
             <div class="col-sm-6">
                 <label for="receipt_no" class="form-label">อ้างอิงจากใบเสร็จค่าจองเลขที่</label>
                 <input type="text" name="contract[{{$key}}][receipt_no]" class="form-control" id="receipt_no" placeholder="" value="{{ @$receipt->receipt_number }}"/>
+            </div>
+            <div class="col-sm-6"></div>
+            <div class="col-sm-6">
+                <label for="water_meter_start_living" class="form-label">เลขมิเตอร์น้ำประปา(เข้าพัก)*</label>
+                <input type="text" name="contract[{{$key}}][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ $meter->water_unit }}"/>
+            </div>
+            <div class="col-sm-6">
+                <label for="electricity_meter_start_living" class="form-label">เลขมิเตอร์ค่าไฟ(เข้าพัก)*</label>
+                <input type="text" name="contract[{{$key}}][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ $meter->electricity_unit }}"/>
             </div>
 
         </div>

@@ -49,176 +49,22 @@
                             <div class="col-sm-12">
                                 <ul class="nav nav-pills mb-3 nav-fill" role="tablist" id="tabMeter">
                                     <li class="nav-item">
-                                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" onclick="remember_type('navs-pills-justified-tab1')"
                                             data-bs-target="#navs-pills-justified-tab1"
                                             aria-controls="navs-pills-justified-tab1" aria-selected="true">
                                             <i class="tf-icons ti ti-droplet me-1"></i> วิเคราะห์มิเตอร์น้ำของผู้เช่า
                                         </button>
                                     </li>
                                     <li class="nav-item">
-                                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" onclick="remember_type('navs-pills-justified-tab2')"
                                             data-bs-target="#navs-pills-justified-tab2"
                                             aria-controls="navs-pills-justified-tab2" aria-selected="false">
                                             <i class="tf-icons ti ti-plug me-1"></i> วิเคราะห์มิเตอร์ไฟฟ้าของผู้เช่า
                                         </button>
                                     </li>
                                 </ul>
-                                <div class="tab-content bg-transparent p-0">
-                                    <div class="tab-pane fade show active" id="navs-pills-justified-tab1"
-                                        role="tabpanel">
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <button type="button"
-                                                    class="btn rounded-pill btn-icon btn-outline-secondary waves-effect"><i
-                                                        class="tf-icons ti ti-chevron-left"></i></button>
-                                            </div>
-                                            <div class="col-sm-8 text-center">
-                                                <h5 class="mb-0">มิเติอร์น้ำชั้น1</h5>
-                                            </div>
-                                            <div class="col-sm-2 text-end">
-                                                <button type="button"
-                                                    class="btn rounded-pill btn-icon btn-outline-secondary waves-effect"><i
-                                                        class="tf-icons ti ti-chevron-right"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A101</h4>
-                                                        </div>
-                                                        {{-- <div class="input-group input-group-merge">
-                                                            <span class="input-group-text" id="basic-addon-search31"><i
-                                                                    class="ti ti-calendar-event"></i></span>
-                                                            <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                                        </div> --}}
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <label for="yearSelect">ปี</label>
-                                                        
-                                                        <select id="yearSelect" class="form-control"></select>
-
-                                                            <script>
-                                                            const yearSelect = document.getElementById("yearSelect");
-                                                            const currentYear = new Date().getFullYear();
-
-                                                            for (let year = currentYear; year >= 2020; year--) {
-                                                                let option = new Option(year, year);
-                                                                yearSelect.add(option);
-                                                            }
-                                                            </script>
-                                                    </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chart01"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A102</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chart02"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้องแม่บ้าน/รปภ</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chart03"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A103</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chart04"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="navs-pills-justified-tab2" role="tabpanel">
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <button type="button"
-                                                    class="btn rounded-pill btn-icon btn-outline-secondary waves-effect"><i
-                                                        class="tf-icons ti ti-chevron-left"></i></button>
-                                            </div>
-                                            <div class="col-sm-8 text-center">
-                                                <h5 class="mb-0">มิเติอร์ไฟฟ้าชั้น1</h5>
-                                            </div>
-                                            <div class="col-sm-2 text-end">
-                                                <button type="button"
-                                                    class="btn rounded-pill btn-icon btn-outline-secondary waves-effect"><i
-                                                        class="tf-icons ti ti-chevron-right"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A101</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chartE01"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A102</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chartE02"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้องแม่บ้าน/รปภ</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chartE03"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="card mb-3">
-                                                    <div class="card-header d-flex justify-content-between">
-                                                        <div class="card-title mb-0">
-                                                            <h4 class="mb-0">ห้อง A103</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div id="chartE04"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="tab-content bg-transparent p-0" id="data">
+                                    
                                 </div>
 
                             </div>
@@ -246,621 +92,697 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#00BAD1'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
+        // var options = {
+        //     series: [{
+        //         data: [] // เริ่มต้นว่าง รอ AJAX โหลด
+        //     }],
+        //     chart: {
+        //         height: 400,
+        //         type: 'line',
+        //         parentHeightOffset: 0,
+        //         zoom: { enabled: false },
+        //         toolbar: { show: false }
+        //     },
+        //     dataLabels: { enabled: false },
+        //     stroke: { curve: 'straight' },
+        //     colors: ['#00BAD1'],
+        //     grid: {
+        //         borderColor: '#ececed',
+        //         xaxis: { lines: { show: true } },
+        //         padding: { top: -20 }
+        //     },
+        //     xaxis: {
+        //         categories: [], // เริ่มต้นว่าง
+        //         axisBorder: { show: false },
+        //         axisTicks: { show: false },
+        //         labels: { style: { colors: '#444050', fontSize: '13px', fontFamily: 'IBM Plex sans thai, sans-serif' } }
+        //     },
+        //     yaxis: { labels: { style: { colors: '#444050', fontSize: '13px', fontFamily: 'IBM Plex sans thai, sans-serif' } } }
+        // };
+
+        // // ---- สร้าง instance ของกราฟ ----
+        // var chart = new ApexCharts(document.querySelector("#chart_line"), options);
+        // chart.render();
+
+        // ---- Ajax ดึงข้อมูล ----
+        // var page = "{{ $page_url }}/get-room-floor"; 
+        var searchData = {};
+        loadChartData(1);
+        var type = 'navs-pills-justified-tab1';
+        function remember_type(t) {
+            type = t;
         }
-    };
+        function loadChartData(floor) {
 
-    var chart = new ApexCharts(document.querySelector("#chart01"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#00BAD1'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
+            $.ajax({
+                method: 'GET',
+                url: "{{ $page_url }}/get-room-floor",
+                data: {
+                    ref_floor_id : floor
+                },
+                success: function(res) {
+                    $("#data").html(res);
+                    // เอาปุ่มตาม id ที่ตรงกับ type
+                    document.querySelectorAll('.tab-pane').forEach(function (pane) {
+                        pane.classList.remove('show', 'active');
+                    });
+
+                    // เซ็ต tab-pane ตาม id = type
+                    var targetPane = document.getElementById(type);
+                    if (targetPane) {
+                        targetPane.classList.add('show', 'active');
+                    }
+
+                    // ทำให้ปุ่ม nav-link ที่ชี้ไปยัง pane นั้น active ด้วย
+                    document.querySelectorAll('.nav-link').forEach(function (link) {
+                        link.classList.remove('active');
+                    });
+                    var activeBtn = document.querySelector('[data-bs-target="#' + type + '"]');
+                    if (activeBtn) {
+                        activeBtn.classList.add('active');
+                    }
                 }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
+            });
         }
-    };
 
-    var chart = new ApexCharts(document.querySelector("#chart02"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#00BAD1'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+        // function onFilterChange(selectElement) {
+        //     loadChartData("{{ $page_url }}/get-line-data");
+        // }
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#00BAD1'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    var chart = new ApexCharts(document.querySelector("#chart03"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#00BAD1'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+    // var chart = new ApexCharts(document.querySelector("#chart01"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#00BAD1'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    var chart = new ApexCharts(document.querySelector("#chart04"), options);
-    chart.render();
-    </script>
+    // var chart = new ApexCharts(document.querySelector("#chart02"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#00BAD1'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#FF4C51'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+    // var chart = new ApexCharts(document.querySelector("#chart03"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#00BAD1'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    var chart = new ApexCharts(document.querySelector("#chartE01"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#FF4C51'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+    // var chart = new ApexCharts(document.querySelector("#chart04"), options);
+    // chart.render();
+    // </script>
 
-    var chart = new ApexCharts(document.querySelector("#chartE02"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#FF4C51'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#FF4C51'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    var chart = new ApexCharts(document.querySelector("#chartE03"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-            data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
-        }],
-        chart: {
-            height: 400,
-            type: 'line',
-            parentHeightOffset: 0,
-            zoom: {
-                enabled: false
-            },
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'straight'
-        },
-        colors: ['#FF4C51'],
-        grid: {
-            borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            },
-            padding: {
-                top: -20
-            }
-        },
-        xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px',
-                    fontFamily: 'IBM Plex sans thai, sans-serif',
-                }
-            }
-        }
-    };
+    // var chart = new ApexCharts(document.querySelector("#chartE01"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#FF4C51'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
 
-    var chart = new ApexCharts(document.querySelector("#chartE04"), options);
-    chart.render();
+    // var chart = new ApexCharts(document.querySelector("#chartE02"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#FF4C51'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
+
+    // var chart = new ApexCharts(document.querySelector("#chartE03"), options);
+    // chart.render();
+    // </script>
+    // <script>
+    // var options = {
+    //     series: [{
+    //         data: [280, 200, 220, 180, 270, 250, 70, 90, 200, 150, 160, 100]
+    //     }],
+    //     chart: {
+    //         height: 400,
+    //         type: 'line',
+    //         parentHeightOffset: 0,
+    //         zoom: {
+    //             enabled: false
+    //         },
+    //         toolbar: {
+    //             show: false
+    //         }
+    //     },
+    //     dataLabels: {
+    //         enabled: false
+    //     },
+    //     stroke: {
+    //         curve: 'straight'
+    //     },
+    //     colors: ['#FF4C51'],
+    //     grid: {
+    //         borderColor: '#ececed',
+    //         xaxis: {
+    //             lines: {
+    //                 show: true
+    //             }
+    //         },
+    //         padding: {
+    //             top: -20
+    //         }
+    //     },
+    //     xaxis: {
+    //         categories: [
+    //             '1',
+    //             '2',
+    //             '3',
+    //             '4',
+    //             '5',
+    //             '6',
+    //             '7',
+    //             '8',
+    //             '9',
+    //             '10',
+    //             '11',
+    //             '12'
+    //         ],
+    //         axisBorder: {
+    //             show: false
+    //         },
+    //         axisTicks: {
+    //             show: false
+    //         },
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     },
+    //     yaxis: {
+    //         labels: {
+    //             style: {
+    //                 colors: '#444050',
+    //                 fontSize: '13px',
+    //                 fontFamily: 'IBM Plex sans thai, sans-serif',
+    //             }
+    //         }
+    //     }
+    // };
+
+    // var chart = new ApexCharts(document.querySelector("#chartE04"), options);
+    // chart.render();
     </script>
 
 </body>

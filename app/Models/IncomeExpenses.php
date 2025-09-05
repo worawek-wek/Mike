@@ -66,4 +66,13 @@ class IncomeExpenses extends Model
 
         return $total - $discount;
     }
+    public function getTotalFromPaymentListAttribute()
+{
+    $lists = $this->receipt_payment_list;
+
+    $total = $lists->where('discount', 0)->sum('price');
+    $discount = $lists->where('discount', 1)->sum('price');
+
+    return $total - $discount;
+}
 }

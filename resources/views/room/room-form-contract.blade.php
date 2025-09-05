@@ -43,8 +43,8 @@
                 <tr>
                     <td>ค่าเช่าห้อง (Room rate)</td>
                     <td class="text-end" width="18%">
-                        {{ number_format($room->rent) }}
-                        <input type="hidden" id="room-rent" value="{{ $room->rent }}">
+                        {{ number_format($room->rent+$room->furniture_rental+$room->air_rental) }}
+                        <input type="hidden" id="room-rent" value="{{ $room->rent+$room->furniture_rental+$room->air_rental }}">
                     </td>
                 </tr>
         

@@ -33,7 +33,7 @@
                 <tr>
                     <td>จำนวนเงิน</td>
                     @if ($income_expenses->type == 1)
-                        <td class="text-success">{{ $income_expenses->receipt->total_amount ?? $income_expenses->total_amount }} บาท</td>
+                        <td class="text-success">{{ number_format($income_expenses->receipt->total_amount ?? $income_expenses->total_amount) }} บาท</td>
                     @else
                         <td class="text-danger">- {{ $income_expenses->amount }} บาท</td>
                     @endif
@@ -52,9 +52,9 @@
             <div class="d-flex">
                 <div class="flex-grow-1 ms-3">
                 <b class="text-black">รายละเอียดหัวบิล</b> <br>
-                    {{ $income_expenses->name.' '.$income_expenses->address }} <br>
-                    เลขประจำตัวผู้เสียภาษี {{ $income_expenses->id_card_number }} <br>
-                    โทร {{ $income_expenses->phone }}
+                    {{ $income_expenses->receipt->renter->fullName().' '.$income_expenses->receipt->renter->fullThaiAddress() }} <br>
+                    เลขประจำตัวผู้เสียภาษี {{ $income_expenses->receipt->renter->id_card_number }} <br>
+                    โทร {{ $income_expenses->receipt->renter->phone }}
                 </div>
             </div>
         </div>

@@ -31,45 +31,113 @@
 
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="row ">
-                            <div class="col-sm-12">
-                                <div class="card card-body mb-3">
-                                    <div class="row g-3 justify-content-between">
-                                        <div class="col-sm-6">
-                                            <h4 class="mb-0">
-                                                <i class="tf-icons ti ti-circle-half-2 text-main ti-md"></i>
-                                                วิเคราะห์ค่าเช่ารายเดือน
-                                            </h4>
-                                        </div>
-                                        {{-- <div class="col-sm-3">
-                                            <div class="input-group input-group-merge">
-                                                <span id="basic-icon-default-fullname2" class="input-group-text"><i
-                                                        class="ti ti-calendar"></i></span>
-                                                <input type="date" class="form-control" id="basic-icon-default-fullname"
-                                                    placeholder="John Doe" aria-label="John Doe"
-                                                    aria-describedby="basic-icon-default-fullname2">
-                                            </div>
-                                        </div> --}}
+                            <div class="col-xl-4 mb-4 col-lg-5 col-12">
+                              <div class="card bg-light-danger">
+                                <div class="d-flex align-items-end row">
+                                  <div class="col-6" style="line-height: 2.2;">
+                                    <div class="card-body text-nowrap">
+                                      <h5 class="text-white card-title mb-0">มีห้องที่ค้างชำระ</h5>
+                                      <p class="text-white mb-2">จำนวน</p>
+                                      <h4 class="text-white mb-2">{{ $summary['overdueRoomCount'] }} ห้อง</h4>
+                                      @if ($summary['overdueRoomCount'] > 0)
+                                          <a href="dashboard/overdue" class="btn bg-label-warning text-black">รายละเอียด</a>
+                                      @endif
                                     </div>
+                                  </div>
+                                  <div class="col-5 text-center text-sm-left">
+                                        <img src="../../assets/img/illustrations/girl-with-laptop.png" width="100%">
+                                  </div>
                                 </div>
+                              </div>
+                            </div>
+                            <!-- View sales -->
+            
+                            <!-- Statistics -->
+                            <div class="col-xl-8 mb-4 col-lg-7 col-12">
+                              <div class="card h-100">
+                                <div class="card-header">
+                                  <div class="d-flex justify-content-between mb-3">
+                                    <h5 class="card-title mb-0">สถิติ</h5>
+                                    <small class="text-muted">Updated 1 month ago</small>
+                                  </div>
+                                </div>
+                                <div class="card-body" style="padding-top: 28px;">
+                                  <div class="row gy-3">
+                                    <div class="col-md-3 col-6">
+                                      <div class="d-flex align-items-center">
+                                        <div class="avatar flex-shrink-0 me-3" style="width: 2.8rem;height: 2.8rem;cursor: unset;">
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-chart-pie-2 ti-md"></i>
+                                            </span>
+                                        </div>
+                                        <div class="card-info">
+                                          <h5 class="mb-0">{{ $summary['percent'] }} %</h5>
+                                          <small>อัตราการเข้าพัก</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                      <div class="d-flex align-items-center">
+                                        <div class="avatar flex-shrink-0 me-3" style="width: 2.8rem;height: 2.8rem;cursor: unset;">
+                                            <span class="avatar-initial rounded bg-label-info">
+                                                <i class="ti ti-calendar-time ti-md"></i>
+                                            </span>
+                                        </div>
+                                        <div class="card-info">
+                                          <h5 class="mb-0">{{ $summary['all_booking_room'] }} ห้อง</h5>
+                                          <small>ห้องจอง</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                      <div class="d-flex align-items-center">
+                                        <div class="avatar flex-shrink-0 me-3"
+                                        @if ($summary['overdueRoomCount'] > 0)
+                                            style="width: 2.8rem;height: 2.8rem;"
+                                            onclick="location.href='/dashboard/overdue';"
+                                        @else
+                                            style="width: 2.8rem;height: 2.8rem;cursor: unset;"
+                                        @endif
+                                         >
+                                            <span class="avatar-initial rounded bg-label-danger">
+                                                <i class="ti ti-report-money ti-md"></i>
+                                            </span>
+                                        </div>
+                                        <div class="card-info">
+                                          <h5 class="mb-0">{{ $summary['overdueRoomCount'] }} ห้อง</h5>
+                                          <small>ค้างชำระ</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                      <div class="d-flex align-items-center">
+                                        <div class="avatar flex-shrink-0 me-3" style="width: 2.8rem;height: 2.8rem;cursor: unset;">
+                                            <span class="avatar-initial rounded bg-label-success">
+                                                <i class="ti ti-door ti-md"></i>
+                                            </span>
+                                        </div>
+                                        <div class="card-info">
+                                          <h5 class="mb-0">{{ $summary['vacant_room'] }} ห้อง</h5>
+                                          <small>ห้องว่าง</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                         </div>
                         <div class="row">
                             <!-- วิเคราะห์รายรับค่าเช่ารายเดือน -->
                             <div class="col-sm-8">
                                 <div class="card mb-3">
-                                    {{-- <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-0">วิเคราะห์รายรับค่าเช่ารายเดือน</h5>
-                                            <small class="text-muted">เดือนพฤษภาคม 2024</small>
-                                        </div>
-                                    </div> --}}
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
                                             <h5 class="mb-0">วิเคราะห์รายรับค่าเช่ารายเดือน</h5>
                                             <small class="text-muted">
                                                 @php
                                                     \Carbon\Carbon::setLocale('th');
-                                                    $thaiDate = \Carbon\Carbon::now()->subMonth()->translatedFormat('F Y');
+                                                    $thaiDate = \Carbon\Carbon::now()->translatedFormat('F Y');
                                                 @endphp
                                                 <h4>{{ $thaiDate }}</h4>
                                             </small>
@@ -85,10 +153,40 @@
                                                 <div
                                                     class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                     <div class="me-2">
-                                                        <h6 class="mb-0 fw">ผู้เช่าชำระค่าเช่าแล้ว</h6>
+                                                        <h6 class="mb-0 fw">ลูกค้าจ่ายตรงเวลา</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0">{{ $summary['all_receipt_last_month'] }} บาท</h6>
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_on_time']) }} บาท</h6>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex mb-3">
+                                                <div class="avatar flex-shrink-0 me-4">
+                                                    <span class="avatar-initial rounded bg-light-success" style="background-color: #ffb975 !important;"><i
+                                                            class="ti ti-building-bank ti-26px"></i></span>
+                                                </div>
+                                                <div
+                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                    <div class="me-2">
+                                                        <h6 class="mb-0 fw">จ่ายล่าช้าแบบนัดเวลา</h6>
+                                                    </div>
+                                                    <div class="user-progress">
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_late_with_appointment']) }} บาท</h6>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex mb-3">
+                                                <div class="avatar flex-shrink-0 me-4">
+                                                    <span class="avatar-initial rounded bg-light-danger"><i
+                                                            class="ti ti-building-bank ti-26px"></i></span>
+                                                </div>
+                                                <div
+                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                    <div class="me-2">
+                                                        <h6 class="mb-0 fw">จ่ายล่าช้าแบบไม่ได้นัดเวลา</h6>
+                                                    </div>
+                                                    <div class="user-progress">
+                                                        <h6 class="text-light-success mb-0">{{ number_format($summary['all_receipt_late']) }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>
@@ -100,7 +198,7 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <h5>ผู้เช่าค้างชำระค่าเช่า</h5>
-                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] }} บาท</h6>
+                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ $summary['overdue_this_month'] < 0 ? 0 : $summary['overdue_this_month'] }} บาท</h6>
                                         </div>
                                         <div class="card card-body bg-light-primary border-0 shadow-none py-5">
                                             <h2 class="text-center fw-semibold mb-0 text-white"><span

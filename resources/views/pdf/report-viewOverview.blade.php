@@ -71,12 +71,12 @@
                 <td class="  control" tabindex="0" style="display: none;">
                 </td>
                 <td class="sorting_1">{{ $row->room_name }}</td>
-                <td><span class="text-truncate">{{ number_format($row->rent) }}</span>
+                <td><span class="text-truncate">{{ number_format($row->invoice->payment_rent_room->price) }}</span>
                 </td>
                 <td><span>{{ number_format($row->water_amount) }}</span></td>
                 <td><span>{{ number_format($row->electricity_amount) }}</span></td>
-                <td><span>0</span></td>
-                <td><span>0</span></td>
+                <td><span>{{ number_format($row->invoice->payment_car_parking_fee->price ?? 0) }}</span></td>
+                <td><span>{{ number_format($row->invoice->payment_motorcycle_parking_fee->price ?? 0) }}</span></td>
                 <td><span>0</span></td>
                 <td><span>0</span></td>
                 <td><span>0</span></td>

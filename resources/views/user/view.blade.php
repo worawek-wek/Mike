@@ -162,7 +162,7 @@
                                     <textarea name="remark" class="form-control"></textarea>
                                 </div>
                             </div>
-                            <div class="col-sm-12 text-start">
+                            {{-- <div class="col-sm-12 text-start">
                                 <h5 class="border-bottom pb-3 text-warning">
                                     <i class="ti ti-pencil"></i> Permission
                                 </h5>
@@ -280,7 +280,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="modal-footer rounded-0 justify-content-center">
                                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
                                 <button type="submit" class="btn btn-main">บันทึก</button>

@@ -74,12 +74,7 @@
                         <tr>
                             {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
                             <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
-
-                                {{ $payment_list_item->title }}
-
-                            @if (strpos($payment_list_item->title, 'Water rate') !== false)
-                                {{ number_format($payment_list_item->unit) }} = {{ $payment_list_item->unit-$meterPrevious->water_unit }} ยูนิต)
-                            @endif
+                                {{ $payment_list_item->title }}@if (strpos($payment_list_item->title, 'Water rate') !== false){{ number_format($payment_list_item->unit) }}&nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }} = {{ $payment_list_item->unit-$invoice->previous_water_unit }} ยูนิต)@endif
                             </td>
                             <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
                             @if ($payment_list_item->unit > 0)
@@ -179,9 +174,6 @@
                                         <tr>
                                             <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
                                                 {{ $item_payment_list->title }}
-                                                @if($item_payment_list->unit > 0 && $key == 1)    
-                                                    {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - $meterPrevious->unit }} ยูนิต)
-                                                @endif
                                             </td>
 
                                                 @if ($item_payment_list->discount == 1)

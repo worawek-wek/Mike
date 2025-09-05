@@ -122,124 +122,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-8 d-flex align-items-stretch">
-                                <div class="card mb-3 w-100">
-                                    <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-0">อายุ</h5>
-                                            <small class="text-muted"></small>
-                                        </div>
-
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">ไม่ระบุ</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 25%;background-color:#FF7878" aria-valuenow="25"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">25%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">30-34 ปี</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 30%;background-color:#C6D57E" aria-valuenow="30"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">30%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">25-29 ปี</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 50%;background-color:#CAB8FF" aria-valuenow="50"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">50%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">10-24 ปี</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 10%;background-color:#F6AE99" aria-valuenow="10"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">10%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">35-39 ปี</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 15%;background-color:#FFC4E1" aria-valuenow="15"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">15%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">40-49 ปี</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 15%;background-color:#B5EAEA" aria-valuenow="15"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">15%</p>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center mb-3">
-                                            <div class="col-sm-2">
-                                                <h6 class="mb-0">50 ปีขึ้นไป</h6>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="progress" style="height: 8px">
-                                                    <div class="progress-bar" role="progressbar"
-                                                        style="width: 5%;background-color:#F1CA89" aria-valuenow="5"
-                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <p class="mb-0 text-muted">5%</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                     <!-- / Content -->
@@ -264,83 +147,79 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
-    var options = {
-        series: [{
-                name: "ผู้เช่าเข้า",
-                data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10]
-            },
-            {
-                name: "ผู้เช่าออก",
-                data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35]
-            },
-        ],
-        chart: {
-            height: 350,
-            type: 'line',
-            zoom: {
-                enabled: false
-            },
-        },
-        dataLabels: {
-            enabled: false
-        },
-        colors: ['#BCE29E', '#FFB3B3'],
-        stroke: {
-            width: [2, 2],
-            curve: 'smooth'
-        },
-        legend: {
-            tooltipHoverFormatter: function(val, opts) {
-                return val + ' - <strong>' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] +
-                    '</strong>'
-            }
-        },
-        markers: {
-            size: 0,
-            hover: {
-                sizeOffset: 6
-            }
-        },
-        xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9',
-                '10', '11', '12'
+        var options = {
+            series: [{
+                    name: "ผู้เช่าเข้า",
+                    data: []
+                },
+                {
+                    name: "ผู้เช่าออก",
+                    data: []
+                },
             ],
-        },
-        tooltip: {
-            y: [{
-                    title: {
-                        formatter: function(val) {
-                            return val + " (mins)"
-                        }
-                    }
-                },
-                {
-                    title: {
-                        formatter: function(val) {
-                            return val + " per session"
-                        }
-                    }
-                },
-                {
-                    title: {
-                        formatter: function(val) {
-                            return val;
-                        }
-                    }
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: { enabled: false }
+            },
+            dataLabels: { enabled: false },
+            colors: ['#BCE29E', '#FFB3B3'],
+            stroke: {
+                width: [2, 2],
+                curve: 'smooth'
+            },
+            legend: {
+                tooltipHoverFormatter: function(val, opts) {
+                    return val + ' - <strong>' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + '</strong>';
                 }
-            ]
-        },
-        grid: {
-            borderColor: '#f1f1f1',
-        }
-    };
+            },
+            markers: { size: 0, hover: { sizeOffset: 6 } },
+            xaxis: {
+                categories: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            },
+            tooltip: {
+                y: [
+                    { title: { formatter: function(val) { return val + " (mins)" } } },
+                    { title: { formatter: function(val) { return val + " per session" } } },
+                    { title: { formatter: function(val) { return val } } }
+                ]
+            },
+            grid: { borderColor: '#f1f1f1' }
+        };
 
-    var chart = new ApexCharts(document.querySelector("#chart01"), options);
-    chart.render();
+        var chart1 = new ApexCharts(document.querySelector("#chart01"), options);
+        chart1.render();
+        
+        var searchData = {};
+        var page = "{{$page_url}}/move-in-out";
+
+        loadData(page);  // โหลดข้อมูลจริงผ่าน AJAX
+
+        function loadData(pages){
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(res) {
+                    chart1.updateSeries([
+                                { name: "ผู้เช่าเข้า", data: res.rentIn },
+                                { name: "ผู้เช่าออก", data: res.rentOut }
+                            ]);
+
+                    }
+            });
+        }
+
     </script>
     <script>
     var options = {
-        series: [60, 28, 12],
+        series: [{{$percent_all_receipt_men}}, {{$percent_all_receipt_men}}, {{$percent_all_receipt_not_specified}}],
         labels: ['หญิง', 'ชาย', 'ไม่ระบุ'],
         colors: ['#FFB3B3', '#8CC0DE', '#F1F0F2'],
         chart: {
@@ -466,6 +345,7 @@
 
     var chart = new ApexCharts(document.querySelector("#chart02"), options);
     chart.render();
+
     </script>
 
 

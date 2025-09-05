@@ -40,7 +40,7 @@
                                                 วิเคราะห์รายรับ-รายจ่าย
                                             </h4>
                                         </div>
-                                        <div class="col-sm-3">
+                                        {{-- <div class="col-sm-3">
                                             <div class="input-group input-group-merge">
                                                 <span id="basic-icon-default-fullname2" class="input-group-text"><i
                                                         class="ti ti-calendar"></i></span>
@@ -48,7 +48,7 @@
                                                     placeholder="John Doe" aria-label="John Doe"
                                                     aria-describedby="basic-icon-default-fullname2">
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -62,20 +62,13 @@
                                             <h5 class="mb-0">รายได้รวม</h5>
                                             <small class="text-muted"></small>
                                         </div>
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect">ปี</label>
-                                            
-                                            <select id="yearSelect" class="form-control"></select>
-
-                                                <script>
-                                                const yearSelect = document.getElementById("yearSelect");
-                                                const currentYear = new Date().getFullYear();
-
-                                                for (let year = currentYear; year >= 2020; year--) {
-                                                    let option = new Option(year, year);
-                                                    yearSelect.add(option);
-                                                }
-                                                </script>
+                                        <div style="display: flex;align-items: center;gap: 10px;">
+                                            <label for="year">ปี:</label>
+                                            <select onchange="income_OnYearChange(this)" name="year" id="selectpickerFloor" class="select2 form-select form-select-lg p_search" data-style="btn-default">
+                                                @for ($year = date('Y'); $year >= 2000; $year--)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -91,25 +84,13 @@
                                             <h5 class="mb-0">รายจ่ายรวม</h5>
                                             <small class="text-muted"></small>
                                         </div>
-                                        {{-- <div class="input-group input-group-merge">
-                                                <span class="input-group-text" id="basic-addon-search31"><i
-                                                        class="ti ti-calendar-event"></i></span>
-                                                <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                            </div> --}}
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                <label for="yearSelect">ปี</label>
-                                            
-                                            <select id="yearSelect2" class="form-control"></select>
-
-                                                <script>
-                                                const yearSelect2 = document.getElementById("yearSelect2");
-                                                const currentYear = new Date().getFullYear();
-
-                                                for (let year = currentYear; year >= 2020; year--) {
-                                                    let option2 = new Option(year, year);
-                                                    yearSelect2.add(option2);
-                                                }
-                                                </script>
+                                        <div style="display: flex;align-items: center;gap: 10px;">
+                                            <label for="year">ปี:</label>
+                                            <select onchange="expenseOnYearChange(this)" name="year" id="selectpickerExpense" class="select2 form-select form-select-lg p_search" data-style="btn-default">
+                                                @for ($year = date('Y'); $year >= 2000; $year--)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -162,27 +143,66 @@
         chart04.render();
 
         // ---- Ajax ดึงข้อมูล ----
-        $.ajax({
-            url: '{{$page_url}}/income', 
-            method: 'GET',
-            success: function(res) {
-                const data = res.seriesData; // array 12 ตัว
-                chart02.updateSeries([{ data: data }]);
-                chart04.updateSeries([{ data: data }]); // ตอนนี้ chart04 มี instance แล้ว
-            }
-        });
+        var page = "{{$page_url}}/get-income";
+        var searchData = {};
+        income_loadData(page);  // 📦 โหลดข้อมูลจริงผ่าน AJAX
 
-        // chart แรก
-        // const chart02Options = JSON.parse(JSON.stringify(baseOptions));
-        // chart02Options.series = [{ data: [400, 100, 220, 260, 180, 110, 110, 110, 110, 110, 110, 110] }];
-        // chart02Options.colors = ['#FFDCA9'];
-        // new ApexCharts(document.querySelector("#chart02"), chart02Options).render();
+        // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+        function income_loadData(pages){
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
 
-        // // chart สอง
-        // const chart04Options = JSON.parse(JSON.stringify(baseOptions));
-        // chart04Options.series = [{ data: [50, 70, 180, 200, 90, 60, 40, 120, 30, 70, 80, 150] }];
-        // chart04Options.colors = ['#DBC4F0'];
-        // new ApexCharts(document.querySelector("#chart04"), chart04Options).render();
+            $.ajax({
+                method: 'GET',
+                url: pages,
+                data: searchData,
+                success: function(res) {
+                    chart02.updateSeries([{ data: res }]);
+                    // chart04.updateSeries([{ data: data }]); // ตอนนี้ chart04 มี instance แล้ว
+                }
+            });
+        }
+
+        // เมื่อเลือกปีจาก dropdown
+        function income_OnYearChange(selectElement) {
+            const year = selectElement.value;
+            // โหลดข้อมูลใหม่
+            income_loadData("{{ $page_url }}/get-income");
+        }
+        
+        var page = "{{$page_url}}/get-expense";
+        var searchData = {};
+        expense_loadData(page);  // 📦 โหลดข้อมูลจริงผ่าน AJAX
+
+        // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+        function expense_loadData(pages){
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            $.ajax({
+                method: 'GET',
+                url: pages,
+                data: searchData,
+                success: function(res) {
+                    chart04.updateSeries([{ data: res }]);
+                    // chart04.updateSeries([{ data: data }]); // ตอนนี้ chart04 มี instance แล้ว
+                }
+            });
+        }
+
+        // เมื่อเลือกปีจาก dropdown
+        function expenseOnYearChange(selectElement) {
+            const year = selectElement.value;
+            // โหลดข้อมูลใหม่
+            expense_loadData("{{ $page_url }}/get-expense");
+        }
+
     </script>
     {{-- <script>
     var options = {

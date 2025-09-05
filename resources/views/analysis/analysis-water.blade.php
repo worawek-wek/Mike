@@ -40,41 +40,39 @@
                                                 วิเคราะห์ค่าน้ำ
                                             </h4>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-2 text-end">
                                             <div class="input-group input-group-merge">
                                                 <span id="basic-icon-default-fullname2" class="input-group-text"><i
                                                         class="ti ti-calendar"></i></span>
-                                                <input type="date" class="form-control" id="basic-icon-default-fullname"
-                                                    placeholder="John Doe" aria-label="John Doe"
-                                                    aria-describedby="basic-icon-default-fullname2">
+                                                <select onchange="onYearChange()" name="year" class="form-select form-select-lg p_search" data-style="btn-default">
+                                                    @for ($year = date('Y'); $year >= 2010; $year--)
+                                                        <option value="{{ $year }}">{{ $year }}</option>
+                                                    @endfor
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <form>
+                                    <form id="insert_water_bill" enctype="multipart/form-data">
                                         <div class="row g-3">
                                             <div class="col-sm-6">
-                                                <label for="exampleFormControlInput1"
-                                                    class="form-label">จำนวนการใช้น้ำทั้งหมด (หน่วย)</label>
-                                                <input type="text" class="form-control" id="exampleFormControlInput1"
-                                                    placeholder="0">
+                                                <label for="use_unit"
+                                                    class="form-label">จำนวนการใช้น้ำทั้งหมด (หน่วย)</label> <span class="text-danger">*</span>
+                                                    <input type="text" name="use_unit" class="form-control" id="use_unit" placeholder="0" required>
                                             </div>
                                             <div class="col-sm-6">
-                                                <label for="exampleFormControlInput1" class="form-label">รายจ่ายการน้ำ
-                                                    (บาท)</label>
-                                                <input type="text" class="form-control" id="exampleFormControlInput1"
-                                                    placeholder="0">
+                                                <label for="amount" class="form-label">รายจ่ายการประปา
+                                                    (บาท)</label> <span class="text-danger">*</span>
+                                                    <input type="text" name="amount" class="form-control" id="amount" placeholder="0" required>
                                             </div>
                                             <div class="col-sm-6">
-                                                <label for="exampleFormControlInput1"
-                                                    class="form-label">วันที่จ่าย</label>
-                                                <input type="date" class="form-control" id="exampleFormControlInput1"
-                                                    placeholder="0">
+                                                <label for="payment_date"
+                                                    class="form-label">วันที่จ่าย</label> <span class="text-danger">*</span>
+                                                    <input type="text" name="payment_date" class="form-control datepicker" id="payment_date" placeholder="dd/mm/yyyy" autocomplete="off" required>
                                             </div>
                                             <div class="col-sm-6">
-                                                <label for="exampleFormControlInput1"
-                                                    class="form-label">ใบเสร็จการประปา</label>
-                                                <input type="file" class="form-control" id="exampleFormControlInput1"
-                                                    placeholder="0">
+                                                <label for="slip"
+                                                    class="form-label">ใบเสร็จการประปา</label> <span class="text-danger">*</span>
+                                                    <input type="file" name="slip" class="form-control" id="slip" placeholder="0" required>
                                             </div>
                                             <div class="col-sm-12 text-center">
                                                 <button type="submit" class="btn btn-main">บันทึก</button>
@@ -137,7 +135,7 @@
                                                                         </h6>
                                                                     </div>
                                                                     <div class="user-progress">
-                                                                        <h6 class="text-light-danger mb-0">5,401 บาท
+                                                                        <h6 class="text-light-danger mb-0 total_income">
                                                                         </h6>
                                                                     </div>
                                                                 </div>
@@ -154,7 +152,7 @@
                                                                         <h6 class="mb-0 fw-normal">รายจ่ายการประปา</h6>
                                                                     </div>
                                                                     <div class="user-progress">
-                                                                        <h6 class="text-light-success mb-0">17,871 บาท
+                                                                        <h6 class="text-light-success mb-0 total_expense">
                                                                         </h6>
                                                                     </div>
                                                                 </div>
@@ -172,7 +170,7 @@
                                                                             ค่าน้ำประปา</h6>
                                                                     </div>
                                                                     <div class="user-progress">
-                                                                        <h6 class="text-warning mb-0">17,871 บาท
+                                                                        <h6 class="text-warning mb-0 total_income-total_expense">
                                                                         </h6>
                                                                     </div>
                                                                 </div>
@@ -186,26 +184,7 @@
                                                     <div class="card-header d-flex justify-content-between">
                                                         <div class="card-title mb-0">
                                                             <h5 class="mb-0">กำไร/ขาดทุนของค่าน้ำ (บาท)</h5>
-                                                        </div>{{-- <div class="input-group input-group-merge">
-                                                            <span class="input-group-text" id="basic-addon-search31"><i
-                                                                    class="ti ti-calendar-event"></i></span>
-                                                            <input type="text" id="bs-rangepicker-basic" class="form-control">
-                                                        </div> --}}
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <label for="yearSelect">ปี</label>
-                                                        
-                                                        <select id="yearSelect" class="form-control"></select>
-            
-                                                            <script>
-                                                            const yearSelect = document.getElementById("yearSelect");
-                                                            const currentYear = new Date().getFullYear();
-            
-                                                            for (let year = currentYear; year >= 2020; year--) {
-                                                                let option = new Option(year, year);
-                                                                yearSelect.add(option);
-                                                            }
-                                                            </script>
-                                                    </div>
+                                                        </div>
                                                     </div>
                                                     <div class="card-body">
                                                         <div id="chart02"></div>
@@ -400,22 +379,108 @@
     </div>
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
-    <script>
-    var options = {
-        series: [28, 42],
+<script>
+    var pageIncomeExpense = "{{ $page_url }}/calculate-income-expense";
+    function calculate_income_expense(pages){
+        var searchDataIncomeExpense = {};
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchDataIncomeExpense[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: pages,
+            data: searchDataIncomeExpense,
+            success: function(res) {
+                // ✅ res ต้อง return array เช่น [120, 300]
+                $('.total_income').html(res.total_income);
+                $('.total_expense').html(res.total_expense);
+                $('.total_income-total_expense').html(res.total_income_total_expense);
+            }
+        });
+
+    }
+    $('.datepicker').datepicker({
+                        format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                        autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                        todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                    });
+    $('#insert_water_bill').on('submit', function(event) {
+        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+        if (!this.checkValidity()) {
+            this.reportValidity();
+            return console.log('ฟอร์มไม่ถูกต้อง');
+        }
+
+        Swal.fire({
+            title: 'ยืนยันการดำเนินการ?',
+            text: 'คุณต้องการ เพิ่มข้อมูล หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก',
+            showDenyButton: false,
+            didOpen: () => {
+                Swal.getConfirmButton().focus();
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ใช้ FormData แทน serialize เพื่อส่งไฟล์ได้
+                let form = document.getElementById('insert_water_bill');
+                let formData = new FormData(form);
+                formData.append('_token', '{{ csrf_token() }}'); // สำหรับ Laravel CSRF
+
+                $.ajax({
+                    url: '{{$page_url}}/insert-water-bill',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false, // ต้องมีเพื่อให้ส่ง multipart/form-data ได้
+                    processData: false,
+                    success: function(response) {
+                        // return 1;
+                        if (response == true) {
+                            Swal.fire('เพิ่มข้อมูล เรียบร้อยแล้ว', '', 'success');
+                            onYearChange();
+                            $('#insert_water_bill')[0].reset();
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            let messages = '';
+                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                messages += value + '<br>';
+                            });
+
+                            Swal.fire({
+                                title: 'เกิดข้อผิดพลาด',
+                                html: messages,
+                                icon: 'error',
+                            });
+                        } else {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', xhr);
+                        }
+                    }
+                });
+            }
+        });
+    });
+    
+
+    var optionsWater = {
+        series: [], // เริ่มต้นว่าง รอ AJAX โหลด
         labels: ['การใช้น้ำประปาของผู้เช่า', 'การใช้น้ำประปาทั้งหมด'],
         colors: ['#28C76F', '#56CA0099'],
         chart: {
             type: 'donut',
             height: '450px'
         },
-        stroke: {
-            show: false,
-            curve: 'straight'
-        },
+        stroke: { show: false },
         dataLabels: {
             enabled: true,
-            formatter: function(val, opt) {
+            formatter: function(val) {
                 return parseInt(val, 10) + '%';
             }
         },
@@ -423,28 +488,17 @@
             show: true,
             position: 'bottom',
             fontFamily: 'IBM Plex Sans Thai',
-            markers: {
-                offsetX: -3
-            },
-            itemMargin: {
-                vertical: 3,
-                horizontal: 10
-            },
-            labels: {
-                useSeriesColors: false,
-            }
+            itemMargin: { vertical: 3, horizontal: 10 },
+            labels: { useSeriesColors: false }
         },
         plotOptions: {
             pie: {
                 donut: {
                     labels: {
                         show: true,
-                        name: {
-                            fontSize: '2rem',
-                            fontFamily: 'IBM Plex Sans Thai'
-                        },
+                        name: { fontSize: '1.2rem', fontFamily: 'IBM Plex Sans Thai' },
                         value: {
-                            fontSize: '1.2rem',
+                            fontSize: '1rem',
                             fontFamily: 'IBM Plex Sans Thai',
                             formatter: function(val) {
                                 return parseInt(val, 10) + '%';
@@ -456,93 +510,57 @@
                             fontFamily: 'IBM Plex Sans Thai',
                             color: '#2F2B3D',
                             fontWeight: 600,
-                            // label: 'AVG. Exceptions',
                             formatter: function(w) {
-                                return '30%';
+                                // สมมุติ series = [ใช้จริง, ใช้ทั้งหมด]
+                                let tenant = w.globals.series[0];   // การใช้น้ำประปาของผู้เช่า
+                                let total  = w.globals.series[1];   // การใช้น้ำประปาทั้งหมด
+
+                                if (total === 0) return "0%";
+
+                                // คำนวณเปอร์เซ็นต์
+                                let percent = (tenant / total * 100).toFixed(2);
+                                // return percent + " %";
+                                return "100%";
                             }
                         }
                     }
                 }
             }
-        },
-        responsive: [{
-                breakpoint: 992,
-                options: {
-                    chart: {
-                        height: 380
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            useSeriesColors: false
-                        }
-                    }
-                }
-            },
-            {
-                breakpoint: 576,
-                options: {
-                    chart: {
-                        height: 320
-                    },
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                labels: {
-                                    show: true,
-                                    name: {
-                                        fontSize: '1.5rem'
-                                    },
-                                    value: {
-                                        fontSize: '1rem'
-                                    },
-                                    total: {
-                                        fontSize: '1.5rem'
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            useSeriesColors: false
-                        }
-                    }
-                }
-            },
-            {
-                breakpoint: 420,
-                options: {
-                    chart: {
-                        height: 280
-                    },
-                    legend: {
-                        show: false
-                    }
-                }
-            },
-            {
-                breakpoint: 360,
-                options: {
-                    chart: {
-                        height: 250
-                    },
-                    legend: {
-                        show: false
-                    }
-                }
-            }
-        ]
+        }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart01"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
+    var chartWater = new ApexCharts(document.querySelector("#chart01"), optionsWater);
+    chartWater.render();
+
+    // ---- Ajax ดึงข้อมูล ----
+    var pageWater = "{{ $page_url }}/calculate-water-usage";
+    var searchDataWater = {};
+
+    // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+    function water_loadData(pages){
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchDataWater[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: pages,
+            data: searchDataWater,
+            success: function(res) {
+                // ✅ res ต้อง return array เช่น [120, 300]
+                chartWater.updateSeries(res);
+            }
+        });
+    }
+
+</script>
+<script>
+    
+    var options02 = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110]
+            data: [] // เริ่มต้นว่าง รอ AJAX โหลด
         }],
         chart: {
             type: 'bar',
@@ -563,16 +581,12 @@
         grid: {
             borderColor: '#ececed',
             xaxis: {
-                lines: {
-                    show: true
-                }
+                lines: { show: true }
             },
-            padding: {
-                top: -20
-            }
+            padding: { top: -20 }
         },
         xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6'],
+            categories: ['1','2','3','4','5','6','7','8','9','10','11','12'],
         },
         yaxis: {
             title: {
@@ -590,19 +604,42 @@
         tooltip: {
             y: {
                 formatter: function(val) {
-                    return "฿ " + val
+                    return "฿ " + Math.floor(val).toLocaleString();
                 }
             }
         }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart02"), options);
-    chart.render();
-    </script>
-    <script>
+    // ---- สร้าง instance ของกราฟ ----
+    var chart02 = new ApexCharts(document.querySelector("#chart02"), options02);
+    chart02.render();
+
+    // ---- Ajax ดึงข้อมูล ----
+    var page = "{{ $page_url }}/calculate-water-profit-loss";
+    var searchData = {};
+
+    // ฟังก์ชันดึงข้อมูลจาก server (ผ่าน AJAX)
+    function income_loadData(pages){
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchData[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: pages,
+            data: searchData,
+            success: function(res) {
+                chart02.updateSeries([{ data: res }]);
+                // chart04.updateSeries([{ data: res }]); // ถ้ามี chart อื่นก็ใช้ได้
+            }
+        });
+    }
+    
     var options = {
         series: [{
-            data: [400, 100, 220, 260, 180, 110]
+            data: [] // ← เริ่มต้นให้ว่างไว้ แล้วไปโหลดจริงจาก AJAX
         }],
         chart: {
             type: 'bar',
@@ -632,7 +669,7 @@
             }
         },
         xaxis: {
-            categories: ['1', '2', '3', '4', '5', '6'],
+            categories: ['1','2','3','4','5','6','7','8','9','10','11','12'],
         },
         yaxis: {
             title: {
@@ -656,31 +693,49 @@
         }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart03"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
+    // --- สร้าง instance ของ chart03 ---
+    var chart03 = new ApexCharts(document.querySelector("#chart03"), options);
+    chart03.render();
+
+    // ---- Ajax ดึงข้อมูล ----
+    var pageExpense = "{{ $page_url }}/water-expenses";
+    var searchData = {};
+    // ฟังก์ชันดึงข้อมูลสำหรับ chart03
+    function expense_loadData(pages) {
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchData[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: pages,
+            data: searchData,
+            success: function(res) {
+                chart03.updateSeries([{ data: res }]);
+            }
+        });
+    }
+
+        var options04 = {
+        series: [
+            {
                 name: 'รายรับที่เก็บได้',
-                data: [100, 120, 90, 170, 130, 160, 140, 240, 220, 180, 270, 280, 375]
+                data: [] // ← ให้เริ่มว่าง
             },
             {
                 name: 'ค้างชำระ',
-                data: [60, 80, 70, 110, 80, 100, 90, 180, 160, 140, 200, 220, 275]
+                data: [] // ← ให้เริ่มว่าง
             }
         ],
         chart: {
             height: 400,
             type: 'area',
             parentHeightOffset: 0,
-            toolbar: {
-                show: false
-            }
+            toolbar: { show: false }
         },
-        dataLabels: {
-            enabled: false
-        },
+        dataLabels: { enabled: false },
         stroke: {
             show: false,
             curve: 'straight'
@@ -696,34 +751,13 @@
         },
         grid: {
             borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            }
+            xaxis: { lines: { show: true } }
         },
         colors: ['#4dcbdb', '#98eae9'],
         xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
+            categories: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            axisBorder: { show: false },
+            axisTicks: { show: false },
             labels: {
                 style: {
                     colors: '#444050',
@@ -739,110 +773,116 @@
                 }
             }
         },
-        fill: {
-            opacity: 1,
-            type: 'solid'
-        },
-        tooltip: {
-            shared: false
-        }
+        fill: { opacity: 1, type: 'solid' },
+        tooltip: { shared: false }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart04"), options);
-    chart.render();
-    </script>
-    <script>
-    var options = {
-        series: [{
-                name: 'โดยผู้เช่า',
-                data: [100, 120, 90, 170, 130, 160, 140, 240, 220, 180, 270, 280, 375]
-            },
-            {
-                name: 'โดยส่วนกลาง',
-                data: [60, 80, 70, 110, 80, 100, 90, 180, 160, 140, 200, 220, 275]
+    // --- สร้าง instance ของ chart04 ---
+    var chart04 = new ApexCharts(document.querySelector("#chart04"), options04);
+    chart04.render();
+
+    // ---- Ajax ดึงข้อมูล ----
+    var pageIncomeDebt = "{{ $page_url }}/renter-income-baht"; // endpoint ของ chart04
+    var searchData = {};
+
+    function chart04_loadData(pages) {
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchData[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: pages,
+            data: searchData,
+            success: function(res) {
+                // res ต้องเป็น { income: [...], debt: [...] }
+                chart04.updateSeries([
+                    { name: 'รายรับที่เก็บได้', data: res.total_income },
+                    { name: 'ค้างชำระ', data: res.total_overdue }
+                ]);
             }
+        });
+    }
+
+    var chartOptions05 = {
+        series: [
+            // { name: 'โดยผู้เช่า', data: [] },
+            { name: 'โดยส่วนกลาง', data: [] }
         ],
         chart: {
             height: 400,
             type: 'area',
             parentHeightOffset: 0,
-            toolbar: {
-                show: false
-            }
+            toolbar: { show: false }
         },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            show: false,
-            curve: 'straight'
-        },
+        dataLabels: { enabled: false },
+        stroke: { show: false, curve: 'straight' },
         legend: {
             show: true,
             position: 'top',
             horizontalAlign: 'right',
-            labels: {
-                colors: '#444050',
-                useSeriesColors: false
-            }
+            labels: { colors: '#444050', useSeriesColors: false }
         },
         grid: {
             borderColor: '#ececed',
-            xaxis: {
-                lines: {
-                    show: true
-                }
-            }
+            xaxis: { lines: { show: true } }
         },
         colors: ['#beb2f6', '#cbc2f1'],
         xaxis: {
-            categories: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12'
-            ],
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px'
-                }
-            }
+            categories: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#444050', fontSize: '13px' } }
         },
         yaxis: {
-            labels: {
-                style: {
-                    colors: '#444050',
-                    fontSize: '13px'
-                }
-            }
+            labels: { style: { colors: '#444050', fontSize: '13px' } }
         },
-        fill: {
-            opacity: 1,
-            type: 'solid'
-        },
-        tooltip: {
-            shared: false
-        }
+        fill: { opacity: 1, type: 'solid' },
+        tooltip: { shared: false }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart05"), options);
-    chart.render();
-    </script>
+    // สร้าง chart instance
+    var chart05 = new ApexCharts(document.querySelector("#chart05"), chartOptions05);
+    chart05.render();
+
+    // ---- AJAX ดึงข้อมูล ----
+    var page05 = "{{ $page_url }}/water-usage-unit"; // backend ส่งข้อมูล
+    var searchData05 = {}; // ถ้ามี filter เช่น ปี หรือ branch
+
+    function loadChart05Data(url){
+        $('.p_search').each(function() {
+            var inputName = $(this).attr('name');
+            var inputValue = $(this).val();
+            searchData05[inputName] = inputValue;
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: url,
+            data: searchData05,
+            success: function(res) {
+                // res ต้องเป็น object แบบ { tenant: [...12ค่า], common: [...12ค่า] }
+                chart05.updateSeries([
+                    // { name: 'โดยผู้เช่า', data: res.total_by_renter },
+                    { name: 'โดยส่วนกลาง', data: res.total_water }
+                ]);
+            }
+        });
+    }
+
+    // เมื่อเลือกปีจาก dropdown
+    onYearChange();
+    function onYearChange() {
+        calculate_income_expense(pageIncomeExpense)
+        water_loadData(pageWater);
+        income_loadData(page);
+        expense_loadData(pageExpense);
+        chart04_loadData(pageIncomeDebt);
+        loadChart05Data(page05);
+    }
+</script>
     <!--ไฟ-->
     <script>
     var options = {

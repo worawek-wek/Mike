@@ -79,7 +79,7 @@
                                                             <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">4 ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">0 ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -89,7 +89,7 @@
                                                             <div class="badge rounded bg-label-danger me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-danger">17,242 บาท</h5>
+                                                                <h5 class="mb-0 text-danger">0 บาท</h5>
                                                                 <small>รวมจำนวนเงินที่คืนผู้เช่า</small>
                                                             </div>
                                                         </div>
@@ -173,10 +173,13 @@
                                                 <thead class="border-top">
                                                     <tr class=" table-info">
                                                         <th class="text-center" style="width: 50px;">
-                                                            ห้อง
+                                                            ลำดับ
                                                         </th>
                                                         <th class="text-center">
-                                                            รอบบิล</th>
+                                                            ห้อง
+                                                        </th>
+                                                        {{-- <th class="text-center">
+                                                            รอบบิล</th> --}}
                                                         <th style="width: 109px;">
                                                             วันที่รับชำระเงิน
                                                         </th>

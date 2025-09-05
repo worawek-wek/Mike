@@ -28,6 +28,10 @@ class Room extends Model
     {
         return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id')->whereIn('ref_status_id', [2,4,7]);
     }
+    public function rent_bill_overdue() // บิลค้างชำระ
+    {
+        return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id')->whereIn('ref_status_id', [2,4,7]);
+    }
     public function room_status()
     {
         return $this->hasOne('App\Models\StatusRoom', 'id', 'status');

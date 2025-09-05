@@ -46,24 +46,24 @@ id="DataTables_Table_0" aria-describedby="DataTables_Table_0_warning">
     @endphp
     @foreach ($list_data as $key => $row)
     @php
-        // ยอดที่จ่ายแล้ว เฉพาะ payment_list_not_fine
-        $paidAmount = $row->receipt->flatMap->payment_list_not_fine->sum('price');
-        // ยอดค้างชำระ
-        $balance = $row->total_amount - $paidAmount;
+        $total_amount = 0;
+        foreach($row->rent_bill_overdue as $overdue) {
+            $total_amount += $overdue->total_amount;
+        }
     @endphp
     <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }})">
         <td class="control" tabindex="0" style="display: none;">
         </td>
         <td class="text-center">{{ $list_data->firstItem()+$i }}</td>
-        <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent->renter->prefix.' '.$row->room_for_rent->renter->name.' '.$row->room_for_rent->renter->surname }}</span>
+        <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent_main->renter->fullName() }}</span>
         </td>
-        <td class="text-center">{{ $row->room->name }}</td>
+        <td class="text-center">{{ $row->name }}</td>
         {{-- <td class="text-center">{{ $thaiMonths[$row->month] }}</td> --}}
         <td class="text-center text-danger">
-            {{ number_format($balance) }}
+            {{ number_format($total_amount) }}
         
         </td>
-        <td class="text-center">{{ number_format($row->total_amount) }}</td>
+        <td class="text-center">{{ number_format($total_amount) }}</td>
         {{-- <td class="text-center">
             <div class="d-inline-block text-nowrap">
                 <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light">

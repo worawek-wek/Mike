@@ -306,6 +306,113 @@ class ReportController extends Controller
         
         return view('report/report-badDebt-table', $data);
     }
+        public function view_overview_excel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // สร้างหัวตาราง 2 แถว
+        $sheet->mergeCells('A1:A2')->setCellValue('A1', 'ห้อง');
+        $sheet->mergeCells('B1:H1')->setCellValue('B1', 'บิลค่าเช่าห้อง');
+        $sheet->mergeCells('I1:J1')->setCellValue('I1', 'บิลจองห้อง');
+        $sheet->mergeCells('K1:L1')->setCellValue('K1', 'บิลเงินประกัน');
+        $sheet->mergeCells('M1:N1')->setCellValue('M1', 'บิลย้ายออก');
+        $sheet->mergeCells('O1:O2')->setCellValue('O1', 'คืนเงินประกัน');
+
+        $sheet->setCellValue('B2', 'ค่าเช่าห้อง');
+        $sheet->setCellValue('C2', 'ค่าน้ำ');
+        $sheet->setCellValue('D2', 'ค่าไฟ');
+        $sheet->setCellValue('E2', 'ค่าที่จอดรถยนต์');
+        $sheet->setCellValue('F2', 'ค่าที่จอดรถมอเตอร์ไซค์');
+        $sheet->setCellValue('G2', 'ส่วนกลาง');
+        $sheet->setCellValue('H2', 'ค่าไฟเกิน');
+        $sheet->setCellValue('I2', 'ค่ามัดจำการจอง');
+        $sheet->setCellValue('J2', 'คืนมัดจำการจอง');
+        $sheet->setCellValue('K2', 'ค่าประกันห้อง');
+        $sheet->setCellValue('L2', 'หักค่ามัดจำจอง');
+        $sheet->setCellValue('M2', 'ค่าน้ำ');
+        $sheet->setCellValue('N2', 'ค่าไฟ');
+
+        // สไตล์หัวตาราง
+        $sheet->getStyle('A1:O2')->applyFromArray([
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+            'font' => ['bold' => true],
+        ]);
+
+        $sheet->getRowDimension(1)->setRowHeight(30);
+        $sheet->getRowDimension(2)->setRowHeight(25);
+        foreach (range('A', 'O') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // ดึงข้อมูลจากฐานข้อมูล
+        $results = Receipt::orderBy('rooms.id','ASC')
+            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+            ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+            ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+            ->where('buildings.ref_branch_id', session("branch_id"))
+            ->where('rent_bills.ref_type_id', 1)
+            ->where('rent_bills.ref_status_id', 5)
+            ->distinct('rooms.id')
+            ->select(
+                'receipts.*',
+                'rent_bills.water_amount',
+                'rent_bills.electricity_amount',
+                'renters.prefix',
+                DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
+                'rooms.name as room_name',
+                'rooms.id as room_id',
+                'rooms.rent',
+                'renters.phone'
+            );
+
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }
+
+        $results = $results->get();
+
+        // ใส่ข้อมูลเริ่มที่แถว 3
+        $rowIndex = 3;
+        foreach ($results as $row) {
+            $sheet->fromArray([
+                $row->room_name,
+                number_format($row->invoice->payment_rent_room->price),
+                $row->water_amount,
+                $row->electricity_amount,
+                number_format($row->invoice->payment_car_parking_fee->price ?? 0), // ค่าที่จอดรถยนต์
+                number_format($row->invoice->payment_motorcycle_parking_fee->price ?? 0), // ค่าที่จอดรถมอเตอร์ไซค์
+                0, // ส่วนกลาง
+                0, // ค่าไฟเกิน
+                0, // ค่ามัดจำการจอง
+                0, // คืนมัดจำ
+                0, // ค่าประกันห้อง
+                0, // หักค่ามัดจำจอง
+                0, // ค่าน้ำย้ายออก
+                0, // ค่าไฟย้ายออก
+                0  // คืนเงินประกัน
+            ], null, 'A' . $rowIndex++);
+        }
+
+        // สร้างไฟล์
+        $fileName = "รายงานจองรายเดือน_" . date('m-Y', strtotime($request->month)) . ".xlsx";
+        $filePath = public_path("upload/export_excel/{$fileName}");
+
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return redirect("upload/export_excel/{$fileName}");
+    }
     public function badDebt_export_excel(Request $request)
     {
         $spreadsheet = new Spreadsheet();
@@ -549,7 +656,7 @@ class ReportController extends Controller
                         $row->renter->room_for_rent->payment_method == 1 ? 'เงินสด': 'โอนเงิน',
                         $row->security_deposit,
                         $row->renter->room_for_rent->deposit,
-                        $row->security_deposit+@$row->renter->room_for_rent->deposit
+                        $row->security_deposit-@$row->renter->room_for_rent->deposit
             ];
         }
         $spreadsheet = new Spreadsheet();

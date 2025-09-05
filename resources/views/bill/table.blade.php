@@ -58,7 +58,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
             </tr>
         </thead>
         <tbody>
-        @foreach ($list_data as $key => $row_2)
+        @forelse ($list_data as $key => $row_2)
             <tr class="odd">
                 <td class="control" tabindex="0" style="display: none;">
                 </td>
@@ -106,7 +106,16 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                     </div>
                 </td>
             </tr>
-        @endforeach
+            @empty
+
+                <tr>
+                    <td colspan="20" class="text-center text-muted py-4">
+                        <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                        ไม่พบข้อมูล
+                    </td>
+                </tr>
+
+            @endforelse
         </tbody>
     </table>
     @include('layout/pagination')

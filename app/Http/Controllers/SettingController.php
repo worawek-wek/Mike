@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
+use App\Models\Electricity;
+use App\Models\Water;
 use App\Models\QRCode;
 use App\Models\Bank;
 use App\Models\Renter;
@@ -1306,4 +1308,87 @@ class SettingController extends Controller
         //
     }
     /////////////////////////////////////////////////
+    
+    public function insert_electricity_bill(Request $request)
+    {
+        try{
+            $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
+            $insert = new Electricity;
+            $insert->use_unit = $request->use_unit;
+            $insert->amount = $request->amount;
+            $insert->payment_date = $payment_date;
+            $insert->ref_branch_id = session("branch_id");
+            if($request->file('slip')){
+                // return 123;
+                    $request->validate([
+                        'slip' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    ],[
+                        'slip.required' => 'กรุณาเลือกรูปภาพ',
+                        'slip.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                        'slip.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                        'slip.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                    ]);
+                $file = $request->file('slip');
+                $nameExtension = $file->getClientOriginalName();
+                $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+                $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+                $path = "upload/slip/";
+                $slip = $img_name.rand().'.'.$extension;
+                $insert->slip = $slip;
+            }
+            $insert->save();
+
+            if(@$file) $file->move($path, $slip);
+
+            DB::commit();
+
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        // return view('analysis/analysis-elect');
+    }
+    /////////////////////////////////////////////////
+    
+    public function insert_water_bill(Request $request)
+    {
+        try{
+            $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
+            $insert = new Water;
+            $insert->use_unit = $request->use_unit;
+            $insert->amount = $request->amount;
+            $insert->payment_date = $payment_date;
+            $insert->ref_branch_id = session("branch_id");
+            if($request->file('slip')){
+                // return 123;
+                    $request->validate([
+                        'slip' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    ],[
+                        'slip.required' => 'กรุณาเลือกรูปภาพ',
+                        'slip.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                        'slip.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                        'slip.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                    ]);
+                $file = $request->file('slip');
+                $nameExtension = $file->getClientOriginalName();
+                $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+                $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+                $path = "upload/slip/";
+                $slip = $img_name.rand().'.'.$extension;
+                $insert->slip = $slip;
+            }
+            $insert->save();
+
+            if(@$file) $file->move($path, $slip);
+
+            DB::commit();
+
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        // return view('analysis/analysis-elect');
+    }
 }

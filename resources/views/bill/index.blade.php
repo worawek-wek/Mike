@@ -144,7 +144,7 @@
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center pb-1">
                                                         <h4 class="ms-1 mb-0 text-success" id="transfer">
-                                                            0.00 บาท
+                                                            {{-- 0.00 บาท --}}
                                                         </h4>
                                                     </div>
                                                     <h5 class="mb-0">โอนเงิน</h5>
@@ -155,8 +155,8 @@
                                             <div class="card card-border-shadow-warning">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center pb-1">
-                                                        <h4 class="ms-1 mb-0 text-warning" id="cash" >
-                                                            0.00 บาท
+                                                        <h4 class="ms-1 mb-0 text-warning" id="cash_wait_for_confirm" >
+                                                            {{-- 0.00 บาท --}}
                                                         </h4>
                                                     </div>
                                                     <h5 class="mb-0">เงินสด</h5>
@@ -569,8 +569,8 @@
                     $('#confirm_by_ceo').html(data.confirm_by_ceo);
                     $('.confirm_by_ceo').html(data.confirm_by_ceo);
                     $('.confirm_by_employee_confirm_by_ceo').html(data.confirm_by_employee_confirm_by_ceo);
-                    $('#transfer').html(data.transfer);
-                    $('#cash').html(data.cash);
+                    $('#transfer').html(data.transfer+' บาท');
+                    $('#cash_wait_for_confirm').html(data.cash_wait_for_confirm+' บาท');
                 }
             });
         }

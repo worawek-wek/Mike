@@ -61,36 +61,55 @@ class Controller extends BaseController
         // จ่ายตรงเวลา
         $all_receipt_on_time = Receipt::whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
-                                        })
-                                        ->where('ref_type_id', 1)
-                                        ->where('payment_on_time', 1)
-                                        ->get() // ดึงข้อมูลออกมาเป็น Collection
-                                        ->sum(function ($receipt) {
-                                            return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
                                         });
+        if($month){
+            $all_receipt_on_time = $all_receipt_on_time->whereHas('invoice', function ($q) use ($year, $month) {
+                                                            $q->where('year', $year)
+                                                                ->where('month', $month);
+                                                        });
+        }
+        $all_receipt_on_time = $all_receipt_on_time->where('ref_type_id', 1)
+                                                    ->where('payment_on_time', 1)
+                                                    ->get() // ดึงข้อมูลออกมาเป็น Collection
+                                                    ->sum(function ($receipt) {
+                                                        return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
+                                                    });
 
 // ------------------------------------------------------------------------------------- //
         // จ่ายล่าช้าแบบนัด
         $all_receipt_late_with_appointment = Receipt::whereHas('room.floor.building', function ($query) use ($branch_id) {
-                                            $query->where('ref_branch_id', $branch_id);
-                                        })
-                                        ->where('ref_type_id', 1)
-                                        ->where('payment_on_time', 2)
-                                        ->get() // ดึงข้อมูลออกมาเป็น Collection
-                                        ->sum(function ($receipt) {
-                                            return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
-                                        });
+                                                            $query->where('ref_branch_id', $branch_id);
+                                                        });
+        if($month){
+            $all_receipt_late_with_appointment = $all_receipt_late_with_appointment->whereHas('invoice', function ($q) use ($year, $month) {
+                                                            $q->where('year', $year)
+                                                                ->where('month', $month);
+                                                        });
+        }
+        $all_receipt_late_with_appointment = $all_receipt_late_with_appointment->where('ref_type_id', 1)
+                                                    ->where('payment_on_time', 2)
+                                                    ->get() // ดึงข้อมูลออกมาเป็น Collection
+                                                    ->sum(function ($receipt) {
+                                                        return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
+                                                    });
 // ------------------------------------------------------------------------------------- //
         // จ่ายล่าช้าแบบไม่ได้นัดเวลา
         $all_receipt_late = Receipt::whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
-                                        })
-                                        ->where('ref_type_id', 1)
-                                        ->where('payment_on_time', 3)
-                                        ->get() // ดึงข้อมูลออกมาเป็น Collection
-                                        ->sum(function ($receipt) {
-                                            return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
                                         });
+        if($month){
+            $all_receipt_late = $all_receipt_late->whereHas('invoice', function ($q) use ($year, $month) {
+                                                    $q->where('year', $year)
+                                                        ->where('month', $month);
+                                                });
+        }
+        $all_receipt_late = $all_receipt_late->where('ref_type_id', 1)
+                                            ->where('ref_type_id', 1)
+                                            ->where('payment_on_time', 3)
+                                            ->get() // ดึงข้อมูลออกมาเป็น Collection
+                                            ->sum(function ($receipt) {
+                                                return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
+                                            });
 
 // ------------------------------------------------------------------------------------- //
         // ยอดเรียกเก็บเงิน ทั้งหมด
@@ -105,18 +124,16 @@ class Controller extends BaseController
 
 // ------------------------------------------------------------------------------------- //
 
-        $confirm_by_employee = Receipt::with('payment_list')
-                                        ->whereHas('invoice', function ($q) {
-                                            $q->where('ref_status_id', '!=', 5);
-                                        })
+        $total_confirm_by_employee = Receipt::with('payment_list')
+                                        ->where('ref_status_id', 2)
                                         ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
                                         })
-                                        ->where('ref_type_id', 1)
                                         ->get()
-                                        ->sum(function ($receipt) {
-                                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
-                                        });
+                                        // ->filter(function ($bill) {
+                                        //     return $bill->total_amount;
+                                        // })
+                                        ->sum('total_amount');
 
 // ------------------------------------------------------------------------------------- //
         $all_receipt_last_month = Receipt::with('payment_list')
@@ -134,21 +151,19 @@ class Controller extends BaseController
                                         });
 
 // ------------------------------------------------------------------------------------- //
-        $confirm_by_ceo = Receipt::with('payment_list')->whereHas('invoice', function ($q) {
-                                            $q->where('ref_status_id', 5);
-                                        })
+        $confirm_by_ceo = Receipt::with('payment_list')->where('ref_status_id', 5)
                                         ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
                                         })
-                                        ->get()->sum('total_amount');
-
+                                        ->get()
+                                        ->sum('total_amount');
 // ------------------------------------------------------------------------------------- //
         $confirm_by_ceo_this_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y'))[0])           //
                                                 ->where('year', explode('-', date('m-Y'))[1])->where('ref_status_id', 5)      //
                                                 ->get()->sum('total_amount');
 // ------------------------------------------------------------------------------------- //
         $all_rent_bill_last_month = RentBill::with('payment_list')->where('month', explode('-', date('m-Y'))[0])            //
-                                                ->whereHas('room_for_rent.room.floor.building', function ($query) use ($branch_id) {
+                                                ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                                     $query->where('ref_branch_id', $branch_id);
                                                 })
                                                 ->whereIn('ref_status_id', [2,4,5,7])
@@ -177,42 +192,39 @@ class Controller extends BaseController
                         });
 // ------------------------------------------------------------------------------------- // เงินสดรอคอนเฟิร์ม
         $cash_wait_for_confirm = Receipt::with('payment_list')
-                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
-                            $query->where('ref_branch_id', $branch_id);
-                        })
-                        ->where('ref_type_id', 1)
-                        ->where('payment_channel', 1)
-                        ->whereHas('invoice', function ($query) use ($month, $year) {
-                                $query->where('ref_status_id', 2);
-                            });
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('payment_channel', 1)
+                                        ->where('ref_status_id', 2);
         if($month){
-            $cash_wait_for_confirm = $cash_wait_for_confirm->whereHas('invoice', function ($query) use ($month, $year) {
-                                                                $query->where('month', $month)
-                                                                    ->where('year', $year);
-                                                            });
+            // $cash_wait_for_confirm = $cash_wait_for_confirm->where('month', $month)
+            //                                                 ->where('year', $year);
         }
         $cash_wait_for_confirm = $cash_wait_for_confirm->get()
-                        ->sum(function ($receipt) {
-                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
-                        });
+                                                        ->filter(function ($bill) {
+                                                            return $bill->total_amount;
+                                                        })
+                                                        ->sum('total_amount');
         // dd($cash_wait_for_confirm);
 // -------------------------------------------------------------------------------------
-        $transfer = Receipt::with('payment_list')
-                            ->whereHas('room.floor.building', function ($query) use ($branch_id) {
-                                $query->where('ref_branch_id', $branch_id);
-                            })
-                            ->where('ref_type_id', 1)
-                            ->where('payment_channel', 2);
+        $transfer = RentBill::with('payment_list')
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('ref_type_id', 1)
+                                        // ->where('payment_channel', 1)
+                                        ->where('ref_status_id', 2);
         if($month){
-            $transfer = $transfer->whereHas('invoice', function ($query) use ($month, $year) {
-                                                                $query->where('month', $month)
-                                                                    ->where('year', $year);
-                                                            });
+            $transfer = $transfer->where('month', $month)
+                                    ->where('year', $year);
         }
         $transfer = $transfer->get()
-                            ->sum(function ($receipt) {
-                                return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
-                            });
+                            ->filter(function ($bill) {
+                                return $bill->total_not_discount_amount >= $bill->total_amount;
+                            })
+                            ->sum('total_paid_transfer');
+
 
         $all_renter = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                             ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
@@ -268,25 +280,37 @@ class Controller extends BaseController
                                 ->count('rooms.id'); // ✅ ใช้ count กับคอลัมน์ตรง ๆ
 // บิลค่าเช่าทั้งหมด
 
-// บิลค่าเช่าค้างชำระทั้งหมด               
+// บิลค้างชำระทั้งหมด               
         $overdueData = RentBill::with('receipt.payment_list_not_fine', 'room_for_rent.room')
-                                ->whereHas('room_for_rent.room.floor.building', function ($query) use ($branch_id) {
+                                ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                     $query->where('ref_branch_id', $branch_id);
                                 })
                                 ->whereIn('ref_status_id', [2, 4, 7])
-                                ->get()
-                                ->filter(function ($bill) {
-                                    $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-                                    return $paidAmount < $bill->total_amount;
-                                });
+                                ->get();
+                                
+// บิลค่าเช่าค้างชำระทั้งหมด               
+        $overdueData_1 = RentBill::with('receipt.payment_list_not_fine', 'room_for_rent.room')
+                                ->where('year', $lastMonth->year)
+                                ->where('month', $lastMonth->month)
+                                ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                    $query->where('ref_branch_id', $branch_id);
+                                })
+                                ->whereIn('ref_status_id', [2, 4, 7])
+                                ->where('ref_type_id', 1)
+                                ->get()->sum->total_amount;
+                                // ->filter(function ($bill) {
+                                //     $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
+                                //     return $paidAmount < $bill->total_amount;
+                                // });
 
         // นับจำนวนห้องไม่ซ้ำ
         $overdueRoomCount = $overdueData->pluck('room_for_rent.room.id')->unique()->count();
 
         // รวมยอดค้างชำระทั้งหมด
         $overdueTotalAmount = $overdueData->sum(function ($bill) {
-            $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-            return $bill->total_amount - $paidAmount;
+            // $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
+            // return $bill->total_amount - $paidAmount;
+            return $bill->total_amount;
         });
 // บิลค่าเช่าค้างชำระทั้งหมด               
 
@@ -300,13 +324,13 @@ class Controller extends BaseController
         $data['all_receipt_not_fine'] = number_format($all_receipt_not_fine); // ยอดชำระเงิน ทั้งหมด ไม่รวม ค่าปรับ
         $data['all_invoice'] = number_format($all_invoice); // ยอดเรียกเก็บเงินทั้งหมด
         $data['outstanding_balance'] = number_format($all_invoice - $all_receipt_not_fine); // ยอดค้างชำระทั้งหมด
-        $data['all_receipt_last_month'] = number_format($all_receipt_last_month);
-        $data['confirm_by_employee'] = number_format($confirm_by_employee,2).' บาท'; // ชำระเงินโดยพนักงาน
-        $data['confirm_by_ceo'] = number_format($confirm_by_ceo,2).' บาท'; // ชำระเงินโดยผู้บริหาร
+        $data['all_receipt_last_month'] = $all_receipt_last_month;
+        $data['confirm_by_employee'] = number_format($total_confirm_by_employee).' บาท'; // ชำระเงินโดยพนักงาน
+        $data['confirm_by_ceo'] = number_format($confirm_by_ceo).' บาท'; // ชำระเงินโดยผู้บริหาร
         $data['confirm_by_ceo_this_month'] = number_format($confirm_by_ceo_this_month); // ชำระเงินโดยผู้บริหาร
-        $data['all_rent_bill_last_month'] = number_format($all_rent_bill_last_month); // ชำระเงินโดยผู้บริหาร
-        $data['overdue_this_month'] = number_format($all_rent_bill_last_month-$all_receipt_last_month); // ชำระเงินโดยผู้บริหาร
-        $data['confirm_by_employee_confirm_by_ceo'] = number_format($confirm_by_employee + $confirm_by_ceo,2).' บาท'; // ชำระเงินหลังคอนเฟิร์ม
+        $data['all_rent_bill_last_month'] = $all_rent_bill_last_month; // ชำระเงินโดยผู้บริหาร
+        $data['overdue_this_month'] = $overdueData_1; // ชำระเงินโดยผู้บริหาร
+        $data['confirm_by_employee_confirm_by_ceo'] = number_format($total_confirm_by_employee + $confirm_by_ceo).' บาท'; // ชำระเงินหลังคอนเฟิร์ม
         $data['transfer'] = $transfer; // เงินโอน
         $data['cash'] = $cash; // เงินสด
         $data['cash_wait_for_confirm'] = $cash_wait_for_confirm; // เงินสด

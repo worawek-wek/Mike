@@ -88,18 +88,19 @@
 
                                     {{ $payment_list_item->title }}
 
-                                @if ($key == 1)
+                            @if (strpos($payment_list_item->title, 'Water rate') !== false) 
                                     <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
-                                    <input name="water_unit" style="width: 18%;background-color: #d6f7fb;border-color: #00bad1;"
+                                    <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;"
                                         type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
-                                        = {{ $payment_list_item->unit-$meterPrevious->water_unit }} ยูนิต)
+                                        &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
+                                        = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
                                 @endif
                                 </td>
                                 <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
                                 @if ($key == 1)
                                     <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                         <span id="text_water_amount">
-                                            {{ number_format($payment_list_item->price) }}
+                                            {{ number_format($payment_list_item->price) }} 
                                         </span>
                                 @else
                                     @if ($payment_list_item->discount == 1)
@@ -256,13 +257,14 @@
         }
         function calculatePrice() { 
             var currentUnit = parseFloat($('#water_unit').val());
-            var previousUnit = parseFloat("{{ (int)$meterPrevious->water_unit ?? 0 }}");
+            var previousUnit = parseFloat("{{ (int)$invoice->previous_water_unit ?? 0 }}");
             var waterRate = parseFloat("{{ (int)$invoice->room_for_rent->room->water_baht_per_unit ?? 0 }}");
 
             var water_amount = (currentUnit - previousUnit) * waterRate;
 
             $('#text_water_amount').html(water_amount.toLocaleString());
             $('#water_amount').val(water_amount);
+            $('#calculate_unit').html(currentUnit - previousUnit);
             const inputs = document.querySelectorAll('.calculate');  // เลือกทุก input ที่มี class="calculate"
             let total = 0;
 

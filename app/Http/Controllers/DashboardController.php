@@ -50,14 +50,15 @@ class DashboardController extends Controller
 
         $data['page_url'] = 'dashboard';
         $summary = $this->summary(session("branch_id"));
+        $summary_month = $this->summary(session("branch_id"), date('m'), date('Y'));
         // return $summary['all_receipt_late'];
-        $total = $summary['all_receipt_on_time'] + $summary['all_receipt_late_with_appointment'] + $summary['all_receipt_late'];
+        $total = $summary_month['all_receipt_on_time'] + $summary_month['all_receipt_late_with_appointment'] + $summary_month['all_receipt_late'];
 
         if ($total > 0) {
             $data['persen_overview'] = "100";
-            $percent_on_time = ($summary['all_receipt_on_time'] / $total) * 100;
-            $percent_late_with_appointment = ($summary['all_receipt_late_with_appointment'] / $total) * 100;
-            $percent_late = ($summary['all_receipt_late'] / $total) * 100;
+            $percent_on_time = ($summary_month['all_receipt_on_time'] / $total) * 100;
+            $percent_late_with_appointment = ($summary_month['all_receipt_late_with_appointment'] / $total) * 100;
+            $percent_late = ($summary_month['all_receipt_late'] / $total) * 100;
         } else {
             $data['persen_overview'] = "0";
             $percent_on_time = $percent_late_with_appointment = $percent_late = 0;
@@ -66,6 +67,7 @@ class DashboardController extends Controller
         $data['percent_late_with_appointment'] = number_format($percent_late_with_appointment);
         $data['percent_late'] = number_format($percent_late);
         $data['summary'] = $summary;
+        $data['summary_month'] = $summary_month;
 
         return view('dashboard/index', $data);
     }
@@ -75,7 +77,7 @@ class DashboardController extends Controller
                                         ->whereHas('room_for_rent.room.floor.building', function ($query) {
                                             $query->where('ref_branch_id', session("branch_id"));
                                         })
-                                        ->where('rent_bills.ref_status_id', 7)
+                                        ->whereIn('ref_status_id', [2, 4, 7])
                                         ->get()
                                         ->sum('total_amount'); // ใช้ accessor ในการ sum
 
@@ -90,30 +92,34 @@ class DashboardController extends Controller
         $perPage = $request->limit ?? 15;
         $page = Paginator::resolveCurrentPage('page');
 
-        $overdueBills = RentBill::with(['receipt.payment_list_not_fine', 'room.floor.building'])
-                                    ->whereHas('room.floor.building', function ($query) {
-                                        $query->where('ref_branch_id', session('branch_id'));
-                                    })
-                                    ->whereIn('ref_status_id', [2, 4, 7])
-                                    ->get() // ดึงก่อน
-                                    ->filter(function ($bill) {
-                                        $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-                                        return $paidAmount < $bill->total_amount; // ยอดค้างชำระ
-                                    })
-                                    ->values();
+        $overdueBills = Room::whereHas('floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                ->whereHas('rent_bill', function ($query) {
+                                    $query->whereIn('ref_status_id', [2, 4, 7]);
+                                });
+
+        $limit = $request['limit'] ?? 15;
+
+        $overdueBills = $overdueBills->paginate($limit);
+                                    // ->filter(function ($bill) {
+                                    //     $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
+                                    //     return $paidAmount < $bill->total_amount; // ยอดค้างชำระ
+                                    // })
+                                    // ->values();
 
         // ทำ paginate หลังจาก filter
-        $page = request()->get('page', 1);
-        $perPage = $request->limit ?? 15;
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-            $overdueBills->forPage($page, $perPage),
-            $overdueBills->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+        // $page = request()->get('page', 1);
+        // $perPage = $request->limit ?? 15;
+        // $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        //     $overdueBills->forPage($page, $perPage),
+        //     $overdueBills->count(),
+        //     $perPage,
+        //     $page,
+        //     ['path' => request()->url(), 'query' => request()->query()]
+        // );
 
-        $data['list_data'] = $paginated;
+        $data['list_data'] = $overdueBills;
         $data['query'] = request()->query();
         $data['query']['limit'] = $request->limit ?? 15;
 
@@ -156,10 +162,59 @@ class DashboardController extends Controller
         return view('dashboard/change_password', $data);
 
     }
-    public function invoice($id)
+    public function invoice($room_id)
     {
+        $room = Room::find($room_id);
+        $invoice = RentBill::with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])
+                            ->whereIn('ref_status_id', [2, 4, 7])
+                            ->where('ref_room_id', $room_id)
+                            ->get();
+        // $receipt = Receipt::where('ref_rent_bill_id', $id)->get();
+        // $fine_invoice = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
+        // $data['fine_invoice_price'] = 0;
+        // if(@$fine_invoice){
+        //     $data['fine_invoice_price'] = $fine_invoice->price;
+        // }
+        // $invoice_fine = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
+        // $data['fine_price'] = $invoice_fine->price ?? 0;
+        // if(@$receipt){
+        //     foreach($receipt as $rec){
+        //         $fine = PaymentList::where('ref_payment_id', $rec->id)->where('document_type', 2)->where('fine', 1)->first();
+        //         if(@$fine){
+        //             $data['fine_price'] = $invoice_fine->price - $fine->price;
+        //         }
+        //     }
+        // }
+        // $contract = Contract::find($invoice->ref_contract_id);
+        // $data['expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
+        // $data['invoice'] = $invoice;
+        // $data['contract'] = $contract;
+        // $data['bank'] = Bank::get();
+        // $data['days'] = [
+        //     'Sunday'    => 'อาทิตย์',
+        //     'Monday'    => 'จันทร์',
+        //     'Tuesday'   => 'อังคาร',
+        //     'Wednesday' => 'พุธ',
+        //     'Thursday'  => 'พฤหัสบดี',
+        //     'Friday'    => 'ศุกร์',
+        //     'Saturday'  => 'เสาร์',
+        // ];
+        
+        // $prevMonth = (int)$invoice->month - 1;
+        // $prevYear = (int)$invoice->year;
+
+        // if ($prevMonth < 1) {
+        //     $prevMonth = 12;
+        //     $prevYear -= 1;
+        // }
+
+        // $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+        
+        // $data['meterPrevious'] = Meter::where('ref_room_id', $contract->ref_room_id)->where('month', $prevMonth)->where('year', $prevYear)->first();
+
         $data['page_url'] = 'dashboard';
-        $invoice = RentBill::find($id);
+        // $invoice = RentBill::find($id);
+        $data['room'] = $room;
         $data['invoice'] = $invoice;
 
         return view('dashboard/invoice', $data);

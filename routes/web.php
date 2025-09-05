@@ -79,10 +79,26 @@ Route::middleware('auth')->group(function() {
         Route::get('analysis/monthly-rent', 'monthly_rent')->name('analysis.monthly-rent');    //////////////////////////
         Route::get('analysis/income-expense', 'income_expense')->name('analysis.income-expense');    //////////////////////////
         Route::get('analysis/income-expense/income', 'income')->name('analysis.income');    //////////////////////////
+        Route::get('analysis/income-expense/get-income', 'get_income')->name('analysis.get-income');    //////////////////////////
+        Route::get('analysis/income-expense/get-expense', 'get_expense')->name('analysis.get-expense');    //////////////////////////
         Route::get('analysis/water', 'water')->name('analysis.water');    //////////////////////////
+        Route::get('analysis/water/calculate-income-expense', 'calculate_water_income_expense')->name('analysis.water.calculate-income-expense');    //////////////////////////
+        Route::get('analysis/water/calculate-water-usage', 'calculate_water_usage')->name('analysis.water.calculate-water-usage');    //////////////////////////
+        Route::get('analysis/water/calculate-water-profit-loss', 'calculate_water_profit_loss')->name('analysis.water.calculate-water-profit-loss');    //////////////////////////
+        Route::get('analysis/water/water-expenses', 'water_expenses')->name('analysis.water.water-expenses');    //////////////////////////
+        Route::get('analysis/water/renter-income-baht', 'water_renter_income_baht')->name('analysis.water.renter-income-baht');    //////////////////////////
+        Route::get('analysis/water/water-usage-unit', 'water_usage_unit')->name('analysis.water-usage-unit');    //////////////////////////
         Route::get('analysis/elect', 'elect')->name('analysis.elect');    //////////////////////////
+        Route::get('analysis/elect/calculate-income-expense', 'calculate_ele_income_expense')->name('analysis.ele.calculate-income-expense');    //////////////////////////
+        Route::get('analysis/elect/calculate-ele-usage', 'calculate_ele_usage')->name('analysis.ele.calculate-ele-usage');    //////////////////////////
+        Route::get('analysis/elect/calculate-ele-profit-loss', 'calculate_ele_profit_loss')->name('analysis.elect.calculate-ele-profit-loss');    //////////////////////////
+        Route::get('analysis/elect/electricity-expenses', 'electricity_expenses')->name('analysis.elect.electricity-expenses');    //////////////////////////
+        Route::get('analysis/elect/renter-income-baht', 'renter_income_baht')->name('analysis.elect.renter-income-baht');    //////////////////////////
+        Route::get('analysis/elect/electricity-usage-unit', 'electricity_usage_unit')->name('analysis.electricity-usage-unit');    //////////////////////////
         Route::get('analysis/meter', 'meter')->name('analysis.meter');    //////////////////////////
+        Route::get('analysis/meter/get-room-floor', 'get_room_floor')->name('analysis.meter.get-room-floor');    //////////////////////////
         Route::get('analysis/tenants', 'tenants')->name('analysis.tenants');    //////////////////////////
+        Route::get('analysis/tenants/move-in-out', 'move_in_out')->name('analysis.tenants.move-in-out');    //////////////////////////
     });
 
     Route::controller(ReportController::class)->group(function() {                    //////////////////////////
@@ -197,6 +213,9 @@ Route::middleware('auth')->group(function() {
         Route::post('setting/company/update/{id}', 'company_update')->name('setting.company-update');    //////////////////////////
         Route::delete('setting/company/{id}', 'company_delete')->name('setting.company-delete');    //////////////////////////
         ////////////////
+        Route::post('analysis/elect/insert-electricity-bill', 'insert_electricity_bill')->name('analysis.insert-electricity-bill');    //////////////////////////
+        Route::post('analysis/water/insert-water-bill', 'insert_water_bill')->name('analysis.insert-water-bill');    //////////////////////////
+
         // Route::get('setting/company', 'company')->name('setting.company');    //////////////////////////
         // Route::get('setting/company/datatable', 'company_datatable')->name('setting.company-datatable');    //////////////////////////
         // Route::post('setting/company/insert', 'company_insert')->name('setting.company-insert');    //////////////////////////
@@ -217,6 +236,7 @@ Route::middleware('auth')->group(function() {
         // Route::get('pdf', 'index')->name('dashboard');    //////////////////////////
         Route::get('pdf/receipt/{receipt_id}', 'receipt')->name('pdf.receipt');    //////////////////////////
         Route::get('pdf/invoice/{invoice_id}', 'invoice')->name('pdf.invoice');    //////////////////////////
+        Route::get('pdf/overdue/invoice/{room_id}', 'overdue_invoice')->name('pdf.overdue_invoice');    //////////////////////////
         Route::get('pdf/invoice-many/{invoice_id}', 'invoice_many')->name('pdf.invoice_many');    //////////////////////////
         Route::get('pdf/invoice-bill-all/{invoice_id}', 'invoice_bill')->name('pdf.invoice_bill');    //////////////////////////
         Route::get('pdf/income-expenses-all/{invoice_id}', 'income_expenses_all')->name('pdf.income_expenses_all');    //////////////////////////

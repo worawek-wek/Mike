@@ -43,7 +43,7 @@
                     </tr>
                     <tr>
                         <td>ค่าเช่าห้อง</td>
-                        <td>{{ @number_format($room->rent) }}</td>
+                        <td>{{ @number_format($room->rent+$room->furniture_rental+$room->air_rental) }}</td>
                     </tr>
                 </tbody>    
             </table>
@@ -52,8 +52,8 @@
             <h5 class="mb-0" style="color: black;">ข้อมูลเงินประกันห้อง</h5>
             <button class="btn btn-warning" onclick="openDe({{ @$rent_bill->id }} , {{ $contract->contract_id }})"
                 role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract-edit" aria-controls="navs-pills-top-contract-edit" aria-selected="false" tabindex="-1"
-                @if(($contract->security_deposit-$contract->deduction_booking_amount) <= $receipt->sum->amount)
-                disabled
+                @if(($contract->security_deposit-$contract->deduction_booking_amount) <= $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount)
+                    disabled
                 @endif
                 >
                 <span>
@@ -63,21 +63,34 @@
         </div>
 
 {{--  --}}
-        @if(($contract->security_deposit-$contract->deduction_booking_amount) > $receipt->sum->amount)
+            @if($receipt->sum->total_amount > 0)
+                <h5 class="text-center text-success">ชำระเงินแล้ว&nbsp; <span>
+                    {{ number_format($receipt->sum->total_amount) }}
+                    {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
+                    </span> &nbsp;บาท
+                </h5>
+            @endif
+            @if($receipt_wait_for_confirm->sum->total_amount > 0)
+                <h5 class="text-center text-warning">ยอดรอคอนเฟิร์มบิล&nbsp; <span>
+                    {{ number_format($receipt_wait_for_confirm->sum->total_amount) }}
+                    {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
+                    </span> &nbsp;บาท
+                </h5>
+            @endif
+            @if(($contract->security_deposit-$contract->deduction_booking_amount) > $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount)
+                <h5 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span>
+                    {{ number_format(($contract->security_deposit-$contract->deduction_booking_amount) - $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount) }}
+                    {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
+                    </span> &nbsp;บาท
+                </h5>
+            @endif
 
-        <h5 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span>
-            {{ number_format(($contract->security_deposit-$contract->deduction_booking_amount) - $receipt->sum->amount) }}
-            {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
-            </span> &nbsp;บาท
-        </h5>
-
-        @else
+        {{-- @else
 
         <h5 class="text-center text-success">ชำระเงินแล้ว&nbsp;
             {{ number_format($contract->security_deposit) }} &nbsp;บาท
-        </h5>
+        </h5> --}}
         
-        @endif
 {{--  --}}
 
     @foreach ($receipt as $key => $item_receipt)
@@ -167,6 +180,7 @@
         
     @endforeach   
     
+        <h5 class="my-4" style="color: black;">ข้อมูลค่าจองห้อง</h5>
         <div class="p-4" style="border: 1px solid #59d57a;border-radius: 5px;">
         <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt_jong->receipt_number }}</span></p>
             <table class="table table-detail table-bordered">

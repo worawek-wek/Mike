@@ -111,7 +111,7 @@
                                                             <div class="avatar me-2" style="cursor: unset;">
                                                             <span class="avatar-initial rounded bg-label-danger"><i class="ti ti-alert-octagon ti-md"></i></span>
                                                             </div>
-                                                            <h4 class="ms-1 mb-0 text-danger">{{ $summary['overdueRoomCount'] }} ห้อง</h4>
+                                                            <h4 class="ms-1 mb-0 text-danger">{{ number_format($summary['overdueRoomCount']) }} ห้อง</h4>
                                                         </div>
                                                         <p class="mb-1">ห้องที่ค้างชำระ</p>
                                                     </div>
@@ -121,7 +121,7 @@
                                                 <div class="card card-border-shadow-danger" style="background-color: #f8eae4;">
                                                     <div class="card-body">
                                                         <div class="d-flex align-items-center mb-2 pb-1">
-                                                            <h4 class="ms-1 mb-0 text-danger">{{ $summary['overdueTotalAmount'] }}</h4>
+                                                            <h4 class="ms-1 mb-0 text-danger">{{ number_format($summary['overdueTotalAmount']) }} บาท</h4>
                                                         </div>
                                                         <p class="mb-1">รวมยอดค้างชำระทั้งหมด</p>
                                                     </div>
@@ -196,8 +196,7 @@
         </div>
     </div>
 
-
-
+    <iframe id="print-iframe" style="display: none;"></iframe>    
 
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
@@ -237,6 +236,44 @@
             });
             // alert(page);
         }
+        
+        function printPdf(id) {
+            $.ajax({
+                url: '/pdf/overdue/invoice/'+id,
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('input[type="radio"]').click(function() {
                 var inputValue = $(this).attr("value");

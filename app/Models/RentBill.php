@@ -36,11 +36,35 @@ class RentBill extends Model
     {
         return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id');
     }
+    public function receipt_pay_cash()
+    {
+        return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id')->where('payment_channel',1);
+    }
+    public function receipt_pay_transfer()
+    {
+        return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id')->where('payment_channel',2);
+    }
     public function getTotalPaidIncludingFineAttribute()  // total_paid_including_fine
     {
         return $this->receipt->sum(function ($receipt) {
             $total = $receipt->payment_list->where('discount', 0)->sum('price');
             $discount = $receipt->payment_list->where('discount', 1)->sum('price');
+            return $total - $discount;
+        });
+    }
+    public function getTotalPaidCashAttribute()  // total_paid_cash
+    {
+        return $this->receipt_pay_cash->sum(function ($receipt_pay_cash) {
+            $total = $receipt_pay_cash->payment_list->where('discount', 0)->sum('price');
+            $discount = $receipt_pay_cash->payment_list->where('discount', 1)->sum('price');
+            return $total - $discount;
+        });
+    }
+    public function getTotalPaidTransferAttribute()  // total_paid_cash
+    {
+        return $this->receipt_pay_transfer->sum(function ($receipt_pay_transfer) {
+            $total = $receipt_pay_transfer->payment_list->where('discount', 0)->sum('price');
+            $discount = $receipt_pay_transfer->payment_list->where('discount', 1)->sum('price');
             return $total - $discount;
         });
     }
@@ -65,6 +89,24 @@ class RentBill extends Model
     public function payment_list()
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1);
+    }
+    public function payment_rent_room()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
+    }
+    public function payment_car_parking_fee()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าที่จอดรถยนต์%');
+    }
+    public function payment_motorcycle_parking_fee()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าที่จอดมอเตอร์ไซค์%');
     }
     public function payment_water()
     {
@@ -104,5 +146,39 @@ class RentBill extends Model
         });
 
         return $billAmount - $paidAmount;
+    }
+    public function getTotalELEAmountAttribute()
+    {
+        return $this->payment_list
+                ->where('discount', 0)
+                ->filter(function($item) {
+                    return str_contains($item->title, 'ค่าไฟ');
+                })
+                ->sum('price');
+    }
+    public function getTotalWaterAmountAttribute()
+    {
+        return $this->payment_list
+                ->where('discount', 0)
+                ->filter(function($item) {
+                    return str_contains($item->title, 'ค่าน้ำ');
+                })
+                ->sum('price');
+    }
+    public function previousMeter()
+    {
+        return $this->hasOne(Meter::class, 'ref_room_id', 'ref_room_id')
+            ->where(function ($q) {
+                $prevMonth = $this->month - 1;
+                $prevYear = $this->year;
+
+                if ($prevMonth <= 0) {
+                    $prevMonth = 12;
+                    $prevYear--;
+                }
+
+                $q->where('month', $prevMonth)
+                ->where('year', $prevYear);
+            });
     }
 }

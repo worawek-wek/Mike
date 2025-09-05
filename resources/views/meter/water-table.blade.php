@@ -166,19 +166,22 @@
 
 <script>
     focus_input_room(0);
-    function focus_input_room(id){
-        const input = document.querySelector(".room"+id);
+    function focus_input_room(id) {
+        const input = document.querySelector(".room" + id);
+        if (!input) return;
+
         input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
+
+        // ✅ Trick สำหรับ number input: reset ค่าแล้วคืนกลับ
+        const val = input.value;
+        input.value = "";
+        input.value = val;
     }
 
     function handleInput(event, id, v, k) {
         if (event.key === 'Enter') {
-            // if($('#water_unit' + id).val() != v){
-            focus_input_room(1+k);
-    // updateRoom(id)
-                // const userInput = event.target.value;
-            // }
+            // ข้ามไป focus ห้องถัดไป
+            focus_input_room(1 + k);
         }
     }
     function editRoom(id, v){
@@ -193,7 +196,6 @@
     let data = [];
     function updateRoom(){
         let data = [];
-        // ดึงค่าจากทุก input ที่ name="id_room[]"
         $('input[name="id_room[]"]').each(function () {
             data.push({
                 id: $(this).attr('id').replace('room', ''), // ดึง meters_id จาก id เช่น room4951

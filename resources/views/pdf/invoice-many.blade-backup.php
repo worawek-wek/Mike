@@ -186,7 +186,7 @@
                         <tr>
                             <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
                             <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
-                                @if($item_payment_list->unit > 0 && $key == 1)    
+                                @if(strpos($item_payment_list->title, 'Water rate') !== false)    
                                     {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
                                 @endif
                             </td>
@@ -277,7 +277,7 @@
                         <tr>
                             <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
                             <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
-                                @if($item_payment_list->unit > 0 && $key == 1)    
+                                @if(strpos($item_payment_list->title, 'Water rate') !== false)    
                                     {{ $item_payment_list->unit }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
                                 @endif
                             </td>

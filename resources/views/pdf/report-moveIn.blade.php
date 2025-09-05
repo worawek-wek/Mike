@@ -73,7 +73,7 @@
             <td><span>{{ @$row->renter->room_for_rent->payment_method == 1 ? 'เงินสด': 'โอนเงิน'; }}</span></td>
             <td><span>{{ $row->security_deposit }}</span></td>
             <td><span>{{ @$row->renter->room_for_rent->deposit }}</span></td>
-            <td><span>{{ @$row->security_deposit+@$row->renter->room_for_rent->deposit }}</span></td>
+            <td><span>{{ @$row->security_deposit-@$row->renter->room_for_rent->deposit }}</span></td>
         </tr>
             @empty
 
