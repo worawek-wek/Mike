@@ -1,3 +1,5 @@
+{{-- Modal รอคอนเฟิร์ม --}}
+
 <div class="card mb-3">
     <div class="card-header d-flex justify-content-between">
         <div class="card-title mb-0">
@@ -54,15 +56,10 @@
             </li>
             
         </ul>
-        {{-- <div class="border-2 border-light border-top my-3"></div>
-        <h2 class="text-center fw-semibold mb-0"><span class="h5">รวม
-            </span>933,584<span class="h5"></span></h2> --}}
-        {{-- <div class="border-2 border-light border-bottom my-3"></div> --}}
         <div class="card card-body border-0 shadow-none py-2">
             <div
                 class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                 <h5>บิลรอคอนเฟิร์ม</h5>
-                {{-- <h6 class="text-warning text-end">รวมเป็นเงิน <span class="detail_confirm_by_employee"></span></h6> --}}
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered text-nowrap">
@@ -83,9 +80,6 @@
                             <th class="text-center">
                                 จำนวนเงินรวม
                             </th>
-                            {{-- <th class="text-center">
-                                ดำเนินการ
-                            </th> --}}
                         </tr>
                     </thead>
                     <tbody>

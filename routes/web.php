@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PageController;
@@ -75,6 +76,9 @@ Route::controller(UserController::class)->middleware('loggedin')->group(function
     Route::post('user', 'store')->name('user.insert');    //////////////////////////
 });
 Route::middleware('auth')->group(function() {
+    Route::controller(Controller::class)->group(function() {                    //////////////////////////
+        Route::get('get-summary-menu', 'get_summary_menu')->name('get-summary-menu');    //////////////////////////
+    });
     Route::controller(AnalysisController::class)->group(function() {                    //////////////////////////
         Route::get('analysis/monthly-rent', 'monthly_rent')->name('analysis.monthly-rent');    //////////////////////////
         Route::get('analysis/income-expense', 'income_expense')->name('analysis.income-expense');    //////////////////////////
@@ -250,8 +254,10 @@ Route::middleware('auth')->group(function() {
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////
         Route::get('room/reserve', 'reserve_form')->name('reserve');    //////////////////////////
+        Route::get('room/check-in/{room_id}', 'get_check_in')->name('check-in');    //////////////////////////
+        Route::post('room/check-in', 'insert_check_in')->name('check-in');    //////////////////////////
         Route::get('room/form-room-rental-contract', 'room_rental_contract_form')->name('form-room-rental-contract');    //////////////////////////
-        Route::post('room/reserve/chec-user', 'reserve_form_check_user')->name('reserve_form_check_user');    ////////////////////////// 
+        Route::post('room/reserve/chec-user', 'reserve_form_check_user')->name('reserve_form_check_user');    //////////////////////////
         
         Route::get('room/get-form-add-renter/{room_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
         Route::get('room/get-form-add-renter/{room_id}/{renter_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
@@ -259,6 +265,10 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
         Route::post('room/move-out-submit', 'move_out_submit')->name('move-out-submit');    //////////////////////////
+        Route::post('room/save-move-out-receipt', 'save_move_out_receipt')->name('save-move-out-receipt');    //////////////////////////
+        Route::post('room/payment-receipt-move-out-bill', 'payment_receipt_move_out_bill')->name('payment-receipt-move-out-bill');    //////////////////////////
+        Route::get('room/get-move-out-detail-receipt/{room_id}', 'get_move_out_detail_receipt')->name('get-move-out-detail-receipt');    //////////////////////////
+        Route::get('room/get-move-out-form-receipt/{room_id}', 'get_move_out_form_receipt')->name('get-move-out-form-receipt');    //////////////////////////
         Route::post('room/insert_contract', 'insert_contract')->name('insert_contract');    //////////////////////////
         Route::post('room/receipt', 'insert_receipt')->name('insert-receipt');    //////////////////////////
         Route::post('room/receipt/all', 'insert_receipt_all')->name('insert-receipt-all');    //////////////////////////
@@ -281,7 +291,7 @@ Route::middleware('auth')->group(function() {
         Route::post('room/insert-or-update-renter', 'insert_or_update_renter')->name('room.insert_or_update_renter');    //////////////////////////
         Route::get('room/export/excel', 'export_excel')->name('room.export_excel');    //////////////////////////
         Route::get('room/{id}', 'show')->name('show');    //////////////////////////
-        Route::get('room/asset/{room_id}/{asset_id}', 'get_asset')->name('room.get_asset');    //////////////////////////
+        Route::get('room/asset/{room_id}/{asset_id}', 'get_asset')->name('room.get_asset');    ////////////////////////// 
         Route::post('room/asset/update_asset', 'update_asset')->name('room.update_asset');    //////////////////////////
         Route::post('room/asset/asset-upload-image-move-out', 'asset_upload_image_move_out')->name('room.asset-upload-image-move-out');    //////////////////////////
 

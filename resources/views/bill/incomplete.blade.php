@@ -1,3 +1,7 @@
+
+@php
+    $permission_bill_edit = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 26)->where('status', 0)->first();
+@endphp
 <div class="modal-header rounded-0">
     <span class="modal-title">
         <span class="h5" style="color: rgb(232, 255, 226);">ห้อง {{ $invoice->room_for_rent->room->name }}</span>
@@ -90,7 +94,7 @@
 
                             @if (strpos($payment_list_item->title, 'Water rate') !== false) 
                                     <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
-                                    <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;"
+                                    <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
                                         type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
                                         &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
                                         = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
@@ -145,7 +149,7 @@
                 </table>
                 
         {{-- ////////////////////////////////////////////////// --}}
-        <div class="mt-4 text-end col-12">
+        <div class="mt-4 text-end col-12" @if ($permission_bill_edit) style="display: none;" @endif>
             <button
                     id="add_discount"
                     style="padding-right: 14px;padding-left: 14px;"
@@ -176,8 +180,11 @@
         </div>
         
     </div>
-
-    <div class="modal-footer rounded-0 justify-content-start">
+    
+    @php
+        $permission_bill_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 25)->where('status', 0)->first();
+    @endphp
+    <div class="modal-footer rounded-0 justify-content-start" @if($permission_bill_confirm) style="display: none;" @endif>
         {{-- <button type="button" class="btn btn-primary waves-effect"><span
                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
         <button type="submit" class="btn btn-info waves-effect">

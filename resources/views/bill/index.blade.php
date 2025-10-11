@@ -1,3 +1,7 @@
+@php
+    $permission_bill_confirm_payment = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 23)->where('status', 0)->first();
+@endphp
+
 <!doctype html>
 
 <html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr"
@@ -117,7 +121,7 @@
                                                     </div>
                                                     <h5 class="mb-0 d-flex">รอคอนเฟิร์ม
                                                         <button type="button"
-                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write"
+                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write change_status_all_check"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#editserviceModal"
                                                             onclick="waitingForConfirmation()">
@@ -236,8 +240,8 @@
                                             </select>
                                             </div>
                                             <div class="col-md-7 text-end" style="padding-right: unset !important;">
-                                                <button
-                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light d-write"
+                                                <button @if($permission_bill_confirm_payment) style="display: none !important;" @endif
+                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light d-write change_status_all_check"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false" data-bs-toggle="modal" data-bs-target="#123"
@@ -371,12 +375,9 @@
                 <div class="modal-body" id="detail">
                     
                 </div>
-                <div class="modal-footer rounded-0 justify-content-center">
-                    <button
-                            class="btn btn-success buttons-collection  btn-info waves-effect waves-light"
-                            tabindex="0" aria-controls="DataTables_Table_0"
-                            type="button" aria-haspopup="dialog"
-                            aria-expanded="false" data-bs-toggle="modal" data-bs-target="#123"
+                <div class="modal-footer rounded-0 justify-content-center" @if($permission_bill_confirm_payment) style="display: none;" @endif>
+                    <button class="btn btn-success buttons-collection  btn-info waves-effect waves-light change_status_all_check"
+                            type="button"
                             onclick="changeStatusAllCheck()"
                             >
                         <span><i class="ti ti-send"></i> ชำระเงิน</span>
@@ -571,6 +572,13 @@
                     $('.confirm_by_employee_confirm_by_ceo').html(data.confirm_by_employee_confirm_by_ceo);
                     $('#transfer').html(data.transfer+' บาท');
                     $('#cash_wait_for_confirm').html(data.cash_wait_for_confirm+' บาท');
+
+                    if(data.confirm_by_employee != "0 บาท"){
+                        $('.change_status_all_check').prop("disabled", false)
+                    }else{
+                        $('.change_status_all_check').prop("disabled", true)
+                    }
+                    
                 }
             });
         }
@@ -745,7 +753,7 @@
                 $('#editserviceModal').modal('show');
             };
         });
-        function waitingForConfirmation(){
+        function waitingForConfirmation(){ // Modal รอคอนเฟิร์ม
             $.ajax({
                 type: "GET",
                 url: "{{$page_url}}/waiting-for-confirmation",

@@ -17,7 +17,17 @@
     {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
     </span> &nbsp;บาท
 </h4>
-<div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
+
+        @php
+        $permission_bill_deposit_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 35)->where('status', 0)->first();
+        @endphp
+
+<div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;" 
+        @if($permission_bill_deposit_confirm)
+            style="pointer-events: none;  /* ปิดคลิก */
+                    opacity: 0.6;          /* ให้ดูจางลง */
+                    cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+        @endif>
     <div class="d-flex">
         <div class="flex-grow-1 ms-3 g-3 row">
             <b class="text-black">รูปแบบการชำระเงิน</b> <br>
@@ -213,14 +223,14 @@
     </div>
 </div>
 
-<script>
-    
-</script>
-
-  
   <div class="modal-footer rounded-0 justify-content-center">
       <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-      <button class="btn btn-info" type="submit">
+      <button class="btn btn-info" type="submit"
+        @if($permission_bill_deposit_confirm)
+            style="pointer-events: none;  /* ปิดคลิก */
+                    opacity: 0.6;          /* ให้ดูจางลง */
+                    cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+        @endif>
         <span>
         <i class="ti-sm ti ti-report-money"></i>
         <b class="dam">

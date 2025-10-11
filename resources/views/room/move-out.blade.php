@@ -29,7 +29,11 @@
                                     <tbody>
                                         <tr>
                                             <td> สถานะสัญญา </td>
-                                            <td class="text-success">ยังไม่หมดสัญญา</td>
+                                            @if (now()->lt(date('Y-m-d', strtotime("+{$move_contract->period} months", strtotime($move_contract->contract_date)))))
+                                                <td class="text-success">ยังไม่หมดสัญญา</td>
+                                            @else
+                                                <span class="text-danger">หมดสัญญาแล้ว</span>
+                                            @endif
                                         </tr>
                                     </tbody>
                                 </table>
@@ -105,7 +109,7 @@
                                                     <span class="mx-2 badge bg-label-danger">ค้างชำระ</span>
                                             </td>
                                             <td>
-                                                <input class="price_increase" type="hidden" value="{{ 0-$move_invoice_7->balance_amount }}">
+                                                <input class="" type="hidden" value="{{ 0-$move_invoice_7->balance_amount }}">
                                                 <span>
                                                     {{-- {{ @$move_invoice_7->receipts->sum(fn($r) => $r->total_amount) }} --}}
                                                     {{-- @if ($move_invoice_7 && $move_invoice_7->receipts)
@@ -146,6 +150,7 @@
                                     <form id="payment_bill" enctype="multipart/form-data">
                                         @csrf
                                         
+                                        <input name="ref_room_for_rent_id" type="hidden" value="{{ $room_for_rent->id }}">
                                         <input name="ref_room_id" type="hidden" value="{{ $move_contract->ref_room_id }}">
                                         <input name="ref_rent_bill_id" type="hidden" value="{{ $move_invoice_7->id }}">
                                         <input name="ref_contract_id" type="hidden" value="{{ $move_contract->id }}">
@@ -206,20 +211,15 @@
                                                                     @foreach ($move_invoice_7->payment_list as $key => $payment_list_item)
                                                                         <tr>
                                                                             {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
-                                                                            <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
+                                                                            <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="align-items: center;">
 
-                                                                                {{ $payment_list_item->title }}
-
-                                                                            @if ($key == 1)
-                                                                                {{ number_format($payment_list_item->unit) }} = {{ $payment_list_item->unit-0 }} ยูนิต)
-                                                                                    
-                                                                            @endif
+                                                                                {{ $payment_list_item->title }}@if (strpos($payment_list_item->title, 'Water rate') !== false){{ number_format($payment_list_item->unit) }}&nbsp;- &nbsp;{{ $move_invoice_7->previous_water_unit ?? 0 }} = {{ $payment_list_item->unit-$move_invoice_7->previous_water_unit }} ยูนิต)@endif
                                                                             </td>
                                                                             <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
                                                                             @if ($key == 1)
                                                                                 <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                                                                     <span id="text_water_amount">
-                                                                                        {{ $payment_list_item->price }}
+                                                                                        {{ number_format($payment_list_item->price) }}
                                                                                     </span>
                                                                             @else
                                                                                 @if ($payment_list_item->discount == 1)
@@ -447,7 +447,6 @@
                                                                     <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $receipt_1->user->name }}<br>
                                                                     &nbsp;
                                                     </td>
-                                                    
                                                 </tr>
                                             </thead>
                                         </table>
@@ -468,9 +467,6 @@
                                                 <tr>
                                                     <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
                                                         {{ $item_payment_list->title }}
-                                                        @if($item_payment_list->unit > 0 && $key == 1)    
-                                                            {{ number_format($item_payment_list->unit) }} = {{ $item_payment_list->unit - 0 }} ยูนิต)
-                                                        @endif
                                                     </td>
 
                                                         @if ($item_payment_list->discount == 1)
@@ -602,7 +598,7 @@
         if(title == ''){
             $('#tr'+id).remove();
         }else{
-            addRow(title, fine, false, id)
+            addRow(title, fine, 0, id)
         }
         calculateTotal()
         calculate_2Price();
@@ -614,125 +610,19 @@
         }
     });
 </script>
-
                                 {{-- /////////////////////////////// --}}
-                                
-                                <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
-                                    ใบเสร็จย้ายออก
-                                </label>
-                                <div class="row g-2 pt-1">
-                                    <div class="p-2">
-                                        <label class="mb-1 text-black"><i class="ti ti-license text-main mb-1"></i> รายละเอียดหัวบิล</label>
-                                            <select name="ref_renter_id" id="select-renter" class="select-renter" onchange="get_room_rental_move_out(this.value)" required>
-                                                <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
-                                                @foreach ($renter as $rent)
-                                                    <option value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
-                                                @endforeach
-                                            </select>
-                                            
-                                                {{-- <select id="select-renter" name="customer_id" placeholder="เลือกชื่อลูกค้า...">
-                                                    <option value="">-- กรุณาเลือก --</option>
-                                                    <option value="1">สมชาย ใจดี</option>
-                                                    <option value="2">สมหญิง ขยันมาก</option>
-                                                    <option value="3">วราวุธ เก่งจริง</option>
-                                                </select> --}}
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="renter_name" class="form-label">ชื่อผู้เข้าพัก</label>
-                                        <input type="text" name="name" class="form-control" id="renter_name" placeholder="" value="" />
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="renter_address" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-                                        <input type="text" name="homeland" class="form-control" id="renter_address" placeholder="" value="" />
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="renter_phone" class="form-label">เบอร์โทรผู้เข้าพัก</label>
-                                        <input type="text" name="phone" class="form-control" id="renter_phone" placeholder="" value="" />
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="renter_id_card_number" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
-                                        <input type="text" name="id_card_number" class="form-control" id="renter_id_card_number" placeholder="" value="" />
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="renter_remark" class="form-label">หมายเหตุ</label>
-                                        <textarea name="remark" class="form-control" id="renter_remark"></textarea>
-                                    </div>
-                                </div>
-                                <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    รายการชำระเงิน
-                                </label>
-                                <table class="table table-bordered mt-2 table-detail" id="discount-table2" >
-                                    <thead>
-                                        <tr>
-                                            <th>รายการ</th>
-                                            <th width="35%">จำนวนเงิน (บาท)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ">
-                                            </td>
-                                            <td class="text-end">
-                                                <input type="number" name="payment_list[price][]" class="form-control discount-value calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>รวม</th>
-                                            <th class="text-end mb-0 fw-bold total-price_2">
-                                                0
-                                            </th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
 
-                                <div class="mt-4 text-end col-12">
+                                    <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                                        <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
+                                        ใบเสร็จย้ายออก
+                                    </label>
                                     
-                                    <button
-                                            id="add_meter"
-                                            style="padding-right: 14px;padding-left: 14px;"
-                                            class="btn btn-sm buttons-collection btn-info waves-effect waves-light me-2"
-                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                            type="button" aria-haspopup="dialog"
-                                            aria-expanded="false"
-                                            onclick="editMeter()"
-                                            >
-                                        <span>
-                                        <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
-                                    </button>
-                                    <button
-                                            id="add_discount"
-                                            style="padding-right: 14px;padding-left: 14px;"
-                                            class="btn btn-sm buttons-collection btn-danger waves-effect waves-light me-2"
-                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                            type="button" aria-haspopup="dialog"
-                                            aria-expanded="false">
-                                        <span>
-                                        <i class="ti ti-plus"></i> เพิ่มส่วนลด</span>
-                                    </button>
-                                    <button
-                                            id="add_expenses"
-                                            style="padding-right: 14px;padding-left: 14px;"
-                                            class="btn btn-sm buttons-collection btn-warning waves-effect waves-light me-2"
-                                            tabindex="0" aria-controls="DataTables_Table_0"
-                                            type="button" aria-haspopup="dialog"
-                                            aria-expanded="false">
-                                        <span>
-                                        <i class="ti ti-plus"></i> เพิ่มรายการ</span>
-                                    </button>
-                                </div>
-                                    <style>
-                                        .bg-lob {
-                                            background-color: rgb(252 228 228);   
-                                        }
-                                    </style>
-                                    <script>
-                                        ////////////////////////////////////////////////////
-                                    </script>
+                                <form id="form_moveout_receipt">
 
+                                    {{-- ajax ใส่ html ตรงนี้ นะจ๊ะ --}}
+                                    {{-- @include('room/move-out-form-receipt') --}}
+                                
+                                </form>
                                 {{-- /////////////////////////////// --}}
 
                                 <label class="my-4 text-black" style="font-weight: 500;font-size: large;" for="">
@@ -760,13 +650,13 @@
                                                             <td>
                                                                 @if ($k == 0)
                                                                     {{ $prakan->title }}
-                                                                    <input name="payment_list[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
+                                                                    <input name="payment_list_p[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
                                                                 @else
-                                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
                                                                 @endif
                                                             </td>
                                                             <td class="text-end">
-                                                                <input type="number" name="payment_list[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
+                                                                <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -800,7 +690,7 @@
                                             <label>หมายเหตุ</label>
                                             <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
                                         </div>
-                                        
+                                    </form>
                                         <script>
                                             
                                         document.getElementById('add_expenses3').addEventListener('click', function() {
@@ -809,11 +699,11 @@
                                             newRow.style.backgroundColor = 'rgb(255 240 225)'; // Set background color
                                             newRow.innerHTML = `
                                                 <td>
-                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" required />
+                                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" required />
                                                 </td>
                                                 <td class="text-end">
                                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                                        <input name="payment_list[price][]" type="number" class="form-control calculate_3 add_expenses3_price price_increase" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                        <input name="payment_list_p[price][]" type="number" class="form-control calculate_3 add_expenses3_price" oninput="calculate_3Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                                                         <button type="button" class="btn btn-danger btn-sm remove-row3">ลบ</button>
                                                     </div>
                                                 </td>
@@ -829,7 +719,7 @@
                                                 calculate_3Price();
                                             });
                                         }
-                                        calculate_3Price();
+                                            calculate_3Price();
                                         function calculate_3Price() { 
                                             const inputs = document.querySelectorAll('.calculate_3');  // เลือกทุก input ที่มี class="calculate"
                                             let total = 0;
@@ -852,6 +742,7 @@
                                                 }
                                             });
                                             $('.total-price_3').html(total.toLocaleString());
+                                            $('.amount').html('ยอดเงินประกันคืนผู้เช่า '+total.toLocaleString()+' บาท');
                                             $('.total-price_3').val(total);
                                             // อัปเดตค่า total ใน span#total-price
                                             // document.getElementById('total-price').innerText = total.toLocaleString();
@@ -859,29 +750,28 @@
                                 </script>
 
                                 {{-- /////////////////////////////// --}}
-                                <div class="text-center">
-                                    <span class="badge bg-label-success text-black mt-5" style="width: 100%;font-size: larger;">
-                                        สรุปการย้ายออก
-                                    </span>
-                                    <h4 class="my-4 amount">เงินจากการหักเงินประกัน 0 บาท</h4>
-                                    
-                                    <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
-                                        <thead>
-                                        <tr class="text-start">
-                                            <th>วันที่ย้ายออก</th>
-                                            <th style="color: red !important;">
-                                                {{ date('d/m/Y') }}
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                                {{-- /////////////////////////////// --}}
                                 <form id="move_out_submit">
                                     @csrf
                                     <input type="hidden" id="type_move_out" name="type_move_out" value="1">
                                     <input type="hidden" name="id" value="{{ $room->id }}">
                                     <input type="hidden" name="ref_renter_id" value="{{ @$contract->ref_renter_id }}">
+                                    <div class="text-center">
+                                        <span class="badge bg-label-success text-black mt-5" style="width: 100%;font-size: larger;">
+                                            สรุปการย้ายออก
+                                        </span>
+                                        <h4 class="my-4 amount">  </h4>
+                                        
+                                        <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
+                                            <thead>
+                                            <tr class="text-start">
+                                                <th>วันที่ย้ายออก</th>
+                                                <th style="color: red !important;">
+                                                    {{ date('d/m/Y') }}
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
                                     <div class="modal-footer rounded-0 justify-content-start mb-0">
                                         {{-- <button type="button" class="btn btn-label-primary waves-effect text-black"><span
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
@@ -891,101 +781,8 @@
                                         </button>
                                     </div>
                                 </form>
-
                                 {{-- /////////////////////////////// --}}
                                 <script>
-                                    function calculate_2Price() {
-                                        let total = 0;
-
-                                        $('#discount-table2 tbody tr').each(function () {
-                                            const priceInput = $(this).find('input[name="payment_list[price][]"]');
-                                            const price = parseFloat(priceInput.val());
-
-                                            if (!isNaN(price)) {
-                                                // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
-                                                if (priceInput.hasClass('price_increase')) {
-                                                    total -= price;
-                                                } else {
-                                                    // รายการปกติ บวกเพิ่ม
-                                                    total += price;
-                                                }
-                                            }
-                                        });
-
-                                        $('.total-price_2').text(
-                                            total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                        );
-                                    }
-
-                                    function addRow(title = '', price = '', isDiscount = false) {
-                                        const discountClass = isDiscount ? 'price_increase' : 'discount-value';
-                                        const trBackground = isDiscount ? 'bg-lob' : '';
-
-                                        const html = `
-                                            <tr class="${trBackground}">
-                                                <td>
-                                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="${title}">
-                                                </td>
-                                                <td class="text-end d-flex gap-1">
-                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน" oninput="calculate_2Price()">
-                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
-                                                </td>
-                                            </tr>`;
-                                        $('#discount-table2 tbody').append(html);
-                                        calculate_2Price();
-                                    }
-
-                                    // กดเพิ่มส่วนลด
-                                    $('#add_discount').click(() => addRow('ส่วนลด', '', true));
-
-                                    // กดเพิ่มรายการปกติ
-                                    $('#add_expenses').click(() => addRow('', '', false));
-
-                                    // กดเพิ่มรายการค่าน้ำค่าไฟฟ้าสุดท้าย
-                                    function addWaterElectric() {
-                                        // ดึงค่ามิเตอร์น้ำ
-                                        const waterOld = parseFloat(document.querySelector('.water-old')?.value) || 0;
-                                        const waterNew = parseFloat(document.querySelector('.water-new')?.value) || 0;
-                                        const waterUsed = Math.max(waterNew - waterOld, 0);
-                                        const waterPricePerUnit = 20; // ใส่ราคาต่อหน่วยจริง
-                                        const waterPrice = waterUsed * waterPricePerUnit;
-
-                                        // ดึงค่ามิเตอร์ไฟฟ้า
-                                        const electricOld = parseFloat(document.querySelector('.electric-old')?.value) || 0;
-                                        const electricNew = parseFloat(document.querySelector('.electric-new')?.value) || 0;
-                                        const electricUsed = Math.max(electricNew - electricOld, 0);
-                                        const electricPricePerUnit = 5; // ใส่ราคาต่อหน่วยจริง
-                                        const electricPrice = electricUsed * electricPricePerUnit;
-
-                                        var modalEl = document.getElementById('move-out-edit-meter');
-                                        var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
-                                        if (modalInstance) {
-                                            modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
-                                        }
-                                        // เพิ่มรายการลงในตาราง
-                                        if (waterUsed > 0) {
-                                            addRow(`ค่าน้ำ (${waterNew} - ${waterOld} = ${waterUsed} ยูนิต)`, waterPrice.toFixed(2), false);
-                                        }
-                                        if (electricUsed > 0) {
-                                            addRow(`ค่าไฟฟ้า (${electricNew} - ${electricOld} = ${electricUsed} ยูนิต)`, electricPrice.toFixed(2), false);
-                                        }
-                                    }
-
-                                    // ลบแถวรายการ
-                                    $(document).on('click', '.btn-remove-row', function () {
-                                        $(this).closest('tr').remove();
-                                        calculate_2Price();
-                                    });
-
-                                    // คำนวณราคาเมื่อพิมพ์ค่า
-                                    $(document).on('input', '.calculate_2', function () {
-                                        calculate_2Price();
-                                    });
-
-                                    // เรียกคำนวณตอนโหลดหน้า
-                                    $(document).ready(function () {
-                                        calculate_2Price();
-                                    });
                                     
                                     function calculateUsedRow(row) {
                                         // สำหรับน้ำ
@@ -1098,8 +895,105 @@
                                             }
                                         });
                                     });
+                                    $('#form_moveout_receipt').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        var amount_receipt_move_out = parseFloat($('#amount_receipt_move_out').html());
+
+                                        // ถ้าไม่ใช่ตัวเลข ให้ตั้งค่าเป็น 0 เพื่อกัน error
+                                        if (isNaN(amount_receipt_move_out)) {
+                                            amount_receipt_move_out = 0;
+                                        }
+
+                                        if (amount_receipt_move_out < 0) {
+                                            console.log('ยอดติดลบ');
+                                            // เช่น เปลี่ยนสีข้อความให้เป็นแดง
+                                            return Swal.fire('ยอดต้องไม่ติดลบ', '', 'warning');
+                                        }
+
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ บันทึกใบเสร็จย้ายออก หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '/room/save-move-out-receipt',
+                                                    type: 'POST',
+                                                    data: $(this).serialize(),
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            get_move_out();
+                                                            calculateTotal()
+                                                            calculate_2Price()
+                                                            loadData(page);
+                                                            summary();
+                                                            Swal.fire('บันทึกใบเสร็จย้ายออกเรียบร้อยแล้ว', '', 'success');
+                                                        }
+                                                    },
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
+                                    
+                                    
+                                    function calculate_2Price() {
+                                        let total = 0;
+
+                                        $('#discount-table2 tbody tr').each(function () {
+                                            const priceInput = $(this).find('input[name="payment_list[price][]"]');
+                                            const price = parseFloat(priceInput.val());
+
+                                            if (!isNaN(price)) {
+                                                // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
+                                                if (priceInput.hasClass('price_increase')) {
+                                                    total -= price;
+                                                } else {
+                                                    // รายการปกติ บวกเพิ่ม
+                                                    total += price;
+                                                }
+                                            }
+                                        });
+
+                                        $('.total-price_2').text(
+                                            total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        );
+                                    }
                                     var total_amount = 0;
-                                    calculateTotal()
+                                    // setTimeout(() => {
+                                    //     calculateTotal()
+                                    // }, 2000);
                                     function calculateTotal() {
                                         let total = 0;
 
@@ -1107,12 +1001,14 @@
                                         document.querySelectorAll('.price_increase').forEach(input => {
                                             const value = parseFloat(input.value) || 0;
                                             total += value;
+                                            // alert(value);
                                         });
-
+                                        // alert(total);
                                         // ลบค่าที่เป็นส่วนลด
                                         document.querySelectorAll('.discount-value').forEach(input => {
                                             const value = parseFloat(input.value) || 0;
                                             total -= value; // คิดเป็นลบเสมอ
+                                            // alert(value);
                                         });
                                         
                                         const formatted = total.toLocaleString('th-TH', { minimumFractionDigits: 2 });
@@ -1134,6 +1030,7 @@
                                             }
                                         }
                                         total_amount = total;
+                                        // alert(total);
                                     }
                                     $(document).on('input', '.price_increase, .discount-value', function () {
                                         calculateTotal();
@@ -1216,3 +1113,4 @@
                                         $(this).addClass('active btn-danger');
                                     });
                                 </script>
+                                

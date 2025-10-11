@@ -9,8 +9,17 @@ aria-labelledby="pills-home-tab" tabindex="0">
             <div class="col-md-6 col-lg5" 
                     @if($row->status == 1 && $row->status_name == "ค้างชำระ")
                         style="cursor: pointer" onclick="openReservation({{ $row->rent_bill_id }})"
+                    @elseif($row->status == 1 && $row->receipt_status_id != 5)
+
                     @else
-                        style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})"
+                        style="cursor: pointer" data-bs-toggle="modal"
+                        @if ($row->status == 0)
+                            data-bs-target="#reserveOneRoomModal"
+                            onclick="reserveOneRoom({{ $row->id }}, '{{ $row->room_name}} ')"
+                        @else
+                            data-bs-target="#insurance"
+                            onclick="view({{ $row->id }})"
+                        @endif
                     @endif
                 >
                 <div class="
@@ -36,14 +45,13 @@ aria-labelledby="pills-home-tab" tabindex="0">
 
                                 @endphp
                         </p>
-                        @if($row->status == 1 && $row->status_name == "ค้างชำระ")
-                            <div class="text-info h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                                ห้องจอง<span class="text-danger">(ค้างชำระ)</span>
-                            </div>
+                        
+                        @if($row->status == 1 && $row->rent_bill_status != 5)
+                            ห้องจอง<span class="text-danger">(ค้างชำระ)</span></td>
+                        @elseif($row->status == 1 && $row->receipt_status_id != 5)
+                            ห้องจอง<span class="text-warning">(รอคอนเฟิร์มบิล)</span></td>
                         @else
-                        <div class="text-{{ $status_room[$row->status_name] }} h5 text-center" style="margin-top: 0;margin-bottom: 0;">
-                            {{ $row->status_name }}
-                        </div>
+                            {{ $row->status_name }}</td>
                         @endif
                     </div>
                 </div>
@@ -97,7 +105,7 @@ aria-labelledby="pills-home-tab" tabindex="0">
         </div>
     </div>
 </div>
-<div class="tab-pane fade show" id="pills-profile" role="tabpanel"
+<div class="tab-pane fade" id="pills-profile" role="tabpanel"
 aria-labelledby="pills-profile-tab" tabindex="0">
 <table class="datatables-basic table dataTable no-footer dtr-column"
     id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
@@ -109,7 +117,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
             <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all"
                 rowspan="1" colspan="1" style="width: 18px;"
                 data-col="1" aria-label="">
-                <input id="checkAll" type="checkbox" class="form-check-input"></th>
+            </th>
             <th class="text-center" tabindex="0" style="width: 40px;">
                 ห้อง
             </th>

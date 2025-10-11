@@ -189,7 +189,12 @@
         <hr class="mb-4">
     @endif
     @if ($invoice->ref_status_id == 5)
-        <button class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $item_receipt->id }},{{$invoice->id}})">
+    
+    @php
+        $permission_cancel_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 24)->where('status', 0)->first();
+    @endphp
+
+        <button class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $item_receipt->id }},{{$invoice->id}})" @if ($permission_cancel_confirm) style="display: none;" @endif>
             <span>
                 <i class="ti-md ti ti-x"></i>
                 ยกเลิกใบเสร็จ

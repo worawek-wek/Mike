@@ -10,7 +10,9 @@ use App\Models\Position;
 use App\Models\Branch;
 use App\Models\UserHasBranch;
 use App\Models\Schedule;
-use App\Models\Leave;
+use App\Models\Permission;
+use App\Models\PermissionGroups;
+use App\Models\PermissionGroupHasUserBranch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +36,46 @@ class UserController extends Controller
         
     public function index()
     {
+        // $pghub = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', session("branch_id"))->where('ref_user_id', 1)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
+
+        // $permission = [];
+
+        // // จัดกลุ่มตาม ref_permission_group_id
+        // foreach ($pghub as $item) {
+        //     $groupId = $item['ref_permission_group_id'];
+
+        //     // ถ้ายังไม่มี group นี้ใน $permission ให้สร้าง
+        //     if (!isset($permission[$groupId])) {
+        //         $permission[$groupId] = [
+        //             "id" => $item['id'],
+        //             "ref_user_id" => $item['ref_user_id'],
+        //             "ref_branch_id" => $item['ref_branch_id'],
+        //             "ref_permission_group_id" => $groupId,
+        //             "ref_permission_id" => $item['ref_permission_id'],
+        //             "status" => $item['status'],
+        //             "created_at" => $item['created_at'],
+        //             "updated_at" => $item['updated_at'],
+        //             "permission_group" => $item['permission_group'],
+        //             "permission" => []
+        //         ];
+        //     }
+
+        //     // ดึงข้อมูล permission ของ item นี้
+        //     $permission[$groupId]["permission"][] = [
+        //         "id" => $item["permission"]["id"],
+        //         "name" => $item["permission"]["name"],
+        //         "description" => $item["permission"]["description"],
+        //         "ref_permission_id" => $item["permission"]["ref_permission_id"],
+        //         "ref_permission_group_id" => $item["permission"]["ref_permission_group_id"],
+        //         "created_at" => $item["permission"]["created_at"],
+        //         "updated_at" => $item["permission"]["updated_at"],
+        //     ];
+        // }
+
+        // // แปลง associative array เป็น index array
+        // $permission = array_values($permission);
+
+        // return $data['permission'] = $permission;
 
         $data['page_url'] = 'user';
         $data['page'] = 'พนักงาน';
@@ -167,7 +209,7 @@ class UserController extends Controller
         $data['position'] = Position::get();
         $data['work_shift'] = Work_shift::get();
         $data['schedule'] = Schedule::get();
-        $data['leave'] = Leave::get();
+        // $data['leave'] = Leave::get();
         $data['boss'] = User::get();
         $data['action'] = route('user.store');
         $data['user'] = [
@@ -259,6 +301,69 @@ class UserController extends Controller
         $data['page_url'] = 'user';
         $data['position'] = Position::get();
         $data['user'] = User::find($id);
+        
+        $pghub = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', session("branch_id"))->where('ref_user_id', $id)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
+
+        // if($pghub->isNotEmpty()){
+        //     $permission_id_1 = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', 1)->where('ref_user_id', 1)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
+        // }
+
+        $permission = [];
+
+        // จัดกลุ่มตาม ref_permission_group_id
+        foreach ($pghub as $item) {
+            
+            // $branch = UserHasBranch::get();
+            // foreach($branch as $bra){
+            //     if($bra->ref_user_id == $id && $bra->ref_branch_id == session("branch_id")){
+
+            //     }else{
+            //         $insert = new PermissionGroupHasUserBranch();
+            //         $insert->ref_user_id = $bra->ref_user_id;
+            //         $insert->ref_branch_id = $bra->ref_branch_id;
+            //         $insert->ref_permission_group_id = $item['ref_permission_group_id'];
+            //         $insert->ref_permission_id = $item['ref_permission_id'];
+            //         $insert->status = 1;
+            //         $insert->save();
+            //     }
+            // }
+
+            $groupId = $item['ref_permission_group_id'];
+
+            // ถ้ายังไม่มี group นี้ใน $permission ให้สร้าง
+            if (!isset($permission[$groupId])) {
+                $permission[$groupId] = [
+                    "id" => $item['id'],
+                    "ref_user_id" => $item['ref_user_id'],
+                    "ref_branch_id" => $item['ref_branch_id'],
+                    "ref_permission_group_id" => $groupId,
+                    "ref_permission_id" => $item['ref_permission_id'],
+                    "status" => $item['status'],
+                    "created_at" => $item['created_at'],
+                    "updated_at" => $item['updated_at'],
+                    "permission_group" => $item['permission_group'],
+                    "permission" => []
+                ];
+            }
+
+            // ดึงข้อมูล permission ของ item นี้
+            $permission[$groupId]["permission"][] = [
+                "id" => $item["permission"]["id"],
+                "name" => $item["permission"]["name"],
+                "description" => $item["permission"]["description"],
+                "ref_permission_id" => $item["permission"]["ref_permission_id"],
+                "ref_permission_group_id" => $item["permission"]["ref_permission_group_id"],
+                "permission_group_has_user_branch_id" => $item['id'],
+                "permission_group_has_user_branch_status" => $item['status'],
+                "created_at" => $item["permission"]["created_at"],
+                "updated_at" => $item["permission"]["updated_at"],
+            ];
+        }
+        // DB::commit();
+        // แปลง associative array เป็น index array
+        $permission = array_values($permission);
+
+        $data['permission'] = $permission;
         return view('user/view', $data);
      }
 
@@ -289,7 +394,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+        // return $request;
         try{
 
             $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');

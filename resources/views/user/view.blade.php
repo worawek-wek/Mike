@@ -57,7 +57,7 @@
                                             <i class="ti ti-flag text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">Email:</span> <span>{{ $user->email }}</span>
                                             </li>
                                             <li class="d-flex align-items-center mb-3">
-                                            <i class="ti ti-flag text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">วันที่เข้าทำงาน:</span> <span>{{ $user->work_start_date }}</span>
+                                            <i class="ti ti-flag text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">วันที่เข้าทำงาน:</span> <span>{{  date('d/m/Y', strtotime($user->work_start_date)) }}</span>
                                             </li>
                                             <li class="d-flex align-items-center mb-3">
                                             <i class="ti ti-file-description text-heading"></i><span class="fw-medium mx-2 me-4 text-heading">หมายเหตุ:</span> <span>{{ $user->remark }}</span>
@@ -101,7 +101,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <label for="bs-datepicker-format" class="form-label">วันที่เข้าทำงาน</label><span class="text-danger"> *</span>
-                                    <input name="work_start_date" value="{{date('d/m/Y', strtotime($user->work_start_date))}}" type="text" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" required/>
+                                    <input name="work_start_date" value="{{ date('d/m/Y', strtotime($user->work_start_date)) }}" type="text" class="form-control" id="bs-datepicker-format2" placeholder="วัน/เดือน/ปี" required/>
                                 </div>
                                 <div class="col-sm-6">
                                     <label for="" class="form-label">ตำแหน่ง</label>
@@ -162,69 +162,52 @@
                                     <textarea name="remark" class="form-control"></textarea>
                                 </div>
                             </div>
-                            {{-- <div class="col-sm-12 text-start">
+                            
+                            {{-- ///////////////////////////////////////
+                            กำหนดสิทธิ์
+                            /////////////////////////////////////// --}}
+
+                            <div class="col-sm-12 text-start">
                                 <h5 class="border-bottom pb-3 text-warning">
                                     <i class="ti ti-pencil"></i> Permission
                                 </h5>
                             </div>
                             <div class="row g-3 p-4">
-                                <div class="col-md-4">
-                                    <div class="card card-action mb-4">
-                                        <div class="card-header collapsed">
-                                        <div class="card-action-title">Collapsible Card</div>
-                                        <div class="card-action-element">
-                                            <ul class="list-inline mb-0">
-                                            <li class="list-inline-item">
-                                                <a href="javascript:void(0);" class="card-collapsible"
-                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
-                                                ></a>
-                                            </li>
-                                            </ul>
-                                        </div>
-                                        </div>
-                                        <div class="collapse">
-                                        <div class="card-body">
-                                            <p class="card-text">
-                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
-                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
-                                            </p>
-                                            <p class="card-text d-flex align-items-center gap-1">
-                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
-                                            action.
-                                            </p>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card card-action mb-4">
-                                        <div class="card-header">
-                                        <div class="card-action-title">Collapsible Card</div>
-                                        <div class="card-action-element">
-                                            <ul class="list-inline mb-0">
-                                            <li class="list-inline-item">
-                                                <a href="javascript:void(0);" class="card-collapsible"
-                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
-                                                ></a>
-                                            </li>
-                                            </ul>
-                                        </div>
-                                        </div>
-                                        <div class="collapse show">
-                                        <div class="card-body">
-                                            <p class="card-text">
-                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
-                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
-                                            </p>
-                                            <p class="card-text d-flex align-items-center gap-1">
-                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
-                                            action.
-                                            </p>
-                                        </div>
+                                @foreach ($permission as $permiss)
+                                @php
+                                    if ($permiss['permission_group']->id == 3){
+                                        continue;
+                                    }
+                                @endphp
+                                    
+                                    <div class="col-md-4">
+                                        <div class="card card-action mb-4">
+                                            <div class="card-header collapsed">
+                                            <div class="card-action-title">{{ $permiss['permission_group']->name }}</div>
+                                                <div class="card-action-element">
+                                                    <ul class="list-inline mb-0">
+                                                        <li class="list-inline-item">
+                                                            <a href="javascript:void(0);" class="card-collapsible">
+                                                                <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="collapse">
+                                                <div class="card-body pt-0">
+                                                    @foreach ($permiss['permission'] as $item)
+                                                    <div class="my-2">
+                                                        <input name="permission_id[]" class="form-check-input me-2" type="checkbox" id="permiss{{ $item['id'] }}" value="{{ $item['permission_group_has_user_branch_id'] }}" {{ $item['permission_group_has_user_branch_status'] == 1 ?'checked':''; }} onclick="toggleSelectFields12()">
+                                                        <label class="form-check-label" for="permiss{{ $item['id'] }}"> {{ $item['name'] }}</label>
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                @endforeach
+                                {{-- <div class="col-md-4">
                                     <div class="card card-action mb-4">
                                         <div class="card-header">
                                         <div class="card-action-title">Collapsible Card</div>
@@ -280,7 +263,40 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div> --}}
+                                <div class="col-md-4">
+                                    <div class="card card-action mb-4">
+                                        <div class="card-header">
+                                        <div class="card-action-title">Collapsible Card</div>
+                                        <div class="card-action-element">
+                                            <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="javascript:void(0);" class="card-collapsible"
+                                                ><i class="tf-icons ti ti-chevron-right scaleX-n1-rtl ti-sm"></i
+                                                ></a>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <div class="collapse show">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                            To create a collapsible card, use <code>.card-collapsible</code> class with action item. To
+                                            show the collapsible content default use <code>.show</code> class with <code>.collapse</code>.
+                                            </p>
+                                            <p class="card-text d-flex align-items-center gap-1">
+                                            Click on <i class="tf-icons ti ti-chevron-right scaleX-n1-rtl"></i> to see card collapse in
+                                            action.
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div> --}}
+                            </div>
+
+                            {{-- ///////////////////////////////////////
+                            กำหนดสิทธิ์
+                            /////////////////////////////////////// --}}
+                            
                             <div class="modal-footer rounded-0 justify-content-center">
                                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
                                 <button type="submit" class="btn btn-main">บันทึก</button>

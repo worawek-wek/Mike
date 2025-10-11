@@ -25,6 +25,7 @@ use App\Models\Subdistrict;
 use App\Models\Company;
 use App\Models\RentalcontractModel;
 use App\Models\Setting_bill;
+use App\Models\PermissionGroupHasUserBranch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -1169,7 +1170,7 @@ class SettingController extends Controller
     }
     public function update_user(Request $request, $id)
     {
-        
+        // return $request;
         try{
             $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
 
@@ -1190,6 +1191,9 @@ class SettingController extends Controller
             $uhb = UserHasBranch::where('ref_user_id',$id)->where('ref_branch_id', session("branch_id"))->first();
             $uhb->ref_position_id  =  $request->ref_position_id;
             $uhb->save();
+
+            PermissionGroupHasUserBranch::where('ref_user_id', $id)->where('ref_branch_id', session("branch_id"))->update(['status' => 0]);
+            PermissionGroupHasUserBranch::whereIn('id', $request->permission_id)->update(['status' => 1]);
 
             DB::commit();
             return 1;

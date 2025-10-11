@@ -38,11 +38,18 @@
         </span>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="col-md-12" style="padding-right: unset !important;">
+    <div class="col-md-12 px-5">
         <div class="card shadow-none bg-transparent mb-3">
             <div class="card-body">
                 <ul class="nav nav-pills" role="tablist" style="justify-content: space-between;padding: 0 35px;">
-                    <li class="nav-item" role="presentation">
+@php
+    $permission_renter = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 58)->where('status', 0)->first();
+@endphp
+                    <li class="nav-item" role="presentation"@if($permission_renter)
+                                                            style="pointer-events: none;  /* ปิดคลิก */
+                                                                    opacity: 0.6;          /* ให้ดูจางลง */
+                                                                    cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                                                        @endif>
                     {{-- <button type="button" class="btn btn-outline-primary">Primary</button> --}}
                       <button class="btn btn-outline-info nav-link active" 
                         role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-edit" aria-controls="navs-pills-top-edit" aria-selected="false" tabindex="-1">
@@ -54,7 +61,15 @@
                         </span>
                       </button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    
+@php
+    $permission_contract = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 46)->where('status', 0)->first();
+@endphp
+                    <li class="nav-item" role="presentation"@if($permission_contract)
+                                                            style="pointer-events: none;  /* ปิดคลิก */
+                                                                    opacity: 0.6;          /* ให้ดูจางลง */
+                                                                    cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                                                        @endif>
                       <button class="btn btn-outline-danger nav-link" 
                         role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
                         <span>
@@ -122,11 +137,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
-
+@php
+    $permission_move = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 42)->where('status', 0)->first();
+@endphp
                       <div class="tab-pane fade active show mb-5" id="navs-pills-top-edit" role="tabpanel">
                         <div class="card shadow-none bg-transparent">
-                            <div class="card-body mb-4" style="background-color: #f5f5f5;border-radius: 1em;border: 1.6px solid #b5b5b56b;">
-                                <div class="row mb-3">
+                            <div class="card-body mb-4" style="background-color: #f5f5f5;border-radius: 1em;border: 1.6px solid #b5b5b56b;" @if($permission_renter) style="display: none !important" @endif>
+                                <div class="row mb-3" @if($permission_move)
+                                                            style="pointer-events: none;  /* ปิดคลิก */
+                                                                    opacity: 0.6;          /* ให้ดูจางลง */
+                                                                    cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                                                        @endif>
                                     <div class="col-md-8" style="padding-right: unset !important;">
                                     </div>
                                     <div class="col-md-2" style="padding-right: 0">
@@ -205,7 +226,7 @@
                                 </h5>
                                 <div class="row g-2 p-4 pt-1">
                                     <div class="col-sm-12">
-                                        <select name="ref_renter_id" id="select2RenterContract2" class="select2 form-select form-select-lg" onchange="get_room_rental_contract(this.value)" required>
+                                        <select name="ref_renter_id" id="select2RenterContract2" class="" onchange="get_room_rental_contract(this.value)" required>
                                             <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                                             @foreach ($renter as $rent)
                                                 <option value="{{ $rent->id }}" selected>{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
@@ -409,8 +430,13 @@
             type: "GET",
             url: "{{ $page_url }}/get-move-out/{{$room->id}}",
             success: function(data) {
-                $("#navs-pills-top-MoveOut").html(data);
-                
+                $("#navs-pills-top-MoveOut").html(data.html);
+                calculateTotal()
+                if(data.invoice_move_out == 0){
+                    editFormReceipt();   
+                }else{
+                    get_move_out_detail_receipt();   
+                }
                 new TomSelect("#select-renter", {
                     create: false,      // ไม่ให้พิมพ์เพิ่มเอง
                     maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
@@ -420,6 +446,37 @@
                         direction: "asc"
                     }
                 });
+            }
+        });
+    }
+    function editFormReceipt(){
+        $.ajax({
+            type: "GET",
+            url: "{{ $page_url }}/get-move-out-form-receipt/{{$room->id}}",
+            success: function(data) {
+                $("#form_moveout_receipt").html(data);
+                calculateTotal()
+                calculate_2Price()
+                new TomSelect("#select-renter", {
+                    create: false,      // ไม่ให้พิมพ์เพิ่มเอง
+                    maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
+                    allowEmptyOption: true, // แสดง option แรกที่ไม่มีค่า (เช่น "-- กรุณาเลือก --")
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            }
+        });
+    }
+    function get_move_out_detail_receipt(){
+        $.ajax({
+            type: "GET",
+            url: "{{ $page_url }}/get-move-out-detail-receipt/{{$room->id}}",
+            success: function(data) {
+                calculateTotal()
+                calculate_2Price()
+                $("#form_moveout_receipt").html(data);
             }
         });
     }
@@ -779,6 +836,6 @@
         $('#select2month').select2();
         // $('#select2RenterDetail').select2();
         $('#select2RenterContract').select2();
-        $('#select2RenterContract2').select2();
+        // $('#select2RenterContract2').select2();
 
 </script>

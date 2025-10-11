@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-select/bootstrap-select.css" /> --}}
 {{-- <link rel="stylesheet" href="assets/vendor/libs/sweetalert2/sweetalert2.css" /> --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="assets/vendor/fonts/tabler-icons.css" />
 
 <link rel="stylesheet" href="assets/vendor/libs/select2/select2.css" />
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-select/bootstrap-select.css" />

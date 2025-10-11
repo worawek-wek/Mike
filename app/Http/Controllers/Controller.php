@@ -19,6 +19,29 @@ use Carbon\Carbon;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    public function get_summary_menu(){
+
+        if(!@$branch_id){
+            $branch_id = session("branch_id");
+        }
+        $overdue_bill = RentBill::whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('ref_type_id', 1)
+                                        ->whereNotIn('ref_status_id', [3, 5])
+                                        ->get()->count();
+
+        $booking_room = Room::whereHas('floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('status', 1)
+                                        ->get()->count();
+
+        $data['overdue_bill'] = $overdue_bill;
+        $data['booking_room'] = $booking_room;
+
+        return $data;
+    }
     public function summary($branch_id, $month = null, $year = null)
     {
         if(!$branch_id){

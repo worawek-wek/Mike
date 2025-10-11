@@ -11,6 +11,11 @@
 
 @foreach ($rent_bill_s as $key => $rent_bill)
 
+{{-- @php
+    $id[] = [$rent_bill->room_name]
+@endphp --}}
+<div class="mb-3 pb-4 billReserveRoom" style="border: 1px solid #dbdade;padding: 15px 2px;" id="billReserveRoom{{$rent_bill->id}}">
+    
 <input name="insert[{{ $key }}][ref_room_id]" type="hidden" value="{{ $rent_bill->ref_room_id }}">
 <input name="insert[{{ $key }}][ref_rent_bill_id]" type="hidden" value="{{ $rent_bill->id }}">
 <input name="insert[{{ $key }}][ref_contract_id]" type="hidden" value="{{ $rent_bill->contract_id }}">
@@ -18,15 +23,16 @@
 <input name="insert[{{ $key }}][ref_type_id]" type="hidden" value="3">
 <input name="insert[{{ $key }}][amount]" class="total-price-lhai" type="hidden">
 
+        <div class="d-flex justify-content-end align-items-center">
+            <a href="javascript:void(0)" onclick="deleteBillReserveRoom({{$rent_bill->id}})" class="pb-4 pe-4">
+                <i class="fa fa-trash text-danger"></i>
+            </a>
+        </div>
 <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">
     {{ number_format($rent_bill->deposit) }}
     {{-- {{ number_format($rent_bill->room_for_rent->room->rent + $rent_bill->water_amount+$rent_bill->electricity_amount) }} --}}
     </span> &nbsp;บาท
 </h4>
-{{-- @php
-    $id[] = [$rent_bill->room_name]
-@endphp --}}
-<div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
     <div class="d-flex">
         <div class="flex-grow-1 ms-3 g-3 row">
             <b class="text-black">รูปแบบการชำระเงิน</b> <br>
@@ -302,5 +308,12 @@
         // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
         // togglePaymentFields();
         
+    function deleteBillReserveRoom(id){
+        if ($('.billReserveRoom').length > 1) {
+            $("#billReserveRoom"+id).remove();
+        } else {
+            Swal.fire('ไม่สามารถลบได้', 'การชำระค่าจองต้องมีอย่างน้อย 1 ห้อง', 'warning');
+        }
+    }
 
   </script>

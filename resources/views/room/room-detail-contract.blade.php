@@ -172,14 +172,15 @@
                         class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
             </div>
             {{--  --}}
-            @if ($key+1 < count($receipt))
+            @if ($key+1 < count($receipt) ?? 0)
                 <hr class="mb-4">
             @endif
             {{--  --}}
         </div>
         
     @endforeach   
-    
+    @if (@$receipt_jong)
+        
         <h5 class="my-4" style="color: black;">ข้อมูลค่าจองห้อง</h5>
         <div class="p-4" style="border: 1px solid #59d57a;border-radius: 5px;">
         <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt_jong->receipt_number }}</span></p>
@@ -264,6 +265,7 @@
             @endif --}}
             {{--  --}}
         </div>
+    @endif
 <iframe id="print-iframe" style="display: none;"></iframe>                   
 <script>
     function printPdf(id) {

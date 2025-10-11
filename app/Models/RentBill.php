@@ -36,6 +36,10 @@ class RentBill extends Model
     {
         return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id');
     }
+    public function receipt_move_out()
+    {
+        return $this->hasOne(Receipt::class, 'ref_rent_bill_id', 'id');
+    }
     public function receipt_pay_cash()
     {
         return $this->hasMany(Receipt::class, 'ref_rent_bill_id', 'id')->where('payment_channel',1);

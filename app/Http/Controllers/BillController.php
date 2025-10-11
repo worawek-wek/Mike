@@ -127,6 +127,7 @@ class BillController extends Controller
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
+                                ->where('room_for_rents.status', 1)
                                 ->distinct('rent_bills.id')
                                 ->select('rent_bills.*', 'rent_bills.id as rent_bill_id', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
         
@@ -457,7 +458,7 @@ class BillController extends Controller
         $data['expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
         $data['invoice'] = $invoice;
         $data['contract'] = $contract;
-        $data['bank'] = Bank::get();
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         $data['days'] = [
             'Sunday'    => 'อาทิตย์',
             'Monday'    => 'จันทร์',
@@ -499,11 +500,17 @@ class BillController extends Controller
     {
         try{
             if($request->status == 3){
-                PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->delete();
+                PaymentList::whereHas('invoice.room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })->where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->get();
             }
             if($id == 'all'){
-                Receipt::where('ref_status_id', 2)->update(['ref_status_id'=> 5]);
-                $bills = RentBill::with(['receipt.payment_list', 'payment_list'])
+                Receipt::whereHas('room.floor.building', function ($query) {
+                            $query->where('ref_branch_id', session("branch_id"));
+                        })->where('ref_status_id', 2)->update(['ref_status_id'=> 5]);
+                $bills = RentBill::whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })->with(['receipt.payment_list', 'payment_list'])
                                     ->where('ref_status_id', 2)
                                     ->get();
 

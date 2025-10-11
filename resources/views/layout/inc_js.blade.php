@@ -6,27 +6,27 @@
             </div>
 
           <script>
-              function user_view(id){
-                  $.ajax({
-                      type: "GET",
-                      url: "/user/"+id,
-                      success: function(data) {
-                          $("#user_view").html(data);
+                function user_view(id){
+                    $.ajax({
+                        type: "GET",
+                        url: "/user/"+id,
+                        success: function(data) {
+                            $("#user_view").html(data);
 
-                            $('#select2Position2').select2({
-                                placeholder: 'เลือกตำแหน่ง',
-                                allowClear: true,
-                                dropdownParent: $('#insurance_2'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                                width: '100%'
-                            });
+                                $('#select2Position2').select2({
+                                    placeholder: 'เลือกตำแหน่ง',
+                                    allowClear: true,
+                                    dropdownParent: $('#insurance_2'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
+                                    width: '100%'
+                                });
 
-                            // $('#insurance').modal('show');
-                            // setTimeout(() => {
-                            //     console.log($('#user_view').html());
-                            // }, 300);
-                      }
-                  });
-              }
+                                // $('#insurance').modal('show');
+                                // setTimeout(() => {
+                                //     console.log($('#user_view').html());
+                                // }, 300);
+                        }
+                    });  
+                }
           </script>
     
     <!-- Core JS -->
@@ -68,3 +68,17 @@
     <!-- <script src="assets/js/dashboards-crm.js"></script> -->
     <script src="assets/js/forms-selects.js"></script>
     {{-- <script src="assets/js/forms-pickers.js"></script> --}}
+    <script>
+            get_summary_menu()
+            function get_summary_menu(){
+                $.ajax({
+                    type: "GET",
+                    url: "get-summary-menu",
+                    success: function(data) {
+                        $("#countBill").html(data.overdue_bill);
+                        $("#countBookingRoom").html(data.booking_room);
+                    }
+                });
+            }
+
+    </script>

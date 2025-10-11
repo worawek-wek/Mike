@@ -328,14 +328,14 @@
                                                 <label class="">Show</label>
                                                 <select onchange='loadData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_search" style="width:100px">
                                                     <option value="10">10</option>
-                                                    <option value="50">50</option>
+                                                    <option value="50" selected>50</option>
                                                     <option value="100">100</option>
                                                     <option value="150">150</option>
                                                 </select>
                                                 <ul class="nav nav-pills" id="pills-tablayout" role="tablist">
                                                     <li class="nav-item me-1" role="presentation">
                                                         <button type="button" onclick="ch_div('pills-home')"
-                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect"
+                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect active"
                                                             id="pills-home-tab" data-bs-toggle="pill"
                                                             data-bs-target="#pills-home" type="button" role="tab"
                                                             aria-controls="pills-home" aria-selected="true">
@@ -344,7 +344,7 @@
                                                     </li>
                                                     <li class="nav-item" role="presentation">
                                                         <button type="button" onclick="ch_div('pills-profile')"
-                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect active"
+                                                            class="btn btn-icon btn-sm btn-label-secondary waves-effect"
                                                             data-bs-toggle="pill" data-bs-target="#pills-profile"
                                                             type="button" role="tab" aria-controls="pills-profile"
                                                             aria-selected="false">
@@ -404,6 +404,35 @@
         <div class="drag-target"></div>
     </div>
     <!--set rent Modal -->
+
+    <div class="modal fade modalHeadDecor" id="insertCheckIn" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">ทำสัญญาเข้าพัก ห้อง <span id="check_in_room_name"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="insert_check_in">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
+                            <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
+                                <i class="tf-icons ti ti-user text-main" style="font-size: 25px;vertical-align: baseline;"></i>
+                                ข้อมูลส่วนตัว
+                            </h5>
+                            <div class="row g-3 p-4 pt-1" id="check_in">
+                                    {{-- @include('room/room-reserve-form') --}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer rounded-0 justify-content-center">
+                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-main">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="modal fade modalHeadDecor" id="insertRenter" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
@@ -414,6 +443,27 @@
                 <form id="insert_renter">
                     @csrf
                 <div class="modal-body" id="reserve">
+                    {{-- @include('room/room-reserve-form') --}}
+                </div>
+                <div class="modal-footer rounded-0 justify-content-center">
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="submit" class="btn btn-main">บันทึก</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modalHeadDecor" id="reserveOneRoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">จองห้อง <span id="room_name_reserve" ></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="reserve_one_room">
+                    @csrf
+                    <input type="hidden" name="room_text_id[]" id="id_reserve_one">
+                <div class="modal-body" id="reserveOneRoom">
                     {{-- @include('room/room-reserve-form') --}}
                 </div>
                 <div class="modal-footer rounded-0 justify-content-center">
@@ -444,6 +494,9 @@
             </div>
         </div>
     </div>
+    @php
+        $permission_bill_reserve_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 38)->where('status', 0)->first();
+    @endphp
     <div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
@@ -451,17 +504,22 @@
                     <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าจองหลายห้อง</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="reservation_form_all" enctype="multipart/form-data">
+                <form id="reservation_form_all" enctype="multipart/form-data"
+                    @if($permission_bill_reserve_confirm)
+                        style="pointer-events: none;  /* ปิดคลิก */
+                                opacity: 0.6;          /* ให้ดูจางลง */
+                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                    @endif>
                     @csrf
                     <div class="modal-body">
                         <div class="p-2">
                             <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
-                                <select name="ref_renter_id" id="select2Renter2" class="select2 form-select form-select-lg" onchange="get_room_rental_reservation(this.value)" required>
-                                    <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
-                                    @foreach ($renter as $rent)
-                                        <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
-                                    @endforeach
-                                </select>
+                            <select name="ref_renter_id" id="select2Renter2" onchange="get_room_rental_reservation(this.value)" required>
+                                <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
+                                @foreach ($renter as $rent)
+                                    <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                @endforeach
+                            </select>
                                 
                         </div>
                         <div id="room-rental-reservation">
@@ -477,7 +535,7 @@
         </div>
     </div>
     <div class="modal fade modalHeadDecor" id="insurance" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" id="view">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document" id="view">
             
         </div>
     </div>
@@ -721,7 +779,7 @@
         var searchData = {};
         loadData(page);
         
-        var ch = "pills-profile";
+        var ch = "pills-home";
         function ch_div(id_ch){
             ch = id_ch;
         }
@@ -739,9 +797,16 @@
                         myModal.show();
                 }
             });
+            
             // var myModal = new bootstrap.Modal(document.getElementById('deposit'));
             //     myModal.show();
         }
+            new TomSelect("#select2Renter2", {
+                            create: false,
+                            maxItems: 1,
+                            allowEmptyOption: true,
+                            sortField: { field: "text", direction: "asc" }
+                        });
 // function แสดงรูป ทรัพย์สิน ในย้ายออก
         function showImage(src) {
             document.getElementById('previewImage').src = src;
@@ -834,11 +899,13 @@
         // }
         var view_id = 0;
         function view(id){
+            document.getElementById('loadingOverlay').style.display = 'flex';
             view_id = id;
             $.ajax({
                 type: "GET",
                 url: "{{$page_url}}/"+id,
                 success: function(data) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
                     $("#view").html(data);
                     // $('#select2District').select2('destroy');
 
@@ -846,6 +913,12 @@
                     //     new TomSelect('#select2RenterMove');
                     // }, 1000);
                     new TomSelect("#change_room", {
+                                    create: false,
+                                    maxItems: 1,
+                                    allowEmptyOption: true,
+                                    sortField: { field: "text", direction: "asc" }
+                                });
+                    new TomSelect("#select2RenterContract2", {
                                     create: false,
                                     maxItems: 1,
                                     allowEmptyOption: true,
@@ -859,12 +932,6 @@
                     // });
                     $('#select2month').select2({
                         placeholder: 'เลือกเดือน',
-                        allowClear: true,
-                        dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                        width: '100%'
-                    });
-                    $('#select2RenterContract2').select2({
-                        placeholder: 'เลือกข้อมูลจากผู้เช่า',
                         allowClear: true,
                         dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
                         width: '100%'
@@ -930,6 +997,147 @@
             });
         }
         
+        function toggleSelectReserveOrCheckin(room_id, room_name){
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/check-in/"+room_id,
+                success: function(data) {
+                    $("#check_in").html(data);
+                    $("#check_in_room_name").html(room_name);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    // tomProvince = new TomSelect("#select2Basic", {
+                    //                 create: false,
+                    //                 maxItems: 1,
+                    //                 allowEmptyOption: true,
+                    //                 sortField: { field: "text", direction: "asc" }
+                    //             });
+
+                    // tomDistrict = new TomSelect("#select2District99", {
+                    //                 create: false,
+                    //                 maxItems: 1,
+                    //                 allowEmptyOption: true,
+                    //                 sortField: { field: "text", direction: "asc" }
+                    //             });
+
+                    // tomSubdistrict = new TomSelect("#select2Subdistrict", {
+                    //                 create: false,
+                    //                 maxItems: 1,
+                    //                 allowEmptyOption: true,
+                    //                 sortField: { field: "text", direction: "asc" }
+                    //             });
+
+                    // setTimeout(() => {
+                    //     // $('#bs-datepicker-format').datepicker({
+                    //     //     format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                    //     //     autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                    //     //     todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                    //     // });
+                    //     $('#bs-datepicker-format2').datepicker({
+                    //         format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                    //         autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                    //         todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                    //     });
+                    //     $('#exampleFormControlInput13').datepicker({
+                    //         format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                    //         autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                    //         todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                    //     });
+                    //     $('#exampleFormControlInput33').datepicker({
+                    //         format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                    //         autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                    //         todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                    //     });
+                    // }, 2000);
+                    
+                }
+            });
+        }
+        
+        function reserveOneRoom(id, name){
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            $("#room_name_reserve").html(name);
+            $("#id_reserve_one").val(id);
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/reserve",
+                data:{
+                    room_id: id,
+                    room_name: name
+                },
+                success: function(data) {
+                    $("#reserveOneRoom").html(data);
+
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    tomProvince = new TomSelect("#select2Basic", {
+                                    create: false,
+                                    maxItems: 1,
+                                    allowEmptyOption: true,
+                                    sortField: { field: "text", direction: "asc" }
+                                });
+
+                    tomDistrict = new TomSelect("#select2District99", {
+                                    create: false,
+                                    maxItems: 1,
+                                    allowEmptyOption: true,
+                                    sortField: { field: "text", direction: "asc" }
+                                });
+
+                    tomSubdistrict = new TomSelect("#select2Subdistrict", {
+                                    create: false,
+                                    maxItems: 1,
+                                    allowEmptyOption: true,
+                                    sortField: { field: "text", direction: "asc" }
+                                });
+
+                    setTimeout(() => {
+                        // $('#bs-datepicker-format').datepicker({
+                        //     format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                        //     autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                        //     todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                        // });
+                        $('#bs-datepicker-format2').datepicker({
+                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                        });
+                        $('#exampleFormControlInput13').datepicker({
+                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                        });
+                        $('#exampleFormControlInput33').datepicker({
+                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                        });
+                    }, 2000);
+                    
+                    $.ajax({
+                        url: '/room/selected', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'get',
+                        data: { rooms: [id] },
+                        success: function(response) {
+                                document.getElementById('loadingOverlay').style.display = 'none';
+                                $("#room-selected1").html(response);
+                        },
+                        error: function(error) {
+                            document.getElementById('loadingOverlay').style.display = 'none';
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', error);
+                        }
+                    });
+                    
+                },
+                error: function(error) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                    console.error('เกิดข้อผิดพลาด:', error);
+                }
+            });
+        }
         function roomRentalContract(){
             document.getElementById('loadingOverlay').style.display = 'flex';
             $.ajax({
@@ -1010,8 +1218,21 @@
                 success: function(data) {
                     $("#pills-tabContent").html(data);
                     $('#'+ch).addClass('active');
-                    
-                    // $("#table-data").html(data);
+                    if(ch == "pills-home"){
+                        // ปิดแท็บ home
+                        document.querySelector('#pills-home').classList.add('show', 'active');
+
+                        // เปิดแท็บ profile
+                        document.querySelector('#pills-profile').classList.remove('show', 'active');
+                        // $("#table-data").html(data);
+                    }else{
+                        // ปิดแท็บ home
+                        document.querySelector('#pills-home').classList.remove('show', 'active');
+
+                        // เปิดแท็บ profile
+                        document.querySelector('#pills-profile').classList.add('show', 'active');
+                        // $("#table-data").html(data);
+                    }
                 }
             });
             // alert(page);
@@ -1078,6 +1299,15 @@
                 Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
                 return false;
             }
+            // if($('#check_selected').val() == 0 && selectChannel == 2){
+            //     return Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
+            // }
+            // let roomText = $('#room_text').val().trim();
+
+            // if (selectChannel == '1' && roomText === '') {
+            //     Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
+            //     return false;
+            // }
             // return alert(123);
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',
@@ -1109,6 +1339,161 @@
                                 $('#roomRentalReservation').modal('show');
                                 get_room_rental_reservation(response);
                                 $('#insert_renter')[0].reset();
+                                loadData(page);
+                                summary();
+                                // Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success');
+                                
+                                Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
+                                    // location.reload();
+                                });
+                            }else{
+                                Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+        });
+        $('#insert_check_in').on('submit', function(event) {  // อันนี้คือ เพิ่มการจอง
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+            if(!this.checkValidity()) {
+                // ถ้าฟอร์มไม่ถูกต้อง
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+                
+            }
+            
+            const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ เข้าพัก หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/room/check-in', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if(response.message == null){
+                                
+                                var modalEl = document.getElementById('insertCheckIn');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                // $('#insert_check_in').modal('hide');
+                                // $('#roomRentalReservation').modal('show');
+                                // get_room_rental_reservation(response);
+                                $('#insert_check_in')[0].reset();
+                                loadData(page);
+                                summary();
+                                // Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success');
+                                
+                                Swal.fire('เข้าพักเรียบร้อยแล้ว', '', 'success').then((result) => {
+                                    // location.reload();
+                                });
+                            }else{
+                                Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+        });
+        // จองห้องเดียว
+        $('#reserve_one_room').on('submit', function(event) {  // อันนี้คือ เพิ่มการจอง
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+            if(!this.checkValidity()) {
+                // ถ้าฟอร์มไม่ถูกต้อง
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+            
+            const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
+
+            // if ($(".date_data").length == 0) { 
+            //     // ไม่พบ input
+            //     return Swal.fire('! โปรดเลือกห้องเช่า', '', 'warning');
+            // }
+            // return alert(123);
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการเพิ่ม การจอง หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/room', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if(response.message == null){
+                                
+                                var modalEl = document.getElementById('reserveOneRoomModal');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                // $('#insertRenter').modal('hide');
+                                $('#roomRentalReservation').modal('show');
+                                get_room_rental_reservation(response);
+                                $('#reserve_one_room')[0].reset();
                                 loadData(page);
                                 summary();
                                 // Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success');

@@ -84,7 +84,7 @@ class RoomController extends Controller
         $data['buildings'] = Building::where('ref_branch_id', session("branch_id"))->get();
         $data['floors'] = Floor::get();
         $data['service'] = Service::where('ref_branch_id', session("branch_id"))->get();
-        $data['bank'] = Bank::get();
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         $data['asset'] = Asset::with('room_has_asset.room')->get();
         // $data['asset'] = Asset::get();
         // $data['selected_buildings'] = [];
@@ -102,7 +102,8 @@ class RoomController extends Controller
     public function reserve_form(Request $request)
     {
         // return Auth::id();
-                                        
+        $data['room_id'] = $request->room_id;
+        $data['room_name'] = $request->room_name;
         $data['province'] = Province::get();
         $data['district'] = District::get();
         $data['subdistrict'] = Subdistrict::get();
@@ -112,7 +113,25 @@ class RoomController extends Controller
         
         return view('room/room-reserve-form', $data);
     }
-    // form สำสัญญาหลายห้อง
+    public function get_check_in($room_id)
+    {
+        // return Auth::id();
+        $data['page_url'] = 'room';
+
+        $room = Room::find($room_id);
+        $data['check_in'] = "1";
+        $data['room'] = $room;
+        $data['service'] = Service::where('ref_branch_id', session("branch_id"))->get();
+        $data['discount'] = Discount::where('ref_branch_id', session("branch_id"))->get();
+        $data['room_has_service'] = RoomHasService::where('ref_room_id', $room_id)->pluck('ref_service_id')->toArray();
+        $data['room_has_discount'] = RoomHasDiscount::where('ref_room_id', $room_id)->pluck('ref_discount_id')->toArray();
+        $meter = Meter::where('ref_room_id', $room_id)->orderBy('created_at','DESC')->first();
+        $data['meter'] = $meter;
+        
+        return view('room/room-form-contract', $data);
+    }
+    
+    // form ทำสัญญาหลายห้อง
     public function room_rental_contract_form(Request $request)
     {
         // return Auth::id();
@@ -148,6 +167,7 @@ class RoomController extends Controller
             'found' => $room ? true : false
         ]);
     }
+    // view
     public function show($id)
     {
         $data['page_url'] = 'room';
@@ -201,36 +221,40 @@ class RoomController extends Controller
         $data['otherRooms'] = Room::whereHas('floor.building', function ($query) {
                                         $query->where('ref_branch_id', session("branch_id"));
                                     })->where('status', 0)->whereNot('id', $id)->get();
-        $data['service'] = Service::get();
-        $data['discount'] = Discount::get();
+        
+        $data['service'] = Service::where('ref_branch_id', session("branch_id"))->get();
+        $data['discount'] = Discount::where('ref_branch_id', session("branch_id"))->get();
+        
         $meter = Meter::where('ref_room_id', $id)->orderBy('created_at','DESC')->first();
         $data['meter'] = $meter;
         $data['room_has_service'] = RoomHasService::where('ref_room_id', $id)->pluck('ref_service_id')->toArray();
         $data['room_has_discount'] = RoomHasDiscount::where('ref_room_id', $id)->pluck('ref_discount_id')->toArray();
-        $province = Province::find($room_for_rent->ref_province_id)->name_in_thai;
-        $district = District::find($room_for_rent->ref_district_id)->name_in_thai;
-        $subdistrict = Subdistrict::find($room_for_rent->ref_subdistrict_id);
+        $province = Province::find(@$room_for_rent->ref_province_id)->name_in_thai ?? '';
+        $district = District::find(@$room_for_rent->ref_district_id)->name_in_thai ?? '';
+        $subdistrict = Subdistrict::find(@$room_for_rent->ref_subdistrict_id);
         $data['asset'] = Asset::with(['room_has_asset' => function ($query) use ($id) { // ดึงข้อมูล รายการทรัพย์สิน
                                         $query->where('ref_room_id', $id); // with โดยแค่อันที่ห้องนี้มี
                                     }])->whereIn('id',[1,2])->get();
         $data['asset_has_room'] = RoomHasAsset::whereIn('ref_room_id', (array) $id)
                                                 ->pluck('status', 'ref_asset_id')
                                                 ->toArray();
-        $data['address'] = $room_for_rent->addess.' '.$subdistrict->name_in_thai.' '.$district.' '.$province.' '.$subdistrict->zip_code;
+        $data['address'] = $room_for_rent->addess.' '.@$subdistrict->name_in_thai.' '.@$district.' '.@$province.' '.@$subdistrict->zip_code;
         // return $room_for_rent->room_for_rent_id;
         $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_type_4 = RentBill::where('ref_type_id', 4)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_contract = Contract::where('ref_room_id', $id)->orderBy('id','desc')->first();
         $data['move_contract'] = $move_contract;
         if(@$move_invoice_7){
             $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
             $data['move_invoice_7'] = $move_invoice_7;
-            $data['move_bank'] = Bank::get();
+            $data['move_bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         }
         
         $data['move_invoice_2'] = $move_invoice_2;
         $data['move_invoice_5'] = $move_invoice_5;
+        $data['move_invoice_type_4'] = $move_invoice_type_4;
         
         return view('room/view', $data);
     }
@@ -307,6 +331,10 @@ class RoomController extends Controller
                                                     ->first();
 
         $data['receipt_1'] = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->orderBy('id','DESC')->latest()->first();
+        // $invoice = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first(); // บิลย้ายออก
+        // if($invoice->receipt_move_out){
+        //     $amount_move = 
+        // }
 
         $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                                     ->where('room_for_rents.ref_room_id', $id)
@@ -320,17 +348,20 @@ class RoomController extends Controller
 
         $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_type_4 = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_contract = Contract::find(@$move_invoice_5->ref_contract_id);
         $data['move_contract'] = $move_contract;
         if(@$move_invoice_7){
             $data['move_expenses'] = AdditionalCosts::where('ref_rent_bill_id', $id)->get();
             $data['move_invoice_7'] = $move_invoice_7;
-            $data['move_bank'] = Bank::get();
+            $data['move_bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         }
         
         $data['move_invoice_2'] = $move_invoice_2;
+        $data['move_invoice_type_4'] = $move_invoice_type_4;
         $data['move_invoice_5'] = $move_invoice_5;
+        $data['room_for_rent'] = $room_for_rent;
 
         $data['days'] = [
             'Sunday'    => 'อาทิตย์',
@@ -342,7 +373,46 @@ class RoomController extends Controller
             'Saturday'  => 'เสาร์',
         ];
 
-        return view('room/move-out', $data);
+        return [
+                    'html' => view('room/move-out', $data)->render(),
+                    'invoice_move_out' => $move_invoice_type_4 == null ? 0 : 1
+                ];
+    }
+    // ใบเสร็จย้ายออก
+    public function get_move_out_detail_receipt($id)
+    {
+        $invoice = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first();
+        $data['invoice'] = $invoice;
+        $data['receipt'] = $invoice->receipt_move_out ?? null;
+        $data['amount_receipt_payment_chanel_deposit'] = 1000;
+        // if($invoice->receipt_move_out){
+        //     $invoice->receipt_move_out->total_amount 
+        // }
+        $data['move_bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
+
+        $data['days'] = [
+            'Sunday'    => 'อาทิตย์',
+            'Monday'    => 'จันทร์',
+            'Tuesday'   => 'อังคาร',
+            'Wednesday' => 'พุธ',
+            'Thursday'  => 'พฤหัสบดี',
+            'Friday'    => 'ศุกร์',
+            'Saturday'  => 'เสาร์',
+        ];
+
+        return view('room/move-out-detail-receipt', $data);
+    }
+    public function get_move_out_form_receipt($id)
+    {
+        $data['room'] = Room::find($id);
+        $data['invoice'] = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first();
+        $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                                    ->where('room_for_rents.ref_room_id', $id)
+                                    ->select('renters.*')
+                                    ->orderBy('room_for_rents.id',"DESC")
+                                    ->get();
+
+        return view('room/move-out-form-receipt', $data);
     }
 
 //// Update รายการทรัพย์สิน
@@ -455,7 +525,7 @@ class RoomController extends Controller
         
         $data['rent_bill'] = RentBill::find($request->rent_bill_id);
         // return $data['rent_bill']->payment_list;
-        $data['bank'] = Bank::get();
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         $data['contract'] = $contract;
         // $data['receipt_reservation'] = $receipt_reservation;
         $data['receipt_security_deposit'] = $receipt_security_deposit;
@@ -484,7 +554,7 @@ class RoomController extends Controller
                                 ->orderBy('rent_bills.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
                                 ->first();
                                 
-        $data['bank'] = Bank::get();
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         
         return view('room/room-reservation-form', $data);
     }
@@ -505,7 +575,7 @@ class RoomController extends Controller
                                         ->orderBy('rooms.name')
                                         ->get();
                                 
-        $data['bank'] = Bank::get();
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         
         return view('room/room-rental-reservation', $data);
     }
@@ -638,6 +708,117 @@ class RoomController extends Controller
             return false;
         }
     }
+    public function save_move_out_receipt(Request $request)
+    {
+        // return $request;
+        try{
+            if($request->invoice_id){
+
+                $invoice = RentBill::find($request->invoice_id);
+                PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
+
+            }else{
+                $invoice = new RentBill;
+                $invoice->invoice_number =  $this->generateInvoiceCode();
+                $invoice->ref_room_id =  $request->ref_room_id;
+                $invoice->ref_contract_id =  $request->ref_contract_id;
+                $invoice->ref_status_id =  7; // 7 = ค้างชำระ
+                $invoice->ref_type_id =  4; // 4 = บิลย้ายออก
+                $invoice->ref_user_id =  Auth::id();
+                $invoice->ref_room_for_rent_id  =  $request->ref_room_for_rent_id;
+                $invoice->month  =  date('m');
+                $invoice->year  =  date('Y');
+            }
+                $invoice->name  =  $request->name;
+                $invoice->address  =  $request->homeland;
+                $invoice->phone  =  $request->phone;
+                $invoice->id_card_number  =  $request->id_card_number;
+                $invoice->remark  =  $request->remark;
+                $invoice->save();
+
+                foreach($request->payment_list['title'] as $key => $title){
+                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                    $pay_list->title  =  $title;
+                    $pay_list->price  =  $request->payment_list['price'][$key];
+                    $pay_list->ref_payment_id  =  $invoice->id;
+                    $pay_list->document_type  =  1;
+                    // return $request->payment_list['discount'][$key];
+                    $pay_list->discount  =  $request->payment_list['discount'][$key];
+                    $pay_list->save();
+                }
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
+    public function payment_receipt_move_out_bill(Request $request)
+    {
+        try{
+                $invoice = RentBill::find($request->invoice_id);
+
+                $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
+                
+                $image_name = "";
+                if($request->file('evidence_of_money_transfer')){
+                    // return 3;
+                        $request->validate([
+                            'evidence_of_money_transfer' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                        ],[
+                            'evidence_of_money_transfer.required' => 'กรุณาเลือกรูปภาพ',
+                            'evidence_of_money_transfer.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+                            'evidence_of_money_transfer.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+                            'evidence_of_money_transfer.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+                        ]);
+                    $file = $request->file('evidence_of_money_transfer');
+                    $nameExtension = $file->getClientOriginalName();
+                    $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+                    $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+                    $path = "upload/receipt/";
+                    $image_name = $img_name.rand().'.'.$extension;
+                }
+
+                $receipt = new Receipt;
+                $receipt->receipt_number =  $this->generateReceiptCode();
+                $receipt->ref_room_id  =  $invoice->ref_room_id;
+                $receipt->ref_rent_bill_id  =  $invoice->id;
+                $receipt->ref_contract_id  =  $invoice->ref_contract_id;
+                $receipt->ref_renter_id  =  $invoice->room_for_rent->ref_renter_id;
+                $receipt->payment_format  =  $request->payment_format;
+                $receipt->payment_channel  =  $request->receipt_payment_channel; // รูปแบบชำระเงิน 1=เงินสด / 2=โอนเงิน / หักจากเงินประกัน
+                $receipt->ref_bank_id  =  $request->ref_bank_id;
+                $receipt->transfer_time  =  $request->transfer_time;
+                $receipt->payment_date  =  $payment_date;
+                $receipt->amount  =  $invoice->total_amount;
+                $receipt->ref_type_id  =  $request->ref_type_id;
+                $receipt->ref_status_id  =  5;
+                $receipt->evidence_of_money_transfer  =  $image_name;
+                $receipt->ref_user_id =  Auth::id();
+                $receipt->save();
+
+
+                foreach($invoice->payment_list as $key => $payment_list){
+                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                    $pay_list->title  =  $payment_list->title;
+                    $pay_list->price  =  $payment_list->price;
+                    $pay_list->ref_payment_id  =  $receipt->id;
+                    $pay_list->document_type  =  2;
+                    $pay_list->discount  =  $payment_list->discount;
+                    $pay_list->save();
+                }
+                // if($request->receipt_payment_channel == 3){
+
+                // }
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
+    
 //   ชำระ ค่าจองหลายห้อง
     public function insert_receipt_all(Request $request)
     {
@@ -715,10 +896,11 @@ class RoomController extends Controller
         
         $data['receipt'] = Receipt::where('ref_room_id', $id)->where('ref_type_id', 3)->orderBy('id','DESC')->first();
 
-        $province = Province::find($contract->ref_province_id)->name_in_thai;
-        $district = District::find($contract->ref_district_id)->name_in_thai;
-        $subdistrict = Subdistrict::find($contract->ref_subdistrict_id);
-        $data['address'] = $contract->addess.' '.$subdistrict->name_in_thai.' '.$district.' '.$province.' '.$subdistrict->zip_code;
+        $province = Province::find(@$contract->ref_province_id)->name_in_thai ?? '';
+        $district = District::find(@$contract->ref_district_id)->name_in_thai ?? '';
+        $subdistrict = Subdistrict::find(@$contract->ref_subdistrict_id);
+
+        $data['address'] = $contract->addess.' '.@$subdistrict->name_in_thai.' '.@$district.' '.@$province.' '.@$subdistrict->zip_code;
         $data['contract'] = $contract;
         
         $data['service'] = Service::where('ref_branch_id', session("branch_id"))->get();
@@ -746,9 +928,11 @@ class RoomController extends Controller
                                 ->select('contracts.*','contracts.id as contract_id', 'renters.*', 'renters.id as renter_id', DB::raw("CONCAT(renters.name, ' ', IFNULL(renters.surname, '')) as full_name"))
                                 ->orderBy('contracts.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
                                 ->first();
-        $province = Province::find($contract->ref_province_id)->name_in_thai;
-        $district = District::find($contract->ref_district_id)->name_in_thai;
-        $subdistrict = Subdistrict::find($contract->ref_subdistrict_id);
+                                
+        $province = Province::find(@$contract->ref_province_id)->name_in_thai ?? '';
+        $district = District::find(@$contract->ref_district_id)->name_in_thai ?? '';
+        $subdistrict = Subdistrict::find(@$contract->ref_subdistrict_id);
+
         $data['contract_date_to'] = Carbon::createFromFormat('Y-m-d', $contract->contract_date)->addMonths($contract->period)->format('d/m/Y'); // แสดงผลแบบ 20/06/2025
         $receipt_first = Receipt::where('ref_contract_id', $contract->contract_id)->first();
         $receipt = Receipt::where('ref_contract_id', $contract->contract_id)->get();
@@ -774,8 +958,7 @@ class RoomController extends Controller
         
         $rent_bill = RentBill::where('ref_type_id', 2)->where('ref_contract_id', $contract->contract_id)->first();;
 
-
-        $data['address'] = $contract->addess.' '.$subdistrict->name_in_thai.' '.$district.' '.$province.' '.$subdistrict->zip_code;
+        $data['address'] = $contract->addess.' '.@$subdistrict->name_in_thai.' '.@$district.' '.@$province.' '.@$subdistrict->zip_code;
         $data['contract'] = $contract;
         $data['receipt_wait_for_confirm'] = $receipt_wait_for_confirm;
         $data['receipt'] = $receipt;
@@ -904,7 +1087,7 @@ class RoomController extends Controller
         // paginate
         $limit = $request->limit ?? 15;
 
-        $results = $results->paginate(100);
+        $results = $results->paginate($limit);
         // $results = $results->paginate($limit);
 
         $status_room = StatusRoom::select('name', 'color')->get()->toArray();
@@ -999,31 +1182,125 @@ class RoomController extends Controller
             $data['buildings'] = Building::whereIn('id', array_keys($request['buildings']))->pluck('name', 'id');
             $data['floors'] = Floor::pluck('name', 'id');
             $data['rooms'] = Room::pluck('name', 'id');
+        }else{
+            if(!$request['rooms']){
+                return '';
+            }
+            $roomIds = $request['rooms'];
+            $rooms = Room::with('floor')->whereIn('id', $roomIds)->get();
+            if(count($rooms) == 0){
+                return view('room/selected');
+            }
+            $structure = [];
+            foreach ($rooms as $ro) {
+                $buildingId = $ro->floor->ref_building_id;
+                $floorId    = $ro->floor->id;
+                $roomId     = $ro->id;
+
+                $structure[$buildingId][$floorId][] = $roomId;
+                $buildings[$buildingId] = $ro->floor->building->name;
+            }
+            $data['structure']['buildings'] = $structure;
+
+            $data['buildings'] = $buildings;
+            $data['class'] = 'col-sm-4';
         }
 
-        // ส่งไปยัง View
+            $data['floors'] = Floor::whereHas('building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })->pluck('name', 'id');
+            $data['rooms'] = Room::whereHas('floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })->pluck('name', 'id');
+        // return $data;
         return view('room/selected', $data);
         
         // return view('room/selected', $data);
     }
-/////////////////////////////////////////////////////// ทำสัญญา
+    
+    // เข้าพักทันทีโดยไม่ต้องจอง
+    public function insert_check_in(Request $request)
+    {
+        $booking_date = Carbon::createFromFormat('d/m/Y', $request->contract_date)->format('Y-m-d');
+        $date_stay = Carbon::createFromFormat('d/m/Y', $request->contract_date)->format('Y-m-d');
+        $payment_received_date = Carbon::createFromFormat('d/m/Y', $request->contract_date)->format('Y-m-d');
+        // return $request;
+        try{
+            // return 123;
+            $renter_blacklist = Renter::where('id_card_number', $request->id_card_number)->where('blacklist_status', 1)->first();
+            if ($renter_blacklist) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'บุคคลนี้ไม่สามารถ จอง ได้ เนื่องจากถูกขึ้นบัญชีดำ <br> เนื่องจาก '.$renter_blacklist->blacklist_detail.'<br>'.$renter_blacklist->room_for_rent->branch->name
+                ]);
+            }
+
+            $room = Room::find($request->room_id);
+
+            $renter = new Renter;
+            $renter->ref_branch_id  =  session("branch_id");
+            $renter->prefix  =  $request->prefix;
+            $renter->name  =  $request->name;
+            $renter->surname  =  $request->surname;
+            $renter->phone  =  $request->phone;
+            $renter->id_card_number  =  $request->id_card_number;
+            $renter->address  =  $request->address;
+            $renter->ref_subdistrict_id  =  $request->ref_subdistrict_id;
+            $renter->ref_district_id  =  $request->ref_district_id;
+            $renter->ref_province_id  =  $request->ref_province_id;
+            $renter->zipcode  =  $request->zipcode;
+            $renter->booking_date  =  $booking_date;
+            $renter->booking_channel  =  'จองโดยตรงกับที่พัก';
+            $renter->save();
+                    
+                $r_f_r = new RoomForRents;
+                $r_f_r->date_stay  =  $date_stay;
+                $r_f_r->ref_room_id  =  $request->room_id;
+                $r_f_r->ref_floor_id  =  $room->ref_floor_id;
+                $r_f_r->ref_building_id  =  $room->floor->ref_building_id;
+                $r_f_r->ref_branch_id  =  session("branch_id");
+                $r_f_r->ref_renter_id  =  $renter->id;
+                $r_f_r->ref_user_id  =  Auth::id();
+                $r_f_r->deposit  =  0;
+                $r_f_r->payment_method  =  1;
+                $r_f_r->payment_received_date  =  $payment_received_date;
+                $r_f_r->save();
+                
+                    // $update_room = Room::find($r_n->id);
+                    $room->status  =  1;
+                    $room->save();
+                            
+            // $merged = array_merge($insert, $request);
+            $request->merge([
+                'check_in' => 1,
+                'ref_room_id' => $request->room_id,
+                'ref_renter_id' => $renter->id
+            ]);
+            $this->insert_contract($request);
+                
+            // DB::commit();
+
+            // return $renter->id;
+            // return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        //
+    }
+/// ทำสัญญา
     public function insert_contract(Request $request) /// ทำสัญญา
     {
     // return $request;
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'บันทึกเรียบร้อยแล้ว',
-        //     'rent_bill_id' => 65,
-        //     'contract_id' => 76,
-        // ]);
         try{
             $contract_date = Carbon::createFromFormat('d/m/Y', $request->contract_date)->format('Y-m-d');
         // return $request->contract;
             foreach($request->contract as $row){
             // return $row;
-                $room = Room::find($row['ref_room_id']); //save อยู่ข้างล่าง
-
-                $deduction_booking_date = Carbon::createFromFormat('d/m/Y', $row['deduction_booking_date'])->format('Y-m-d');
+                $room = Room::find($row['ref_room_id'] ?? $request->ref_room_id); //save อยู่ข้างล่าง
+                if($row['deduction_booking_date']){
+                    $deduction_booking_date = Carbon::createFromFormat('d/m/Y', $row['deduction_booking_date'])->format('Y-m-d');
+                }
                 
                 $contract = new Contract;
 
@@ -1036,14 +1313,14 @@ class RoomController extends Controller
                 $contract->period  =  $request->period;
                 $contract->remark  =  $request->remark;
 
-                $contract->ref_room_id  =  $row['ref_room_id'];
+                $contract->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
                     $contracts = $row['deposit'];
                     $security_deposit = collect($contracts)->sum(function ($item) { // รวมจำนวนเงิน ค่าประกัน security_deposit ทั้งหมด
                         return (float) $item['security_deposit'];
                     });
                 $contract->security_deposit  = $security_deposit;
                 $contract->deduction_booking_amount  =  $row['deduction_booking_amount'];
-                $contract->deduction_booking_date  =  $deduction_booking_date;
+                $contract->deduction_booking_date  =  $deduction_booking_date ?? null;
                 $contract->receipt_no  =  $row['receipt_no'];
                 $contract->water_meter_start_living  =  @$row['water_meter_start_living'];
                 $contract->electricity_meter_start_living  =  @$row['electricity_meter_start_living'];
@@ -1063,7 +1340,7 @@ class RoomController extends Controller
                 $meterPrevious = Meter::where('ref_room_id', $room->id)->where('month', $prevMonth)->where('year', $prevYear)->first();
                 $meter = Meter::where('ref_room_id', $room->id)->where('month', date('m'))->where('year', date('Y'))->first();
 
-                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'])->latest()->first();
+                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->latest()->first();
                 $current_month_usage_water = (int)$meter->water_unit+(int)$meter->meter_before_change-(int)$meter->start_value_of_new_meter - (int)$row['water_meter_start_living'];
                 $current_month_usage_electricity = (int)$meter->electricity_unit+(int)$meter->meter_before_change-(int)$meter->start_value_of_new_meter - (int)$row['electricity_meter_start_living'];
 
@@ -1081,7 +1358,7 @@ class RoomController extends Controller
                 $r_b_room->water_unit  =  (int)$meter->water_unit;
                 $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_water;
                 $r_b_room->invoice_number =  $this->generateInvoiceCode();
-                $r_b_room->ref_room_id =  $row['ref_room_id'];
+                $r_b_room->ref_room_id =  $row['ref_room_id'] ?? $request->ref_room_id;
                 $r_b_room->ref_contract_id =  $contract->id;
                 $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
                 $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
@@ -1097,7 +1374,7 @@ class RoomController extends Controller
                 $r_b->water_unit  =  0;
                 $r_b->water_amount  =  0;
                 $r_b->invoice_number  =  $this->generateInvoiceCode();
-                $r_b->ref_room_id =  $row['ref_room_id'];
+                $r_b->ref_room_id =  $row['ref_room_id'] ?? $request->ref_room_id;
                 $r_b->ref_contract_id =  $contract->id;
                 $r_b->ref_status_id =  7; // 7 = ค้างชำระ
                 $r_b->ref_type_id =  2; // 2 = ค่าประกันห้อง
@@ -1112,15 +1389,15 @@ class RoomController extends Controller
                     $pay_list->document_type  =  1;
                     $pay_list->save();
                 }
-                
-                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
-                $pay_list->title  =  "หักจากค่าจองห้องพัก";
-                $pay_list->price  =  $row['deduction_booking_amount'];
-                $pay_list->ref_payment_id  =  $r_b->id;
-                $pay_list->document_type  =  1;
-                $pay_list->discount  =  1;
-                $pay_list->save();
-
+                if($request->check_in == null){
+                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                    $pay_list->title  =  "หักจากค่าจองห้องพัก";
+                    $pay_list->price  =  $row['deduction_booking_amount'];
+                    $pay_list->ref_payment_id  =  $r_b->id;
+                    $pay_list->document_type  =  1;
+                    $pay_list->discount  =  1;
+                    $pay_list->save();
+                }
                 $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
                 $pay_list->title  =  "ค่าเช่าห้อง (Room rate) $room->name เดือน ".(date('m'))."/".date('Y');
                 $pay_list->price  =  $room->rent+$room->furniture_rental+$room->air_rental;
@@ -1145,12 +1422,12 @@ class RoomController extends Controller
                 $pay_list->document_type  =  1;
                 $pay_list->save();
                 
-                RoomHasService::where('ref_room_id', $row['ref_room_id'])->delete(); // ลบค่าบริการห้อง เพื่อ สร้างใหม่
+                RoomHasService::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบค่าบริการห้อง เพื่อ สร้างใหม่
                 if(@$request->ref_service_id){
                     foreach($request->ref_service_id as $ser){ // for เพื่อสร้าง ค่าบริการห้องใหม่
                         
                         $insert = new RoomHasService;
-                        $insert->ref_room_id  =  $row['ref_room_id'];
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
                         $insert->ref_service_id  =  $ser;
                         $insert->price  =  $request->service_price[$ser];
                         $insert->save();
@@ -1164,12 +1441,12 @@ class RoomController extends Controller
                         $pay_list->save();
                     }
                 }
-                RoomHasDiscount::where('ref_room_id', $row['ref_room_id'])->delete(); // ลบส่วนลดห้อง เพื่อ สร้างใหม่
+                RoomHasDiscount::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบส่วนลดห้อง เพื่อ สร้างใหม่
                 if(@$request->ref_discount_id){
                     foreach($request->ref_discount_id as $dis){ // for เพื่อสร้าง ส่วนลดห้อง ใหม่
 
                         $insert = new RoomHasDiscount;
-                        $insert->ref_room_id  =  $row['ref_room_id'];
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
                         $insert->ref_discount_id  =  $dis;
                         $insert->price  =  $request->discount_price[$dis];
                         $insert->save();
@@ -1401,17 +1678,18 @@ class RoomController extends Controller
             $renter->booking_date  =  $booking_date;
             $renter->booking_channel  =  $request->booking_channel;
             $renter->save();
-            
             if($request->select_channel == 1){
-                $room_names = explode(',', preg_replace('/\s+/', '', $request->room_text));
-                $room_all = Room::whereHas('floor.building', function ($query) {
-                                    $query->where('ref_branch_id', session("branch_id"));
-                                })
-                                ->where('status', 0)
-                                ->whereIn('name', $room_names)
-                                ->get();
+                if(@$request->room_text){
 
-                // เช็คห้องที่ไม่ว่าง ถ้ามีให้ error ว่า ห้องเหล่านี้ไม่ว่าง เริ่ม {
+                    $room_names = explode(',', preg_replace('/\s+/', '', $request->room_text));
+                    $room_all = Room::whereHas('floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })
+                                    ->where('status', 0)
+                                    ->whereIn('name', $room_names)
+                                    ->get();
+
+                    // เช็คห้องที่ไม่ว่าง ถ้ามีให้ error ว่า ห้องเหล่านี้ไม่ว่าง เริ่ม {
                     $vacant_room_all = Room::whereHas('floor.building', function ($query) {
                                     $query->where('ref_branch_id', session("branch_id"));
                                 })
@@ -1419,6 +1697,19 @@ class RoomController extends Controller
                                 ->whereIn('name', $room_names)
                                 ->pluck('name') // ดึงเฉพาะคอลัมน์ name
                                 ->toArray();    // แปลงเป็น array
+
+                }else{
+                    $room_all = Room::whereIn('id', $request->room_text_id)->get();
+
+                    // เช็คห้องที่ไม่ว่าง ถ้ามีให้ error ว่า ห้องเหล่านี้ไม่ว่าง เริ่ม {
+                    $vacant_room_all = Room::whereHas('floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
+                                ->where('status', '!=', 0)
+                                ->whereIn('id', $request->room_text_id)
+                                ->pluck('name') // ดึงเฉพาะคอลัมน์ name
+                                ->toArray();    // แปลงเป็น array
+                }
 
                     if (!empty($vacant_room_all)) {
                         return response()->json([
@@ -1485,6 +1776,7 @@ class RoomController extends Controller
                             $payment_list->save();
                 }
             }else{
+
                 foreach($request->buildings as $key => $building){
                     foreach($building as $key_2 => $floor){
                         foreach($floor as $room){
@@ -1544,9 +1836,9 @@ class RoomController extends Controller
                     }
                 }
             }
-
             
             DB::commit();
+
             return $renter->id;
             // return true;
         } catch (QueryException $err) {

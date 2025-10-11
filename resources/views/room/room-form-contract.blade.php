@@ -7,11 +7,33 @@
         <link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
         
         <script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-
-        <div class="col-sm-5">
-            <label for="exampleFormControlInput1" class="form-label">ชื่อผู้เข้าพัก</label>
-            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="{{ @$contract->full_name }}" />
-        </div>
+        @if (@$check_in)
+        <input type="hidden" name="room_id" value="{{ $room->id }}">
+            <div class="col-sm-2">
+                <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
+                <select name="prefix" class="form-select" id="exampleFormControlSelect1"
+                    aria-label="Default select example">
+                    <option value="บริษัท" selected>บริษัท</option>
+                    <option value="นาย">นาย</option>
+                    <option value="นางสาว">นางสาว</option>
+                    <option value="นาง">นาง</option>
+                </select>
+            </div>
+            <div class="col-sm-5">
+                <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="" required/>
+            </div>
+            <div class="col-sm-5">
+                <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
+                <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="" />
+            </div>
+        @else
+            <div class="col-sm-5">
+                <label for="exampleFormControlInput1" class="form-label">ชื่อผู้เข้าพัก</label>
+                <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="{{ @$contract->full_name }}" />
+            </div>
+        @endif
+        
         <div class="col-sm-7">
             <label for="exampleFormControlInput2" class="form-label">ที่อยู่ผู้เข้าพัก</label>
             <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ @$contract->address }}" />
@@ -291,32 +313,35 @@
         <!-- JavaScript คำนวณรวม -->
         <script>
             // คำนวณวันที่เริ่มต้นเมื่อเอกสารโหลดเสร็จ
-            updateContractDateTo();
+            // setTimeout(() => {
+                
+            // }, 1000);
+            // updateContractDateTo();
 
-            function initContractFormScript() {
-                const contractDateField = $('#contract_date');
-                const periodField = $('#period');
-                const contractDateToField = $('#contract_date_to');
+        function updateContractDateTo() {
+            const contractDate = $('#contract_date').val();
+            const periodMonths = parseInt($('#period').val(), 10);
+            const contractDateToField = $('#contract_date_to');
 
-                // ใช้ on('input') แทน .change() เพื่อให้ตอบสนองทันทีที่พิมพ์
-                contractDateField.on('input', updateContractDateTo);
-                periodField.on('input', updateContractDateTo);
-
-                function updateContractDateTo() {
-                    const contractDate = contractDateField.val();
-                    const periodMonths = parseInt(periodField.val(), 10);
-
-                    if (contractDate && periodMonths && !isNaN(periodMonths)) {
-                        const dateParts = contractDate.split('/');
-                        const contractDateObject = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-                        contractDateObject.setMonth(contractDateObject.getMonth() + periodMonths);
-                        const endDate = contractDateObject.toLocaleDateString('en-GB');
-                        contractDateToField.val(endDate);
-                    }
-                }
-
-                updateContractDateTo(); // คำนวณค่าตอนเริ่ม
+            if (contractDate && periodMonths && !isNaN(periodMonths)) {
+                const dateParts = contractDate.split('/');
+                const contractDateObject = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+                contractDateObject.setMonth(contractDateObject.getMonth() + periodMonths);
+                const endDate = contractDateObject.toLocaleDateString('en-GB');
+                contractDateToField.val(endDate);
             }
+        }
+
+        function initContractFormScript() {
+            $('#contract_date').on('input', updateContractDateTo);
+            $('#period').on('input', updateContractDateTo);
+            updateContractDateTo(); // คำนวณครั้งแรก
+        }
+
+        // เรียกตอนโหลดเสร็จ
+        $(document).ready(function(){
+            initContractFormScript();
+        });
 
         </script>
         

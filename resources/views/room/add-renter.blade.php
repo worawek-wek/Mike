@@ -43,10 +43,10 @@
             <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
             <select name="prefix" class="form-select" id="exampleFormControlSelect1"
                 aria-label="Default select example">
-                <option @if ($renter_edit->prefix == 'บริษัท') selected @endif value="บริษัท" selected>บริษัท</option>
-                <option @if ($renter_edit->prefix == 'นาย') selected @endif  value="นาย">นาย</option>
-                <option @if ($renter_edit->prefix == 'นางสาว') selected @endif  value="นางสาว">นางสาว</option>
-                <option @if ($renter_edit->prefix == 'นาง') selected @endif  value="นาง">นาง</option>
+                <option @if (@$renter_edit->prefix == 'บริษัท') selected @endif value="บริษัท" selected>บริษัท</option>
+                <option @if (@$renter_edit->prefix == 'นาย') selected @endif  value="นาย">นาย</option>
+                <option @if (@$renter_edit->prefix == 'นางสาว') selected @endif  value="นางสาว">นางสาว</option>
+                <option @if (@$renter_edit->prefix == 'นาง') selected @endif  value="นาง">นาง</option>
             </select>
         </div>
         <div class="col-sm-5">
@@ -265,6 +265,11 @@
                             sortField: { field: "text", direction: "asc" }
                         });
                         document.getElementById('loadingOverlay').style.display = 'none';
+                    },
+                    error: function(error) {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', error);
                     }
                 });
             }
@@ -299,6 +304,11 @@
                             sortField: { field: "text", direction: "asc" }
                         });
                         document.getElementById('loadingOverlay').style.display = 'none';
+                    },
+                    error: function(error) {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', error);
                     }
                 });
             }

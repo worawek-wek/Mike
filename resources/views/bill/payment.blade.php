@@ -52,16 +52,16 @@
         </div>
         <div class="tab-content" style="box-shadow: unset;padding:0px">
             <div class="tab-pane fade active show" id="navs-pills-top-edit" role="tabpanel">
-              <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
-                <div class="d-flex">
-                    <div class="flex-grow-1 ms-3">
-                    <b class="text-black">รายละเอียดหัวบิล</b> <br>
-                        {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }} <br>
-                        เลขประจำตัวผู้เสียภาษี {{ $invoice->room_for_rent->renter->id_card_number }} <br>
-                        โทร {{ $invoice->room_for_rent->renter->phone }}
+                <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                    <div class="d-flex">
+                        <div class="flex-grow-1 ms-3">
+                        <b class="text-black">รายละเอียดหัวบิล</b> <br>
+                            {{ $invoice->room_for_rent->renter->prefix.' '.$invoice->room_for_rent->renter->name.' '.$invoice->room_for_rent->renter->surname }} <br>
+                            เลขประจำตัวผู้เสียภาษี {{ $invoice->room_for_rent->renter->id_card_number }} <br>
+                            โทร {{ $invoice->room_for_rent->renter->phone }}
+                        </div>
                     </div>
                 </div>
-            </div>
             <table class="table table-bordered" id="discount-table">
                 <thead>
                     <tr>
@@ -209,7 +209,10 @@
                                 <hr class="mb-4">
                             @endif
                             @if ($invoice->ref_status_id != 5)
-                                <button class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $item_receipt->id }},{{$invoice->id}})">
+                            @php
+                                $permission_cancel_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 24)->where('status', 0)->first();
+                            @endphp
+                                <button class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $item_receipt->id }},{{$invoice->id}})" @if ($permission_cancel_confirm) style="display: none!important;" @endif>
                                     <span>
                                         <i class="ti-md ti ti-x"></i>
                                         ยกเลิกใบเสร็จ

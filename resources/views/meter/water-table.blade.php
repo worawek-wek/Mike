@@ -1,4 +1,6 @@
     @php
+    $permission_meter_water = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 49)->where('status', 0)->first();
+
         $monthNames = [
                         '01' => 'มกราคม', '02' => 'กุมภาพันธ์', '03' => 'มีนาคม', '04' => 'เมษายน',
                         '05' => 'พฤษภาคม', '06' => 'มิถุนายน', '07' => 'กรกฎาคม', '08' => 'สิงหาคม',
@@ -66,7 +68,10 @@
                             value="{{ intval($row->water_unit) }}" onkeydown="handleInput(event,{{ $row->meters_id }}, this.value, {{ $key }})"
                             oninput="editRoom({{ $row->meters_id }}, this.value)" style="background-color: #d6f7fb;border-color: #00bad1;"
                             onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                            min="0">
+                            min="0"
+                             @if ($permission_meter_water)
+readonly                    
+                @endif>
                     </span>
                     {{-- <div style="padding: inherit;"> --}}
                         {{-- <button type="button" id="updateRoom{{ $row->meters_id }}" class="btn btn-sm btn-secondary" disabled onclick="updateRoom('{{ $row->meters_id }}')">

@@ -1,9 +1,12 @@
+@php
+    $permission_bill = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 22)->where('status', 1)->first();
+@endphp
 <div class="tab-pane fade show" id="pills-home" role="tabpanel"
 aria-labelledby="pills-home-tab" tabindex="0">
     <div class="card card-body shadow-none" style="padding: 10px;line-height: 5px;">
         <div class="row g-3 new_box" style="padding: 0px 30px;">
             @foreach ($list_data as $row)
-            <div class="col-md-6 col-lg5" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }},'table')">
+            <div class="col-md-6 col-lg5" @if($permission_bill) style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }},'table')" @endif>
                 <div class="card bg-label-{{ $row->status->color }} card-check shadow-sm" style="height: 155.5px;">
                     <div class="card-body d-flex flex-column justify-content-center text-center p-3">
                         <h5 class="card-title mb-0"><i class="text-{{ $row->status->color }} {{ $row->status->icon }} me-2"></i><b>{{ $row->room_name }}</b></h5>
@@ -59,15 +62,21 @@ aria-labelledby="pills-profile-tab" tabindex="0">
         </thead>
         <tbody>
         @forelse ($list_data as $key => $row_2)
+        @php
+        $click = '';
+            if($permission_bill){
+                $click = "style='cursor: pointer' data-bs-toggle='modal' data-bs-target='#invoice' onclick='view({$row_2->id}, \"table\")'";
+            }
+        @endphp
             <tr class="odd">
                 <td class="control" tabindex="0" style="display: none;">
                 </td>
-                <td class="dt-checkboxes-cell" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')">
+                <td class="dt-checkboxes-cell" {{ $click }}>
                     {{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')">{{ $row_2->room_name }}</td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')"><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
+                <td class="text-center" {!! $click !!}>{{ $row_2->room_name }}</td>
+                <td class="text-center" {!! $click !!}><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')">
+                <td class="text-center" {!! $click !!}>
                     <span class="text-truncate">
                         {{-- @if($row_2->total > 0)
                             {{ number_format($row_2->rent+$row_2->electricity_amount+$row_2->water_amount) }}
@@ -87,7 +96,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                         @endif
                     @endif
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'table')">
+                <td class="text-center" {!! $click !!}>
                     @if (count(@$row_2->receipt ?? []) > 0 & $row_2->ref_status_id == 7)
                         <span class="badge bg-danger py-1" aria-expanded="false" text-capitalized="" style="font-size: unset;">
                         <i class="ti ti-mail ti-md me-2"></i>

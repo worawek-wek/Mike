@@ -70,6 +70,29 @@
         background:#9d9da0;
     }
 </style>
+@php
+    $permission_daschborad = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 1)->where('status', 0)->first();
+    $permission_room = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 2)->where('status', 0)->first();
+    $permission_meter = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 3)->where('status', 0)->first();
+    $permission_bill = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 4)->where('status', 0)->first();
+    $permission_income_expenses = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 15)->where('status', 0)->first();
+    $permission_analysis = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 16)->where('status', 0)->first();
+    $permission_report = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 17)->where('status', 0)->first();
+    $permission_renter = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 18)->where('status', 0)->first();
+    $permission_vehicle = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 19)->where('status', 0)->first();
+    $permission_audit = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 20)->where('status', 0)->first();
+    $permission_setting = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 21)->where('status', 0)->first();
+    $permission_dorm_info = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 59)->where('status', 0)->first();/////
+    $permission_manage_bill = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 60)->where('status', 0)->first();
+    $permission_rental_contract = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 61)->where('status', 0)->first();
+    $permission_room_layout = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 62)->where('status', 0)->first();
+    $permission_water_electric_bill = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 63)->where('status', 0)->first();
+    $permission_room_rent = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 64)->where('status', 0)->first();
+    $permission_service_discount = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 65)->where('status', 0)->first();
+    $permission_fine = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 66)->where('status', 0)->first();
+    $permission_bank = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 67)->where('status', 0)->first();
+    $permission_blacklist = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 68)->where('status', 0)->first();
+@endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme pt-2">
     <div class="app-brand demo" style="height: 66px;">
         <div class="app-brand-link d-block text-center w-100">
@@ -83,40 +106,46 @@
     </div>
 
     {{-- <div class="menu-inner-shadow"></div> --}}
-
+    
     <ul class="menu-inner py-3">
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_daschborad) style='display:none;' @endif>
             <a href="/dashboard" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
                 <div data-i18n="Dashboards">Dashboards</div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_room) style='display:none;' @endif>
             <a href="/room" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-sitemap"></i>
-                <div data-i18n="ผังห้อง">ผังห้อง</div>
+                <div>
+                    <span data-i18n="ผังห้อง">ผังห้อง</span>
+                    <span class="badge bg-danger text-white badge-notifications px-2 py-1 mx-3" id="countBookingRoom"></span>
+                </div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_meter) style='display:none;' @endif>
             <a href="/meter" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-id"></i>
                 <div data-i18n="มิเตอร์">มิเตอร์</div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_bill) style='display:none;' @endif>
             <a href="/bill" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-license"></i>
-                <div data-i18n="บิลค่าเช่า">บิลค่าเช่า</div>
+                <div>
+                    <span data-i18n="บิลค่าเช่า">บิลค่าเช่า</span>
+                    <span class="badge bg-danger text-white badge-notifications px-2 py-1 mx-3" id="countBill"></span>
+                </div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_income_expenses) style='display:none;' @endif>
             <a href="/income-expenses" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-calculator"></i>
                 <div data-i18n="รายรับ-รายจ่าย">รายรับ-รายจ่าย</div>
             </a>
         </li>
         <!-- วิเคราะห์ -->
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_analysis) style='display:none;' @endif>
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ti ti-circle-half-2"></i>
                 <div data-i18n="วิเคราะห์">วิเคราะห์</div>
@@ -155,7 +184,7 @@
             </ul>
         </li>
         <!-- รายงานสรุป -->
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_report) style='display:none;' @endif>
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ti ti-chart-pie-3"></i>
                 <div data-i18n="รายงานสรุป">รายงานสรุป</div>
@@ -193,13 +222,13 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_renter) style='display:none;' @endif>
             <a href="/renter" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-users"></i>
                 <div data-i18n="ผู้เช่า">ผู้เช่า</div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_vehicle) style='display:none;' @endif>
             <a href="/vehicle" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-car"></i>
                 <div data-i18n="ยานพาหนะ">ยานพาหนะ</div>
@@ -211,65 +240,65 @@
                 <div data-i18n="บุคลากร">บุคลากร</div>
             </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_audit) style='display:none;' @endif>
             <a href="/audit" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-receipt-tax"></i>
                 <div data-i18n="บัญชี">บัญชี</div>
             </a>
         </li>
         <!-- ตั้งค่าหอพัก -->
-        <li class="menu-item">
+        <li class="menu-item" @if(@$permission_setting) style='display:none;' @endif>
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ti ti-adjustments-horizontal"></i>
                 <div data-i18n="ตั้งค่าหอพัก">ตั้งค่าหอพัก</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_dorm_info) style='display:none;' @endif>
                     <a href="/setting/dorm-info" class="menu-link">
                         <div data-i18n="ข้อมูลหอพัก">ข้อมูลหอพัก</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_manage_bill) style='display:none;' @endif>
                     <a href="/setting/manage-bill" class="menu-link">
                         <div data-i18n="จัดการบิล">จัดการบิล</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_rental_contract) style='display:none;' @endif>
                     <a href="/setting/rental-contract" class="menu-link">
                         <div data-i18n="สัญญาเช่า">สัญญาเช่า</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_room_layout) style='display:none;' @endif>
                     <a href="/setting/room-layout" class="menu-link">
                         <div data-i18n="ผังห้อง">ผังห้อง</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_water_electric_bill) style='display:none;' @endif>
                     <a href="/setting/water-electric-bill" class="menu-link">
                         <div data-i18n="ค่าน้ำ-ค่าไฟ">ค่าน้ำ-ค่าไฟ</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_room_rent) style='display:none;' @endif>
                     <a href="/setting/room-rent" class="menu-link">
                         <div data-i18n="ค่าเช่าห้อง">ค่าเช่าห้อง</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_service_discount) style='display:none;' @endif>
                     <a href="/setting/service-discount" class="menu-link">
                         <div data-i18n="ค่าบริการ ส่วนลด">ค่าบริการ ส่วนลด</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_fine) style='display:none;' @endif>
                     <a href="/setting/fine" class="menu-link">
                         <div data-i18n="ค่าปรับ">ค่าปรับ</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_bank) style='display:none;' @endif>
                     <a href="/setting/bank" class="menu-link">
                         <div data-i18n="บัญชีธนาคาร">บัญชีธนาคาร</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" @if(@$permission_blacklist) style='display:none;' @endif>
                     <a href="/setting/blacklist" class="menu-link">
                         <div data-i18n="บัญชีดำ">บัญชีดำ</div>
                     </a>

@@ -20,4 +20,12 @@ class PaymentList extends Model
     {
         return $this->hasOne('App\Models\RoomForRents', 'id', 'ref_room_for_rent_id');
     }
+    public function invoice()
+    {
+        return $this->hasOne('App\Models\RentBill', 'id', 'ref_payment_id')->where('document_type', 1);
+    }
+    public function receipt()
+    {
+        return $this->hasOne('App\Models\Receipt', 'id', 'ref_payment_id')->where('document_type', 2);
+    }
 }

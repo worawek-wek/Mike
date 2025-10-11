@@ -112,7 +112,7 @@
                         @endfor
                     </select>
                 </div>
-                    <button type="submit" class="btn btn-main mt-5" style="margin-bottom: 10%;"><i class="ti ti-plus"></i> สร้างสาขา</button>
+                    <button type="submit" class="btn btn-main mt-5" style="margin-bottom: 10%;">บันทึก</button>
             </div>
         </form>
         </div>

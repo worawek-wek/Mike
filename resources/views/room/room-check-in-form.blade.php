@@ -58,7 +58,7 @@
         <div class="row g-3 p-2">
             <div class="col-sm-9"></div>
             <div class="col-sm-3">
-                <button type="button" class="btn btn-info" onclick="toggleSelectReserveOrCheckin({{$room_id}},'{{$room_name}}')" data-bs-toggle="modal" data-bs-target="#insertCheckIn">
+                <button type="button" class="btn btn-info" onclick="toggleSelectReserveOrCheckin({{$room_id}})" data-bs-toggle="modal" data-bs-target="#insertContract">
                     <i class="fa-solid fa-right-to-bracket me-2"></i>เปลี่ยนเป็นเข้าพัก
                 </button>
             </div>
