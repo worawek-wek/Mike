@@ -97,7 +97,10 @@ class ReportController extends Controller
                                 ->where('rent_bills.ref_type_id', 1)
                                 // ->where('rent_bills.ref_status_id', 5)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+                                ->select('rent_bills.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' 
+                                , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name')
+                                , 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone'
+                                , 'receipts.receipt_number as receipt_number', 'receipts.payment_date as payment_date');
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);

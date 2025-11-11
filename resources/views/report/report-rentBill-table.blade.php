@@ -66,7 +66,7 @@
                     @endif
                     </span>
                 </td>
-                <td><span>{{ $row->receipt_number }}</span></td>
+                <td><span>{{ @$row->receipt_number ?? '-' }}</span></td>
                 <td style="padding: 0 22px;"><span>
                     @if ($row->payment_date)
                         {{ date('d/m/Y', strtotime($row->payment_date)) }}
