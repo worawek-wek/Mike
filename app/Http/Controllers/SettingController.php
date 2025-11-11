@@ -1353,27 +1353,35 @@ class SettingController extends Controller
         }
         //
     }
-    public function delete_user_in_branch($id)
+    public function delete_user_in_branch(Request $request, $id)
     {
         // $ref_position_id = 1 เจ้าของหอพัก
         try{
 
-            return response()->json([ "title"=> "เกิดข้อผิดพลาดไม่พบข้อมูลผู้ใช้งาน", "text"=> ""],500);
             $user = Auth::guard()->user();
             if($user){
-                return response()->json([ "title"=> "ดำเนินการสำเร็จ", "text"=> "ลบข้อมูลผู้ลงทะเบียนเรียบร้อย"],200);
-            }else{
-                return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "ไม่พบข้อมูลผู้ใช้งาน !"],404);
-            }
+                $user_position = $user->ref_position_id;
+                $branch = UserHasBranch::whereIn('id', explode(',',$id))->get();
+                if($branch)
+                {
+                    foreach($branch as $data){
+                        $data_position = $data->ref_position_id;
 
-            // $user_has_branch = UserHasBranch::whereIn('id', explode(',',$id))->get();
-            // UserHasBranch::destroy(explode(',',$id));
-            // foreach($user_has_branch as $uhb){
-            //     if($uhb->ref_position_id == 1 && $user->ref_position_id != 1){
-            //         return false;
-            //     }
-            //     PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
-            // }
+                        if($data_position == 1){
+                            if($user_position != 1){
+                                return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "คุณไม่สามารถลบข้อมูลของเจ้าของหอพักได้ !"],500);
+                            }
+                        }
+                        PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
+                    }
+                }
+                DB::commit();
+                return response()->json([ "title"=> "ดำเนินการสำเร็จ", "text"=> "ลบข้อมูลผู้ลงทะเบียนเรียบร้อย"],200);
+            }
+            else
+            {
+                return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "ไม่พบข้อมูลผู้ใช้งาน !"],500);
+            }
 
             // DB::commit();
             // return true;
