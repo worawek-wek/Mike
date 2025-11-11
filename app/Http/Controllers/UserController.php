@@ -401,6 +401,12 @@ class UserController extends Controller
     
      public function edit($id)
      {
+        $user_check = Auth::guard()->user();
+        if($user_check){
+            if($user_check->ref_position_id != 1){
+                return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "คุณไม่มีสิทธิ์ในการใช้งาน"],500);
+            }
+        }
         $data['page_url'] = 'user';
         $data['position'] = Position::get();
         $data['user'] = User::find($id);

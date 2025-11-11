@@ -360,8 +360,8 @@
                 type: "GET",
                 url: "{{ $page_url }}/"+id,
                 success: function(data) {
+                    $('#insurance').modal('show');
                     $("#view").html(data);
-
                     $('#select2Position2').select2({
                         placeholder: 'เลือกตำแหน่ง',
                         allowClear: true,
@@ -369,6 +369,21 @@
                         width: '100%'
                     });
 
+                },
+                error:function(xhr){
+                    const errorMessage = xhr.responseJSON;
+                    Swal.fire({
+                        title: "" + errorMessage.title,
+                        text: "" + errorMessage.text,
+                        icon: 'error',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Close',
+                        customClass: {
+                            confirmButton: 'btn btn-danger waves-effect waves-light'
+                        },
+                    });
                 }
             });
         }

@@ -39,22 +39,22 @@
                 @endif
                 
                 >
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ $list_data->firstItem()+$key }}
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ $row->name }}
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ number_format($row->salary) }}
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ $row->phone }}
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ $row->email }}
                 </td>
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer" onclick="view({{ $row->id }})">
                     {{ date('d/m/Y', strtotime($row->work_start_date)) }}
                 </td>
                 <td class="text-center d-write">
@@ -83,7 +83,7 @@
                     @endif
                 </td>
                
-                <td class="text-center" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view({{ $row->id }})">
+                <td class="text-center" style="cursor: pointer"  onclick="view({{ $row->id }})">
                     {{ $row->remark }} 
                 </td>
                 <td class="table-report__action text-center d-write" style="font-size: 12px;">
