@@ -415,15 +415,35 @@
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(response) {
-                            if(response == true){
-                                Swal.fire('ลบผู้ลงทะเบียนเรียบร้อยแล้ว', '', 'success');
-                                loadData(page);
-                                summary();
-                            }
+                            console.log(response);
+                            Swal.fire({
+								title: "" + response.title,
+								text: "" + response.text,
+								icon: 'success',
+								showCancelButton: false,
+								confirmButtonText: 'ปิด',
+								customClass: {
+									confirmButton: 'btn btn-danger waves-effect waves-light'
+								},
+							});
+                            loadData(page);
+                            summary();
                         },
-                        error: function(error) {
-                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                            console.error('เกิดข้อผิดพลาด:', error);
+                        error: function(xhr) {
+                            console.log(xhr);
+                            const errorMessage = xhr.responseJSON;
+							Swal.fire({
+								title: "" + errorMessage.title,
+								text: "" + errorMessage.text,
+								icon: 'error',
+								showCancelButton: false,
+								confirmButtonColor: '#3085d6',
+								cancelButtonColor: '#d33',
+								confirmButtonText: 'Close',
+								customClass: {
+									confirmButton: 'btn btn-danger waves-effect waves-light'
+								},
+							});
                         }
                     });
                 } else if (result.isDismissed) {

@@ -1355,16 +1355,28 @@ class SettingController extends Controller
     }
     public function delete_user_in_branch($id)
     {
+        // $ref_position_id = 1 เจ้าของหอพัก
         try{
-            // return 123;
-            $user_has_branch = UserHasBranch::whereIn('id', explode(',',$id))->get();
-            UserHasBranch::destroy(explode(',',$id));
-            foreach($user_has_branch as $uhb){
-                PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
+
+            return response()->json([ "title"=> "เกิดข้อผิดพลาดไม่พบข้อมูลผู้ใช้งาน", "text"=> ""],500);
+            $user = Auth::guard()->user();
+            if($user){
+                return response()->json([ "title"=> "ดำเนินการสำเร็จ", "text"=> "ลบข้อมูลผู้ลงทะเบียนเรียบร้อย"],200);
+            }else{
+                return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "ไม่พบข้อมูลผู้ใช้งาน !"],404);
             }
 
-            DB::commit();
-            return true;
+            // $user_has_branch = UserHasBranch::whereIn('id', explode(',',$id))->get();
+            // UserHasBranch::destroy(explode(',',$id));
+            // foreach($user_has_branch as $uhb){
+            //     if($uhb->ref_position_id == 1 && $user->ref_position_id != 1){
+            //         return false;
+            //     }
+            //     PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
+            // }
+
+            // DB::commit();
+            // return true;
         } catch (QueryException $err) {
             DB::rollBack();
         }
