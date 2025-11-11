@@ -1365,6 +1365,9 @@ class SettingController extends Controller
                 if($branch)
                 {
                     foreach($branch as $data){
+                        if($user->id == $data->ref_user_id){
+                            return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "คุณไม่สามารถลบตัวเองออกได้ !"],500);
+                        }
                         $data_position = $data->ref_position_id;
 
                         if($data_position == 1){
