@@ -758,6 +758,15 @@ class ReportController extends Controller
             $sheet->getHighestColumn() . 
             $sheet->getHighestRow()
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getColumnDimension('A')->setWidth(10);  // ห้อง
+        $sheet->getColumnDimension('B')->setWidth(15);  // วันที่
+        $sheet->getColumnDimension('C')->setWidth(30);  // ชื่อผู้เช่า
+        $sheet->getColumnDimension('D')->setWidth(25);  // โดย
+        $sheet->getColumnDimension('E')->setWidth(20);  // ช่องทาง
+        $sheet->getColumnDimension('F')->setWidth(20);  // ค่าประกันห้อง
+        $sheet->getColumnDimension('G')->setWidth(20);  // หักค่ามัดจำจอง
+        $sheet->getColumnDimension('H')->setWidth(15);  // รวม
         
         $writer = new WriterXlsx($spreadsheet);
         $writer->save("upload/export_excel/รายงานย้ายเข้า".date('m-Y', strtotime($request->month)).".xlsx");
