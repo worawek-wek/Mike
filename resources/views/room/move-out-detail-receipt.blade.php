@@ -56,9 +56,9 @@
             
             <div class="mt-4 col-12 d-flex justify-content-end gap-2"
                     @if($permission_bill_move_edit || @$receipt || $invoice->payment_channel == 3)
-                        style="pointer-events: none;  /* ปิดคลิก */
+                        {{-- style="pointer-events: none;  /* ปิดคลิก */
                                 opacity: 0.6;          /* ให้ดูจางลง */
-                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */" --}}
                     @endif
                     {{-- @if () disabled @endif  --}}
                     >
@@ -82,7 +82,7 @@
                     </ul>
                 </div>
             </div>
-                @if ($invoice->payment_channel == 3)
+                @if (@$receipt->payment_channel == 3)
                     <h4 class="text-danger mt-4" align="center">หมายเหตุ : ยอดชำระด้วยวิธี “หักจากเงินประกัน” จะถูกนำไปดำเนินการในขั้นตอนเคลียร์บิลย้ายออก</h4>
                     <input type="hidden" class="discount-value" value="{{ $invoice->total_amount }}"> <!-- เอายอดนี้ ไปหักค่าประกัน ถ้า payment_channel = 3 (ชำระโดย หักจากเงินประกัน) -->
                 @endif
