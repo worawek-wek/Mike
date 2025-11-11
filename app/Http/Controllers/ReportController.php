@@ -730,6 +730,7 @@ class ReportController extends Controller
             [
                 "ห้อง",
                 "วันที่",
+                "ชื่อผู้เช่า",
                 "โดย",
                 "ช่องทาง",
                 "ค่าประกันห้อง",
@@ -741,6 +742,7 @@ class ReportController extends Controller
             $data[] = [
                         $row->room->name,
                         date('d/m/Y', strtotime($row->created_at)),
+                        $row->renter->prefix.' '.$row->renter->name.' '.$row->renter->surname,
                         $row->renter->room_for_rent->user->name,
                         $row->renter->room_for_rent->payment_method == 1 ? 'เงินสด': 'โอนเงิน',
                         $row->security_deposit,
