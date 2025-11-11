@@ -634,10 +634,18 @@ class UserController extends Controller
             $sheet->getHighestColumn() . 
             $sheet->getHighestRow()
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getColumnDimension('A')->setWidth(10);  // ลำดับ
+        $sheet->getColumnDimension('B')->setWidth(42);  // ชื่อพนักงาน
+        $sheet->getColumnDimension('C')->setWidth(42);  // ชื่อผู้ใช้งาน
+        $sheet->getColumnDimension('D')->setWidth(35);  // อีเมล
+        $sheet->getColumnDimension('E')->setWidth(20);  // เบอร์โทรศัพท์
+        $sheet->getColumnDimension('F')->setWidth(15);  // เงินเดือน
+        $sheet->getColumnDimension('G')->setWidth(20);  // วันที่เริ่มทำงาน
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
-        return redirect("upload/export_excel/ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx");
+        $writer->save("upload/export_excel/ข้อมูลผู้ใช้งานทั้งหมดประจำวันที่ ".date('d-m-Y').".xlsx");
+        return redirect("upload/export_excel/ข้อมูลผู้ใช้งานทั้งหมดประจำวันที่ ".date('d-m-Y').".xlsx");
     }
 
     
