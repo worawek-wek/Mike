@@ -43,8 +43,7 @@ class IncomeExpensesController extends Controller
     }
     public function datatable(Request $request)
     {
-        $results = IncomeExpenses::orderBy('id','DESC')
-                                    ->where('ref_branch_id', session("branch_id"));
+        $results = IncomeExpenses::orderBy('id','DESC')->where('ref_branch_id', session("branch_id"));
         
         if(@$request->search){
             $results = $results->Where(function ($query) use ($request) {
@@ -54,7 +53,13 @@ class IncomeExpensesController extends Controller
         }
 
         if(@$request->ref_category_id != "all"){
-            $results = $results->Where('ref_category_id', $request->ref_category_id);
+
+            if($request->ref_category_id == 2){
+                $results = $results->whereIN('ref_category_id',[0,$request->ref_category_id]);
+
+            }else{
+                $results = $results->Where('ref_category_id', $request->ref_category_id);
+            }
         }
 
         if(@$request->type != "all"){
