@@ -242,7 +242,7 @@ class ReportController extends Controller
     }
     public function move_in_datatable(Request $request)
     {
-        $results = Contract::orderBy('id','ASC')
+        $results = Contract::orderBy('created_at','desc')
                             ->whereHas('room.floor.building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             });
