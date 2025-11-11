@@ -5,7 +5,7 @@
             <input type="hidden" name="invoice_id" value="{{ @$invoice->id }}">
             <input name="ref_room_for_rent_id" type="hidden" value="{{ $invoice->ref_room_for_rent_id ?? $room->room_for_rent_main->id }}">
             <input name="ref_room_id" type="hidden" value="{{ $invoice->ref_room_id ?? $room->id }}">
-            <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id ?? $room->contract->id }}">
+            <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id ?? $contract->id }}">
             <div class="row g-2 pt-1"
             @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */

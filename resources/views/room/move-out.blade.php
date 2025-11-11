@@ -950,7 +950,7 @@
                                                             <div class="flex-grow-1 ms-3 g-3 row">
                                                                 <b class="text-black">ช่องทางการชำระเงิน</b> <br>
                                                                 <div class="col-sm-11">
-                                                                    <input name="bad_debt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt1" value="1" checked onclick="togglePaymentBadDebtFields()">
+                                                                    <input name="receipt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt1" value="1" checked onclick="togglePaymentBadDebtFields()">
                                                                     <label class="form-check-label" for="radio_bad_debt1"> เงินสด </label>
                                                                 </div>
                                                                 
@@ -961,7 +961,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-sm-11">
-                                                                    <input name="bad_debt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt2" value="2" onclick="togglePaymentBadDebtFields()"> 
+                                                                    <input name="receipt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt2" value="2" onclick="togglePaymentBadDebtFields()"> 
                                                                     <label class="form-check-label" for="radio_bad_debt2"> โอนเงิน </label>
                                                                 </div>
                                                     
@@ -1019,7 +1019,7 @@
                                                             todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
                                                         });
                                                         function togglePaymentBadDebtFields() {
-                                                            const paymentChannel = document.querySelector('input[name="bad_debt_payment_channel"]:checked').value;
+                                                            const paymentChannel = document.querySelector('input[name="receipt_payment_channel"]:checked').value;
                                                             const bad_debtPaymentDetails = document.getElementById('bad_debtPaymentDetails');
                                                             const bad_debtPaymentDetails2 = document.getElementById('bad_debtPaymentDetails2');
                                                             // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
