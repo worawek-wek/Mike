@@ -841,11 +841,11 @@
                                         {{-- <h4 class="my-4 amount">  </h4> --}}
                                         <h4 class="my-4">
                                             @if ($cal > 0)
-                                            <span class="text-success">
-                                                เก็บเงินผู้เช่าเพิ่ม
-                                            @else
                                             <span class="text-danger">
                                                 ยอดเงินประกันคืนผู้เช่า
+                                            @else
+                                            <span class="text-success">
+                                                เก็บเงินผู้เช่าเพิ่ม
                                             @endif
                                             &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
                                             </span>
@@ -1066,11 +1066,11 @@
 
                                                     <h4 class="text-center">
                                                         @if ($cal > 0)
-                                                        <span class="text-success">
-                                                            เก็บเงินผู้เช่าเพิ่ม
-                                                        @else
                                                         <span class="text-danger">
                                                             ยอดเงินประกันคืนผู้เช่า
+                                                        @else
+                                                        <span class="text-success">
+                                                            เก็บเงินผู้เช่าเพิ่ม
                                                         @endif
                                                              &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
                                                         </span>
