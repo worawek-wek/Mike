@@ -1,3 +1,8 @@
+{{-- ทำสัญญาหลายห้อง --}}
+{{-- ทำสัญญาหลายห้อง --}}
+{{-- ทำสัญญาหลายห้อง --}}
+{{-- ทำสัญญาหลายห้อง --}}
+
 <div class="p-2">
     <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
         <select name="ref_renter_id" class="form-select form-control" onchange="get_room_rental_contract(this.value)" required>

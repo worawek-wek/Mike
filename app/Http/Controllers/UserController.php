@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
 use Carbon\Carbon;
@@ -94,6 +95,48 @@ class UserController extends Controller
         // $data['title'] = 'Profile';
         
         return view('register/index', $data);
+    }
+    public function forgot_password()
+    {
+
+        $data['page_url'] = 'forgot-password';
+        $data['page'] = 'ลืมรหัสผ่าน';
+        $data['position'] = Position::whereIn('id', [1,2])->get();
+        // $data['title'] = 'Profile';
+        
+        return view('forgot-password/index', $data);
+    }
+    public function reset_password($remember_token)
+    {
+
+        $data['page_url'] = 'forgot-password';
+        $data['page'] = 'พนักงาน';
+        $data['remember_token'] = $remember_token;
+        $user = user::where('remember_token', $remember_token)->first();
+
+        if(!$user){
+            return 'ไม่สามารถดำเนินการได้.!';
+        }
+
+        $data['position'] = Position::whereIn('id', [1,2])->get();
+        // $data['title'] = 'Profile';
+        
+        return view('forgot-password/reset', $data);
+    }
+
+    public function submit_reset_password(Request $request)
+    {
+        try{
+            $user = user::where('remember_token', $request->remember_token)->first();
+            $user->password = Hash::make($request->password);
+            $user->save();
+            // return $user->password;
+            DB::commit();
+            return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+
     }
 
     public function profile($id = null)
@@ -259,6 +302,66 @@ class UserController extends Controller
                 throw new \Exception('Login failed after registration.');
             }
             return 1;
+        } catch (QueryException $err) {
+            DB::rollBack();
+        }
+        //
+    }
+    public function forgot_password_send_mail(Request $request)
+    {
+        try{
+
+            $user = User::where('email', $request->email)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'ไม่พบ ผู้ใช้ อีเมล นี้ ในระบบ'
+                ]);
+            }
+            
+            $remember_token = rand();
+            
+            // $user = User;
+            $user->remember_token = $remember_token;
+            $user->save();
+
+            $data['user'] = $user;
+            $data['remember_token'] = $remember_token;
+
+            Mail::send('forgot-password.email', $data, function ($message) use ($request) {
+                $message->from('worawek@ots.co.th', 'Kittinakorn');
+                // $message->to('wolverine.wek@gmail.com')
+                $message->to($request->email)->subject("ลืมรหัสผ่าน");
+            });
+
+            // $work_start_date = Carbon::createFromFormat('d/m/Y', $request->work_start_date)->format('Y-m-d');
+            // $ref_user_id = $request->ref_user_id;
+            // if($ref_user_id == null){
+            //     $ref_user_id = 0;
+            // }
+
+            // $user = new User;
+            // $user->name  =  $request->name;
+            // $user->username  =  $request->username;
+            // $user->salary  =  preg_replace('/\D/', '', $request->salary);
+            // $user->phone  =  $request->phone;
+            // $user->email  =  $request->email;
+            // $user->work_start_date  =  $work_start_date;
+            // $user->ref_position_id  =  $request->ref_position_id;
+            // $user->ref_user_id  =  $ref_user_id;
+            // $user->remark  =  $request->remark;
+            // // $user->ref_branch_id  =  session("branch_id");
+            // $user->password = Hash::make($request->password);
+            // $user->save();
+
+            DB::commit();
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Success'
+            ]);
+
         } catch (QueryException $err) {
             DB::rollBack();
         }

@@ -1,8 +1,13 @@
+    {{-- ทำสัญญาหลายห้อง --}}
+    {{-- ทำสัญญาหลายห้อง --}}
+    {{-- ทำสัญญาหลายห้อง --}}
+    {{-- ทำสัญญาหลายห้อง --}}
+
     <input type="hidden" name="ref_renter_id" value="{{ $renter->id }}">
     <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
         <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
             <i class="tf-icons ti ti-vocabulary text-main" style="font-size: 25px;"></i>
-            กรุณากรอกรายละเอียดสัญญาเช่า
+            กรุณากรอกรายละเอียดสัญญาเช่า {{count($room_for_rent)}}
         </h5>
         <div class="row g-3 p-4 pt-1">
             <div class="col-sm-5">
@@ -27,9 +32,14 @@
             </div>
             <div class="col-sm-6">
                 <label class="form-label">ระยะเวลาทำสัญญา(เดือน)</label>
-                <input type="number" name="period" class="form-control" placeholder="" value="" required/>
+                <input type="number" name="period" class="form-control" placeholder="" value="" id="period" required/>
             </div>
+            
             <div class="col-sm-6">
+                <label for="contract_date_to" class="form-label">วันที่สิ้นสุดสัญญา </label>
+                <input type="text" name="contract_date_to" class="form-control" placeholder="" id="contract_date_to" required autocomplete="off" value=""/>
+            </div>
+            <div class="col-sm-12">
                 <label for="remark" class="form-label">หมายเหตุ</label>
                 <input type="text" name="remark" class="form-control" id="remark" placeholder="" value="" value="" />
             </div>
@@ -48,9 +58,9 @@
             // }
             
             $receipt = \App\Models\Receipt::where('ref_room_id', $item->ref_room_id)->where('ref_type_id', 3)->orderBy('id','DESC')->first();
-            if($receipt->ref_status_id != 5){
-               continue; 
-            }
+            // if($receipt->ref_status_id != 5){
+            //    continue; 
+            // }
             $contract = \App\Models\Renter::leftJoin('contracts', 'renters.id', '=', 'contracts.ref_renter_id')
                         ->leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                         ->where('room_for_rents.ref_room_id', $item->ref_room_id)
@@ -138,13 +148,12 @@
             <div class="col-sm-6"></div>
             <div class="col-sm-6">
                 <label for="water_meter_start_living" class="form-label">เลขมิเตอร์น้ำประปา(เข้าพัก)*</label>
-                <input type="text" name="contract[{{$key}}][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ $meter->water_unit }}"/>
+                <input type="text" name="contract[{{$key}}][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ (int) $meter->water_unit }}"/>
             </div>
             <div class="col-sm-6">
                 <label for="electricity_meter_start_living" class="form-label">เลขมิเตอร์ค่าไฟ(เข้าพัก)*</label>
-                <input type="text" name="contract[{{$key}}][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ $meter->electricity_unit }}"/>
+                <input type="text" name="contract[{{$key}}][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ (int) $meter->electricity_unit }}"/>
             </div>
-
         </div>
         <script>
             $('#deduction_booking_date{{$item->id}}').datepicker({
@@ -152,25 +161,182 @@
                 autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
                 todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
             });
+                $('#submit_insert_contract').prop('disabled', false);
         </script>
             @if (!$loop->last)
                 <hr>
             @endif
         @endforeach
     </div>
-<script>
-    $('#contract_date').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        
+    <div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
+        <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
+            <i class="tf-icons ti ti-browser-plus text-main" style="font-size: 25px;vertical-align: baseline;"></i>
+            ชำระเงิน
+        </h5>
+        <div class="row g-3 p-4 pt-1">
+                                                <div class="col-sm-12">
+                                                    <div>
+                                                        <label for="exampleFormControlInput31" class="form-label">วิธีการชำระเงิน</label>
+                                                    </div>
+                                                    {{-- <div class="ms-3">
+                                                    <input
+                                                        name="payment_method"
+                                                        class="form-check-input"
+                                                        type="radio"
+                                                        value="1"
+                                                        id="defaultRadio1"
+                                                        checked />
+                                                    <label class="form-check-label" for="defaultRadio1">&nbsp; เงินสด </label>
+                                                    <input
+                                                        name="payment_method"
+                                                        class="form-check-input ms-2"
+                                                        type="radio"
+                                                        value="2"
+                                                        id="tranfer" />
+                                                    <label class="form-check-label" for="tranfer">&nbsp; โอนเงิน </label>
+                                                    </div> --}}
+                                                    {{-- ///////////////////////////////////////////////////// --}}
+                                                    <div class="col-sm-11 mb-3">
+                                                        <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
+                                                        <label class="form-check-label" for="reservation_payByCash"> เงินสด </label>
+                                                    </div>
+
+                                                    <div id="paymentChanel_Res2">
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label for="payment_date">วันที่ชำระเงิน</label>
+                                                            <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-11 mb-3">
+                                                        <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
+                                                        <label class="form-check-label" for="reservation_payByTransfer"> โอนเงิน </label>
+                                                    </div>
+
+                                                    <!-- แสดงเมื่อเลือก โอนเงิน -->
+                                                    <div id="paymentChanel_Res" style="display:none;">
+                                                        <div class="col-sm-6 mb-2">
+                                                            <label>เลือกบัญชีธนาคาร</label><span class="text-danger"> *</span>
+                                                            <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
+                                                                @foreach ($bank as $r_bank)
+                                                                    <option value="{{ $r_bank->id }}">{{ $r_bank->bank.' '.$r_bank->bank_account_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-3 mb-2">
+                                                            <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
+                                                            <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
+                                                        </div>
+                                                        <div class="col-sm-6 mb-2">
+                                                            <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                                                            <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                                                        </div>
+                                                        <div class="col-sm-10 mt-3">
+                                                            <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
+                                                            <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
+                                                            <div class="preview-container">
+                                                                <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {{-- ///////////////////////////////////////////////////// --}}
+                                                </div>
+        </div>
+        </div>
+    </div>
+    {{-- @if (count($room_for_rent) == 0)
+        <script>
+            setTimeout(() => {
+                alert(123);
+            }, 2000);
+        </script>
+    @endif --}}
+    
+    <script>
+        $('#contract_date').datepicker({
+                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+            });
+        $('#contract_date_to').datepicker({
+                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+            });
+        $('#payment_date').datepicker({
+                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+            });
+        $('#payment_date2').datepicker({
+                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+            });
+    </script>
+    <script>
+        $('.reservation_payment_channel').on('change', function() {
+            const paymentChannel = $('.reservation_payment_channel:checked').val();
+
+            if (paymentChannel === '2') {
+                // แสดงช่องโอนเงิน
+                $('#paymentChanel_Res').show();
+                $('#paymentChanel_Res2').hide();
+
+                // ใส่ required
+                $('#ref_bank_id').attr('required', true);
+                $('#transfer_time').attr('required', true);
+                $('#payment_date2').attr('required', true);
+            } else {
+                // แสดงช่องเงินสด
+                $('#paymentChanel_Res').hide();
+                $('#paymentChanel_Res2').show();
+
+                // เอา required ออก
+                $('#ref_bank_id').removeAttr('required');
+                $('#transfer_time').removeAttr('required');
+                $('#payment_date2').removeAttr('required');
+            }
         });
-</script>
-<script>
-    function deleteContractRoom(id){
-        if ($('.contractRoom').length > 1) {
-            $("#contractRoom"+id).remove();
-        } else {
-            Swal.fire('ไม่สามารถลบได้', 'การทำสัญญาต้องมีอย่างน้อย 1 ห้อง', 'warning');
+
+        // ให้รันตอนโหลดหน้าด้วย (กรณีมีค่า checked อยู่แล้ว)
+        $(document).ready(function() {
+            $('.reservation_payment_channel:checked').trigger('change');
+        });
+    </script>
+    <script>
+        function updateContractDateTo() {
+            const contractDate = $('#contract_date').val();
+            const periodMonths = parseInt($('#period').val(), 10);
+            const contractDateToField = $('#contract_date_to');
+
+            if (contractDate && periodMonths && !isNaN(periodMonths)) {
+                const dateParts = contractDate.split('/');
+                const contractDateObject = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+                contractDateObject.setMonth(contractDateObject.getMonth() + periodMonths);
+                const endDate = contractDateObject.toLocaleDateString('en-GB');
+                contractDateToField.val(endDate);
+            }
         }
-    }
-</script>
+
+        function initContractFormScript() {
+            $('#contract_date').on('input', updateContractDateTo);
+            $('#period').on('input', updateContractDateTo);
+            updateContractDateTo(); // คำนวณครั้งแรก
+        }
+
+        // เรียกตอนโหลดเสร็จ
+        $(document).ready(function(){
+            initContractFormScript();
+        });
+    </script>
+    <script>
+        function deleteContractRoom(id){
+            if ($('.contractRoom').length > 1) {
+                $("#contractRoom"+id).remove();
+            } else {
+                Swal.fire('ไม่สามารถลบได้', 'การทำสัญญาต้องมีอย่างน้อย 1 ห้อง', 'warning');
+            }
+        }
+    </script>

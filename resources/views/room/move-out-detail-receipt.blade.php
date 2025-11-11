@@ -55,11 +55,13 @@
             </table>
             
             <div class="mt-4 col-12 d-flex justify-content-end gap-2"
-                    @if($permission_bill_move_edit)
+                    @if($permission_bill_move_edit || @$receipt || $invoice->payment_channel == 3)
                         style="pointer-events: none;  /* ปิดคลิก */
                                 opacity: 0.6;          /* ให้ดูจางลง */
                                 cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
-                    @endif>
+                    @endif
+                    {{-- @if () disabled @endif  --}}
+                    >
                 <button
                     @if (@$receipt) disabled @endif
                     style="padding-right: 14px;padding-left: 14px;"
@@ -67,11 +69,10 @@
                     type="button"
                     onClick="editFormReceipt()"
                 >
-                    <i class="fa fa-pencil me-1"></i> แก้ไขใบเสร็จ
+                    <i class="ti ti-pencil me-1"></i> แก้ไขใบเสร็จ
                 </button>
-
                 <div class="dropdown">
-                    <button @if (@$receipt) disabled @endif class="btn btn-main dropdown-toggle" type="button" id="paymentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-main dropdown-toggle" type="button" id="paymentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         เคลียร์ใบเสร็จย้ายออก
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="paymentDropdown">
@@ -81,12 +82,15 @@
                     </ul>
                 </div>
             </div>
+                @if ($invoice->payment_channel == 3)
+                    <h4 class="text-danger mt-4" align="center">หมายเหตุ : ยอดชำระด้วยวิธี “หักจากเงินประกัน” จะถูกนำไปดำเนินการในขั้นตอนเคลียร์บิลย้ายออก</h4>
+                    <input type="hidden" class="discount-value" value="{{ $invoice->total_amount }}"> <!-- เอายอดนี้ ไปหักค่าประกัน ถ้า payment_channel = 3 (ชำระโดย หักจากเงินประกัน) -->
+                @endif
             <script>
                 function payReceiptMoveOut(ch){
                     $('#payment_receipt').show();
                     $('#payment_receipt_by_deposit').hide();
                     $('#defaultRadio1').prop('checked', true);
-
                 }
                 function payReceiptMoveOutByDeposit(ch){
                     $('#payment_receipt_by_deposit').show();
@@ -96,9 +100,6 @@
             </script>
 
             @if (@$receipt)
-            @if ($receipt->payment_channel == 3)
-                <input type="hidden" class="discount-value" value="{{ $receipt->total_amount }}">
-            @endif
                 <div class="p-4 mt-4" style="border: 1px solid #59d57a;border-radius: 5px;">
                     <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt->receipt_number }}</span></p>
                         <table class="table table-detail table-bordered">

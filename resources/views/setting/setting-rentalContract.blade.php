@@ -194,6 +194,28 @@
     <script src="assets/vendor/libs/quill/katex.js"></script>
     <script src="assets/vendor/libs/quill/quill.js"></script>
     <script>
+
+        var name = '';
+        var address = '';
+        var toDay = '';
+        var thisMonthYear = '';
+        var renter = '';
+        var cartID = '';
+        var tel = '';
+        var roomName = '';
+        var floorName = '';
+        var contractPeriod = '';
+        var contractDate = '';
+        var contractEndDate = '';
+        var deposit = '';
+        var allRoomRent = '';
+        var furnitureRental = '';
+        var roomRent = '';
+        var paymentDueDate = '';
+        var electricityStartUnit = '';
+        var waterStartUnit = '';
+        var tenant_signature = '';
+
         function generatePlaceholdersFromButtons() {
             const placeholders = {};
             document.querySelectorAll('.addCondition').forEach(button => {
@@ -203,30 +225,27 @@
             return placeholders;
         }
         function getPlaceholderValue(key) {
-            const now = new Date();
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-
             switch (key) {
-                case '{ชื่อหอพัก}': return 'หอพัก  Orange';
-                case '{ที่อยู่หอพัก}': return '32/1 ถ. จรัญสนิทวงศ์ แขวงบางอ้อ บางพลัด กรุงเทพมหานคร 10700';
-                case '{วันที่ปัจจุบัน}': return now.toLocaleDateString('th-TH', options);
-                case '{เดือน/ปีปัจจุบัน}': return now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
-                case '{ชื่อผู้เช่า}': return 'นายพิพัฒน์';
-                case '{หมายเลขบัตรประชาชนผู้เช่า}': return '0000000000';
-                case '{เบอร์โทรผู้เช่า}': return '02-424-555-9';
-                case '{หมายเลขห้องพัก}': return 'ชั้น 3';
-                case '{หมายเลขชั้นของห้องพัก}': return '3';
-                case '{ระยะเวลาสัญญา}': return '12 เดือน';
-                case '{วันที่เริ่มต้นสัญญา}': return '1 มกราคม 2568';
-                case '{วันที่สิ้นสุดสัญญา}': return '31 ธันวาคม 2568';
-                case '{เงินประกันห้อง}': return '5,000 บาท';
-                case '{ค่าเช่าห้อง}': return '7,500 บาท';
-                case '{ค่าเช่าเฟอร์นิเจอร์}': return '1,000 บาท';
-                case '{ค่าเช่าห้องไม่รวมค่าเฟอร์นิเจอร์}': return '6,500 บาท';
-                case '{วันที่สิ้นสุดการชำระเงิน}': return '5 มกราคม 2568';
-                case '{เลขมิเตอร์ไฟฟ้าเข้าพัก}': return '0000';
-                case '{เลขมิเตอร์น้ำเข้าพัก}': return '0000';
-                case '{ลายเซนต์ผู้เช่า}': return '(พิพัฒน์)';
+                case '{ชื่อหอพัก}': return name;
+                case '{ที่อยู่หอพัก}': return address;
+                case '{วันที่ปัจจุบัน}': return toDay;
+                case '{เดือน/ปีปัจจุบัน}': return thisMonthYear;
+                case '{ชื่อผู้เช่า}': return renter;
+                case '{หมายเลขบัตรประชาชนผู้เช่า}': return cartID;
+                case '{เบอร์โทรผู้เช่า}': return tel;
+                case '{หมายเลขห้องพัก}': return roomName;
+                case '{หมายเลขชั้นของห้องพัก}': return floorName;
+                case '{ระยะเวลาสัญญา}': return contractPeriod;
+                case '{วันที่เริ่มต้นสัญญา}': return contractDate;
+                case '{วันที่สิ้นสุดสัญญา}': return contractEndDate;
+                case '{เงินประกันห้อง}': return deposit;
+                case '{ค่าเช่าห้อง}': return allRoomRent;
+                case '{ค่าเช่าเฟอร์นิเจอร์}': return furnitureRental;
+                case '{ค่าเช่าห้องไม่รวมค่าเฟอร์นิเจอร์}': return roomRent;
+                case '{วันที่สิ้นสุดการชำระเงิน}': return paymentDueDate;
+                case '{เลขมิเตอร์ไฟฟ้าเข้าพัก}': return electricityStartUnit;
+                case '{เลขมิเตอร์น้ำเข้าพัก}': return waterStartUnit;
+                case '{ลายเซนต์ผู้เช่า}': return tenant_signature;
                 default: return key; 
             }
         }
@@ -238,52 +257,92 @@
             return content;
         }
         function print_show() {
-            const content = document.getElementById('detail').value;
-            const placeholders = generatePlaceholdersFromButtons();
-            const replacedContent = replacePlaceholders(content, placeholders);
-            const printWindow = window.open('', '', 'width=800,height=600');
+            
+            const now = new Date();
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
 
-            printWindow.document.open();
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>พิมพ์ตัวอย่าง</title>
-                        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-                        <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
-                        <style>
-                            @page {
-                                size: A4;
-                                margin: 20mm;
-                            }
-                            body {
-                                font-family: 'Sarabun', sans-serif;
-                                font-size: 14pt;
-                                padding: 20px;
-                                line-height: 1.6;
-                            }
+            $.ajax({
+                url: 'setting/get-contract-data', 
+                type: 'GET',
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    // alert(123);
+                        name = response.name;
+                        address = response.address;
+                        toDay = now.toLocaleDateString('th-TH', options);
+                        thisMonthYear = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+                        renter = response.renter;
+                        cartID = response.cartID;
+                        tel = response.tel;
+                        roomName = response.roomName;
+                        floorName = response.floorName;
+                        contractPeriod = response.contractPeriod;
+                        contractDate = response.contractDate;
+                        contractEndDate = response.contractEndDate;
+                        deposit = response.deposit;
+                        allRoomRent = response.allRoomRent;
+                        furnitureRental = response.furnitureRental;
+                        roomRent = response.roomRent;
+                        paymentDueDate = response.paymentDueDate;
+                        electricityStartUnit = response.electricityStartUnit;
+                        waterStartUnit = response.waterStartUnit;
+                        tenant_signature = response.tenant_signature;
+                },
+                error: function(error) {
+                    Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                    console.error('เกิดข้อผิดพลาด:', error);
+                }
+            });
+            setTimeout(() => {
+                const content = document.getElementById('detail').value;
+                const placeholders = generatePlaceholdersFromButtons();
+                const replacedContent = replacePlaceholders(content, placeholders);
+                const printWindow = window.open('', '', 'width=800,height=600');
 
-                            .ql-align-center {
-                                text-align: center;
-                            }
-                            .ql-align-right {
-                                text-align: right;
-                            }
-                            .ql-align-left {
-                                text-align: left;
-                            }
+                printWindow.document.open();
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>พิมพ์ตัวอย่าง</title>
+                            <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+                            <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+                            <style>
+                                @page {
+                                    size: A4;
+                                    margin: 20mm;
+                                }
+                                body {
+                                    font-family: 'Sarabun', sans-serif;
+                                    font-size: 14pt;
+                                    padding: 20px;
+                                    line-height: 1.6;
+                                }
 
-                            /* เพิ่ม margin ให้ element ภายใน */
-                            p {
-                                margin: 0 0 10px;
-                            }
-                        </style>
-                    </head>
-                    <body onload="window.print(); window.close();">
-                        ${replacedContent}
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
+                                .ql-align-center {
+                                    text-align: center;
+                                }
+                                .ql-align-right {
+                                    text-align: right;
+                                }
+                                .ql-align-left {
+                                    text-align: left;
+                                }
+
+                                /* เพิ่ม margin ให้ element ภายใน */
+                                p {
+                                    margin: 0 0 10px;
+                                }
+                            </style>
+                        </head>
+                        <body onload="window.print(); window.close();">
+                            ${replacedContent}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }, 1000);
         }
         function check_add() {
             var formData = new FormData($("#form_submit")[0]);

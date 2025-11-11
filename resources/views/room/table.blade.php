@@ -9,13 +9,17 @@ aria-labelledby="pills-home-tab" tabindex="0">
             <div class="col-md-6 col-lg5" 
                     @if($row->status == 1 && $row->status_name == "ค้างชำระ")
                         style="cursor: pointer" onclick="openReservation({{ $row->rent_bill_id }})"
-                    @elseif($row->status == 1 && $row->receipt_status_id != 5)
-
+                    {{-- @elseif($row->status == 1 && $row->receipt_status_id != 5)
+                            style="cursor: pointer"
+                            data-bs-toggle="modal"
+                            data-bs-target="#reserveData"
+                            onclick="openReservData({{ $row->id }}, '{{ $row->room_name}}')" --}}
                     @else
                         style="cursor: pointer" data-bs-toggle="modal"
                         @if ($row->status == 0)
-                            data-bs-target="#reserveOneRoomModal"
-                            onclick="reserveOneRoom({{ $row->id }}, '{{ $row->room_name}} ')"
+                            {{-- data-bs-target="#reserveOneRoomModal" --}}
+                            {{-- onclick="reserveOneRoom({{ $row->id }}, '{{ $row->room_name}} ')" --}}
+                            onclick="window.location.href='/room/reserve/{{ $row->id }}'"
                         @else
                             data-bs-target="#insurance"
                             onclick="view({{ $row->id }})"
@@ -33,9 +37,13 @@ aria-labelledby="pills-home-tab" tabindex="0">
                         card-check shadow-sm h-100">
                     <div class="card-body text-center">
                         <h5 class="card-title" style="color: black"><b>{{ $row->room_name }}</b></h5>
-                            <p style="color: rgb(40, 40, 40);font-weight: 430;">
+                            <p style="color: rgb(40, 40, 40); font-weight: 430; 
+                                        white-space: normal; 
+                                        word-break: keep-all; 
+                                        overflow-wrap: anywhere; 
+                                        line-height: 1.2;">
                                 @php
-                                    $renter_name = $row->prefix.' '.$row->renter_name;
+                                    $renter_name = $row->renter_prefix.' '.$row->renter_name;
                                     if (strlen($renter_name) > 40) {
                                         // echo substr($renter_name, 0, 40) . '...'; // ตัดให้เหลือ 10 ตัวอักษรแล้วเพิ่ม "..."
                                     }else{
@@ -135,7 +143,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                 if ($row2->status != 0){
                     if($row2->status == 1 && $row2->rent_bill_status != 5){
                         $onclick = 'style="cursor: pointer" onclick="openReservation('.$row2->rent_bill_id.')"';
-                    }else if($row2->status == 1 && $row2->receipt_status_id != 5){
+                    // }else if($row2->status == 1 && $row2->receipt_status_id != 5){
 
                     }else{
                         $onclick = 'style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#insurance" onclick="view('.$row2->id.')"';

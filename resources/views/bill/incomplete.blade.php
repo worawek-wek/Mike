@@ -66,7 +66,7 @@
                 </ul>
         </div>
         <div class="tab-content" style="box-shadow: unset;padding:0px">
-            <div class="tab-pane fade active show mb-5" id="navs-pills-top-edit" role="tabpanel">
+            <div class="tab-pane fade active show" id="navs-pills-top-edit" role="tabpanel">
               
                 <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
                     <div class="d-flex">
@@ -174,22 +174,27 @@
         
         <div class="col-sm-11 mt-3">
             <label>หมายเหตุ</label>
-            <input type="text" class="form-control" placeholder="หมายเหตุ" />
+            <input type="text" name="remark" class="form-control" placeholder="หมายเหตุ" value="{{ $invoice->remark }}" />
         </div>
+            <div class="modal-footer rounded-0 justify-content-end my-2 pb-0">
+                <button type="submit" class="btn btn-sm btn-warning waves-effect" value="save">
+                    <span class="fa fa-save me-2" style="font-size: x-large;"></span>บันทึกรายการ</button>
+            </div>
           </div>
         </div>
         
     </div>
-    
-    @php
-        $permission_bill_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 25)->where('status', 0)->first();
-    @endphp
-    <div class="modal-footer rounded-0 justify-content-start" @if($permission_bill_confirm) style="display: none;" @endif>
-        {{-- <button type="button" class="btn btn-primary waves-effect"><span
-                class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
-        <button type="submit" class="btn btn-info waves-effect">
-            <span class="fas fa-paper-plane me-2" style="font-size: x-large;"></span>คอนเฟิร์มบิล</button>
-    </div>
+    @if(Auth::user()->user_has_branch->position->id == 1)
+        @php
+            $permission_bill_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 25)->where('status', 0)->first();
+        @endphp
+        <div class="modal-footer rounded-0 justify-content-start" @if($permission_bill_confirm) style="display: none;" @endif>
+            {{-- <button type="button" class="btn btn-primary waves-effect"><span
+                    class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
+            <button type="submit" class="btn btn-info waves-effect" value="approve">
+                <span class="fas fa-paper-plane me-2" style="font-size: x-large;"></span>คอนเฟิร์มบิล</button>
+        </div>
+    @endif
 </form>
 <script>
     
@@ -326,6 +331,17 @@
         
         $('#incomplete_update').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+            // ดึงค่าจากปุ่มที่กด
+            const action = $(this).find('button[type=submit][clicked=true]').val();
+
+            // เลือก URL ตามปุ่ม
+            let title = '';
+            if (action === 'save') {
+                title = 'บันทึกรายการ';
+            } else if (action === 'approve') {
+                title = 'คอนเฟิร์มบิล';
+            }
+
             if(!this.checkValidity()) {
                 // ถ้าฟอร์มไม่ถูกต้อง
                 this.reportValidity();
@@ -334,7 +350,7 @@
             // return alert(123);
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',
-                text: 'คุณต้องการ คอนเฟิร์มบิล หรือไม่?',
+                text: 'คุณต้องการ '+title+' หรือไม่?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'ตกลง',
@@ -347,7 +363,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ $page_url }}/incomplete_update', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        url: '{{ $page_url }}/incomplete_update/'+action, // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
                         type: 'POST',
                         data: $(this).serialize(),
                         success: function(response) {
@@ -355,7 +371,7 @@
                                 $('#invoice').modal('hide');
                                 summary();
                                 loadData(page);
-                                Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+                                Swal.fire(''+title+' เรียบร้อยแล้ว', '', 'success');
                             }
                         },
                         error: function(error) {
@@ -367,5 +383,10 @@
                     // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
                 }
             });
+        });
+        // จับปุ่มที่ถูกคลิกก่อน submit
+        $('#incomplete_update button[type=submit]').on('click', function() {
+            $('button[type=submit]', $(this).parents('form')).removeAttr('clicked');
+            $(this).attr('clicked', 'true');
         });
 </script>

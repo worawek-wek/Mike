@@ -9,8 +9,8 @@ aria-labelledby="pills-home-tab" tabindex="0">
             <div class="col-md-6 col-lg5" @if($permission_bill) style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row->id }},'table')" @endif>
                 <div class="card bg-label-{{ $row->status->color }} card-check shadow-sm" style="height: 155.5px;">
                     <div class="card-body d-flex flex-column justify-content-center text-center p-3">
-                        <h5 class="card-title mb-0"><i class="text-{{ $row->status->color }} {{ $row->status->icon }} me-2"></i><b>{{ $row->room_name }}</b></h5>
-                        <div class="text-{{ $row->status->color }} h5 text-center" style="margin-top: 0;margin-bottom: 0;">
+                        <h4 class="card-title mb-0 mb-2"><i class="text-{{ $row->status->color }} {{ $row->status->icon }} me-2"></i><b>{{ $row->room_name }}</b></h4>
+                        <div class="text-{{ $row->status->color }} h4 text-center" style="margin-top: 0;margin-bottom: 0;">
                             {{
                                 number_format($row->total_amount)
                             }}
@@ -30,19 +30,23 @@ aria-labelledby="pills-home-tab" tabindex="0">
         </div>
     </div>
 </div>
+<input type="hidden" id="allIds" value="{{ $allIds }}">
 <div class="tab-pane fade show" id="pills-profile" role="tabpanel"
 aria-labelledby="pills-profile-tab" tabindex="0">
     <table class="datatables-basic table dataTable no-footer dtr-column"
         id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         <thead class="border-top">
             <tr class=" table-info">
-                <th class="control sorting_disabled dtr-hidden" rowspan="1"
-                    colspan="1" style="width: 0px; display: none;"
-                    aria-label=""></th>
-                <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all"
-                    rowspan="1" colspan="1" style="width: 18px;"
+                <th class="sorting_disabled dt-checkboxes-cell-t dt-checkboxes-select-all-t"
+                    rowspan="1" colspan="1" style="width: 0px;"
                     data-col="1" aria-label="">
-                    <input id="checkAll" type="checkbox" class="form-check-input"></th>
+                    <input id="checkAll-T" type="checkbox" class="form-check-input">
+                </th>
+                <th class="control sorting_disabled dtr-hidden" rowspan="1"
+                    colspan="1" style="width: 0px;"
+                    aria-label="">
+                    #
+                </th>
                 <th class="text-center" tabindex="0" style="width: 40px;">
                     ห้อง
                 </th>
@@ -71,7 +75,12 @@ aria-labelledby="pills-profile-tab" tabindex="0">
             <tr class="odd">
                 <td class="control" tabindex="0" style="display: none;">
                 </td>
-                <td class="dt-checkboxes-cell" {{ $click }}>
+                <td class="dt-checkboxes-cell-t">
+                    {{-- @if ($row_2->ref_status_id == 2) --}}
+                        <input type="checkbox" class="dt-checkboxes form-check-input ids_invoice" value="{{ $row_2->id }}">
+                    {{-- @endif --}}
+                </td>
+                <td class="dt-checkboxes-cell-t" {{ $click }}>
                     {{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}
                 <td class="text-center" {!! $click !!}>{{ $row_2->room_name }}</td>
                 <td class="text-center" {!! $click !!}><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
@@ -130,20 +139,42 @@ aria-labelledby="pills-profile-tab" tabindex="0">
     @include('layout/pagination')
 </div>
 <script>
-    $('#checkAll').change(function() {
-        $('.check-list-td').prop('checked', this.checked);
+    $(document).ready(function () {
+        // เมื่อคลิกที่ checkbox ใน <th>
+        $('.dt-checkboxes-select-all-t input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบสถานะของ checkbox ใน <th>
+            var isChecked = $(this).prop('checked');
+            
+            // ทำให้ checkbox ทุกอันใน <td> ถูกเช็คหรือยกเลิกการเช็ค
+            $('td.dt-checkboxes-cell-t input[type="checkbox"]').prop('checked', isChecked);
+            checkNoCheckedT();
+        });
+
+        // เมื่อคลิกที่ checkbox ใน <td> (ตรวจสอบสถานะของทุก checkbox)
+        $('td.dt-checkboxes-cell-t input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบว่า checkbox ใน <td> ถูกเช็คหรือไม่
+            var allChecked = $('td.dt-checkboxes-cell-t input[type="checkbox"]').length === $('td.dt-checkboxes-cell-t input[type="checkbox"]:checked').length;
+            
+            // ถ้าทุก checkbox ใน <td> ถูกเช็ค จะทำให้ checkbox ใน <th> ถูกเช็ค
+            $('.dt-checkboxes-select-all-t input[type="checkbox"]').prop('checked', allChecked);
+            checkNoCheckedT();
+        });
+        
     });
-    $('.check-list-td').on('change', function() {
-        // ตรวจสอบสถานะของ checkbox ทั้งหมดที่มี class="check-list-td"
-        const totalCheckboxes = $('.check-list-td').length;
-        const checkedCheckboxes = $('.check-list-td:checked').length;
-
-        // ถ้าทุก checkbox ถูกเลือก ให้เลือก checkAll
-        $('#checkAll').prop('checked', checkedCheckboxes === totalCheckboxes);
-
-        // ถ้าไม่มี checkbox ที่ถูกเลือกเลย จะทำให้ checkAll ถูกยกเลิก
-        if (checkedCheckboxes === 0) {
-            $('#checkAll').prop('checked', false);
+    checkNoCheckedT();
+    function floorCheckedT() {
+        $('.dt-checkboxes-select-all-t input[type="checkbox"]').prop('checked', true);
+            $('td.dt-checkboxes-cell-t input[type="checkbox"]').prop('checked', true);
+            checkNoCheckedT();
+        // });
+    }
+    function checkNoCheckedT() {
+        if ($('td.dt-checkboxes-cell-t input[type="checkbox"]:checked').length === 0) {
+        // ทำให้ปุ่มถูก disabled
+            $('#edit-rent').prop('disabled', true);
+        } else {
+            // ถ้ามี checkbox ถูกเช็ค ให้เปิดใช้งานปุ่ม
+            $('#edit-rent').prop('disabled', false);
         }
-    });
+    }
 </script>

@@ -72,6 +72,10 @@ Route::controller(AuthController::class)->middleware('loggedin')->group(function
 });
 Route::controller(UserController::class)->middleware('loggedin')->group(function() {
     Route::get('register', 'register')->name('register.index');
+    Route::get('forgot-password', 'forgot_password')->name('forgot-password.index');
+    Route::get('user/reset-password/{remember_token}', 'reset_password')->name('reset-password.index');
+    Route::post('user/reset-password', 'submit_reset_password')->name('reset-password.index');
+    Route::post('user/forgot-password-send-mail', 'forgot_password_send_mail')->name('user.forgot-password-send-mail');    //////////////////////////
     // Route::post('register', 'store')->name('register.store');
     Route::post('user', 'store')->name('user.insert');    //////////////////////////
 });
@@ -112,6 +116,7 @@ Route::middleware('auth')->group(function() {
         Route::get('report/rent-bill/summary', 'rent_bill_summary')->name('report.rent-bill-summary');    //////////////////////////
         Route::get('report/move-in', 'move_in')->name('report.move_in');    //////////////////////////
         Route::get('report/move-in/datatable', 'move_in_datatable')->name('report.move-in-datatable');    //////////////////////////
+        Route::get('report/move-out/datatable', 'move_out_datatable')->name('report.move-out-datatable');    //////////////////////////
         Route::get('report/move-out', 'move_out')->name('report.move_out');    //////////////////////////
         Route::get('report/bad-debt', 'badDebt')->name('report.bad_debt');    //////////////////////////
         Route::get('report/bad-debt/datatable', 'badDebt_datatable')->name('report.bad-debt-datatable');    //////////////////////////
@@ -138,6 +143,7 @@ Route::middleware('auth')->group(function() {
 
         Route::get('setting/manage-bill', 'manage_bill')->name('setting.manage_bill');    //////////////////////////
         Route::get('setting/rental-contract', 'rental_contract')->name('setting.rental_contract');            
+        Route::get('setting/get-contract-data', 'get_contract_data')->name('branch.get-contract-data');    //////////////////////////
         Route::post('setting/manage-bill', 'manage_billSubmit');    //////////////////////////
 
         Route::get('setting/rental-contract', 'rental_contract')->name('setting.rental_contract');    //////////////////////////
@@ -254,6 +260,8 @@ Route::middleware('auth')->group(function() {
     Route::controller(RoomController::class)->group(function() {                    //////////////////////////
         Route::get('room', 'index')->name('room');    //////////////////////////
         Route::get('room/reserve', 'reserve_form')->name('reserve');    //////////////////////////
+        Route::get('room/reserve/{room_id}', 'reserve_form')->name('reserve');    //////////////////////////
+        Route::get('room/reserve-data', 'reserve_data')->name('reserve-data');    //////////////////////////
         Route::get('room/check-in/{room_id}', 'get_check_in')->name('check-in');    //////////////////////////
         Route::post('room/check-in', 'insert_check_in')->name('check-in');    //////////////////////////
         Route::get('room/form-room-rental-contract', 'room_rental_contract_form')->name('form-room-rental-contract');    //////////////////////////
@@ -266,9 +274,13 @@ Route::middleware('auth')->group(function() {
         Route::post('room', 'store')->name('insert');    //////////////////////////
         Route::post('room/move-out-submit', 'move_out_submit')->name('move-out-submit');    //////////////////////////
         Route::post('room/save-move-out-receipt', 'save_move_out_receipt')->name('save-move-out-receipt');    //////////////////////////
+        Route::post('room/update-deposit-refund', 'update_deposit_refund')->name('update-deposit-refund');    //////////////////////////
+        Route::post('room/save-move-out-bad-debt-bill', 'save_move_out_bad_debt_bill')->name('save-move-out-bad-debt-bill');    //////////////////////////
         Route::post('room/payment-receipt-move-out-bill', 'payment_receipt_move_out_bill')->name('payment-receipt-move-out-bill');    //////////////////////////
         Route::get('room/get-move-out-detail-receipt/{room_id}', 'get_move_out_detail_receipt')->name('get-move-out-detail-receipt');    //////////////////////////
         Route::get('room/get-move-out-form-receipt/{room_id}', 'get_move_out_form_receipt')->name('get-move-out-form-receipt');    //////////////////////////
+        Route::get('room/move-out-detail-bad-debt-bill/{room_id}', 'move_out_detail_bad_debt_bill')->name('move-out-detail-bad-debt-bill');    //////////////////////////
+        Route::get('room/move-out-form-bad-debt-bill/{room_id}', 'move_out_form_bad_debt_bill')->name('move-out-form-bad-debt-bill');    //////////////////////////
         Route::post('room/insert_contract', 'insert_contract')->name('insert_contract');    //////////////////////////
         Route::post('room/receipt', 'insert_receipt')->name('insert-receipt');    //////////////////////////
         Route::post('room/receipt/all', 'insert_receipt_all')->name('insert-receipt-all');    //////////////////////////
@@ -280,6 +292,7 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-room-form-contract/{id}', 'get_room_form_contract')->name('get_room_form_contract');    //////////////////////////
         Route::get('room/get-bill/{id}/{month}', 'get_bill')->name('get_bill');    //////////////////////////
         Route::get('room/get-move-out/{id}', 'get_move_out')->name('get-move-out');    //////////////////////////
+        Route::get('room/get-invoice-move-out/{contract_id}', 'get_invoice_move_out')->name('get-invoice-move-out');    //////////////////////////
         Route::get('get-districts/{id}', 'get_districts')->name('get-districts');    //////////////////////////
         Route::get('get-subdistricts/{id}', 'get_subdistricts')->name('get-subdistricts');    //////////////////////////
         Route::get('get-zipcode/{id}', 'get_zipcode')->name('get-zipcode');    //////////////////////////
@@ -294,15 +307,19 @@ Route::middleware('auth')->group(function() {
         Route::get('room/asset/{room_id}/{asset_id}', 'get_asset')->name('room.get_asset');    ////////////////////////// 
         Route::post('room/asset/update_asset', 'update_asset')->name('room.update_asset');    //////////////////////////
         Route::post('room/asset/asset-upload-image-move-out', 'asset_upload_image_move_out')->name('room.asset-upload-image-move-out');    //////////////////////////
+        Route::get('room/set_branch/{branch_id}', 'index')->name('room.set_branch');    //////////////////////////
 
 
     });
     Route::controller(MeterController::class)->group(function() {                   //////////////////////////
         Route::get('meter', 'index')->name('meter');    //////////////////////////
+        Route::get('meter/get-moving-meter-room-count', 'get_moving_meter_room_count')->name('meter.water-get-moving-meter-room-count');    //////////////////////////
         Route::get('meter/water/datatable', 'water_datatable')->name('meter.water-datatable');    //////////////////////////
         Route::get('meter/get-water-meter-unit/{id}', 'get_water_meter_unit')->name('meter.get-water-meter-unit');    //////////////////////////
+        Route::get('meter/get-electricity-meter-unit/{id}', 'get_electricity_meter_unit')->name('meter.get-electricity-meter-unit');    //////////////////////////
         Route::post('meter/water_unit', 'water_unit_update')->name('meter.water-unit_update');    //////////////////////////
         Route::post('meter/change-meter/water/{id}', 'change_meter')->name('meter.water-change-meter');    //////////////////////////
+        Route::post('meter/change-meter/electricity/{id}', 'change_electricity_meter')->name('meter.electricity-change-meter');    //////////////////////////
         Route::get('meter/electricity/datatable', 'electricity_datatable')->name('meter.electricity-datatable');    //////////////////////////
         Route::get('meter/electricity/export/excel', 'electricityExportExcel')->name('meter.electricity-export-excel');    //////////////////////////
         Route::get('meter/water/export/excel', 'waterExportExcel')->name('meter.water-export-excel');    //////////////////////////
@@ -328,7 +345,6 @@ Route::middleware('auth')->group(function() {
         Route::get('user/datatable', 'datatable')->name('user.datatable');    //////////////////////////
         Route::get('user/check-user/{email}', 'check_user')->name('user.check-user');    //////////////////////////
         Route::get('user/{id}', 'edit')->name('user');    //////////////////////////
-        // Route::post('user/{id}', 'update')->name('user.update');    //////////////////////////
         Route::get('user/export/excel', 'exportExcel')->name('pdf.userPdf'); 
     });
     Route::controller(AuditController::class)->group(function() {                   //////////////////////////
@@ -346,12 +362,16 @@ Route::middleware('auth')->group(function() {
         Route::get('bill/summary', 'bill_summary')->name('bill.summary');    //////////////////////////
         Route::get('bill/datatable', 'datatable')->name('bill.datatable');    //////////////////////////
         Route::get('bill/waiting-for-confirmation', 'waiting_for_confirmation')->name('bill.waiting-for-confirmation');    //////////////////////////
+        Route::get('bill/confirmation', 'confirmation')->name('bill.confirmation');    //////////////////////////
         Route::get('bill/export/excel', 'export_excel')->name('bill.export-excel');    //////////////////////////
         Route::get('bill/export/excel-summary', 'export_excel_summary')->name('bill.export-excel-summary');    //////////////////////////
-        Route::post('bill/incomplete_update', 'incomplete_update')->name('bill.incomplete_update');    //////////////////////////
+        Route::post('bill/incomplete_update/{submit}', 'incomplete_update')->name('bill.incomplete_update');    //////////////////////////
+        Route::post('bill/confirm-bill-all', 'confirm_bill_all')->name('bill.confirm-bill-all');    //////////////////////////
         Route::post('bill/payment_bill', 'payment_bill')->name('bill.payment_bill');    //////////////////////////
         Route::get('bill/{id}', 'invoice')->name('bill.invoice');    //////////////////////////
-        Route::post('bill/change_status_bill/{id}', 'change_status_bill')->name('bill.change-status-bill');    //////////////////////////
+        Route::post('bill/change_status_bill_receipt', 'change_status_bill_receipt')->name('bill.change-status-bill-receipt');    //////////////////////////
+        Route::post('bill/change_status_bill_invoice', 'change_status_bill_invoice')->name('bill.change-status-bill-invoice');    //////////////////////////
+        Route::post('bill/change_status_bill/{invoice_id}', 'change_status_bill_invoice')->name('bill.change-status-bill-invoice');    //////////////////////////
         Route::post('bill/delete-receipt/{receipt_id}', 'delete_receipt')->name('bill.delete-receipt');    //////////////////////////
     });
     Route::controller(ApartmentController::class)->group(function() {                    //////////////////////////

@@ -206,6 +206,15 @@ table {
                                                                     </span>
                                                             </button>
                                                         </div>
+                                                        <div class="mt-3" style="padding-right: unset !important;" id="movingMeterWaterRoom">
+                                                            <button onclick="showMovingMeterRoomCount()"
+                                                                    style="padding-right: 14px; padding-left: 14px;"
+                                                                    class="btn btn-warning buttons-collection me-2">
+                                                                    <i class="ti ti-alert-triangle me-1"></i>
+                                                                        พบห้องว่างมีการเคลื่อนไหวมิเตอร์ (<span id="movingMeterWaterRoomCount"></span>)
+                                                                    </span>
+                                                            </button>
+                                                        </div>
                                                     
                                                 </div>
                                                 <div class="card-body px-0 pt-0">
@@ -435,6 +444,95 @@ table {
                 </div>
             </div>
         </div>
+        <div class="modal fade modalHeadDecor" id="change_ele_meter" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header rounded-0">
+                        <span class="modal-title">
+                            <span class="h5" style="color: white;">&nbsp;เปลี่ยนมิเตอร์&nbsp;</span>
+                        </span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="change_ele_meter_form">
+                        @csrf
+                        <div class="col-md-12">
+                            <div class="card shadow-none bg-transparent mb-3">
+                                <div class="card-body p-5">
+                                    <div class="row g-3">
+
+                                        <!-- Radio: มิเตอร์ไฟเต็ม -->
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input name="ref_reason_ele_id" class="form-check-input" type="radio" id="defaultRadio3" value="1" checked onclick="toggleReasonFieldsEle()">
+                                                <label class="form-check-label" for="defaultRadio3">มิเตอร์ไฟเต็ม</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Input + Button Group -->
+                                        <div class="col-12 px-5 pb-3" id="div_reason3">
+                                            <label for="max_meter" class="form-label">กรุณาเลือกค่าสูงสุดของมิเตอร์ไฟ</label>
+                                            <div class="input-group">
+                                                <!-- ปุ่มลบ -->
+                                                <button class="btn" style="border: 2px solid #a69feb" type="button" id="btn-decrease">
+                                                    <i class="tf-icons ti ti-minus"></i>
+                                                </button>
+
+                                                <!-- input -->
+                                                <input readonly
+                                                    name="meter_before_change[1]"
+                                                    type="number"
+                                                    class="form-control text-center"
+                                                    value="9999"
+                                                    id="max_meter"
+                                                    style="background-color: rgba(75, 70, 92, 0.08);"
+                                                />
+                                                <input type="hidden" name="start_value_of_new_meter[1]" value="0">
+
+                                                <!-- ปุ่มเพิ่ม -->
+                                                <button class="btn" style="border: 2px solid #a69feb" type="button" id="btn-increase">
+                                                    <i class="tf-icons ti ti-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Radio: เปลี่ยนมิเตอร์ไฟ -->
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input name="ref_reason_ele_id" class="form-check-input" type="radio" id="defaultRadio4" value="2" onclick="toggleReasonFieldsEle()">
+                                                <label class="form-check-label" for="defaultRadio4">เปลี่ยนมิเตอร์ไฟ</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- รายละเอียดเพิ่มเติม (เมื่อเลือก "เปลี่ยนมิเตอร์ไฟ") -->
+                                        <div id="div_reason4" class="col-12 px-5" style="display:none;">
+                                            <div class="mb-3">
+                                                <label for="meter_before_change[2]" class="form-label">
+                                                    กรุณากรอกหน่วยมิเตอร์ล่าสุดของมิเตอร์ไฟตัวเก่า<span class="text-danger"> *</span>
+                                                </label>
+                                                <input type="number" name="meter_before_change[2]" class="form-control text-center" id="meter_electricity_before_change" autocomplete="off" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="start_value_of_new_meter" class="form-label">
+                                                    กรุณากรอกหน่วยมิเตอร์เริ่มต้นของมิเตอร์ไฟตัวใหม่<span class="text-danger"> *</span>
+                                                </label>
+                                                <input type="number" name="start_value_of_new_meter[2]" class="form-control text-center" id="start_value_of_new_meter" autocomplete="off" value="0" required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer rounded-0 justify-content-center">
+                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                            <button type="submit" class="btn btn-main">บันทึก</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
 
@@ -457,6 +555,49 @@ table {
     var searchWaterData = {};
     var searchElectricityData = {};
 
+    function getMovingMeterRoomCount(callback) {
+        $.ajax({
+            type: "GET",
+            url: "meter/get-moving-meter-room-count",
+            success: function(data) {
+
+                if (data.water && data.water.length > 0) {
+                    $('#movingMeterWaterRoom').show();
+                    document.getElementById('movingMeterWaterRoomCount').innerText = data.water.length;
+                } else {
+                    $('#movingMeterWaterRoom').hide();
+                }
+                
+                if (callback) callback(data.water);
+            }
+        });
+    }
+
+    function showMovingMeterRoomCount() {
+        getMovingMeterRoomCount(function(room) {
+            alertMovingMeterRoomCount(room);
+        });
+    }
+
+    function alertMovingMeterRoomCount(room) {
+        const movingRooms = room || [];
+        const count = movingRooms.length;
+
+        if (count > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'ห้องที่มีการเคลื่อนไหวมิเตอร์',
+                html: movingRooms.map(r => `ห้อง ${r}`).join('<br>'),
+                confirmButtonText: 'ตกลง'
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'ไม่มีห้องที่มีการเคลื่อนไหวมิเตอร์',
+                confirmButtonText: 'ตกลง'
+            });
+        }
+    }
 
     loadWaterData(water_page);
     loadElectricityData(electricity_page);
@@ -479,6 +620,7 @@ table {
             success: function(data) {
                 $(".water_table").html(data);
                 $('[data-bs-toggle="tooltip"]').tooltip();
+                getMovingMeterRoomCount();
             }
         });
 
@@ -511,6 +653,19 @@ table {
                 div_reason2.style.display = 'block';
             }
         }
+    function toggleReasonFieldsEle() {
+            const input_reason = document.querySelector('input[name="ref_reason_ele_id"]:checked').value;
+            const div_reason3 = document.getElementById('div_reason3');
+            const div_reason4 = document.getElementById('div_reason4');
+            // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
+            if (input_reason == '1') {
+                div_reason3.style.display = 'block';
+                div_reason4.style.display = 'none';
+            } else {
+                div_reason3.style.display = 'none';
+                div_reason4.style.display = 'block';
+            }
+        }
     function loadElectricityData(pages){
         
         $('.p_electricity_search').each(function() {
@@ -528,6 +683,7 @@ table {
             data: searchElectricityData,
             success: function(data) {
                 $(".electricity_table").html(data);
+                getMovingMeterRoomCount();
             }
         });
         // alert(page);

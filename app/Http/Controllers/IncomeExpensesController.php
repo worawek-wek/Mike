@@ -97,6 +97,8 @@ class IncomeExpensesController extends Controller
             $insert_income_expenses->type  =  $request->type;
             $insert_income_expenses->label  =  $request->label;
             $insert_income_expenses->amount  =  $request->amount ?? 0;
+            $insert_income_expenses->payment_channel  =  $request->payment_channel ?? 0;
+            $insert_income_expenses->time  =  $request->time ?? date('H:i');
             $insert_income_expenses->date  =  $date;
             $insert_income_expenses->ref_category_id  =  $request->ref_category_id ?? 1;
             $insert_income_expenses->ref_room_id  =  $request->ref_room_id;

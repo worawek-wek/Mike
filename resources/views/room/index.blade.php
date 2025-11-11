@@ -294,16 +294,18 @@
                                                 <span>
                                                 <i class="ti ti-upload"></i> ดาวน์โหลด Excel</span>
                                                 </button>
-                                                <button
-                                                        style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
-                                                        class="btn btn-info buttons-collection btn-info"
-                                                        tabindex="0" aria-controls="DataTables_Table_0"
-                                                        type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false" data-bs-toggle="modal" data-bs-target="#insertRenter"
-                                                        onclick="reserve()"
-                                                        >
-                                                    <span><i class="ti ti-plus"></i> จองห้อง</span>
-                                                </button>
+                                                <a href="{{ $page_url }}/reserve" style="color: white; text-decoration: none;">
+                                                    <button
+                                                            style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
+                                                            class="btn btn-info buttons-collection btn-info"
+                                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                                            type="button" aria-haspopup="dialog"
+                                                            {{-- aria-expanded="false" data-bs-toggle="modal" data-bs-target="#insertRenter"
+                                                            onclick="reserve()" --}}
+                                                            >
+                                                        <span><i class="ti ti-plus"></i> จองห้อง</span>
+                                                    </button>
+                                                </a>
                                                 <button
                                                         style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
                                                         class="btn btn-success buttons-collection btn-success"
@@ -313,14 +315,14 @@
                                                         onclick="roomRentalContract()">
                                                     <span><i class="ti ti-plus"></i> ทำสัญญาเช่า</span>
                                                 </button>
-                                                <button
+                                                {{-- <button
                                                         style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
                                                         class="btn btn-danger buttons-collection btn-danger"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomRentalReservation">
                                                     <span><i class="ti ti-plus"></i> ชำระค่าจอง</span>
-                                                </button>
+                                                </button> --}}
                                             </div>
                                         </div>
                                         <div class="col-lg-4 mt-4">
@@ -421,7 +423,6 @@
                                 ข้อมูลส่วนตัว
                             </h5>
                             <div class="row g-3 p-4 pt-1" id="check_in">
-                                    {{-- @include('room/room-reserve-form') --}}
                             </div>
                         </div>
                     </div>
@@ -433,7 +434,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade modalHeadDecor" id="insertRenter" tabindex="-1" aria-hidden="true">
+    {{-- <div class="modal fade modalHeadDecor" id="insertRenter" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
@@ -443,7 +444,6 @@
                 <form id="insert_renter">
                     @csrf
                 <div class="modal-body" id="reserve">
-                    {{-- @include('room/room-reserve-form') --}}
                 </div>
                 <div class="modal-footer rounded-0 justify-content-center">
                     <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -452,7 +452,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="modal fade modalHeadDecor" id="reserveOneRoomModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
@@ -471,6 +471,27 @@
                     <button type="submit" class="btn btn-main">บันทึก</button>
                 </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modalHeadDecor" id="reserveData" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">รายละเอียดการจองห้อง <span id="room_name_reserve_data" ></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                {{-- <form id="reserve_one_room"> --}}
+                    @csrf
+                    {{-- <input type="hidden" name="room_text_id[]" id="id_reserve_one"> --}}
+                <div class="modal-body" id="reserveDetail">
+                    {{-- @include('room/room-reserve-form') --}}
+                </div>
+                <div class="modal-footer rounded-0 justify-content-center">
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                    {{-- <button type="submit" class="btn btn-main">บันทึก</button> --}}
+                </div>
+                {{-- </form> --}}
             </div>
         </div>
     </div>
@@ -726,10 +747,10 @@
                                 <tr align="center" style="background: #ecfcff;">
                                     <td>มิเตอร์น้ำ</td>
                                     <td>
-                                        <input type="number" class="form-control water-old" oninput="calculateUsed(this)" />
+                                        <input type="number" class="form-control water-old" oninput="calculateUsed(this)" readonly/>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control water-new" oninput="calculateUsed(this)" />
+                                        <input type="number" class="form-control water-new" oninput="calculateUsed(this)" readonly/>
                                     </td>
                                     <td>
                                         <input type="number" class="form-control water-used" readonly />
@@ -738,10 +759,10 @@
                                 <tr align="center" style="background: #ffeeec;">
                                     <td>มิเตอร์ไฟ</td>
                                     <td>
-                                        <input type="number" class="form-control electric-old" oninput="calculateUsed(this)" />
+                                        <input type="number" class="form-control electric-old" oninput="calculateUsed(this)" readonly/>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control electric-new" oninput="calculateUsed(this)" />
+                                        <input type="number" class="form-control electric-new" oninput="calculateUsed(this)" readonly/>
                                     </td>
                                     <td>
                                         <input type="number" class="form-control electric-used" readonly />
@@ -1055,6 +1076,28 @@
             });
         }
         
+        function openReservData(id, name){
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            $("#room_name_reserve_data").html(name);
+            // $("#id_reserve_one").val(id);
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/reserve-data",
+                data:{
+                    room_id: id,
+                    room_name: name
+                },
+                success: function(data) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    $("#reserveDetail").html(data);
+                },
+                error: function(error) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                    console.error('เกิดข้อผิดพลาด:', error);
+                }
+            });
+        }
         function reserveOneRoom(id, name){
             document.getElementById('loadingOverlay').style.display = 'flex';
             $("#room_name_reserve").html(name);
@@ -1178,25 +1221,40 @@
                 $('#submit_insert_contract').prop('disabled', true);
                 return false;
             }
+                $('#submit_insert_contract').prop('disabled', true);
 
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-rental-contract/"+id,
                 success: function(data) {
                     $("#room-rental-contract").html(data);
-                $('#submit_insert_contract').prop('disabled', false);
+                // $('#submit_insert_contract').prop('disabled', false);
                 }
             });
         }
         function get_room_rental_move_out(id){
+            // alert(1);
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-rental-move-out/"+id,
                 success: function(data) {
-                    $("#renter_name").val(data.renter.prefix+' '+data.renter.name+' '+data.renter.surname)
+                    $("#renter_name").val(data.renter.fullName)
                     $("#renter_address").val(data.renter_address)
                     $("#renter_phone").val(data.renter.phone)
                     $("#renter_id_card_number").val(data.renter.id_card_number)
+                }
+            });
+        }
+        function get_room_rental_bad_debt(id){
+            // alert(1);
+            $.ajax({
+                type: "GET",
+                url: "{{ $page_url }}/get-room-rental-move-out/"+id,
+                success: function(data) {
+                    $("#renter_bad_name").val(data.renter.fullName)
+                    $("#renter_bad_address").val(data.renter_address)
+                    $("#renter_bad_phone").val(data.renter.phone)
+                    $("#renter_bad_id_card_number").val(data.renter.id_card_number)
                 }
             });
         }
@@ -1278,7 +1336,7 @@
         $('#select2District').select2();
         $('#select2District99').select2();
         $('#select2Subdistrict').select2();
-        
+        // อันนี้คือ เพิ่มการจอง
         $('#insert_renter').on('submit', function(event) {  // อันนี้คือ เพิ่มการจอง
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
             if(!this.checkValidity()) {
@@ -1288,6 +1346,10 @@
                 
             }
             
+            var reserve_deposit = $('#reserve_deposit').val();
+            if(reserve_deposit < 1){
+                return Swal.fire('กรุณากรอก ค่ามัดจำ', '', 'warning');
+            }
             const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
 
             if($('#check_selected').val() == 0 && selectChannel == 2){
@@ -1336,8 +1398,8 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insertRenter').modal('hide');
-                                $('#roomRentalReservation').modal('show');
-                                get_room_rental_reservation(response);
+                                // $('#roomRentalReservation').modal('show');
+                                // get_room_rental_reservation(response);
                                 $('#insert_renter')[0].reset();
                                 loadData(page);
                                 summary();
@@ -1382,6 +1444,10 @@
                 
             }
             
+            var reserve_deposit = $('#reserve_deposit').val();
+            if(reserve_deposit < 1){
+                return Swal.fire('กรุณากรอก ค่ามัดจำ', '', 'warning');
+            }
             const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
 
             Swal.fire({
@@ -1457,6 +1523,10 @@
                 return console.log('ฟอร์มไม่ถูกต้อง');
             }
             
+            var reserve_deposit = $('#reserve_deposit').val();
+            if(reserve_deposit < 1){
+                return Swal.fire('กรุณากรอก ค่ามัดจำ', '', 'warning');
+            }
             const selectChannel = document.querySelector('input[name="select_channel"]:checked').value;
 
             // if ($(".date_data").length == 0) { 
@@ -1491,8 +1561,8 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insertRenter').modal('hide');
-                                $('#roomRentalReservation').modal('show');
-                                get_room_rental_reservation(response);
+                                // $('#roomRentalReservation').modal('show');
+                                // get_room_rental_reservation(response);
                                 $('#reserve_one_room')[0].reset();
                                 loadData(page);
                                 summary();

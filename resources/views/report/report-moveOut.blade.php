@@ -79,7 +79,7 @@
                                                             <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">0 ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">{{ $all_room }} ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -167,108 +167,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <table class="datatables-products table dataTable no-footer dtr-column"
-                                                id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-                                                style="width: 1396px;">
-                                                <thead class="border-top">
-                                                    <tr class=" table-info">
-                                                        <th class="text-center" style="width: 50px;">
-                                                            ลำดับ
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ห้อง
-                                                        </th>
-                                                        {{-- <th class="text-center">
-                                                            รอบบิล</th> --}}
-                                                        <th style="width: 109px;">
-                                                            วันที่รับชำระเงิน
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รับชำระโดย
-                                                        </th>
-                                                        <th class="text-center">
-                                                            ค่าเช่าห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            คืนเงินประกันห้อง
-                                                        </th>
-                                                        <th class="text-center">
-                                                            รวม
-                                                        </th>
-                                                        <th class="text-center" style="width: 87px;">
-                                                            จัดการ
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {{-- <tr class="odd text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        
-                                                        <td class="sorting_1">A212</td>
-                                                        <td><span>06/2024</span></td>
-                                                        <td><span>09/07/2024</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,209</span></td>
-                                                        <td><span>0</span></td>
-                                                        <td><span class="text-danger">4,209</span></td>
-                                                        <td><button
-                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                    class="ti ti-printer ti-md"></i></button></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        
-                                                        <td class="sorting_1">A606</td>
-                                                        <td><span>06/2024</span></td>
-                                                        <td><span>02/07/2024</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>5,740</span></td>
-                                                        <td><span>-7,000</span></td>
-                                                        <td><span class="text-danger">-1,260</span></td>
-                                                        <td><button
-                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                    class="ti ti-printer ti-md"></i></button></td>
-                                                    </tr>
-                                                    <tr class="odd text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        
-                                                        <td class="sorting_1">A502</td>
-                                                        <td><span>06/2024</span></td>
-                                                        <td><span>02/07/2024</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>4,001</span></td>
-                                                        <td><span>-700</span></td>
-                                                        <td><span class="text-danger">3,301</span></td>
-                                                        <td><button
-                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                    class="ti ti-printer ti-md"></i></button></td>
-                                                    </tr>
-                                                    <tr class="even text-center">
-                                                        <td class="  control" tabindex="0" style="display: none;">
-                                                        </td>
-                                                        
-                                                        <td class="sorting_1">A605</td>
-                                                        <td><span>06/2024</span></td>
-                                                        <td><span>02/07/2024</span></td>
-                                                        <td><span>นิชกานต์</span></td>
-                                                        <td><span>5,364</span></td>
-                                                        <td><span>-7,000</span></td>
-                                                        <td><span class="text-danger">-1636</span></td>
-                                                        <td><button
-                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light"><i
-                                                                    class="ti ti-printer ti-md"></i></button></td>
-                                                    </tr> --}}
-                                                    <tr>
-                                                        <td colspan="20" class="text-center text-muted py-4">
-                                                            <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
-                                                            ไม่พบข้อมูล
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            <div id="table-data">
+
+                                            </div>
                                             <div style="width: 1%;"></div>
                                         </div>
                                     </div>
@@ -373,5 +274,61 @@
     @include('layout/inc_js')
 
 </body>
-
+    <iframe id="print-iframe" style="display: none;"></iframe>        
 </html>
+<script>
+        var page = "{{$page_url}}/datatable";
+        var searchData = {};
+        loadData(page);
+        
+        function loadData(pages){
+            
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
+                var inputValue = $(this).val(); // ดึงค่า value ของ input
+                
+                searchData[inputName] = inputValue; // เก็บข้อมูลลงในออบเจ็กต์ searchData
+            });
+
+            // alert(page);
+            page = pages;
+            $.ajax({
+                type: "GET",
+                url: pages,
+                data: searchData,
+                success: function(data) {
+                    $("#table-data").html(data);
+                    
+                    $('.select2Position2').select2({
+                        placeholder: 'เลือก',
+                    });
+
+                }
+            });
+            // alert(page);
+        }
+        function printPdfReceipt(id) {
+            $.ajax({
+                url: '/pdf/receipt/'+id,
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+    
+</script>

@@ -24,6 +24,18 @@ class Room extends Model
     {
         return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id');
     }
+    public function rent_bill_booking()
+    {
+        return $this->hasOne('App\Models\RentBill', 'ref_room_id', 'id')->where('ref_type_id', 3);
+    }
+    public function rent_bill_deposit()
+    {
+        return $this->hasOne('App\Models\RentBill', 'ref_room_id', 'id')->where('ref_type_id', 2);
+    }
+    public function rent_bill_rent()
+    {
+        return $this->hasOne('App\Models\RentBill', 'ref_room_id', 'id')->where('ref_type_id', 1);
+    }
     public function rent_bill_247() // บิลค้างชำระ
     {
         return $this->hasMany('App\Models\RentBill', 'ref_room_id', 'id')->whereIn('ref_status_id', [2,4,7]);
@@ -35,6 +47,10 @@ class Room extends Model
     public function room_status()
     {
         return $this->hasOne('App\Models\StatusRoom', 'id', 'status');
+    }
+    public function user()
+    {
+        return $this->hasOne('App\Models\User', 'id', 'ref_user_id');
     }
     public function contract()
     {

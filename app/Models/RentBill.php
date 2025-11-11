@@ -94,6 +94,12 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1);
     }
+    public function payment_not_discount()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('discount', 0);
+    }
     public function payment_rent_room()
     {
         return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
@@ -135,6 +141,13 @@ class RentBill extends Model
 
 
         return $total - $discount;
+    }
+    public function getNotDiscountAttribute()
+    {
+
+        $lists = $this->payment_list; // ใช้ attribute ที่ถูกโหลดแล้ว
+
+        return $lists->where('discount', 0)->sum('price');
     }
     public function getBalanceAmountAttribute()
     {

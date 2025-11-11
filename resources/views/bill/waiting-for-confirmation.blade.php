@@ -68,15 +68,28 @@
                             <th class="control sorting_disabled dtr-hidden" rowspan="1"
                                 colspan="1" style="width: 0px; display: none;"
                                 aria-label=""></th>
-                            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all"
+                            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all_2"
+                                rowspan="1" colspan="1" style="width: 18px;"
+                                data-col="1" aria-label="">
+                                <input type="checkbox" class="form-check-input">
+                            </th>
+                            <th class=""
                                 rowspan="1" colspan="1" style="width: 18px;"
                                 data-col="1" aria-label="">
                                 #
+                            </th>
                             <th class="text-center" tabindex="0" style="width: 40px;">
                                 ห้อง
                             </th>
                             <th class="text-center">
-                                ผู้เช่า</th>
+                                ผู้เช่า
+                            </th>
+                            <th class="text-center">
+                                ประเภท
+                            </th>
+                            <th class="text-center">
+                                ช่องทาง
+                            </th>
                             <th class="text-center">
                                 จำนวนเงินรวม
                             </th>
@@ -86,10 +99,20 @@
                         @foreach ($list_data as $key => $row_2)
                             {{-- <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'detail')"> --}}
                             <tr class="odd">
+                                <td class="dt-checkboxes-cell">
+                                    <input type="checkbox" class="dt-checkboxes form-check-input ids_receipt" value="{{ $row_2->id }}">
+                                </td>
                                 <td class="  dt-checkboxes-cell">
                                     {{ $key+1 }}
+                                </td>
                                 <td class="text-center">{{ $row_2->room->name }}</td>
                                 <td class="text-center"><span class="text-truncate">{{ $row_2->renter->fullName() }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-truncate">{{ $type[$row_2->ref_type_id] }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-truncate">{{ $payment_channel[$row_2->payment_channel] }}</span>
                                 </td>
                                 <td class="text-center">
                                     <span class="text-truncate">{{ number_format($row_2->total_amount) }}</span>
@@ -105,7 +128,7 @@
                             </tr>
                         @endforeach
                         <tr class="bg-label-warning">
-                            <th class="text-center" colspan="3">ยอดรวม</th>
+                            <th class="text-center" colspan="6">ยอดรวม</th>
                             <th class="text-center text-warning detail_confirm_by_employee"></th>
                         </tr>
                     </tbody>
@@ -114,3 +137,44 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        // เมื่อคลิกที่ checkbox ใน <th>
+        $('.dt-checkboxes-select-all_2 input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบสถานะของ checkbox ใน <th>
+            var isChecked = $(this).prop('checked');
+            
+            // ทำให้ checkbox ทุกอันใน <td> ถูกเช็คหรือยกเลิกการเช็ค
+            $('td.dt-checkboxes-cell input[type="checkbox"]').prop('checked', isChecked);
+            checkNoChecked();
+        });
+
+        // เมื่อคลิกที่ checkbox ใน <td> (ตรวจสอบสถานะของทุก checkbox)
+        $('td.dt-checkboxes-cell input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบว่า checkbox ใน <td> ถูกเช็คหรือไม่
+            var allChecked = $('td.dt-checkboxes-cell input[type="checkbox"]').length === $('td.dt-checkboxes-cell input[type="checkbox"]:checked').length;
+            
+            // ถ้าทุก checkbox ใน <td> ถูกเช็ค จะทำให้ checkbox ใน <th> ถูกเช็ค
+            $('.dt-checkboxes-select-all_2 input[type="checkbox"]').prop('checked', allChecked);
+            checkNoChecked();
+        });
+        
+    });
+    checkNoChecked();
+    function floorChecked() {
+        $('.dt-checkboxes-select-all_2 input[type="checkbox"]').prop('checked', true);
+            $('td.dt-checkboxes-cell input[type="checkbox"]').prop('checked', true);
+            checkNoChecked();
+        // });
+    }
+    function checkNoChecked() {
+        if ($('td.dt-checkboxes-cell input[type="checkbox"]:checked').length === 0) {
+        // ทำให้ปุ่มถูก disabled
+            $('#edit-rent').prop('disabled', true);
+        } else {
+            // ถ้ามี checkbox ถูกเช็ค ให้เปิดใช้งานปุ่ม
+            $('#edit-rent').prop('disabled', false);
+        }
+    }
+</script>

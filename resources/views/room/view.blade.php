@@ -86,7 +86,7 @@
                                 data-bs-target="#navs-pills-top-payment"
                                 aria-controls="navs-pills-top-payment"
                                 aria-selected="false" tabindex="-1"
-                                onclick="get_bill('{{ date('Y-m') }}')"
+                                onclick="get_bill('default')"
                                 >
                         <span>
                           <i class="ti ti-cash-banknote pe-1"></i>
@@ -396,7 +396,7 @@
 
                             <div class="tab-pane fade" id="navs-pills-top-MoveOut" role="tabpanel">
                                 @if($room->status == 2)
-                                    @include('room/move-out')
+                                    {{-- @include('room/move-out') --}}
                                 @else
                                 
                                 @endif
@@ -410,13 +410,16 @@
     </div>
       
 <script>
-    get_bill("{{date('Y-m')}}");
+    get_bill($('#select2month').val());
     function editAssetModal(){
             var myModal = new bootstrap.Modal(document.getElementById('editAssetModal'));
                 myModal.show();
         }
     // get_bill()
     function get_bill(month){
+        if(month == 'default'){
+            month = $('#select2month').val();
+        }
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-bill/{{$room->id}}/"+month,
@@ -433,8 +436,10 @@
                 $("#navs-pills-top-MoveOut").html(data.html);
                 calculateTotal()
                 if(data.invoice_move_out == 0){
+                    // alert(111);
                     editFormReceipt();   
                 }else{
+                    // alert(222);
                     get_move_out_detail_receipt();   
                 }
                 new TomSelect("#select-renter", {
@@ -449,7 +454,7 @@
             }
         });
     }
-    function editFormReceipt(){
+    function editFormReceipt(){  // ดึง Form ใบเสร็จย้ายออก
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-move-out-form-receipt/{{$room->id}}",
@@ -457,19 +462,10 @@
                 $("#form_moveout_receipt").html(data);
                 calculateTotal()
                 calculate_2Price()
-                new TomSelect("#select-renter", {
-                    create: false,      // ไม่ให้พิมพ์เพิ่มเอง
-                    maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
-                    allowEmptyOption: true, // แสดง option แรกที่ไม่มีค่า (เช่น "-- กรุณาเลือก --")
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    }
-                });
             }
         });
     }
-    function get_move_out_detail_receipt(){
+    function get_move_out_detail_receipt(){  // ดึง รายละเอียด ใบเสร็จย้ายออก
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-move-out-detail-receipt/{{$room->id}}",
@@ -477,6 +473,28 @@
                 calculateTotal()
                 calculate_2Price()
                 $("#form_moveout_receipt").html(data);
+            }
+        });
+    }
+    function editFormBadDebtBillt(){  // ดึง Form รายการหนี้สูญ
+        $.ajax({
+            type: "GET",
+            url: "{{ $page_url }}/move-out-form-bad-debt-bill/{{$room->id}}",
+            success: function(data) {
+                $("#form_bad_debt_bill").html(data);
+                calculateTotal()
+                calculate_2Price()
+            }
+        });
+    }
+    function get_move_out_detail_bad_debt_bill(){  // ดึง รายละเอียด รายการหนี้สูญ
+        $.ajax({
+            type: "GET",
+            url: "{{ $page_url }}/move-out-detail-bad-debt-bill/{{$room->id}}",
+            success: function(data) {
+                calculateTotal()
+                calculate_2Price()
+                $("#form_bad_debt_bill").html(data);
             }
         });
     }

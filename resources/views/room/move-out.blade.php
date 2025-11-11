@@ -2,6 +2,13 @@
 ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก ย้ายออก
 //////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<!-- ก่อน </body> -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+
 <style>
 .no-data-box {
     background-color: #f8f9fa; /* สีเทาอ่อน */
@@ -30,9 +37,9 @@
                                         <tr>
                                             <td> สถานะสัญญา </td>
                                             @if (now()->lt(date('Y-m-d', strtotime("+{$move_contract->period} months", strtotime($move_contract->contract_date)))))
-                                                <td class="text-success">ยังไม่หมดสัญญา</td>
+                                                <td class="text-danger">ยังไม่หมดสัญญา</td>
                                             @else
-                                                <span class="text-danger">หมดสัญญาแล้ว</span>
+                                                <span class="text-success">หมดสัญญาแล้ว</span>
                                             @endif
                                         </tr>
                                     </tbody>
@@ -41,7 +48,7 @@
                                     
                                     <ul class="nav nav-pills nav-fill p-4" role="tablist">
                                         <li class="nav-item pe-4">
-                                            <button type="button" class="nav-link btn-warning active" id="meter_water" role="tab"
+                                            <button type="button" class="nav-link btn-warning active" id="move-out-tab" role="tab"
                                                 data-bs-toggle="tab" data-bs-target="#navs-pills-top-home"
                                                 aria-controls="navs-pills-top-home"
                                                 aria-selected="true"
@@ -51,7 +58,7 @@
                                             </button>
                                         </li>
                                         <li class="nav-item">
-                                            <button type="button" class="nav-link btn-label-danger" id="meter_electricity" role="tab"
+                                            <button type="button" class="nav-link btn-label-danger" id="bad-debt-bill" role="tab"
                                                 data-bs-toggle="tab"
                                                 data-bs-target="#navs-pills-top-profile"
                                                 aria-controls="navs-pills-top-profile"
@@ -64,14 +71,40 @@
                                     </ul>
 <script>
     function showMoveOut(){
+        
+        $('#bad-debt-bill').removeClass('active btn-danger btn-warning');
+        $('#bad-debt-bill').addClass('btn-label-danger');
+        $('#move-out-tab').removeClass('btn-label-warning');
+        $('#move-out-tab').addClass('active btn-warning');
+
         $('#type_move_out').val(1);
         $('.showMoveOut').show();
         $('.label-move-out').css('background-color', '#54BAB9');
+        $('#moveOutReceipt').show();
+        $('#badDebtBill').hide();
+        get_move_out_detail_receipt();
+        $('#payment-receipt').show();
+        $('#print-bad-debt-btn').attr('style', 'display: none !important;');
+        $('#print-move-out-btn').show();
+        
+        
     }
     function showEscapes(){
+        
+        $('#move-out-tab').removeClass('active btn-danger btn-warning');
+        $('#move-out-tab').addClass('btn-label-warning');
+        $('#bad-debt-bill').removeClass('btn-label-danger');
+        $('#bad-debt-bill').addClass('active btn-danger');
+
         $('#type_move_out').val(2);
         $('.showMoveOut').hide();
         $('.label-move-out').css('background-color', '#d34c4d');
+        $('#badDebtBill').show();
+        $('#moveOutReceipt').hide();
+        get_move_out_detail_bad_debt_bill();
+        $('#payment-receipt').hide();
+        $('#print-bad-debt-btn').show();
+        $('#print-move-out-btn').attr('style', 'display: none !important;');
     }
 </script>
                                     <div class="tab-content p-0">
@@ -86,7 +119,7 @@
                                 {{-- /////////////////////////////// --}}
                                 
                                 <label class="mb-0 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">1</span>
+                                    <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">1</span>
                                     รายการบิล
                                 </label>
                                 @if (@$move_invoice_7)
@@ -285,7 +318,7 @@
                                                     <div id="paymentDetails2">
                                                         <div class="col-sm-6 mb-2">
                                                             <label for="payment_date">วันที่ชำระเงิน</label>
-                                                            <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" required autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                                            <input type="text" name="payment_date" class="form-control datepicker" placeholder="" id="payment_date" required autocomplete="off" value="{{date('d/m/Y')}}"/>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-11">
@@ -313,7 +346,7 @@
                                                             </div>
                                                             <div class="col-sm-6 mb-2">
                                                                 <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                                                                <input type="text" name="payment_date2" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                                                                <input type="text" name="payment_date2" class="form-control datepicker" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                                                             </div>
                                                         <div class="col-sm-10 mt-3">
                                                             <label for="paymentReceipt">แนบหลักฐานการโอน</label>
@@ -409,7 +442,7 @@
                                     <!-- วันที่หักเงิน -->
                                     <div class="mb-3">
                                         <label for="deduct_date" class="form-label" style="font-size: medium;"><strong>วันที่หักเงินประกัน</strong></label>
-                                        <input type="text" id="deduct_date" name="deduct_date" class="form-control" value="21/04/2025" readonly>
+                                        <input type="text" id="deduct_date" name="deduct_date" class="form-control datepicker" value="21/04/2025" readonly>
                                     </div>
                                 
                                     <!-- ปุ่ม -->
@@ -509,7 +542,7 @@
                                 {{-- /////////////////////////////// --}}
 
                                 <label class="mt-4 mb-0 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
+                                    <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
                                     รายการทรัพย์สิน (รับห้อง)
                                 </label>
                                 <style>
@@ -610,26 +643,45 @@
         }
     });
 </script>
-                                {{-- /////////////////////////////// --}}
-
+                                {{-- //////////////// กรณี ย้ายออก /////////////// --}}
+                                <div id="moveOutReceipt">
                                     <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                        <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
+                                        <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
                                         ใบเสร็จย้ายออก
                                     </label>
                                     
-                                <form id="form_moveout_receipt">
+                                    <form id="form_moveout_receipt">
 
-                                    {{-- ajax ใส่ html ตรงนี้ นะจ๊ะ --}}
-                                    {{-- @include('room/move-out-form-receipt') --}}
-                                
-                                </form>
+                                        {{-- ajax ใส่ html ตรงนี้ นะจ๊ะ --}}
+                                        {{-- @include('room/move-out-form-receipt') --}}
+                                    
+                                    </form>
+                                </div>
                                 {{-- /////////////////////////////// --}}
 
-                                <label class="my-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                                    <span class="badge badge-center rounded-pill bg-primary me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
-                                    เงินประกัน
-                                </label>
-                                        @if (@$move_invoice_2->payment_list)
+                                {{-- /////////////// กรณี ผู้เช่าหนี //////////////// --}}
+                                <div id="badDebtBill" style="display: none;">
+                                    <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                                        <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
+                                        รายการหนี้สูญ
+                                    </label>
+                                    
+                                    <form id="form_bad_debt_bill">
+
+                                        {{-- ajax ใส่ html ตรงนี้ นะจ๊ะ --}}
+                                        {{-- @include('room/move-out-form-bad-debt-bill') --}}
+                                    
+                                    </form>
+                                </div>
+                                {{-- /////////////////////////////// --}}
+                                <form id="form_edit_deposit_refund">
+                                    @csrf
+                                    <input type="hidden" name="invoice_id" value="{{ @$move_invoice_6->id }}">
+                                    <label class="my-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                                        <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">4</span>
+                                        เงินประกัน
+                                    </label>
+                                        @if (@$move_invoice_6->payment_list)
                                 
                                         <table class="table table-bordered table-detail" id="discount-table3" >
                                             <thead>
@@ -639,7 +691,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                    @foreach ($move_invoice_2->payment_list as $k => $prakan)
+                                                    @foreach ($move_invoice_6->payment_list as $k => $prakan)
                                                     @php
                                                     if ($prakan->discount == 1) {
                                                         continue;
@@ -652,11 +704,11 @@
                                                                     {{ $prakan->title }}
                                                                     <input name="payment_list_p[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
                                                                 @else
-                                                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title"  placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title deposit-list" disabled placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
                                                                 @endif
                                                             </td>
                                                             <td class="text-end">
-                                                                <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase" value="{{ $prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
+                                                                <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase deposit-list" value="{{ (int)$prakan->price }}" placeholder="จำนวนเงิน" max="" disabled oninput="calculate_3Price()">
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -664,35 +716,62 @@
 
                                             </tbody>
                                             <tfoot>
+                                                    <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ $move_invoice_6->payment_list->sum('price') }}">
                                                 <tr>
                                                     <th>รวม</th>
                                                     <th class="text-end mb-0 fw-bold total-price_3">
-                                                        {{ $move_invoice_2->payment_list->sum('price') }}
+                                                        {{ $move_invoice_6->payment_list->sum('price') }}
                                                     </th>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                                 @endif
                                         
-                                        <div align="right">
+                                        <div id="save-deposit-refund" style="display: none;" align="right" class="mt-2">
                                             <button
                                                     id="add_expenses3"
                                                     style="padding-right: 14px;padding-left: 14px;"
-                                                    class="btn btn-sm buttons-collection btn-label-warning waves-effect waves-light me-2 mt-2"
+                                                    class="btn btn-sm buttons-collection btn-label-warning waves-effect waves-light me-2"
                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                     type="button" aria-haspopup="dialog"
                                                     aria-expanded="false">
                                                 <span>
                                                 <i class="ti ti-plus"></i> เพิ่มรายการ</span>
                                             </button>
+                                            
+                                            <button 
+                                                    style="padding-right: 14px;padding-left: 14px;"
+                                                    class="btn buttons-collection btn-success waves-effect waves-light me-2"
+                                                    tabindex="0" aria-controls="DataTables_Table_0"
+                                                    type="submit" aria-haspopup="dialog"
+                                                    aria-expanded="false">
+                                                <span>
+                                                <i class="fa fa-save me-1 fa-lg my-2"></i> บันทึกรายการคืนเงิน</span>
+                                            </button>
+                                        </div>
+                                        <div id="edit-deposit-refund" align="right" class="mt-2">
+                                            <button
+                                                {{-- @if (@$receipt) disabled @endif --}}
+                                                style="padding-right: 14px;padding-left: 14px;"
+                                                class="btn buttons-collection btn-warning waves-effect waves-light"
+                                                type="button"
+                                                onClick="editFormDepositRefund()"
+                                            >
+                                                <i class="ti ti-pencil me-1"></i> แก้ไขรายการคืนเงินประกัน
+                                            </button>
                                         </div>
                                         <div class="col-sm-11 mt-3 mb-3">
                                             <label>หมายเหตุ</label>
                                             <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
                                         </div>
-                                    </form>
+                                </form>
                                         <script>
-                                            
+                                            function editFormDepositRefund(){
+                                                $('#edit-deposit-refund').hide();
+                                                $('#save-deposit-refund').show();
+                                                $('.deposit-list').prop('disabled', false);
+                                                
+                                            }
                                         document.getElementById('add_expenses3').addEventListener('click', function() {
                                             const tableBody = document.querySelector('#discount-table3 tbody');
                                             const newRow = document.createElement('tr');
@@ -750,17 +829,27 @@
                                 </script>
 
                                 {{-- /////////////////////////////// --}}
-                                <form id="move_out_submit">
+                                <form id="move_out_submit" class="mb-5">
                                     @csrf
                                     <input type="hidden" id="type_move_out" name="type_move_out" value="1">
-                                    <input type="hidden" name="id" value="{{ $room->id }}">
+                                    <input type="hidden" name="room_id" value="{{ $room->id }}">
                                     <input type="hidden" name="ref_renter_id" value="{{ @$contract->ref_renter_id }}">
                                     <div class="text-center">
                                         <span class="badge bg-label-success text-black mt-5" style="width: 100%;font-size: larger;">
                                             สรุปการย้ายออก
                                         </span>
-                                        <h4 class="my-4 amount">  </h4>
-                                        
+                                        {{-- <h4 class="my-4 amount">  </h4> --}}
+                                        <h4 class="my-4">
+                                            @if ($cal > 0)
+                                            <span class="text-success">
+                                                เก็บเงินผู้เช่าเพิ่ม
+                                            @else
+                                            <span class="text-danger">
+                                                ยอดเงินประกันคืนผู้เช่า
+                                            @endif
+                                            &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
+                                            </span>
+                                        </h4>
                                         <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
                                             <thead>
                                             <tr class="text-start">
@@ -773,13 +862,233 @@
                                         </table>
                                     </div>
                                     <div class="modal-footer rounded-0 justify-content-start mb-0">
-                                        {{-- <button type="button" class="btn btn-label-primary waves-effect text-black"><span
+                                        
+                                        <button id="print-move-out-btn" type="button" class="btn btn-label-primary waves-effect text-black"
+                                         onclick="printPdfInvoice({{ @$move_invoice_type_7->id }})"
+                                        >
+                                         <span
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
-                                        </button> --}}
-                                        <button type="submit" class="btn btn-main waves-effect ms-auto">
-                                            บันทึกยอดเงินทั้งหมดแล้วย้ายออก
                                         </button>
+
+                                        <button id="print-bad-debt-btn" type="button" class="btn btn-label-primary waves-effect text-black"
+                                        style="display: none!important;"
+                                         onclick="printPdfInvoice({{ @$bad_debt_invoice->id }})"
+                                        >
+                                        
+                                         <span
+                                                class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
+                                        </button>
+                                        {{-- <button type="button" class="btn btn-main waves-effect ms-auto"
+                                        onclick="payment_bad_debt()"
+                                        >
+                                            บันทึกยอดเงินทั้งหมดแล้วย้ายออก
+                                        </button> --}}
+                                        {{-- <button type="submit" class="btn btn-main waves-effect ms-auto">
+                                            บันทึกยอดเงินทั้งหมดแล้วย้ายออก
+                                        </button> --}}
                                     </div>
+                                    <script>
+                                        
+                                        function printPdfInvoice(id) {
+                                            $.ajax({
+                                                url: '/pdf/invoice/'+id,
+                                                type: 'GET',
+                                                success: function(html) {
+                                                    const iframe = document.getElementById('print-iframe');
+                                                    const doc = iframe.contentWindow.document;
+                                                    doc.open();
+                                                    doc.write(html);
+                                                    doc.close();
+
+                                                    // รอโหลดก่อนค่อยพิมพ์
+                                                    iframe.onload = function () {
+                                                        iframe.contentWindow.focus();
+                                                        iframe.contentWindow.print();
+                                                    };
+                                                },
+                                                error: function (xhr) {
+                                                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                        let messages = '';
+                                                        $.each(xhr.responseJSON.errors, function (key, value) {
+                                                            messages += value + '<br>';
+                                                        });
+
+                                                        Swal.fire({
+                                                            title: 'เกิดข้อผิดพลาด',
+                                                            html: messages,
+                                                            icon: 'error',
+                                                        });
+                                                    } else {
+                                                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                        console.error('เกิดข้อผิดพลาด:', xhr);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        function payment_bad_debt(){
+                                            // $('#payment_bad_debt').show();
+                                        }
+                                    </script>
+                                    <div id="payment_bad_debt">
+                                        <input type="hidden" name="invoice_id" value="{{ @$move_invoice_type_7->id }}">
+                                            <input name="ref_room_for_rent_id" type="hidden" value="{{ @$move_invoice_type_7->ref_room_for_rent_id }}">
+                                            <input name="ref_room_id" type="hidden" value="{{ @$move_invoice_type_7->ref_room_id }}">
+                                            <input name="ref_contract_id" type="hidden" value="{{ @$move_invoice_type_7->ref_contract_id }}">
+                                            <input name="payment_format" type="hidden" value="1">
+                                            
+                                            <input name="ref_type_id" type="hidden" value="7">
+                                            <input name="amount" type="hidden" value="{{ $cal }}">
+
+                                            <input type="hidden" name="id" value="{{@$move_invoice_type_7->id}}">
+                                            <h4 align="center">
+                                                เคลียร์บิล
+                                            </h4>
+                                            <div class="mt-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                                                <div id="payment-receipt">
+                                                    <div class="mb-3 pb-4" style="padding: 15px 2px;">
+                                                        <div class="d-flex">
+                                                            <div class="flex-grow-1 ms-3 g-3 row">
+                                                                <b class="text-black">ช่องทางการชำระเงิน</b> <br>
+                                                                <div class="col-sm-11">
+                                                                    <input name="bad_debt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt1" value="1" checked onclick="togglePaymentBadDebtFields()">
+                                                                    <label class="form-check-label" for="radio_bad_debt1"> เงินสด </label>
+                                                                </div>
+                                                                
+                                                                <div id="bad_debtPaymentDetails2">
+                                                                    <div class="col-sm-6 mb-2">
+                                                                        <label for="payment_date">วันที่ชำระเงิน</label>
+                                                                        <input type="text" name="payment_date" class="form-control datepicker" placeholder="" id="payment_date" required autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-11">
+                                                                    <input name="bad_debt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt2" value="2" onclick="togglePaymentBadDebtFields()"> 
+                                                                    <label class="form-check-label" for="radio_bad_debt2"> โอนเงิน </label>
+                                                                </div>
+                                                    
+                                                                <!-- แสดงเมื่อเลือก โอนเงิน -->
+                                                                <div id="bad_debtPaymentDetails" style="display:none;">
+                                                                    
+                                                                    <div class="col-sm-6 mb-2">
+                                                                        <label>เลือกบัญชีธนาคาร</label>
+                                                                        <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
+                                                                            {{-- <option value="" disabled="" selected="selected">บัญชีธนาคาร</option> --}}
+                                                                            @foreach ($move_bank as $move_r_bank)
+                                                                                <option value="{{ $move_r_bank->id }}">{{ $move_r_bank->bank.' '.$move_r_bank->bank_account_name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-sm-4 mb-2">
+                                                                    </div>
+                                                                        <div class="col-sm-3 mb-2">
+                                                                            <label for="bad_debt_transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
+                                                                            <input type="time" name="transfer_time" class="form-control" placeholder="" id="bad_debt_transfer_time" autocomplete="off"/>
+                                                                        </div>
+                                                                        <div class="col-sm-3 mb-2">
+                                                                            <label for="">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                                                                            <input type="text" name="payment_date2" class="form-control datepicker" placeholder="" id="" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                                                                        </div>
+                                                                    <div class="col-sm-10 mt-3">
+                                                                        <label for="paymentReceipt">แนบหลักฐานการโอน</label>
+                                                                        <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt" accept="image/*">
+                                                                        <div class="preview-container">
+                                                                            <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                    
+                                                                {{-- <div class="col-sm-11 mt-2">
+                                                                    <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                                                                    @if ($cal > 0)
+                                                                    <span class="text-success">
+                                                                        เก็บเงินผู้เช่าเพิ่ม
+                                                                    @else
+                                                                    <span class="text-danger">
+                                                                        ยอดเงินประกันคืนผู้เช่า
+                                                                    @endif
+                                                                        {{ number_format(abs($cal)) }} บาท
+                                                                    </span>
+                                                                </div> --}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <script>
+                                                        $('.datepicker').datepicker({
+                                                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
+                                                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
+                                                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                                                        });
+                                                        function togglePaymentBadDebtFields() {
+                                                            const paymentChannel = document.querySelector('input[name="bad_debt_payment_channel"]:checked').value;
+                                                            const bad_debtPaymentDetails = document.getElementById('bad_debtPaymentDetails');
+                                                            const bad_debtPaymentDetails2 = document.getElementById('bad_debtPaymentDetails2');
+                                                            // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
+                                                            if (paymentChannel == '2') {
+                                                                bad_debtPaymentDetails.style.display = 'block';
+                                                                bad_debtPaymentDetails2.style.display = 'none';
+                                                                $('#bad_debt_ref_bank_id').attr('required', true);
+                                                                $('#bad_debt_transfer_time').attr('required', true);
+                                                                $('#bad_debt_payment_date2').attr('required', true);
+                                                            } else {
+                                                                bad_debtPaymentDetails.style.display = 'none';
+                                                                bad_debtPaymentDetails2.style.display = 'block';
+                                                                $('#bad_debt_ref_bank_id').removeAttr('required');
+                                                                $('#bad_debt_transfer_time').removeAttr('required');
+                                                                $('#bad_debt_payment_date2').removeAttr('required')
+                                                            }
+                                                        }
+                                                        function handleFileInput(fileInputId, previewId) {
+                                                            const fileInput = document.getElementById(fileInputId);
+                                                            const previewImage = document.getElementById(previewId);
+
+                                                            fileInput.addEventListener('change', function () {
+                                                                const file = fileInput.files[0];
+
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+
+                                                                    reader.onload = function (e) {
+                                                                        previewImage.src = e.target.result;
+                                                                        previewImage.style.display = 'block';  // แสดงภาพพรีวิว
+                                                                    };
+
+                                                                    reader.readAsDataURL(file);
+                                                                } else {
+                                                                    previewImage.style.display = 'none'; // ซ่อนพรีวิวถ้าไม่ได้เลือกไฟล์
+                                                                }
+                                                            });
+                                                        }
+                                                    
+                                                        handleFileInput('paymentReceipt', 'preview1');
+                                                        // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
+                                                        togglePaymentBadDebtFields();
+                                                    </script>
+
+                                                    <h4 class="text-center">
+                                                        @if ($cal > 0)
+                                                        <span class="text-success">
+                                                            เก็บเงินผู้เช่าเพิ่ม
+                                                        @else
+                                                        <span class="text-danger">
+                                                            ยอดเงินประกันคืนผู้เช่า
+                                                        @endif
+                                                             &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
+                                                        </span>
+                                                    </h4>
+                                                </div>
+                                                <div class="modal-footer rounded-0 justify-content-center">
+                                                    {{-- <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ยกเลิก</button> --}}
+                                                    <button class="btn btn-info" type="submit">
+                                                        <span>
+                                                        <i class="ti-md ti ti-report-money"></i>
+                                                        <b class="dam">
+                                                        บันทึกยอดเงินทั้งหมดแล้วย้ายออก
+                                                        </b>
+                                                    </span></button>
+                                                </div>
+                                        </div>
+                                    </div>
+
                                 </form>
                                 {{-- /////////////////////////////// --}}
                                 <script>
@@ -820,8 +1129,8 @@
                                         moveOutEditMeter.show();
                                         $('.water-old').val('{{ intval(@$move_invoice_5->water_unit) }}');
                                         $('.electric-old').val('{{ intval(@$move_invoice_5->electricity_unit) }}');
-                                        $('.water-new').val('{{ intval(@$room->meterCurrent->water_unit) }}');
-                                        $('.electric-new').val('{{ intval(@$room->meterCurrent->electricity_unit) }}');
+                                        $('.water-new').val('{{ intval(@$meter->water_unit) }}');
+                                        $('.electric-new').val('{{ intval(@$meter->electricity_unit) }}');
 
                                        document.querySelectorAll('tr').forEach(row => {
                                             calculateUsedRow(row);
@@ -837,9 +1146,9 @@
                                             this.reportValidity();
                                             return console.log('ฟอร์มไม่ถูกต้อง');
                                         }
-                                        if(total_amount < 0){
-                                            return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
-                                        }
+                                        // if(total_amount < 0){
+                                        //     return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
+                                        // }
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
                                             text: 'คุณต้องการ ย้ายออก หรือไม่?',
@@ -966,6 +1275,151 @@
                                             }
                                         });
                                     });
+                                    $('#form_edit_deposit_refund').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        // var amount_receipt_move_out = parseFloat($('#amount_receipt_move_out').html());
+
+                                        // // ถ้าไม่ใช่ตัวเลข ให้ตั้งค่าเป็น 0 เพื่อกัน error
+                                        // if (isNaN(amount_receipt_move_out)) {
+                                        //     amount_receipt_move_out = 0;
+                                        // }
+
+                                        // if (amount_receipt_move_out < 0) {
+                                        //     console.log('ยอดติดลบ');
+                                        //     // เช่น เปลี่ยนสีข้อความให้เป็นแดง
+                                        //     return Swal.fire('ยอดต้องไม่ติดลบ', '', 'warning');
+                                        // }
+
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ บันทึกรายการคืนเงิน หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '/room/update-deposit-refund',
+                                                    type: 'POST',
+                                                    data: $(this).serialize(),
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            get_move_out();
+                                                            calculateTotal()
+                                                            calculate_2Price()
+                                                            loadData(page);
+                                                            summary();
+                                                            Swal.fire('บันทึกรายการคืนเงินเรียบร้อยแล้ว', '', 'success');
+                                                        }
+                                                    },
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
+                                    $('#form_bad_debt_bill').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        var amount_receipt_move_out = parseFloat($('#amount_receipt_move_out').html());
+
+                                        // ถ้าไม่ใช่ตัวเลข ให้ตั้งค่าเป็น 0 เพื่อกัน error
+                                        if (isNaN(amount_receipt_move_out)) {
+                                            amount_receipt_move_out = 0;
+                                        }
+
+                                        if (amount_receipt_move_out < 0) {
+                                            console.log('ยอดติดลบ');
+                                            // เช่น เปลี่ยนสีข้อความให้เป็นแดง
+                                            return Swal.fire('ยอดต้องไม่ติดลบ', '', 'warning');
+                                        }
+
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ บันทึกรายการหนี้สูญ หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '/room/save-move-out-bad-debt-bill',
+                                                    type: 'POST',
+                                                    data: $(this).serialize(),
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            get_move_out();
+                                                            setTimeout(() => {
+                                                                showEscapes();
+                                                                calculateTotal()
+                                                                calculate_2Price()
+                                                                loadData(page);
+                                                                summary();
+                                                            }, 1000);
+                                                            Swal.fire('บันทึกรายการหนี้สูญเรียบร้อยแล้ว', '', 'success');
+                                                        }
+                                                    },
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
                                     
                                     
                                     function calculate_2Price() {
@@ -977,7 +1431,7 @@
 
                                             if (!isNaN(price)) {
                                                 // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
-                                                if (priceInput.hasClass('price_increase')) {
+                                                if (priceInput.hasClass('form-price_increase')) {
                                                     total -= price;
                                                 } else {
                                                     // รายการปกติ บวกเพิ่ม
@@ -1099,18 +1553,6 @@
                                                 // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
                                             }
                                         });
-                                    });
-                                    $('#meter_water').on('click', function() {
-                                        $('.nav-link').removeClass('active btn-danger');
-                                        $('#meter_electricity').addClass('btn-label-danger');
-                                        $(this).removeClass('btn-label-warning');
-                                        $(this).addClass('active btn-warning');
-                                    });
-                                    $('#meter_electricity').on('click', function() {
-                                        $('.nav-link').removeClass('active btn-warning');
-                                        $('#meter_water').addClass('btn-label-warning');
-                                        $(this).removeClass('btn-label-danger');
-                                        $(this).addClass('active btn-danger');
                                     });
                                 </script>
                                 

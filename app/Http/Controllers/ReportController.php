@@ -11,6 +11,7 @@ use App\Models\Position;
 use App\Models\Branch;
 use App\Models\Receipt;
 use App\Models\RentBill;
+use App\Models\Bank;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -46,22 +47,22 @@ class ReportController extends Controller
     }
     public function view_overview_datatable(Request $request)
     {
-        $results = Receipt::orderBy('rooms.id','ASC')
-                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                ->where('buildings.ref_branch_id', session("branch_id"))
-                                ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', 5)
-                                ->distinct('rooms.id')
-                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+        $results = Room::orderBy('rooms.name','ASC')
+                                ->whereHas('floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                });
+                                // ->leftJoin('receipts', 'rooms.id', '=',  'receipts.ref_room_id')
+                                // ->leftJoin('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                                // ->leftJoin('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                // ->where('rent_bills.ref_type_id', 1)
+                                // ->where('rent_bills.ref_status_id', 5)
+                                // ->distinct('rooms.id')
+                                // ->select('rooms.*','rent_bills.water_amount','rent_bills.electricity_amount', 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent');
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            // $results = $results->where('rent_bills.year', $year)
+            //                 ->where('rent_bills.month', $month);
         }
 
         $limit = $request->limit ?? 15;
@@ -86,22 +87,22 @@ class ReportController extends Controller
     }
     public function rent_bill_datatable(Request $request)
     {
-        $results = Receipt::orderBy('rooms.id','ASC')
-                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                ->where('buildings.ref_branch_id', session("branch_id"))
+        $results = RentBill::orderBy('rooms.id','ASC')
+                                ->leftJoin('receipts', 'rent_bills.id', '=', 'receipts.ref_rent_bill_id')
+                                ->leftJoin('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                ->leftJoin('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                ->whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
                                 ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', 5)
-                                ->distinct('receipts.id')
-                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+                                // ->where('rent_bills.ref_status_id', 5)
+                                ->distinct('rent_bills.id')
+                                ->select('rent_bills.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            // $results = $results->where('rent_bills.year', $year)
+            //                 ->where('rent_bills.month', $month);
         }
 
         $limit = $request->limit ?? 15;
@@ -118,10 +119,51 @@ class ReportController extends Controller
     }
     public function rent_bill_summary(Request $request)
     {
+
+
+        $confirm_by_ceo = Receipt::with('payment_list')
+                                    ->where('ref_status_id', 5)
+                                    ->where('receipts.payment_channel', 1)
+                                    ->whereIn('ref_type_id', [1])
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                    ->get()
+                                    ->sum('total_amount');
+
+        $list_data = Receipt::with('payment_list')
+                                ->where('receipts.ref_status_id', 5)
+                                ->where('receipts.payment_channel', 2)
+                                ->whereIn('ref_type_id', [1])
+                                ->whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                ->get()
+                                ->filter(fn($bill) => $bill->total_amount)
+                                ->groupBy('ref_bank_id')
+                                ->map(fn($group) => $group->sum(fn($item) => $item->total_amount));; // ใช้ Accessor ได้ตรงนี้
+        $total_amount = [];
+        foreach($list_data as $bank_id => $amount){
+            $bank = Bank::find($bank_id);
+            $total_amount[] = [ 'bank' => $bank, 'amount' => $amount];
+        }
+        // return $total_amount;
+        // foreach ($total_amount as $key => $item){
+        // // foreach($total_amount as $total){
+        //     return $item['bank']->bank;
+        // }
+        $data['confirm_by_ceo'] = $confirm_by_ceo;
+        $data['total_amount'] = $total_amount;
+
+
+
         $paid = Receipt::with('payment_list') // เพื่อ preload
                             ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
                             ->where('rent_bills.ref_status_id', 5)
                             ->where('rent_bills.ref_type_id', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session('branch_id'));
+                            })
                             ->select('receipts.*');
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
@@ -138,7 +180,10 @@ class ReportController extends Controller
 
         $overdue = RentBill::with('payment_list')
                             ->where('ref_status_id', "!=", 3)
-                            ->where('ref_type_id', 1);
+                            ->where('ref_type_id', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session('branch_id'));
+                            });
                             
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
@@ -153,25 +198,27 @@ class ReportController extends Controller
         $data['paid'] = number_format($paid).' บาท';
         $data['overdue'] = number_format($overdue-$paid).' บาท';
 
-        $transfer = $this->summary(session("branch_id"), $month, $year)['transfer'];
+        $transfer = array_sum(array_column($total_amount, 'amount'));
         $cash = $this->summary(session("branch_id"), $month, $year)['cash'];
-        $cash_wait_for_confirm = $this->summary(session("branch_id"), $month, $year)['cash_wait_for_confirm'];
+        // $cash_wait_for_confirm = $this->summary(session("branch_id"), $month, $year)['cash_wait_for_confirm'];
         
-        $total_all = $transfer + $cash + $cash_wait_for_confirm;
+        $total_all = $transfer
+                     + $cash;
+                    //  + $cash_wait_for_confirm;
 
         if($total_all > 0){
             $percent_transfer = $total_all > 0 ? ($transfer / $total_all) * 100 : 0;
             $percent_cash    = $total_all > 0 ? ($cash / $total_all) * 100 : 0;
-            $percent_cash_wait_for_confirm   = 100 - ($percent_transfer + $percent_cash);
+            // $percent_cash_wait_for_confirm   = 100 - ($percent_transfer + $percent_cash);
         }
 
         $data['transfer'] = $transfer;
         $data['cash'] = $cash;
-        $data['cash_wait_for_confirm'] = $cash_wait_for_confirm;
+        // $data['cash_wait_for_confirm'] = $cash_wait_for_confirm;
 
         $data['percent_transfer'] = number_format($percent_transfer ?? 0);
         $data['percent_cash'] = number_format($percent_cash ?? 0);
-        $data['percent_cash_wait_for_confirm'] = number_format($percent_cash_wait_for_confirm ?? 0);
+        // $data['percent_cash_wait_for_confirm'] = number_format($percent_cash_wait_for_confirm ?? 0);
         
         // foreach ($values as $value) {
         //         $percent = ($value / $total) * 100;
@@ -192,7 +239,10 @@ class ReportController extends Controller
     }
     public function move_in_datatable(Request $request)
     {
-        $results = Contract::orderBy('id','ASC');
+        $results = Contract::orderBy('id','ASC')
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            });
 
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
@@ -212,9 +262,45 @@ class ReportController extends Controller
 
         return view('report/report-moveIn-table', $data);
     }
+    public function move_out_datatable(Request $request)
+    {
+        $results = Receipt::orderBy('id','ASC')
+                            ->where('ref_status_id', 5)
+                            ->where('ref_type_id', 4)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            });
+
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+        }
+
+        $limit = $request->limit ?? 15;
+
+        $results = $results->paginate($limit);
+
+        $data['list_data'] = $results->appends(request()->query());
+        $data['query'] = request()->query();
+        $data['query']['limit'] = $limit;
+
+        $data['list_data'] = $results;
+
+        return view('report/report-moveOut-table', $data);
+    }
     public function move_out(Request $request)
     {
-        return view('report/report-moveOut');
+        $data['page_url'] = 'report/move-out';
+
+        $data['all_room'] = Receipt::orderBy('id','ASC')
+                            ->where('ref_status_id', 5)
+                            ->where('ref_type_id', 4)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            })
+                            ->count();
+        return view('report/report-moveOut', $data);
     }
     public function badDebt(Request $request)
     {

@@ -136,7 +136,6 @@
                 </div>
             </div>
 
-
             <div class="col-sm-11 mt-3">
                 <b id="totalpayfull2">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price-lhai">
                     0

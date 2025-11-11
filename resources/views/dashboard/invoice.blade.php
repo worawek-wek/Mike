@@ -9,7 +9,7 @@
                             '5' => 'พฤษภาคม', '6' => 'มิถุนายน', '7' => 'กรกฎาคม', '8' => 'สิงหาคม',
                             '9' => 'กันยายน', '10' => 'ตุลาคม', '11' => 'พฤศจิกายน', '12' => 'ธันวาคม'
                         ];
-            $type = [ 3 => "ค่าจองห้อง", 2 => "ค่าเงินประกันห้อง", 1 => "ค่าเช่ารายเดือน"]
+            $type = [ 4 => "ย้ายออก", 3 => "ค่าจองห้อง", 2 => "ค่าเงินประกันห้อง", 1 => "ค่าเช่ารายเดือน"]
             @endphp
 
         </span>
@@ -46,8 +46,8 @@
             @foreach ($invoice as $key => $row)
                 <tr>
                     <td class="text-center">{{ $key+1 }}</td>
-                    <td class="text-center">{{ $row->invoice_number }}</td>
                     <td class="text-center">{{ $monthNames[$row->month].' '.$row->year }}</td>
+                    <td class="text-center">{{ $row->invoice_number }}</td>
                     <td class="text-center">{{ $type[$row->ref_type_id] }}</td>
                     <td class="text-end">{{ number_format($row->total_amount) }}</td>
                 </tr>

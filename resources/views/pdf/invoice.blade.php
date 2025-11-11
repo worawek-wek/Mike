@@ -75,15 +75,15 @@
             padding: 1px;
             font-size: 10px;
         }
-        .total-table td:nth-child(1) {
+        .total-table td:nth-child(2) {
             text-align: left;
         }
-        .total-table td:nth-child(2) {
+        .total-table td:nth-child(3) {
             text-align: left;
             font-weight: bold;
             border-bottom: 1px solid #000;
         }
-        .total-table td:nth-child(3) {
+        .total-table td:nth-child(4) {
             text-align: right;
             font-weight: bold;
             border-bottom: 1px solid #000;
@@ -192,17 +192,32 @@
         </div>
         <table class="total-table">
             <tr style="vertical-align: top;">
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $invoice->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
                 <td style="font-size: large;">
                     {{ number_format($invoice->total_amount) }} บาท
                 </td>
             </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        {{-- <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div> --}}
+                    </div>
+                </td>
+            </tr>
         </table>
-        <table>
+        {{-- <table>
             <tr>
                 <td width="150px" style="padding-top: 5px;">
-                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
                 </td>
                 <td width="80%" style="padding: 0px 40px;">
                     <div class="note">หมายเหตุ(Note) </div>
@@ -210,14 +225,11 @@
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
                         </div>
-                        <div class="signature-line">
-                            <span>( ................................................. )</span>
-                        </div>
                     </div>
                 </td>
             </tr>
-        </table>
-        @if(count($invoice->payment_list) < 4)
+        </table> --}}
+        @if(count($invoice->payment_list) < 6)
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
             <div style="page-break-before: always;"></div>
@@ -273,29 +285,28 @@
                 @endforeach
             </table>
         </div>
+        
         <table class="total-table">
             <tr style="vertical-align: top;">
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $invoice->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
                 <td style="font-size: large;">
                     {{ number_format($invoice->total_amount) }} บาท
                 </td>
             </tr>
-        </table>
-        <table>
             <tr>
-                <td width="150px" style="padding-top: 5px;">
-                    <img src="/upload/qr-code/{{ $invoice->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
-                </td>
-                <td width="80%" style="padding: 0px 40px;">
+                <td colspan="2">
                     <div class="note">หมายเหตุ(Note) </div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
                         </div>
-                        <div class="signature-line">
+                        {{-- <div class="signature-line">
                             <span>( ................................................. )</span>
-                        </div>
+                        </div> --}}
                     </div>
                 </td>
             </tr>

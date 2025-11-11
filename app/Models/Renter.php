@@ -61,11 +61,11 @@ class Renter extends Model
 
     public function fullThaiAddress()
     {
-        $subdistrict = $this->subdistrict?->name_in_thai ?? '';
-        $district = $this->district?->name_in_thai ?? '';
-        $province = $this->province?->name_in_thai ?? '';
+        $subdistrict = $this->subdistrict != null ? 'ต.'.$this->subdistrict->name_in_thai:'';
+        $district = $this->district != null ? 'อ.'.$this->district->name_in_thai:'';
+        $province = $this->province != null ? 'จ.'.$this->province->name_in_thai:'';
 
-        return trim("ต.{$subdistrict} อ.{$district} จ.{$province}");
+        return trim("$this->address $subdistrict $district $province ".$this->zipcode);
     }
     
 }

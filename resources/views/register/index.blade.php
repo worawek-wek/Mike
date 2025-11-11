@@ -56,7 +56,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <label for="" class="form-label">เบอร์โทรศัพท์</label></label><span class="text-danger"> *</span>
-                                <input name="phone" type="tel" class="form-control" placeholder="เบอร์โทรศัพท์" pattern="^\d{9,10}$" required />
+                                <input name="phone" type="tel" class="form-control" placeholder="เบอร์โทรศัพท์" oninput="this.value=this.value.slice(0,10);" pattern="^\d{9,10}$" required />
                             </div>
                             <div class="col-sm-6">
                                 <label for="" class="form-label">อีเมล</label></label><span class="text-danger"> *</span>

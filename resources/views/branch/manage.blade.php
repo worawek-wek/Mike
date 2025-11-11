@@ -221,7 +221,7 @@
                               </div>
                             </div>
                             
-                            <button onclick="location.href='{{ url("dashboard/".$row->id) }}';" type="button" class="btn btn-main waves-effect waves-light">
+                            <button onclick="location.href='{{ url("room/set_branch/".$row->id) }}';" type="button" class="btn btn-main waves-effect waves-light">
                               <i class="ti-xs ti ti-pencil me-2"></i>
                               จัดการ
                             </button>

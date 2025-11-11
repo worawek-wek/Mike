@@ -20,11 +20,11 @@
                 </select>
             </div>
             <div class="col-sm-5">
-                <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span></label>
+                <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span>
                 <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="" required/>
             </div>
             <div class="col-sm-5">
-                <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
+                <label for="exampleFormControlInput2" class="form-label">นามสกุล</label><span class="text-danger">*</span>
                 <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="" />
             </div>
         @else
@@ -299,11 +299,11 @@
         <div></div>
         <div class="col-sm-6">
             <label for="water_meter_start_living" class="form-label">เลขมิเตอร์น้ำประปา(เข้าพัก)*</label>
-            <input type="text" name="contract[1][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ $meter->water_unit }}"/>
+            <input type="text" name="contract[1][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ (int) $meter->water_unit ?? (int) @$contract->water_meter_start_living }}" min="0" />
         </div>
         <div class="col-sm-6">
             <label for="electricity_meter_start_living" class="form-label">เลขมิเตอร์ค่าไฟ(เข้าพัก)*</label>
-            <input type="text" name="contract[1][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ $meter->electricity_unit }}"/>
+            <input type="text" name="contract[1][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ (int) $meter->electricity_unit ?? (int) @$contract->electricity_meter_start_living }}" min="0" />
         </div>
         <div class="col-sm-12">
             <label for="" class="form-label">หมายเหตุ</label>

@@ -34,8 +34,12 @@
             @foreach ($list_data as $key => $row)
                 @php
                     $current_month_usage = intval($row->water_unit+$row->meter_before_change-$row->start_value_of_new_meter) - intval($row->meterPrevious->water_unit);
+                    $background = '';
+                    if($row->status == 0 && $row->move_out_water_meter != $row->water_unit){
+                        $background = 'style="background-color: antiquewhite;"';
+                    }
                 @endphp
-            <tr>
+            <tr {!! $background !!}>
                 <input type="hidden" id="water_unit{{ $row->meters_id }}" value="{{ intval($row->water_unit) }}">
                 <td class="text-center">
                     {{ $row->name }}
@@ -66,12 +70,14 @@
                         <span class="ti ti-droplet me-2 m-auto"></span>
                         <input type="number" name="id_room[]" id="room{{ $row->meters_id }}" class="form-control form-control-sm room{{$key}}"
                             value="{{ intval($row->water_unit) }}" onkeydown="handleInput(event,{{ $row->meters_id }}, this.value, {{ $key }})"
-                            oninput="editRoom({{ $row->meters_id }}, this.value)" style="background-color: #d6f7fb;border-color: #00bad1;"
+                            oninput="editRoom({{ $row->meters_id }}, this.value, {{ $row->meterPrevious->water_unit }})" style="background-color: #d6f7fb;border-color: #00bad1;"
                             onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                            min="0"
-                             @if ($permission_meter_water)
-readonly                    
-                @endif>
+                            min="{{ $row->meterPrevious->water_unit }}"
+                            @if ($permission_meter_water)
+                                readonly
+                            @endif
+                            autocomplete="off"
+                            >
                     </span>
                     {{-- <div style="padding: inherit;"> --}}
                         {{-- <button type="button" id="updateRoom{{ $row->meters_id }}" class="btn btn-sm btn-secondary" disabled onclick="updateRoom('{{ $row->meters_id }}')">
@@ -85,6 +91,7 @@ readonly
                         class="badge bg-label-danger"
                         style="padding: 15px;"
                     @endif
+                     id="current_month_usage_water_{{ $row->meters_id }}"
                     >
                         {{ $current_month_usage }}
                     </span>
@@ -181,6 +188,10 @@ readonly
         const val = input.value;
         input.value = "";
         input.value = val;
+        
+        // ✅ เลือกข้อความทั้งหมด (เหมือน Ctrl+A)
+        input.select();
+
     }
 
     function handleInput(event, id, v, k) {
@@ -189,24 +200,45 @@ readonly
             focus_input_room(1 + k);
         }
     }
-    function editRoom(id, v){
-        if($('#water_unit' + id).val() != v){
-            $('#updateRoom' + id).prop('disabled', false);
-            $('#updateRoom' + id).removeClass('btn-secondary').addClass('btn-success');
-        }else{
-            $('#updateRoom' + id).prop('disabled', true);
-            $('#updateRoom' + id).removeClass('btn-success').addClass('btn-secondary');
-        }
+    function editRoom(id, v, p){
+        var c = v-p;
+        $('#current_month_usage_water_'+id).html(c);
+        // if($('#water_unit' + id).val() != v){
+        //     $('#updateRoom' + id).prop('disabled', false);
+        //     $('#updateRoom' + id).removeClass('btn-secondary').addClass('btn-success');
+        // }else{
+        //     $('#updateRoom' + id).prop('disabled', true);
+        //     $('#updateRoom' + id).removeClass('btn-success').addClass('btn-secondary');
+        // }
     }
     let data = [];
     function updateRoom(){
+        var check_min = 0;
         let data = [];
         $('input[name="id_room[]"]').each(function () {
+            const id = $(this).attr('id').replace('room', '');
+            const value = parseFloat($(this).val()); // แปลงค่าเป็นตัวเลข
+            const min = parseFloat($(this).attr('min')) || 0; // ถ้าไม่มี min ให้ถือว่า 0
+
+            // ✅ ตรวจสอบว่า value น้อยกว่า min หรือไม่
+            if (value < min) {
+                check_min = 1;
+                console.warn(`room${id}: ค่าน้อยกว่า min (${value} < ${min})`);
+                $(this).addClass('is-invalid'); // เพิ่ม class สำหรับ highlight error
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+            // เก็บข้อมูลใน array
             data.push({
-                id: $(this).attr('id').replace('room', ''), // ดึง meters_id จาก id เช่น room4951
-                value: $(this).val()
+                id: id,
+                value: value
             });
         });
+        
+            if(check_min == 1){
+                return Swal.fire('พบการกรอก มิเตอร์ ไม่ถูกต้อง', '', 'warning');
+            }
+            
         $.ajax({
             url: '/meter/water_unit', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
             type: 'POST',

@@ -14,34 +14,32 @@
             @endif>
                 <div class="p-2">
                     <label class="mb-1 text-black"><i class="ti ti-license text-main mb-1"></i> รายละเอียดหัวบิล</label>
-                        <select name="ref_renter_id" id="select-renter" class="select-renter" onchange="get_room_rental_move_out(this.value)" required>
-                            {{-- @if (!@$invoice) --}}
-                                <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
-                            {{-- @endif --}}
+                        <select name="ref_renter_id" id="select-renter2" class="select-renter" onchange="get_room_rental_bad_debt(this.value)" required>
+                            <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                             @foreach ($renter as $rent)
-                                <option value="{{ $rent->id }}" @if (@$invoice->ref_room_for_rent_id == $rent->room_for_rents_id) selected @endif>{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                <option value="{{ $rent->id }}" @if (@$invoice->ref_room_for_rent_id == $rent->room_for_rents_id) selected @endif >{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
                             @endforeach
                         </select>
                 </div>
                 <div class="col-sm-12">
                     <label for="renter_name" class="form-label">ชื่อผู้เข้าพัก</label>
-                    <input type="text" name="name" class="form-control" id="renter_name" placeholder="ชื่อผู้เข้าพัก" value="{{ @$invoice->name }}" />
+                    <input type="text" name="name" class="form-control" id="renter_bad_name" placeholder="ชื่อผู้เข้าพัก" value="{{ @$invoice->name }}" />
                 </div>
                 <div class="col-sm-12">
                     <label for="renter_address" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-                    <input type="text" name="homeland" class="form-control" id="renter_address" placeholder="ที่อยู่ผู้เข้าพัก" value="{{ @$invoice->address }}" />
+                    <input type="text" name="homeland" class="form-control" id="renter_bad_address" placeholder="ที่อยู่ผู้เข้าพัก" value="{{ @$invoice->address }}" />
                 </div>
                 <div class="col-sm-12">
                     <label for="renter_phone" class="form-label">เบอร์โทรผู้เข้าพัก</label>
-                    <input type="text" name="phone" class="form-control" id="renter_phone" placeholder="เบอร์โทรผู้เข้าพัก" value="{{ @$invoice->phone }}" />
+                    <input type="text" name="phone" class="form-control" id="renter_bad_phone" placeholder="เบอร์โทรผู้เข้าพัก" value="{{ @$invoice->phone }}" />
                 </div>
                 <div class="col-sm-12">
                     <label for="renter_id_card_number" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
-                    <input type="text" name="id_card_number" class="form-control" id="renter_id_card_number" placeholder="หมายเลขบัตรประชาชนผู้เข้าพัก" value="{{ @$invoice->id_card_number }}" />
+                    <input type="text" name="id_card_number" class="form-control" id="renter_bad_id_card_number" placeholder="หมายเลขบัตรประชาชนผู้เข้าพัก" value="{{ @$invoice->id_card_number }}" />
                 </div>
                 <div class="col-sm-12">
                     <label for="renter_remark" class="form-label">หมายเหตุ</label>
-                    <textarea name="remark" class="form-control" id="renter_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
+                    <textarea name="remark" class="form-control" id="renter_bad_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
                 </div>
             </div>
             <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
@@ -76,11 +74,12 @@
                     @empty
                         <tr>
                             <td>
-                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" required>
+                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" @if(@$invoice_rent_room) value="ค่าเช่าห้อง {{ $room->name .' เดือน '.$invoice_rent_room->month.'/'.$invoice_rent_room->year }}" @endif required>
                             </td>
                             <td class="text-end">
-                                <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
+                                <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2" @if(@$invoice_rent_room) value="{{ $invoice_rent_room->total_amount }}" @endif placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
                                 <input type="hidden" name="payment_list[discount][]" value="0">
+                                <input type="hidden" name="payment_list[bad_debt_rent_status][]" value="1">
                             </td>
                         </tr>
 
@@ -125,7 +124,7 @@
                 <i class="ti ti-plus"></i> เพิ่มส่วนลด</span>
             </button>
             <button
-                    id="add_expenses"
+                    id="bad_debt_add_expenses"
                     style="padding-right: 14px;padding-left: 14px;"
                     class="btn btn-sm buttons-collection btn-warning waves-effect waves-light me-2"
                     tabindex="0" aria-controls="DataTables_Table_0"
@@ -177,7 +176,7 @@
                 $('#add_discount').click(() => addRow('ส่วนลด', '', 1));
 
                 // กดเพิ่มรายการปกติ
-                $('#add_expenses').click(() => addRow('', '', 0));
+                $('#bad_debt_add_expenses').click(() => addRow('', '', 0));
 
                 // กดเพิ่มรายการค่าน้ำค่าไฟฟ้าสุดท้าย
                 function addWaterElectric() {
@@ -223,8 +222,8 @@
                 // เรียกคำนวณตอนโหลดหน้า
                 $(document).ready(function () {
                     calculate_2Price();
-
-                    new TomSelect("#select-renter", {
+                    
+                    new TomSelect("#select-renter2", {
                         create: false,      // ไม่ให้พิมพ์เพิ่มเอง
                         maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
                         allowEmptyOption: true, // แสดง option แรกที่ไม่มีค่า (เช่น "-- กรุณาเลือก --")
@@ -233,6 +232,6 @@
                             direction: "asc"
                         }
                     });
-                    
+
                 });
             </script>

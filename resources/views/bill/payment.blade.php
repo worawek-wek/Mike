@@ -111,13 +111,15 @@
                         <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
                     </button>
                 </div>
-                    @if ($invoice->ref_status_id == 7 & count($invoice->receipt) == 0)
-                        <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกใบแจ้งหนี้')">
-                            <span>
-                                <i class="ti-md ti ti-x"></i>
-                                ยกเลิกใบแจ้งหนี้
-                            </span>
-                        </button>
+                    @if(Auth::user()->user_has_branch->position->id == 1)
+                        @if ($invoice->ref_status_id == 7 & count($invoice->receipt) == 0)
+                            <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกใบแจ้งหนี้')">
+                                <span>
+                                    <i class="ti-md ti ti-x"></i>
+                                    ยกเลิกใบแจ้งหนี้
+                                </span>
+                            </button>
+                        @endif
                     @endif
                     @foreach ($invoice->receipt as $key => $item_receipt)
                         
@@ -484,7 +486,7 @@
                                         
                                         <div class="col-sm-6 mb-2">
                                             <label>เลือกบัญชีธนาคาร</label>
-                                            <select class="select2 form-select mb-2" name="bank" id="exampleFormControlSelect1">
+                                            <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
                                                 {{-- <option value="" disabled="" selected="selected">บัญชีธนาคาร</option> --}}
                                                 @foreach ($bank as $r_bank)
                                                     <option value="{{ $r_bank->id }}">{{ $r_bank->bank.' '.$r_bank->bank_account_name }}</option>

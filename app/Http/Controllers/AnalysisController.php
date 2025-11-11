@@ -19,6 +19,7 @@ use App\Models\Contract;
 use App\Models\Leave;
 use App\Models\UserLeave;
 use App\Models\News;
+use App\Models\Building;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -141,6 +142,7 @@ class AnalysisController extends Controller
 
     public function water(Request $request)
     {
+
         $data['total_expense'] = Water::where("ref_branch_id", session("branch_id"))->sum('amount');
         $data['total_income'] = RentBill::with('payment_list')
                                             ->whereHas('room.floor.building', function ($query) {
@@ -163,7 +165,7 @@ class AnalysisController extends Controller
                                             ->where('year', $year)
                                             ->where('ref_status_id', 5)
                                             ->get()
-                                            ->sum->total_e_l_e_amount;
+                                            ->sum->total_water_amount;
 
         return ['total_expense' => number_format($total_expense), 'total_income' => number_format($total_income), 'total_income_total_expense' => number_format($total_income-$total_expense)];
     }
@@ -651,6 +653,12 @@ class AnalysisController extends Controller
     
     public function get_room_floor(Request $request)
     {
+        
+        $data['buildings'] = Building::where('ref_branch_id', session("branch_id"))->get();
+        $data['floors'] = Floor::whereHas('building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })->get();
+
         $floors_previous_id = Floor::orderBy('ref_building_id')->orderBy('name')->whereHas('building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             })
@@ -758,9 +766,9 @@ class AnalysisController extends Controller
             $percent_all_receipt_women = ($all_receipt_women / $total) * 100;
             $percent_all_receipt_not_specified = ($all_receipt_not_specified / $total) * 100;
         }
-        $data['percent_all_receipt_men'] = $percent_all_receipt_men;
-        $data['percent_all_receipt_women'] = $percent_all_receipt_women;
-        $data['percent_all_receipt_not_specified'] = $percent_all_receipt_not_specified;
+        $data['percent_all_receipt_men'] = number_format($percent_all_receipt_men);
+        $data['percent_all_receipt_women'] = number_format($percent_all_receipt_women);
+        $data['percent_all_receipt_not_specified'] = number_format($percent_all_receipt_not_specified);
 
         $data['page_url'] = "analysis/tenants";
         return view('analysis/analysis-tenants', $data);
@@ -769,17 +777,30 @@ class AnalysisController extends Controller
     {
         // $contract = Contract::orderBy('id','ASC')->whereYear('created_at', 2025)->get();
         $raw = Contract::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                        // ->whereHas('room', function ($query) {
+                        //     $query->where('status', '!=', 0);
+                        // })
+                        ->whereYear('created_at', 2025)
+                        ->groupBy(DB::raw('MONTH(created_at)'))
+                        ->pluck('total','month');
+
+        $raw_out = Contract::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                        ->whereHas('room', function ($query) {
+                            $query->where('status', 0);
+                        })
                         ->whereYear('created_at', 2025)
                         ->groupBy(DB::raw('MONTH(created_at)'))
                         ->pluck('total','month');
 
         $rentIn = [];
+        $rentOut = [];
         for ($i = 1; $i <= 12; $i++) {
             $rentIn[] = $raw[$i] ?? 0;
+            $rentOut[] = $raw_out[$i] ?? 0;
         }
 
         $data['rentIn']  = $rentIn;
-        $data['rentOut'] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        $data['rentOut'] = $rentOut;
         return $data;
 
     }

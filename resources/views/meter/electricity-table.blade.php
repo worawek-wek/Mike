@@ -22,10 +22,20 @@
                 <th class="text-center">
                     หน่วยที่ใช้
                 </th>
+                <th class="text-center">
+                    ดำเนินการ
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach ($list_data as $key => $row)
+            @php
+                $current_month_usage = intval($row->electricity_unit+$row->meter_before_change-$row->start_value_of_new_meter_electricity) - intval($row->meterPrevious->electricity_unit);
+                $background = '';
+                if($row->status == 0 && $row->move_out_electricity_meter != $row->electricity_unit){
+                    $background = 'style="background-color: antiquewhite;"';
+                }
+            @endphp
             <tr>
                 <td class="text-center">
                     {{ $row->name }}
@@ -41,7 +51,16 @@
                 @endif
                 </td>
                 <td class="text-center">
-                    {{ intval($row->meterPrevious->electricity_unit) }}
+                    @if ($row->reason_name == '')
+                        {{ intval($row->meterPrevious->electricity_unit) }}<br>
+                    @else
+                        ({{ (int) $row->meter_before_change }} - {{ (int) $row->meterPrevious->electricity_unit }}) {{ $row->start_value_of_new_meter_electricity }}
+                        <i class="fa fa-exclamation-circle text-warning"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="{{$row->reason_name}}น้ำ">
+                        </i>
+                    @endif
                 </td>
                 <td class="text-end">
                     <span class="badge rounded-pill bg-label-danger text-black" text-capitalized="" style="font-size: unset;display: block;" >
@@ -51,7 +70,23 @@
                     
                 </td>
                 <td class="text-center text-danger">
-                    {{ intval($row->electricity_unit) - intval($row->meterPrevious->electricity_unit) }}
+                    <span
+                    @if ($current_month_usage < 0)
+                        class="badge bg-label-danger"
+                        style="padding: 15px;"
+                    @endif
+                     id="current_month_usage_electricity_{{ $row->meters_id }}"
+                    >
+                        {{ $current_month_usage }}
+                    </span>
+                </td>
+                <td class="text-center text-warning">
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#change_ele_meter" onclick="changeEleMeter_form({{ $row->meters_id }},'{{ $row->name }}')">
+                        <span>
+                            <i class="ti-md ti ti-settings"></i>
+                            <b class="dam">เปลี่ยนมิเตอร์</b>
+                        </span>
+                    </button>
                 </td>
             </tr>
             @endforeach
@@ -122,4 +157,74 @@
     </div>
 </div>
 
+<script>
+    var meter_id;
+    var room_name;
+    function changeEleMeter_form(p_meter_id, p_room_name){
+        meter_id = p_meter_id;
+        room_name = p_room_name;
         
+        $.ajax({
+            type: "GET",
+            url: '/meter/get-electricity-meter-unit/'+p_meter_id,
+            success: function(data) {
+                $("#meter_electricity_before_change").val(data);
+            }
+        });
+    }
+    $('#change_ele_meter_form').on('submit', function(event) {
+        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+        Swal.fire({
+            title: 'ยืนยันการดำเนินการ?',
+            text: 'คุณต้องการ เปลี่ยนมิเตอร์ ห้อง '+room_name+' หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก',
+            showDenyButton: false,
+            didOpen: () => {
+                // โฟกัสที่ปุ่ม confirm
+                Swal.getConfirmButton().focus();
+            }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/meter/change-meter/electricity/'+meter_id, // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if(response == true){
+                                loadElectricityData(electricity_page)
+                                
+                                var modalEl = document.getElementById('change_ele_meter');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                $('#change_ele_meter_form')[0].reset();
+                                $('#defaultRadio3').prop('checked', true);
+                                $('#div_reason4').css('display',"none");
+                                $('#div_reason3').css('display',"block");
+                                Swal.fire({
+                                    title: 'เปลี่ยน มิเตอร์น้ำ เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', error);
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+    });
+</script>

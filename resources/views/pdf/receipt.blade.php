@@ -75,15 +75,15 @@
             padding: 1px;
             font-size: 10px;
         }
-        .total-table td:nth-child(1) {
+        .total-table td:nth-child(2) {
             text-align: left;
         }
-        .total-table td:nth-child(2) {
+        .total-table td:nth-child(3) {
             text-align: left;
             font-weight: bold;
             border-bottom: 1px solid #000;
         }
-        .total-table td:nth-child(3) {
+        .total-table td:nth-child(4) {
             text-align: right;
             font-weight: bold;
             border-bottom: 1px solid #000;
@@ -191,26 +191,34 @@
                 @endforeach
             </table>
         </div>
+        
         <table class="total-table">
             <tr style="vertical-align: top;">
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $receipt->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
                 <td style="font-size: large;">
                     {{ number_format($receipt->total_amount) }} บาท
                 </td>
             </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        {{-- <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div> --}}
+                    </div>
+                </td>
+            </tr>
         </table>
-        <div class="note">หมายเหตุ(Note) </div>
-        <div class="signature">
-            <div class="signature-line">
-                <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
-            </div>
-            <div class="signature-line">
-                <span>( ................................................. )</span>
-            </div>
-        </div>
 
-        @if(count($receipt->payment_list) < 4)
+        @if(count($receipt->payment_list) < 6)
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
             <div style="page-break-before: always;"></div>
@@ -266,7 +274,34 @@
                 @endforeach
             </table>
         </div>
+        
         <table class="total-table">
+            <tr style="vertical-align: top;">
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $receipt->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
+                <td style="font-size: large;">({{ $amount_thai }})</td>
+                <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
+                <td style="font-size: large;">
+                    {{ number_format($receipt->total_amount) }} บาท
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="signature" style="margin: auto 15px;">
+                        <div class="signature-line">
+                            <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
+                        </div>
+                        {{-- <div class="signature-line">
+                            <span>( ................................................. )</span>
+                        </div> --}}
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        {{-- <table class="total-table">
             <tr style="vertical-align: top;">
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
@@ -283,7 +318,7 @@
             <div class="signature-line">
                 <span>( ................................................. )</span>
             </div>
-        </div>
+        </div> --}}
     </div>
 </body>
 </html>

@@ -179,8 +179,8 @@
             },
             tooltip: {
                 y: [
-                    { title: { formatter: function(val) { return val + " (mins)" } } },
-                    { title: { formatter: function(val) { return val + " per session" } } },
+                    { title: { formatter: function(val) { return val } } },
+                    { title: { formatter: function(val) { return val } } },
                     { title: { formatter: function(val) { return val } } }
                 ]
             },

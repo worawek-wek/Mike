@@ -22,12 +22,15 @@ use App\Models\Floor;
 use App\Models\Room;
 use App\Models\RoomForRents;
 use App\Models\StatusRentBill;
+use App\Models\Renter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriterXlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use Carbon\Carbon;
 
 DB::beginTransaction();
@@ -47,6 +50,17 @@ class BillController extends Controller
         //                                     $query->where('ref_branch_id', session("branch_id"));
         //                                 })
         //                                 ->get();
+        $data['renter'] = Renter::whereHas('room_for_rent', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
+                                ->whereHas('room_for_rent.rent_bills', function ($query) {
+                                                    $query->where('ref_type_id', 1)
+                                                            ->where('ref_status_id', 7);
+                                                })
+                                ->whereHas('room_for_rent.room', function ($query) {
+                                    $query->where('status', 2);
+                                })->get();
+
         $invoice = RentBill::where('ref_status_id', '!=', 5)->where('ref_type_id', 1)->with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->get();
         foreach($invoice as $inv){
 
@@ -104,17 +118,66 @@ class BillController extends Controller
         //                                 ->filter(function ($bill) {
         //                                     return $bill->total_not_discount_amount >= $bill->total_amount;
         //                                 });
-        $data['list_data'] = Receipt::with('payment_list')
-                                        ->where('ref_status_id', 2)
+        $data['type'] = [ 1 => 'บิลค่าเช่าห้อง', 2 => 'บิลค่าประกันห้อง', 3 => 'บิลค่าจองห้อง', 4 => 'บิลย้ายออก', 4 => 'บิลหนี้สูญ' ];
+        $data['payment_channel'] = [ 1 => 'เงินสด', 2 => 'โอนเงิน', 3 => 'หักจากเงินประกัน'];
+        $data['list_data'] = Receipt::orderBy('rooms.name')
+                                        ->with('payment_list')
+                                        ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                        ->where('receipts.ref_status_id', 2)
                                         ->whereHas('room.floor.building', function ($query) {
                                             $query->where('ref_branch_id', session("branch_id"));
                                         })
+                                        ->select('receipts.*')
                                         ->get()
                                         ->filter(function ($bill) {
                                             return $bill->total_amount;
                                         });
 
         return view('bill/waiting-for-confirmation', $data);
+    }
+    public function confirmation(Request $request)
+    {
+        $request['limit'] = 9999999;
+        $request['re'] = 1;
+        $request['ref_status_id'] = 2;
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->pluck('bank', 'id');
+        
+        $confirm_by_ceo = Receipt::with('payment_list')
+                                    ->where('ref_status_id', 5)
+                                    ->where('receipts.payment_channel', 1)
+                                    ->whereIn('ref_type_id', [1,2,3])
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                    ->get()
+                                    ->sum('total_amount');
+
+        $list_data = Receipt::with('payment_list')
+                                ->where('receipts.ref_status_id', 5)
+                                ->where('receipts.payment_channel', 2)
+                                ->whereIn('ref_type_id', [1,2,3])
+                                ->whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                ->get()
+                                ->filter(fn($bill) => $bill->total_amount)
+                                ->groupBy('ref_bank_id')
+                                ->map(fn($group) => $group->sum(fn($item) => $item->total_amount));; // ใช้ Accessor ได้ตรงนี้
+        $total_amount = [];
+        foreach($list_data as $bank_id => $amount){
+            $bank = Bank::find($bank_id);
+            $total_amount[] = [ 'bank' => $bank, 'amount' => $amount];
+        }
+        // return $total_amount;
+        // foreach ($total_amount as $key => $item){
+        // // foreach($total_amount as $total){
+        //     return $item['bank']->bank;
+        // }
+        $data['confirm_by_ceo'] = $confirm_by_ceo;
+        $data['total_amount'] = $total_amount;
+        
+        $data['list_data'] = $list_data;
+        return view('bill/confirmation', $data);
     }
     
     public function datatable(Request $request)
@@ -164,6 +227,12 @@ class BillController extends Controller
             $limit = $request['limit'];
         }
 
+        $allIdsQuery = clone $results; // <-- แยกออกเป็น object ใหม่
+        $allIds = $allIdsQuery->where('rent_bills.ref_status_id', 3)
+                            ->get()
+                            ->pluck('id')
+                            ->implode(',');
+
         $results = $results->paginate($limit);
 
         foreach ($results as $res) {
@@ -179,6 +248,7 @@ class BillController extends Controller
         $data['query'] = request()->query();
         $data['query']['limit'] = $limit;
 
+        $data['allIds'] = $allIds;
         $data['list_data'] = $results;
         
         if(@$request->re){
@@ -187,7 +257,8 @@ class BillController extends Controller
 
         return view('bill/table', $data);
     }
-    public function incomplete_update(Request $request)
+    // คอนเฟิร์มบิล
+    public function incomplete_update(Request $request, $submit = null)
     {
         try{
             $rent_bill = RentBill::find($request->id);
@@ -219,12 +290,28 @@ class BillController extends Controller
                     
                     }
                 }
-
+            if(@$submit == 'approve'){
                 $rent_bill->ref_status_id = 7;
+            }
 
+            $rent_bill->remark = $request->remark;
             $rent_bill->total = $rent_bill->total_amount;
 
             $rent_bill->save();
+            
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        //
+    }
+    // คอนเฟิร์มบิลทั้งหมด
+    public function confirm_bill_all(Request $request)
+    {
+        try{
+            RentBill::whereIn('id', explode(',', $request->id))->where('ref_status_id', 3)->update(['ref_status_id' => 7]);
             
             DB::commit();
             return true;
@@ -496,40 +583,92 @@ class BillController extends Controller
         $summary['transfer'] = number_format($summary['transfer']);
         return $summary;
     }
-    public function change_status_bill(Request $request, $id)
+    public function change_status_bill_receipt(Request $request)
     {
         try{
-            if($request->status == 3){
-                PaymentList::whereHas('invoice.room.floor.building', function ($query) {
-                                    $query->where('ref_branch_id', session("branch_id"));
-                                })->where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->get();
-            }
-            if($id == 'all'){
-                Receipt::whereHas('room.floor.building', function ($query) {
-                            $query->where('ref_branch_id', session("branch_id"));
-                        })->where('ref_status_id', 2)->update(['ref_status_id'=> 5]);
-                $bills = RentBill::whereHas('room.floor.building', function ($query) {
-                                        $query->where('ref_branch_id', session("branch_id"));
-                                    })->with(['receipt.payment_list', 'payment_list'])
-                                    ->where('ref_status_id', 2)
-                                    ->get();
+            // return $request;
+            // if($request->status == 3){
+            //     PaymentList::whereHas('invoice.room.floor.building', function ($query) {
+            //                         $query->where('ref_branch_id', session("branch_id"));
+            //                     })->where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->get();
+            // }
+            // if($id == 'all'){
+                Receipt::whereIn('id', $request->id)->update(['ref_status_id'=> 5]);
+                foreach($request->id as $id){
+                    $receict = Receipt::find($id);
+                    $bill = RentBill::with(['receipt.payment_list', 'payment_list'])
+                                        ->where('id', $receict->ref_rent_bill_id)
+                                        ->first();
 
-                foreach ($bills as $bill) {
-                    if ($bill->total_not_discount_amount >= $bill->total_amount) {
-                        foreach ($bills as $bill) {
-                            if ($bill->total_not_discount_amount >= $bill->total_amount) {
-                                $bill->ref_status_id = $request->status;
-                                $bill->save();
-                            }
-                        }
-                    }
+                    // foreach ($bills as $bill) {
+                    //     if ($bill->total_not_discount_amount >= $bill->total_amount) {
+                    //         foreach ($bills as $bill) {
+                    // return $bill->total_amount;
+                                if ($bill->total_not_discount_amount >= $bill->total_amount) {
+                                    $bill->ref_status_id = $request->status;
+                                    $bill->save();
+                                }
+                    //         }
+                    //     }
+                    // }
                 }
                 DB::commit();
                 return true;
-            }
+            // }
 
-            $update = RentBill::whereIn('id', explode(',', $id));
-            $update->update(['ref_status_id' => $request->status]);
+            // $update = RentBill::whereIn('id', explode(',', $id));
+            // $update->update(['ref_status_id' => $request->status]);
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+        //
+    }
+    public function change_status_bill_invoice(Request $request, $id = null)
+    {
+        try{
+            // return $request;
+            if($request->status == 3){
+                // PaymentList::whereHas('invoice.room.floor.building', function ($query) {
+                //                     $query->where('ref_branch_id', session("branch_id"));
+                //                 })->where('ref_payment_id', $id)->where('document_type', 1)->where('new_list_from_incomplate', 1)->get();
+                                
+                $update = RentBill::where('id', $id)->update(['ref_status_id' => $request->status]);
+            }
+            // if($id == 'all'){
+                // Receipt::whereIn('id', $request->id)->update(['ref_status_id'=> 5]);
+                
+                $bills = RentBill::with(['receipt.payment_list', 'payment_list'])
+                                        ->where('id', $request->id)
+                                        ->get();
+                // foreach($request->id as $id){
+                //     $receict = Receipt::find($id);
+                //     $bill = RentBill::with(['receipt.payment_list', 'payment_list'])
+                //                         ->where('id', $receict->ref_rent_bill_id)
+                //                         ->first();
+
+                    // foreach ($bills as $bill) {
+                    //     if ($bill->total_not_discount_amount >= $bill->total_amount) {
+                            foreach ($bills as $bill) {
+                                Receipt::where('ref_rent_bill_id', $bill->id)->update(['ref_status_id'=> 5]);
+                    // return $bill->total_amount;
+                                if ($bill->total_not_discount_amount >= $bill->total_amount) {
+                                    $bill->ref_status_id = $request->status;
+                                    $bill->save();
+                                }
+                            }
+                    //     }
+                    // }
+                // }
+                DB::commit();
+                return true;
+            // }
+
+            // $update = RentBill::whereIn('id', explode(',', $id));
+            // $update->update(['ref_status_id' => $request->status]);
 
             DB::commit();
             return true;
@@ -546,6 +685,8 @@ class BillController extends Controller
                 $re_del = Receipt::find($id);
 
                 PaymentList::where('ref_payment_id', $re_del->id)->where('document_type', 2)->delete();
+                
+                IncomeExpenses::where('ref_receipt_id', $id)->delete();
 
                 $re_del?->delete();
                 
@@ -558,8 +699,8 @@ class BillController extends Controller
                     // return [ 'rent_bill_id' => $rent_bill->id ];
                 // }
 
-                DB::commit();
-                return true;
+                // DB::commit();
+                // return true;
 
             DB::commit();
             return true;
@@ -594,7 +735,7 @@ class BillController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
-        $results = RentBill::orderBy('rent_bills.id','DESC')
+        $results = RentBill::orderBy('rooms.name','ASC')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
@@ -604,87 +745,129 @@ class BillController extends Controller
                                 ->where('rent_bills.ref_type_id', 1)
                                 // ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.phone')
+                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.id_card_number', 'renters.phone')
                                 ->get();
         $branch = Branch::find(session("branch_id"));
 
         $service = Service::where('ref_branch_id', session("branch_id"))
                             ->pluck('name')
                             ->toArray();
-        
 
         $data_1 = [
             "ห้อง",
             "ค่าเช่าห้อง",
+            "มิเตอร์น้ำก่อน",
+            "มิเตอร์น้ำหลัง",
+            "หน่วยที่ใช้",
             "ค่าน้ำประปา",
+            "มิเตอร์ไฟฟ้าก่อน",
+            "มิเตอร์ไฟฟ้าหลัง",
+            "หน่วยที่ใช้",
             "ค่าไฟฟ้า",
         ];
         $data_2 = [
             "ค่าปรับ",
             "รวม",
             "หมายเหตุ",
-            "มิเตอร์น้ำก่อน",
-            "มิเตอร์น้ำหลัง",
-            "มิเตอร์ไฟฟ้าก่อน",
-            "มิเตอร์ไฟฟ้าหลัง",
             "ชื่อ",
             "ที่อยู่",
             "เลขประจำตัวผู้เสียภาษี",
             "สำนักงานสาขา",
-            "เบอร์โทร"
+            "เบอร์โทร",
+            "สถานะบิล"
         ];
 
-        $data =  [
-                    [
-                        $branch->name
-                    ],
-                    [
-                        "บิลค่าเช่าห้องเดือน".date('m-Y')
-                    ],
-                    array_merge($data_1, $service, $data_2)
+        $data = [
+            [$branch->name],
+            ["บิลค่าเช่าห้องเดือน " . date('m-Y')],
+            array_merge($data_1, $service, $data_2)
+        ];
 
-                ];
-        // return $data;
-        foreach($results as $row){
-            $fine = PaymentList::where('ref_payment_id', $row->id)->where('document_type', 1)->where('fine', 1)->first();
-            // foreach($service_id as $ser_id){
-            //     RoomHasService::where('ref_room_id', $row->room_id)->where('ref_service_id', $ser_id)->first();
-            // }
+        // วนลูปข้อมูลจริง
+        foreach ($results as $row) {
+            $fine = PaymentList::where('ref_payment_id', $row->id)
+                ->where('document_type', 1)
+                ->where('fine', 1)
+                ->first();
+
+            $unit_water_used = $row->water_unit - $row->previous_water_unit;
+            $unit_electricity_used = $row->electricity_unit - $row->previous_electricity_unit;
+
             $data_list = [
-                        $row->room_name,
-                        $row->rent,
-                        (string) $row->water_amount,
-                        $row->electricity_amount,
+                $row->room_name,
+                $row->rent,
+                $row->previous_water_unit == 0 ? "0" : $row->previous_water_unit,
+                $row->water_unit == 0 ? "0" : $row->water_unit,
+                $row->unit_water_used == 0 ? "0" : $row->unit_water_used,
+                (string)$row->water_amount,
+                $row->previous_electricity_unit == 0 ? "0" : $row->previous_electricity_unit,
+                $row->electricity_unit == 0 ? "0" : $row->electricity_unit,
+                $row->unit_electricity_used == 0 ? "0" : $row->unit_electricity_used,
+                (string)$row->electricity_amount,
             ];
-            $data_list_2 = [
-                        $fine->price ?? "0",
-                        number_format($row->total_amount),
-                        "0",
-                        "0",
-                        $row->water_unit == 0 ? "0":$row->water_unit,
-                        "0",
-                        $row->electricity_unit ?? "0",
-                        $row->renter_name,
-                        @$row->room_for_rent->renter->fullThaiAddress(),
-                        $row->id_card_number,
-                        "",
-                        $row->phone
-            ];
-            
-            $service_price = Service::where('services.ref_branch_id', session('branch_id'))
-                                            ->leftJoin('room_has_services', function ($join) use ($row) {
-                                                $join->on('services.id', '=', 'room_has_services.ref_service_id')
-                                                    ->where('room_has_services.ref_room_id', $row->room_id);
-                                            })
-                                            ->selectRaw('COALESCE(room_has_services.price, 0) as price')
-                                            ->pluck('price')
-                                            ->toArray();
 
+            $data_list_2 = [
+                $fine->price ?? "0",
+                number_format($row->total_amount),
+                "0",
+                $row->renter_name,
+                @$row->room_for_rent->renter->fullThaiAddress(),
+                $row->id_card_number,
+                "",
+                $row->phone,
+                $row->status->name
+            ];
+
+            // ดึงราคาบริการแต่ละรายการ
+            $service_price = Service::where('services.ref_branch_id', session('branch_id'))
+                                    ->leftJoin('room_has_services', function ($join) use ($row) {
+                                        $join->on('services.id', '=', 'room_has_services.ref_service_id')
+                                            ->where('room_has_services.ref_room_id', $row->room_id);
+                                    })
+                                    ->selectRaw('COALESCE(room_has_services.price, 0) as price')
+                                    ->pluck('price')
+                                    ->toArray();
+
+            // รวมเป็นแถวสุดท้าย
             $data[] = array_merge($data_list, $service_price, $data_list_2);
         }
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        // ใส่ข้อมูลลงในชีต
+        $rowNum = 1;
+        foreach ($data as $row) {
+            $col = 'A';
+            foreach ($row as $cellValue) {
+                $sheet->setCellValue($col . $rowNum, $cellValue);
+                $col++;
+            }
+            $rowNum++;
+        }
+
+        // ✅ ใส่พื้นหลังแถวหัวตาราง (แถวที่ 3)
+        $sheet->getStyle('A3:' . $sheet->getHighestColumn() . '3')
+            ->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('CCE5FF'); // ฟ้าอ่อน
+
+        // ✅ ใส่พื้นหลังเฉพาะคอลัมน์ค่าน้ำ (F) และค่าไฟ (J)
+        $lastRow = $sheet->getHighestRow();
+        $sheet->getStyle("F4:F{$lastRow}")
+            ->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('d9f8fc'); // เขียวอ่อน
+
+        $sheet->getStyle("J4:J{$lastRow}")
+            ->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('fce5e6'); // เหลืองอ่อน
+
+        // ✅ ใส่เส้นขอบทุกช่อง
+        $lastCol = $sheet->getHighestColumn();
+        $sheet->getStyle("A1:{$lastCol}{$lastRow}")
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // ✅ ปรับความกว้างคอลัมน์อัตโนมัติ
+        foreach (range('A', $lastCol) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
         $sheet->fromArray($data);
         $sheet->getStyle(
             'A1:' . 

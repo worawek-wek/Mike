@@ -26,6 +26,7 @@ use App\Models\Company;
 use App\Models\RentalcontractModel;
 use App\Models\Setting_bill;
 use App\Models\PermissionGroupHasUserBranch;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -171,6 +172,29 @@ class SettingController extends Controller
         $branch = Branch::find(session("branch_id"));
         $data['branch'] = $branch;
         return view('setting/setting-dormInfo', $data);
+    }
+    public function get_contract_data()
+    {
+        $branch = Branch::find(session("branch_id"));
+        $data['name'] = $branch->name;
+        $data['address'] = $branch->fullThaiAddress();
+        $data['renter'] = 'นาย สมชาย';
+        $data['cartID'] = '1234567891234';
+        $data['tel'] = '029999999';
+        $data['roomName'] = 'A101';
+        $data['floorName'] = '3';
+        $data['contractPeriod'] = '12 เดือน';
+        $data['contractDate'] = '1 มกราคม 2568';
+        $data['contractEndDate'] = '31 ธันวาคม 2568';
+        $data['deposit'] = '5,000 บาท';
+        $data['allRoomRent'] = '7,500 บาท';
+        $data['furnitureRental'] = '1,000 บาท';
+        $data['roomRent'] = '6,500 บาท';
+        $data['paymentDueDate'] = '5 มกราคม 2568';
+        $data['electricityStartUnit'] = '0000';
+        $data['waterStartUnit'] = '0000';
+        $data['tenant_signature'] = 'นาย สมชาย';
+        return $data;
     }
     public function update_branch(Request $request)
     {
@@ -1071,7 +1095,7 @@ class SettingController extends Controller
     //    User User User User
     ////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////
-    public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร
+    public function insert_user_has_branch(Request $request) // เพิ่ม บุคลากร จาก เบอร์โทร email
     {
         try{
             // Validate required field
@@ -1102,7 +1126,19 @@ class SettingController extends Controller
             $uhb->ref_branch_id  =  session("branch_id");
             $uhb->ref_position_id  =  2;
             $uhb->save();
-            
+
+            $permission = Permission::get(); // ดึง Permission ทั้งหมด เพื่อเอามา foreach
+
+            foreach($permission as $permis){
+                $pghub = new PermissionGroupHasUserBranch; // insert Permission ของ user ใน branch นี้
+                $pghub->ref_branch_id = session("branch_id");
+                $pghub->ref_user_id = $user->id;
+                $pghub->ref_permission_id = $permis->id;
+                $pghub->ref_permission_group_id = $permis->ref_permission_group_id;
+                $pghub->status = 1;
+                $pghub->save();
+            }
+
             DB::commit();
             
             return 1;
@@ -1160,6 +1196,19 @@ class SettingController extends Controller
             $uhb->ref_branch_id  =  session("branch_id");
             $uhb->ref_position_id  =  $request->ref_position_id;
             $uhb->save();
+
+            $permission = Permission::get(); // ดึง Permission ทั้งหมด เพื่อเอามา foreach
+
+            foreach($permission as $permis){
+                $pghub = new PermissionGroupHasUserBranch; // insert Permission ของ user ใน branch นี้
+                $pghub->ref_branch_id = session("branch_id");
+                $pghub->ref_user_id = $user->id;
+                $pghub->ref_permission_id = $permis->id;
+                $pghub->ref_permission_group_id = $permis->ref_permission_group_id;
+                $pghub->status = 1;
+                $pghub->save();
+            }
+
 
             DB::commit();
             
@@ -1255,6 +1304,10 @@ class SettingController extends Controller
             
         try{
             Floor::query()->update(['qr_code' => ""]);
+            if(!$request->floor){
+                DB::commit();
+                return 1;
+            }
             foreach($request->floor as $key => $floor){
                 $qrc = Floor::find($key);            
                 $qrc->qr_code = $floor;
@@ -1303,7 +1356,13 @@ class SettingController extends Controller
     public function delete_user_in_branch($id)
     {
         try{
-            $user = UserHasBranch::destroy(explode(',',$id));
+            // return 123;
+            $user_has_branch = UserHasBranch::whereIn('id', explode(',',$id))->get();
+            UserHasBranch::destroy(explode(',',$id));
+            foreach($user_has_branch as $uhb){
+                PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
+            }
+
             DB::commit();
             return true;
         } catch (QueryException $err) {

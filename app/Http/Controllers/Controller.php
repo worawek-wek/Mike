@@ -93,6 +93,7 @@ class Controller extends BaseController
         }
         $all_receipt_on_time = $all_receipt_on_time->where('ref_type_id', 1)
                                                     ->where('payment_on_time', 1)
+                                                    ->where('ref_status_id', 5)
                                                     ->get() // ดึงข้อมูลออกมาเป็น Collection
                                                     ->sum(function ($receipt) {
                                                         return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
@@ -111,6 +112,7 @@ class Controller extends BaseController
         }
         $all_receipt_late_with_appointment = $all_receipt_late_with_appointment->where('ref_type_id', 1)
                                                     ->where('payment_on_time', 2)
+                                                    ->where('ref_status_id', 5)
                                                     ->get() // ดึงข้อมูลออกมาเป็น Collection
                                                     ->sum(function ($receipt) {
                                                         return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
@@ -128,6 +130,7 @@ class Controller extends BaseController
         }
         $all_receipt_late = $all_receipt_late->where('ref_type_id', 1)
                                             ->where('ref_type_id', 1)
+                                            ->where('ref_status_id', 5)
                                             ->where('payment_on_time', 3)
                                             ->get() // ดึงข้อมูลออกมาเป็น Collection
                                             ->sum(function ($receipt) {
@@ -168,13 +171,14 @@ class Controller extends BaseController
                                             $query->where('ref_branch_id', $branch_id);
                                         })
                                         ->where('ref_type_id', 1)
+                                        ->where('ref_status_id', 5)
                                         ->get()
                                         ->sum(function ($receipt) {
                                             return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
                                         });
 
 // ------------------------------------------------------------------------------------- //
-        $confirm_by_ceo = Receipt::with('payment_list')->where('ref_status_id', 5)
+        $confirm_by_ceo = Receipt::with('payment_list')->where('ref_status_id', 5)->whereIn('ref_type_id', [1,2,3])
                                         ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
                                         })
@@ -225,6 +229,22 @@ class Controller extends BaseController
             //                                                 ->where('year', $year);
         }
         $cash_wait_for_confirm = $cash_wait_for_confirm->get()
+                                                        ->filter(function ($bill) {
+                                                            return $bill->total_amount;
+                                                        })
+                                                        ->sum('total_amount');
+// ------------------------------------------------------------------------------------- // เงินสดรอคอนเฟิร์ม
+        $transfer_wait_for_confirm = Receipt::with('payment_list')
+                                        ->whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('payment_channel', 2)
+                                        ->where('ref_status_id', 2);
+        if($month){
+            // $transfer_wait_for_confirm = $transfer_wait_for_confirm->where('month', $month)
+            //                                                 ->where('year', $year);
+        }
+        $transfer_wait_for_confirm = $transfer_wait_for_confirm->get()
                                                         ->filter(function ($bill) {
                                                             return $bill->total_amount;
                                                         })
@@ -298,7 +318,7 @@ class Controller extends BaseController
                                 ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', $branch_id)
-                                ->whereIn('rent_bills.ref_status_id', [2, 4, 7])
+                                ->whereIn('rent_bills.ref_status_id', [2, 7])
                                 ->distinct()
                                 ->count('rooms.id'); // ✅ ใช้ count กับคอลัมน์ตรง ๆ
 // บิลค่าเช่าทั้งหมด
@@ -318,7 +338,7 @@ class Controller extends BaseController
                                 ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                     $query->where('ref_branch_id', $branch_id);
                                 })
-                                ->whereIn('ref_status_id', [2, 4, 7])
+                                ->whereIn('ref_status_id', [2, 7])
                                 ->where('ref_type_id', 1)
                                 ->get()->sum->total_amount;
                                 // ->filter(function ($bill) {
@@ -355,6 +375,7 @@ class Controller extends BaseController
         $data['overdue_this_month'] = $overdueData_1; // ชำระเงินโดยผู้บริหาร
         $data['confirm_by_employee_confirm_by_ceo'] = number_format($total_confirm_by_employee + $confirm_by_ceo).' บาท'; // ชำระเงินหลังคอนเฟิร์ม
         $data['transfer'] = $transfer; // เงินโอน
+        $data['transfer_wait_for_confirm'] = $transfer_wait_for_confirm; // เงินโอน
         $data['cash'] = $cash; // เงินสด
         $data['cash_wait_for_confirm'] = $cash_wait_for_confirm; // เงินสด
 

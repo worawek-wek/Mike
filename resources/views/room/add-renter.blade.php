@@ -50,12 +50,12 @@
             </select>
         </div>
         <div class="col-sm-5">
-            <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label>
-            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="ชื่อจริง" value="{{ @$renter_edit->name }}"/>
+            <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span>
+            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="ชื่อจริง" value="{{ @$renter_edit->name }}" required/>
         </div>
         <div class="col-sm-5">
-            <label for="exampleFormControlInput2" class="form-label">นามสกุล</label>
-            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->surname }}" />
+            <label for="exampleFormControlInput2" class="form-label">นามสกุล</label><span class="text-danger">*</span>
+            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->surname }}" required/>
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput6" class="form-label">เงินเดือน</label>
@@ -63,12 +63,12 @@
         </div>
         <div class="col-sm-6"></div>
         <div class="col-sm-6">
-            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label>
-            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->phone }}"/>
+            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label><span class="text-danger">*</span>
+            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->phone }}" required/>
         </div>
         <div class="col-sm-6">
-            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label>
-            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="หมายเลขบัตรประชาชน" value="{{ @$renter_edit->id_card_number }}"/>
+            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label><span class="text-danger">*</span>
+            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="หมายเลขบัตรประชาชน" value="{{ @$renter_edit->id_card_number }}" required/>
         </div>
         <div class="col-sm-12">
             <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
@@ -76,7 +76,7 @@
         </div>
         <div class="col-sm-4">
             <label>เลือกจังหวัด</label>
-            <select name="ref_province_id" id="select2BasicAddRenter" required>
+            <select name="ref_province_id" id="select2BasicAddRenter">
                 <option selected disabled hidden value="">เลือกจังหวัด</option>
                 @foreach ($province as $pro)
                     <option value="{{ $pro->id }}" @if ($pro->id == @$renter_edit->ref_province_id) selected @endif>{{ $pro->name_in_thai }}</option>
@@ -85,7 +85,7 @@
         </div>
         <div class="col-sm-4">
             <label>เลือกอำเภอ</label>
-            <select name="ref_district_id" id="select2DistrictAddRenter" required>
+            <select name="ref_district_id" id="select2DistrictAddRenter">
                 <option selected disabled hidden value="">เลือกอำเภอ</option>
                 @foreach ($district as $dis)
                     <option value="{{ $dis->id }}" @if ($dis->id == @$renter_edit->ref_district_id) selected @endif>{{ $dis->name_in_thai }}</option>
@@ -94,7 +94,7 @@
         </div>
         <div class="col-sm-4">
             <label>เลือกตำบล</label>
-            <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter" required>
+            <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter">
                 <option selected disabled hidden value="">เลือกตำบล</option>
                 @foreach ($subdistrict as $sub_dis)
                     <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == @$renter_edit->ref_subdistrict_id) selected @endif>{{ $sub_dis->name_in_thai }}</option>

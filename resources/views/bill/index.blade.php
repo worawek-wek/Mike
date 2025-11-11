@@ -139,7 +139,15 @@
                                                         <h4 class="ms-1 mb-0 text-success" id="confirm_by_ceo">
                                                         </h4>
                                                     </div>
-                                                    <h5 class="mb-0">ยอดในบัญชี</h5>
+                                                    <h5 class="mb-0 d-flex">ยอดในบัญชี
+                                                        <button type="button"
+                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write change_status_all_check"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#model-confirmation"
+                                                            onclick="confirmation()">
+                                                            รายละเอียด
+                                                        </button>
+                                                    </h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -147,7 +155,7 @@
                                             <div class="card card-border-shadow-success">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center pb-1">
-                                                        <h4 class="ms-1 mb-0 text-success" id="transfer">
+                                                        <h4 class="ms-1 mb-0 text-success" id="transfer_wait_for_confirm">
                                                             {{-- 0.00 บาท --}}
                                                         </h4>
                                                     </div>
@@ -220,8 +228,6 @@
                                                 </div>
                                     </div>
                                     <div class="row border-top mt-3 border-light p-3">
-                                            <div class="col-md-1" style="padding-right: unset !important;">
-                                            </div>
                                             <div class="col-md-2" style="padding-right: unset !important;">
                                             <select onchange='loadData("{{$page_url}}/datatable")' name="building" id="selectpickerBuilding" class="select2 form-select form-select-lg p_search" data-style="btn-default">
                                                     <option value="all">ทุกตึก</option>
@@ -239,19 +245,30 @@
                                                     @endforeach
                                             </select>
                                             </div>
-                                            <div class="col-md-7 text-end" style="padding-right: unset !important;">
-                                                <button @if($permission_bill_confirm_payment) style="display: none !important;" @endif
-                                                        class="btn btn-success buttons-collection  btn-info waves-effect waves-light d-write change_status_all_check"
-                                                        tabindex="0" aria-controls="DataTables_Table_0"
-                                                        type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false" data-bs-toggle="modal" data-bs-target="#123"
-                                                        onclick="changeStatusAllCheck()"
-                                                        >
-                                                    <span><i class="ti ti-send"></i> ชำระเงิน</span>
-                                                </button>
+                                            <div class="col-md-8 text-end" style="padding-right: unset !important;">
+                                                @if(Auth::user()->user_has_branch->position->id == 1)
+                                                    <button
+                                                            class="btn btn-sm btn-success buttons-collection waves-effect waves-light d-write change_status_all_check me-2"
+                                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                                            type="button" aria-haspopup="dialog"
+                                                            aria-expanded="false" data-bs-toggle="modal" data-bs-target="#123"
+                                                            onclick="changeStatusByInvoiceCheck()"
+                                                            >
+                                                        <span><i class="ti ti-check"></i> ชำระเงิน</span>
+                                                    </button>
+                                                    <button @if($permission_bill_confirm_payment) style="display: none !important;" @endif
+                                                            class="btn btn-sm btn-info buttons-collection waves-effect waves-light d-write change_status_all_check me-2"
+                                                            tabindex="0" aria-controls="DataTables_Table_0"
+                                                            type="button" aria-haspopup="dialog"
+                                                            aria-expanded="false"
+                                                            onclick="confirmBillAll()"
+                                                            >
+                                                        <span><i class="ti ti-send"></i> คอนเฟิร์มบิลทั้งหมด</span>
+                                                    </button>
+                                                @endif
                                                 <button 
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
+                                                        class="btn btn-sm btn-success buttons-collection btn-warning waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -261,7 +278,7 @@
                                                 </button>
                                                 <button
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-primary waves-effect waves-light me-2 d-write"
+                                                        class="btn btn-sm btn-label-primary buttons-collection waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -273,7 +290,7 @@
                                                 </button>
                                                 <button
                                                         style="padding-right: 14px;padding-left: 14px;"
-                                                        class="btn btn-success buttons-collection btn-danger waves-effect waves-light me-2 d-write"
+                                                        class="btn btn-sm btn-label-danger buttons-collection waves-effect waves-light me-2 d-write"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
@@ -285,7 +302,7 @@
                                             </div>
                                 </div>
                                 <div class="row mt-4">
-                                        <div class="col-lg-7">
+                                        <div class="col-lg-4">
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
                                                 <select onchange='loadData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_search" style="width:100px">
@@ -322,7 +339,17 @@
                                         <div class="col-md-2" style="padding-right: unset !important;">
                                             <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ date('Y-m') }}" />
                                         </div>
-                                        
+                                        <div class="col-md-4 text-end" style="padding-right: unset !important;">
+                                            <button
+                                                    class="btn btn-sm btn-primary buttons-collection waves-effect waves-light d-write change_status_all_check me-2"
+                                                    tabindex="0" aria-controls="DataTables_Table_0"
+                                                    type="button" aria-haspopup="dialog"
+                                                    aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomRentalReservation"
+                                                    {{-- onclick="changeStatusByInvoiceCheck()" --}}
+                                                    >
+                                                <span><i class="ti ti-cash"></i> ชำระเงินหลายห้อง</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -357,6 +384,45 @@
         <!-- Drag Target Area To SlideIn Menu On Small Screens -->
         <div class="drag-target"></div>
     </div>
+    
+    <div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าจองหลายห้อง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="reservation_form_all" enctype="multipart/form-data"
+                    {{-- @if($permission_bill_reserve_confirm)
+                        style="pointer-events: none;  /* ปิดคลิก */
+                                opacity: 0.6;          /* ให้ดูจางลง */
+                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
+                    @endif --}}
+                    >
+                    @csrf
+                    <div class="modal-body">
+                        <div class="p-2">
+                            <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
+                            <select name="ref_renter_id" id="select2Renter2" onchange="get_room_rental_reservation(this.value)" required>
+                                <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
+                                @foreach ($renter as $rent)
+                                    <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                @endforeach
+                            </select>
+                                
+                        </div>
+                        <div id="room-rental-reservation">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer rounded-0 justify-content-center">
+                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" id="submit_reservation_form_all" class="btn btn-main" disabled>บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!--set rent Modal -->
     <div class="modal fade modalHeadDecor" id="invoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -365,8 +431,21 @@
             </div>
         </div>
     </div>
-    <div class="modal fade modalHeadDecor" id="editserviceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modalHeadDecor" id="model-confirmation" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">ยอดในบัญชี</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmation">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modalHeadDecor" id="editserviceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
                     <h5 class="modal-title" id="exampleModalLabel1">รอคอนเฟิร์ม</h5>
@@ -375,14 +454,18 @@
                 <div class="modal-body" id="detail">
                     
                 </div>
-                <div class="modal-footer rounded-0 justify-content-center" @if($permission_bill_confirm_payment) style="display: none;" @endif>
-                    <button class="btn btn-success buttons-collection  btn-info waves-effect waves-light change_status_all_check"
-                            type="button"
-                            onclick="changeStatusAllCheck()"
-                            >
-                        <span><i class="ti ti-send"></i> ชำระเงิน</span>
-                    </button>
-                </div>
+                @if(Auth::user()->user_has_branch->position->id == 1)
+                    <div class="modal-footer rounded-0 justify-content-center" @if($permission_bill_confirm_payment) style="display: none;" @endif>
+                        <button class="btn btn-success buttons-collection  btn-info waves-effect waves-light change_status_all_check"
+                                type="button"
+                                onclick="changeStatusAllCheck()"
+                                disabled
+                                disabled
+                                >
+                            <span><i class="ti ti-check"></i> ชำระเงิน</span>
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -570,7 +653,7 @@
                     $('#confirm_by_ceo').html(data.confirm_by_ceo);
                     $('.confirm_by_ceo').html(data.confirm_by_ceo);
                     $('.confirm_by_employee_confirm_by_ceo').html(data.confirm_by_employee_confirm_by_ceo);
-                    $('#transfer').html(data.transfer+' บาท');
+                    $('#transfer_wait_for_confirm').html(data.transfer_wait_for_confirm+' บาท');
                     $('#cash_wait_for_confirm').html(data.cash_wait_for_confirm+' บาท');
 
                     if(data.confirm_by_employee != "0 บาท"){
@@ -757,7 +840,7 @@
             $.ajax({
                 type: "GET",
                 url: "{{$page_url}}/waiting-for-confirmation",
-                data: searchData,
+                // data: searchData,
                 success: function(data) {
                     $("#detail").html(data);
                     summary();
@@ -765,7 +848,31 @@
             });
             // alert(page);
         }
+
+        function confirmation(){ // Modal รอคอนเฟิร์ม
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/confirmation",
+                // data: searchData,
+                success: function(data) {
+                    $("#confirmation").html(data);
+                }
+            });
+            // alert(page);
+        }
+        
         function changeStatusAllCheck(){
+            let ids = [];
+            $('.ids_receipt:checked').each(function() {
+                ids.push($(this).val());
+            });
+
+            // ✅ ตรวจสอบก่อนส่ง
+            if (ids.length === 0) {
+                Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
+                return;
+            }
+
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',
                 text: 'คุณต้องการ ชำระเงินทั้งหมด หรือไม่?',
@@ -782,9 +889,159 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: "{{ $page_url }}/change_status_bill/all",
+                        url: "{{ $page_url }}/change_status_bill_receipt",
                         data: {
                             _token: "{{ csrf_token() }}",
+                            id: ids,
+                            status: 5
+                        },
+                        success: function(response) {
+                            if(response == true){
+                                $('#invoice').modal('hide');
+                                loadData(page);
+                                waitingForConfirmation();
+                                Swal.fire('ชำระเงินทั้งหมด เรียบร้อยแล้ว', '', 'success');
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+            // var selectedValues = $('input.confirm-bill:checked').map(function() {
+            //     return this.value;
+            // }).get();
+
+            // // แสดงผลลัพธ์
+            // if (selectedValues.length === 0) {
+            //     return 1;
+            // } else {
+            //     changeStatusBill(selectedValues, 2, "คอนเฟิร์มบิล");
+            // }
+        }
+        function confirmBillAll(){
+            // let ids = [];
+            // $('.ids_invoice:checked').each(function() {
+            //     ids.push($(this).val());
+            // });
+
+            // // ✅ ตรวจสอบก่อนส่ง
+            // if (ids.length === 0) {
+            //     Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
+            //     return;
+            // }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ คอนเฟิร์มบิล ทั้งหมด หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ $page_url }}/confirm-bill-all",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: $('#allIds').val(),
+                            // building: $('#selectpickerBuilding').val(),
+                            // floor: $('#selectpickerFloor').val(),
+                            status: 7
+                        },
+                        success: function(response) {
+                            if(response == true){
+                                Swal.fire('คอนเฟิร์มบิล ทั้งหมด เรียบร้อยแล้ว', '', 'success');
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+            // var selectedValues = $('input.confirm-bill:checked').map(function() {
+            //     return this.value;
+            // }).get();
+
+            // // แสดงผลลัพธ์
+            // if (selectedValues.length === 0) {
+            //     return 1;
+            // } else {
+            //     changeStatusBill(selectedValues, 2, "คอนเฟิร์มบิล");
+            // }
+        }
+        function changeStatusByInvoiceCheck(){
+            let ids = [];
+            $('.ids_invoice:checked').each(function() {
+                ids.push($(this).val());
+            });
+
+            // ✅ ตรวจสอบก่อนส่ง
+            if (ids.length === 0) {
+                Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ชำระเงินทั้งหมด หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ $page_url }}/change_status_bill_invoice",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: ids,
                             status: 5
                         },
                         success: function(response) {

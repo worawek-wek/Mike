@@ -282,6 +282,22 @@
                             <label for="exampleFormControlInput2" class="form-label">จำนวนเงิน (บาท) <span class="text-danger">*</span></label>
                             <input name="amount" type="number" class="form-control" id="exampleFormControlInput2" placeholder="จำนวนเงิน (บาท)" />
                         </div>
+                        <b class="text-black">ช่องทางการชำระเงิน</b> <br>
+                        <div class="col-sm-11">
+                            <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio1" value="1" checked onclick="togglePaymentFields()">
+                            <label class="form-check-label" for="defaultRadio1"> เงินสด </label>
+                        </div>
+                        <div class="col-sm-11">
+                            <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio2" value="2" onclick="togglePaymentFields()"> 
+                            <label class="form-check-label" for="defaultRadio2"> โอนเงิน </label>
+                        </div>
+                        <div class="col-sm-12">
+                            <label for="bs-datepicker-format" class="form-label">เวลา <span class="text-danger">*</span></label>
+                            @php
+                                date_default_timezone_set('Asia/Bangkok');
+                            @endphp
+                            <input name="time" type="time" class="form-control" placeholder="เวลา" value="{{ date('H:i') }}" />
+                        </div>
                         <div class="col-sm-12">
                             <label for="bs-datepicker-format" class="form-label">วันที่ <span class="text-danger">*</span></label>
                             @php
@@ -303,6 +319,8 @@
                             <label for="selectRoom" class="form-label">รายจ่ายของห้อง <span class="text-danger">*</span></label>
                             <select name="ref_room_id" id="selectRoom" class="select2 form-select form-select-lg" data-allow-clear="true">
                                 <option value="0">รายจ่ายของ Office</option>
+                                <option value="888888888">รายจ่าย แม่บ้าน</option>
+                                <option value="999999999">รายจ่าย ช่าง</option>
                                 @foreach ($room as $r)
                                         <option value="{{$r->id}}">{{$r->name}}</option>
                                 @endforeach
@@ -353,6 +371,10 @@
                             <input name="amount" type="text" class="form-control" id="exampleFormControlInput1" placeholder="จำนวนเงิน" />
                         </div> --}}
                         <div class="col-sm-6">
+                            <label for="bs-datepicker-format-2" class="form-label">เวลา <span class="text-danger">*</span></label>
+                            <input name="time" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="เวลา" autocomplete="off"/>
+                        </div>
+                        <div class="col-sm-6">
                             <label for="bs-datepicker-format-2" class="form-label">วันที่ <span class="text-danger">*</span></label>
                             <input name="date" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="วันที่" autocomplete="off"/>
                         </div>
@@ -369,6 +391,7 @@
                         <div class="col-sm-12">
                             <label for="selectRoomIncome" class="form-label">รายรับของห้อง <span class="text-danger">*</span></label>
                             <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" onchange="get_room_rental(this.value)" data-allow-clear="true">
+                                <option value="0">รายรับของ Office</option>
                                 @foreach ($room as $r)
                                         <option value="{{$r->id}}">{{$r->name}}</option>
                                 @endforeach
