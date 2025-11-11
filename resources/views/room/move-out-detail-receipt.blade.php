@@ -55,10 +55,10 @@
             </table>
             
             <div class="mt-4 col-12 d-flex justify-content-end gap-2"
-                    @if($permission_bill_move_edit || @$receipt || $invoice->payment_channel == 3)
-                        {{-- style="pointer-events: none;  /* ปิดคลิก */
+                    @if($permission_bill_move_edit || @$receipt || $invoice->payment_channel == 4)
+                        style="pointer-events: none;  /* ปิดคลิก */
                                 opacity: 0.6;          /* ให้ดูจางลง */
-                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */" --}}
+                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
                     @endif
                     {{-- @if () disabled @endif  --}}
                     >

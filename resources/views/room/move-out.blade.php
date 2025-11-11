@@ -123,7 +123,7 @@
                                     รายการบิล
                                 </label>
                                 @if (@$move_invoice_7)
-
+                                <input type="hidden" id="check-rent-bell" value="1">
                                 <table class="table table-detail table-bordered mt-4">
                                     <thead>
                                         <tr>
@@ -1149,6 +1149,10 @@
                                         // if(total_amount < 0){
                                         //     return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
                                         // }
+                                        var check = $('#check-rent-bell').val();
+                                        if(check == 1){
+                                            return Swal.fire('กรุณาเคลียร์บิลค่าเช่าก่อน.!', '', 'warning');
+                                        }
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
                                             text: 'คุณต้องการ ย้ายออก หรือไม่?',
