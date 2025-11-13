@@ -1038,7 +1038,7 @@ class RoomController extends Controller
     {
 
         $data['page_url'] = 'room';
-        $room = Room::where('id',1)->whereHas('room_for_rent_s', function ($query) use ($id) {
+        $room = Room::whereHas('room_for_rent_s', function ($query) use ($id) {
                     $query->where('ref_renter_id', $id);
                 })->get();
         foreach($room as $row){
@@ -1099,7 +1099,7 @@ class RoomController extends Controller
                         
                     }
                 
-                $move_invoice_6 = RentBill::with('payment_list')->where('ref_type_id', 6)->where('ref_contract_id', $row->contract->id)->latest()->first(); // เงินประกัน
+                $move_invoice_6 = RentBill::where('ref_type_id', 6)->where('ref_contract_id', $row->contract->id)->latest()->first(); // เงินประกัน
 
             }
             $move_invoice_4 = RentBill::where('ref_type_id', 4)->where('ref_room_id', $row->id)->where('ref_contract_id', $row->contract->id)->first();
@@ -1108,13 +1108,6 @@ class RoomController extends Controller
             $row['move_invoice_6'] = $move_invoice_6;
             $row['move_invoice_type_7'] = $move_invoice_type_7;
         }
-        // return $room;
-        // foreach($room as $row){
-        //     foreach($row['move_invoice_6']->payment_list as $payment_list){
-        //         return $payment_list;
-        //     }
-        //     return $row['move_invoice_6'];
-        // }
         DB::commit();
         $data['room'] = $room;
         // $data['move_invoice_type_7'] = $move_invoice_type_7;

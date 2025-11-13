@@ -21,7 +21,7 @@
             {{ $row->name }}
         </label>
         {{-- @if (@$row['move_invoice_4']->payment_list) --}}
-            <table class="table table-bordered table-detail" id="discount-table3" >
+            <table class="table table-bordered table-detail mb-4" id="discount-table3" >
                 <thead>
                     <tr>
                         <th>รายการใบเสร็จย้ายออก</th>
@@ -32,7 +32,7 @@
                         @php
                             $amount_receipt = 0;
                         @endphp
-                        @forelse ($row['move_invoice_4']->payment_list as $key => $row)
+                        @forelse ($row['move_invoice_4']->payment_list ?? [] as $key => $row)
                         @php
                             $amount_receipt += $row->price;
                         @endphp
@@ -73,7 +73,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                        @foreach ($row['move_invoice_6']->payment_list ?? []  as $k => $prakan)
+                        @foreach ($row['move_invoice_6']->payment_list ?? [] as $k => $prakan)
                         @php
                         if ($prakan->discount == 1) {
                             continue;
@@ -98,11 +98,11 @@
 
                 </tbody>
                 <tfoot>
-                        <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ $row['move_invoice_6']->payment_list->sum('price') }}">
+                        <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ isset($row['move_invoice_6']) ? $row['move_invoice_6']->payment_list->sum('price') : 0 }}">
                     <tr>
                         <th>รวม</th>
                         <th class="text-end mb-0 fw-bold total-price_3">
-                            {{ $row['move_invoice_6']->payment_list->sum('price') }}
+                            {{ isset($row['move_invoice_6']) ? $row['move_invoice_6']->payment_list->sum('price') : 0 }}
                         </th>
                     </tr>
                 </tfoot>

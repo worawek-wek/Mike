@@ -8,6 +8,11 @@
                     $total_amount = 0;
                 @endphp
     @forelse ($invoice_alls as $key => $invoice)
+    @php 
+        if(count($invoice->receipt) > 0){
+            continue;
+        }
+    @endphp
     <div class="mb-3 billReserveRoom" id="billReserveRoom{{$invoice->id}}">
     <input name="insert[{{ $key }}][ref_room_id]" type="hidden" value="{{ $invoice->ref_room_id }}">
     <input name="insert[{{ $key }}][ref_rent_bill_id]" type="hidden" value="{{ $invoice->id }}">
