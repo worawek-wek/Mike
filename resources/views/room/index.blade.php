@@ -313,16 +313,16 @@
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomRentalContract"
                                                         onclick="roomRentalContract()">
-                                                    <span><i class="ti ti-plus"></i> ทำสัญญาเช่า</span>
+                                                    <span><i class="ti ti-pencil"></i> ทำสัญญาเช่า</span>
                                                 </button>
-                                                {{-- <button
+                                                <button
                                                         style="padding-right: 14px;padding-left: 14px;margin-right: 0px;"
                                                         class="btn btn-danger buttons-collection btn-danger"
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
-                                                        aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomRentalReservation">
-                                                    <span><i class="ti ti-plus"></i> ชำระค่าจอง</span>
-                                                </button> --}}
+                                                        aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomMoveOut">
+                                                    <span><i class="ti ti-door-exit"></i> ย้ายออก</span>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="col-lg-4 mt-4">
@@ -518,11 +518,11 @@
     @php
         $permission_bill_reserve_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 38)->where('status', 0)->first();
     @endphp
-    <div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modalHeadDecor" id="roomMoveOut" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
-                    <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าจองหลายห้อง</h5>
+                    <h5 class="modal-title" id="exampleModalLabel1">ย้ายออกหลายห้อง</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="reservation_form_all" enctype="multipart/form-data"
@@ -535,7 +535,7 @@
                     <div class="modal-body">
                         <div class="p-2">
                             <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
-                            <select name="ref_renter_id" id="select2Renter2" onchange="get_room_rental_reservation(this.value)" required>
+                            <select name="ref_renter_id" id="select2Renter2" onchange="get_room_move_out(this.value)" required>
                                 <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                                 @foreach ($renter as $rent)
                                     <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
@@ -543,7 +543,7 @@
                             </select>
                                 
                         </div>
-                        <div id="room-rental-reservation">
+                        <div id="room-move-out">
 
                         </div>
                     </div>
@@ -822,12 +822,12 @@
             // var myModal = new bootstrap.Modal(document.getElementById('deposit'));
             //     myModal.show();
         }
-            new TomSelect("#select2Renter2", {
-                            create: false,
-                            maxItems: 1,
-                            allowEmptyOption: true,
-                            sortField: { field: "text", direction: "asc" }
-                        });
+        new TomSelect("#select2Renter2", {
+                        create: false,
+                        maxItems: 1,
+                        allowEmptyOption: true,
+                        sortField: { field: "text", direction: "asc" }
+                    });
 // function แสดงรูป ทรัพย์สิน ในย้ายออก
         function showImage(src) {
             document.getElementById('previewImage').src = src;
@@ -898,18 +898,18 @@
             // var myModal = new bootstrap.Modal(document.getElementById('reservation'));
             //     myModal.show();
         }
-        function get_room_rental_reservation(id){ // Show form ชำระค่าจอง หลายห้อง
+        function get_room_move_out(id){ // Show form ชำระค่าจอง หลายห้อง
             if(id == 'no'){
-                $("#room-rental-reservation").html('');
+                $("#room-move-out").html('');
                 $('#submit_reservation_form_all').prop('disabled', true);
                 return false;
             }
             $.ajax({
                 type: "GET",
-                url: "{{ $page_url }}/get-room-rental-reservation/"+id,
+                url: "{{ $page_url }}/get-room-move-out/"+id,
                 success: function(data) {
 
-                    $("#room-rental-reservation").html(data);
+                    $("#room-move-out").html(data);
                     $('#submit_reservation_form_all').prop('disabled', false);
 
                 }
@@ -1398,8 +1398,8 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insertRenter').modal('hide');
-                                // $('#roomRentalReservation').modal('show');
-                                // get_room_rental_reservation(response);
+                                // $('#roomMoveOut').modal('show');
+                                // get_room_move_out(response);
                                 $('#insert_renter')[0].reset();
                                 loadData(page);
                                 summary();
@@ -1477,8 +1477,8 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insert_check_in').modal('hide');
-                                // $('#roomRentalReservation').modal('show');
-                                // get_room_rental_reservation(response);
+                                // $('#roomMoveOut').modal('show');
+                                // get_room_move_out(response);
                                 $('#insert_check_in')[0].reset();
                                 loadData(page);
                                 summary();
@@ -1561,8 +1561,8 @@
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
                                 // $('#insertRenter').modal('hide');
-                                // $('#roomRentalReservation').modal('show');
-                                // get_room_rental_reservation(response);
+                                // $('#roomMoveOut').modal('show');
+                                // get_room_move_out(response);
                                 $('#reserve_one_room')[0].reset();
                                 loadData(page);
                                 summary();
@@ -2008,7 +2008,7 @@
                         processData: false,
                         success: function(response) {
                             if (response == true) {
-                                var modalEl = document.getElementById('roomRentalReservation');
+                                var modalEl = document.getElementById('roomMoveOut');
                                 var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
                                 if (modalInstance) {
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง

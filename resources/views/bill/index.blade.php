@@ -77,6 +77,10 @@
 <link rel="stylesheet" href="assets/vendor/libs/select2/select2.css" />
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-select/bootstrap-select.css" />
 
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<!-- ก่อน </body> -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
 <body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
@@ -257,7 +261,7 @@
                                                         <span><i class="ti ti-check"></i> ชำระเงิน</span>
                                                     </button>
                                                     <button @if($permission_bill_confirm_payment) style="display: none !important;" @endif
-                                                            class="btn btn-sm btn-info buttons-collection waves-effect waves-light d-write change_status_all_check me-2"
+                                                            class="btn btn-sm btn-info buttons-collection waves-effect waves-light d-write me-2"
                                                             tabindex="0" aria-controls="DataTables_Table_0"
                                                             type="button" aria-haspopup="dialog"
                                                             aria-expanded="false"
@@ -341,11 +345,11 @@
                                         </div>
                                         <div class="col-md-4 text-end" style="padding-right: unset !important;">
                                             <button
-                                                    class="btn btn-sm btn-primary buttons-collection waves-effect waves-light d-write change_status_all_check me-2"
+                                                    class="btn btn-sm btn-primary buttons-collection waves-effect waves-light d-write me-2"
                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                     type="button" aria-haspopup="dialog"
-                                                    aria-expanded="false" data-bs-toggle="modal" data-bs-target="#roomRentalReservation"
-                                                    {{-- onclick="changeStatusByInvoiceCheck()" --}}
+                                                    {{-- aria-expanded="false" data-bs-toggle="modal" data-bs-target="#modal-payment-bill-all" --}}
+                                                    onclick="checkCheckInvoice()"
                                                     >
                                                 <span><i class="ti ti-cash"></i> ชำระเงินหลายห้อง</span>
                                             </button>
@@ -385,44 +389,6 @@
         <div class="drag-target"></div>
     </div>
     
-    <div class="modal fade modalHeadDecor" id="roomRentalReservation" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content rounded-0">
-                <div class="modal-header rounded-0">
-                    <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าจองหลายห้อง</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="reservation_form_all" enctype="multipart/form-data"
-                    {{-- @if($permission_bill_reserve_confirm)
-                        style="pointer-events: none;  /* ปิดคลิก */
-                                opacity: 0.6;          /* ให้ดูจางลง */
-                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */"
-                    @endif --}}
-                    >
-                    @csrf
-                    <div class="modal-body">
-                        <div class="p-2">
-                            <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
-                            <select name="ref_renter_id" id="select2Renter2" onchange="get_room_rental_reservation(this.value)" required>
-                                <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
-                                @foreach ($renter as $rent)
-                                    <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
-                                @endforeach
-                            </select>
-                                
-                        </div>
-                        <div id="room-rental-reservation">
-
-                        </div>
-                    </div>
-                    <div class="modal-footer rounded-0 justify-content-center">
-                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" id="submit_reservation_form_all" class="btn btn-main" disabled>บันทึก</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
     <!--set rent Modal -->
     <div class="modal fade modalHeadDecor" id="invoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -460,7 +426,6 @@
                                 type="button"
                                 onclick="changeStatusAllCheck()"
                                 disabled
-                                disabled
                                 >
                             <span><i class="ti ti-check"></i> ชำระเงิน</span>
                         </button>
@@ -469,12 +434,88 @@
             </div>
         </div>
     </div>
+    <div class="modal fade modalHeadDecor" id="modal-payment-bill-all" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">ชำระค่าเช่าหลายห้อง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="payment_bill_form_all" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="p-2">
+                            <label class="h5 mb-1">เลือกรายการจากใบแจ้งหนี้</label>
+                            <select name="ref_renter_id" class="select-room-payment-bill" onchange="payMultipleRentBills(this.value)" required>
+                                {{-- <option selected hidden value="no">เลือกรายการจากใบแจ้งหนี้</option> --}}
+                                {{-- @foreach ($renter as $rent) --}}
+                                    <option value="payment_rent_room_array">ค่าเช่าห้อง</option>
+                                    <option value="payment_meter_array">ค่าน้ำ-ค่าไฟฟ้า</option>
+                                    <option value="payment_parking_fee_array">ค่าที่จอดรถ</option>
+                                {{-- @endforeach --}}
+                            </select>
+                        </div>
+                        <div id="div-form-payment-rent-bill-all" class="p-2">
+                            <div colspan="20" class="text-center text-muted py-4">
+                                <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                                โปรดเลือกรายการ.!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer rounded-0 justify-content-center">
+                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" id="submit_payment_bill_form_all" class="btn btn-main">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <iframe id="print-iframe" style="display: none;"></iframe>    
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
-        
+        new TomSelect(".select-room-payment-bill", {
+            create: false,
+            maxItems: 1,
+            allowEmptyOption: true,
+            sortField: { field: "text", direction: "desc" }
+        });checkCheckInvoice
+        function checkCheckInvoice(list) // modal ชำระเงินหลายห้อง
+        {                               // ดึงห้องที่ ติ๊ก มาแสดง
+            let invoice_ids = [];
+            $('.ids_invoice:checked').each(function() {
+                invoice_ids.push($(this).val());
+            });
+
+            if (invoice_ids.length === 0) {
+                Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
+                return;
+            }
+            payMultipleRentBills('payment_rent_room_array')
+            var myModal = new bootstrap.Modal(document.getElementById('modal-payment-bill-all'));
+                myModal.show();
+
+        }
+        function payMultipleRentBills(list) // modal ชำระเงินหลายห้อง
+        {                               // ดึงห้องที่ ติ๊ก มาแสดง
+            let invoice_ids = [];
+            $('.ids_invoice:checked').each(function() {
+                invoice_ids.push($(this).val());
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/get-room-for-payment",
+                data: {
+                    invoice_ids: invoice_ids,
+                    list: list
+                },
+                success: function(data) {
+                    $("#div-form-payment-rent-bill-all").html(data);
+                }
+            });
+        }
         function printPdf(id) {
             $.ajax({
                 url: '/pdf/invoice/'+id,
@@ -788,7 +829,7 @@
             ch = id_ch;
         }
         function loadData(pages){
-            
+
             $('.p_search').each(function() {
                 var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
                 var inputValue = $(this).val(); // ดึงค่า value ของ input
@@ -836,7 +877,8 @@
                 $('#editserviceModal').modal('show');
             };
         });
-        function waitingForConfirmation(){ // Modal รอคอนเฟิร์ม
+        function waitingForConfirmation() // Modal รอคอนเฟิร์ม
+        {
             $.ajax({
                 type: "GET",
                 url: "{{$page_url}}/waiting-for-confirmation",
@@ -848,7 +890,6 @@
             });
             // alert(page);
         }
-
         function confirmation(){ // Modal รอคอนเฟิร์ม
             $.ajax({
                 type: "GET",
@@ -860,7 +901,73 @@
             });
             // alert(page);
         }
-        
+        $('#payment_bill_form_all').on('submit', function(event) {
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ชำระเงิน ค่าเช่าห้อง หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ใช้ FormData แทน serialize เพื่อส่งไฟล์ได้
+                    let form = document.getElementById('payment_bill_form_all');
+                    let formData = new FormData(form);
+                    formData.append('_token', '{{ csrf_token() }}'); // สำหรับ Laravel CSRF
+
+                    $.ajax({
+                        url: 'room/receipt/all',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false, // ต้องมีเพื่อให้ส่ง multipart/form-data ได้
+                        processData: false,
+                        success: function(response) {
+                            if (response == true) {
+                                var modalEl = document.getElementById('reservation');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                Swal.fire('ชำระเงิน ค่าเช่าห้อง เรียบร้อยแล้ว', '', 'success').then((result) => {
+                                    location.reload();
+                                });
+                                loadData(page);
+                                summary()
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                }
+            });
+        });
         function changeStatusAllCheck(){
             let ids = [];
             $('.ids_receipt:checked').each(function() {

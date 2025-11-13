@@ -103,7 +103,36 @@ class BillController extends Controller
 
         return view('bill/index', $data);
     }
-    public function waiting_for_confirmation(Request $request)
+    
+    public function get_room_for_payment(Request $request) // ดึง ห้อง   // ข้อมูลชำระเงินห้อง ที่ติ๊ก
+    {
+        // return $request;
+        // $data['list_data'] = RentBill::with('payment_list')
+        //                                 ->where('ref_status_id', '!=', 5)
+        //                                 ->whereHas('room.floor.building', function ($query) {
+        //                                     $query->where('ref_branch_id', session("branch_id"));
+        //                                 })
+        //                                 ->where('ref_type_id', 1)
+        //                                 ->get()
+        //                                 ->filter(function ($bill) {
+        //                                     return $bill->total_not_discount_amount >= $bill->total_amount;
+        //                                 });
+        // $data['type'] = [ 1 => 'บิลค่าเช่าห้อง', 2 => 'บิลค่าประกันห้อง', 3 => 'บิลค่าจองห้อง', 4 => 'บิลย้ายออก', 4 => 'บิลหนี้สูญ' ];
+        // $data['payment_channel'] = [ 1 => 'เงินสด', 2 => 'โอนเงิน', 3 => 'หักจากเงินประกัน'];
+        $data['list'] = $request->list;
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
+        // return $request->invoice_ids;
+        $data['invoice_alls'] = RentBill::orderBy('rooms.name')
+                                        ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
+                                        // ->with('payment_rent_room_array')
+                                        ->whereIn('rent_bills.id', $request->invoice_ids)
+                                        ->where('rent_bills.ref_type_id', 1)
+                                        ->select('rent_bills.*')
+                                        ->get();
+        // return 123;
+        return view('bill/list-payment-all', $data);
+    }
+    public function waiting_for_confirmation(Request $request) // ดึง ใบเสร็จที่รอคอนเฟิร์มการชำระเงิน ref_status_id = 2
     {
         $request['limit'] = 9999999;
         $request['re'] = 1;

@@ -287,7 +287,8 @@ Route::middleware('auth')->group(function() {
         Route::post('room/update_contract/{id}', 'update_contract')->name('update_contract');    //////////////////////////
         Route::get('room/get-room-rental-contract/{id}', 'get_room_rental_contract')->name('get_room_rental_contract');    //////////////////////////
         Route::get('room/get-room-rental-move-out/{id}', 'get_room_rental_move_out')->name('get_room_rental_move_out');    //////////////////////////
-        Route::get('room/get-room-rental-reservation/{id}', 'get_room_rental_reservation')->name('get_room_rental_reservation');    //////////////////////////
+        Route::get('room/get-room-rental-reservation/{id}', 'get_room_rental_reservation')->name('get-room-rental-reservation');    //////////////////////////
+        Route::get('room/get-room-move-out/{id}', 'get_room_move_out')->name('get-room-move-out');    //////////////////////////
         Route::get('room/get-room-detail-contract/{id}', 'get_room_detail_contract')->name('get_room_detail_contract');    //////////////////////////
         Route::get('room/get-room-form-contract/{id}', 'get_room_form_contract')->name('get_room_form_contract');    //////////////////////////
         Route::get('room/get-bill/{id}/{month}', 'get_bill')->name('get_bill');    //////////////////////////
@@ -361,6 +362,7 @@ Route::middleware('auth')->group(function() {
         Route::get('bill', 'index')->name('bill');    //////////////////////////
         Route::get('bill/summary', 'bill_summary')->name('bill.summary');    //////////////////////////
         Route::get('bill/datatable', 'datatable')->name('bill.datatable');    //////////////////////////
+        Route::get('bill/get-room-for-payment', 'get_room_for_payment')->name('bill.get-room-for-payment');    //////////////////////////
         Route::get('bill/waiting-for-confirmation', 'waiting_for_confirmation')->name('bill.waiting-for-confirmation');    //////////////////////////
         Route::get('bill/confirmation', 'confirmation')->name('bill.confirmation');    //////////////////////////
         Route::get('bill/export/excel', 'export_excel')->name('bill.export-excel');    //////////////////////////
