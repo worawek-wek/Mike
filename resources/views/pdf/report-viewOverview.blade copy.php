@@ -1,12 +1,48 @@
+<style>
+    @media print {
+        body {
+            font-size: 10px;
+            margin: 10mm;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            font-size: 10px;
+            word-wrap: break-word;
+            border: 1px solid black;
+            padding: 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .text-truncate {
+            white-space: normal !important;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+    }
+       
+        .text-center {
+            text-align: center;
+        }
+    </style>
 <table
     class="datatables-products table table-bordered dataTable no-footer dtr-column"
     id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info"
-    style="width: 1396px;">
+    style="width: 100%; max-width: 100%;">
     <thead class="border-top table-info">
         <tr class="text-nowrap ">
             <th class="control sorting_disabled dtr-hidden" rowspan="2"
                 style="width: 0px; display: none;" aria-label=""></th>
-            <th class="text-center" rowspan="2" style="padding: 0 50px;">ห้อง</th>
+            <th class="text-center" rowspan="2">ห้อง</th>
             <th class="text-center" colspan="7">บิลค่าเช่าห้อง</th>
             <th class="text-center" colspan="2">บิลจองห้อง</th>
             <th class="text-center" colspan="2">บิลเงินประกัน</th>
@@ -32,19 +68,21 @@
     <tbody>
         @forelse ($list_data as $row)
             <tr class="odd text-center">
-                <td class="  control" tabindex="0" style="display: none;"></td>
-                <td class="sorting_1">{{ $row->name }}</td>
-                <td><span class="text-truncate">{{ number_format($row->rent_bill_rent->payment_rent_room->price ?? 0) }}</span></td>
-                <td><span>{{ number_format($row->water_amount ?? 0) }}</span></td>
-                <td><span>{{ number_format($row->electricity_amount ?? 0) }}</span></td>
-                <td><span>{{ number_format($row->rent_bill_rent->payment_car_parking_fee->price ?? 0) }}</span></td>
-                <td><span>{{ number_format($row->rent_bill_rent->payment_motorcycle_parking_fee->price ?? 0) }}</span></td>
+                <td class="  control" tabindex="0" style="display: none;">
+                </td>
+                <td class="sorting_1">{{ $row->room_name }}</td>
+                <td><span class="text-truncate">{{ number_format($row->invoice->payment_rent_room->price) }}</span>
+                </td>
+                <td><span>{{ number_format($row->water_amount) }}</span></td>
+                <td><span>{{ number_format($row->electricity_amount) }}</span></td>
+                <td><span>{{ number_format($row->invoice->payment_car_parking_fee->price ?? 0) }}</span></td>
+                <td><span>{{ number_format($row->invoice->payment_motorcycle_parking_fee->price ?? 0) }}</span></td>
                 <td><span>0</span></td>
                 <td><span>0</span></td>
-                <td><span>{{ number_format($row->rent_bill_booking->total_amount ?? 0) }}</span></td>
                 <td><span>0</span></td>
-                <td><span>{{ number_format($row->rent_bill_deposit->total_amount ?? 0) }}</span></td>
-                <td><span>{{ number_format($row->rent_bill_booking->total_amount ?? 0) }}</span></td>
+                <td><span>0</span></td>
+                <td><span>0</span></td>
+                <td><span>0</span></td>
                 <td><span>0</span></td>
                 <td><span>0</span></td>
                 <td><span>0</span></td>
@@ -62,4 +100,3 @@
         @endforelse
     </tbody>
 </table>
-    @include('layout/pagination')

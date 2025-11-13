@@ -282,26 +282,17 @@ class PDFController extends Controller
     }
     public function report_view_overview(Request $request)
     {
-        $results = Receipt::orderBy('rooms.id','ASC')
-                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                ->where('buildings.ref_branch_id', session("branch_id"))
-                                ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', 5)
-                                ->distinct('rooms.id')
-                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
-        
-        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+        $results = Room::orderBy('rooms.name','ASC')
+        ->whereHas('floor.building', function ($query) {
+            $query->where('ref_branch_id', session("branch_id"));
+        });
+         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            // $results = $results->where('rent_bills.year', $year)
+            //                 ->where('rent_bills.month', $month);
         }
 
         $results = $results->get();
-
         $data['list_data'] = $results;
 
         return view('pdf/report-viewOverview', $data);

@@ -441,52 +441,79 @@ class ReportController extends Controller
         }
 
         // ดึงข้อมูลจากฐานข้อมูล
-        $results = Receipt::orderBy('rooms.id','ASC')
-            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-            ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-            ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-            ->where('buildings.ref_branch_id', session("branch_id"))
-            ->where('rent_bills.ref_type_id', 1)
-            ->where('rent_bills.ref_status_id', 5)
-            ->distinct('rooms.id')
-            ->select(
-                'receipts.*',
-                'rent_bills.water_amount',
-                'rent_bills.electricity_amount',
-                'renters.prefix',
-                DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
-                'rooms.name as room_name',
-                'rooms.id as room_id',
-                'rooms.rent',
-                'renters.phone'
-            );
+        // $results = Receipt::orderBy('rooms.id','ASC')
+        //     ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+        //     ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+        //     ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+        //     ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+        //     ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
+        //     ->where('buildings.ref_branch_id', session("branch_id"))
+        //     ->where('rent_bills.ref_type_id', 1)
+        //     ->where('rent_bills.ref_status_id', 5)
+        //     ->distinct('rooms.id')
+        //     ->select(
+        //         'receipts.*',
+        //         'rent_bills.water_amount',
+        //         'rent_bills.electricity_amount',
+        //         'renters.prefix',
+        //         DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
+        //         'rooms.name as room_name',
+        //         'rooms.id as room_id',
+        //         'rooms.rent',
+        //         'renters.phone'
+        //     );
 
-        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+        // if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+        //     [$year, $month] = explode('-', $request->month);
+        //     $results = $results->where('rent_bills.year', $year)
+        //                     ->where('rent_bills.month', $month);
+        // }
+
+        $results = Room::orderBy('rooms.name','ASC')
+        ->whereHas('floor.building', function ($query) {
+            $query->where('ref_branch_id', session("branch_id"));
+        });
+         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            // $results = $results->where('rent_bills.year', $year)
+            //                 ->where('rent_bills.month', $month);
         }
-
         $results = $results->get();
 
         // ใส่ข้อมูลเริ่มที่แถว 3
         $rowIndex = 3;
         foreach ($results as $row) {
-            $sheet->fromArray([
-                $row->room_name,
-                number_format($row->invoice->payment_rent_room->price),
+            // $sheet->fromArray([
+            //     $row->room_name,
+            //     number_format($row->invoice->payment_rent_room->price),
+            //     $row->water_amount,
+            //     $row->electricity_amount,
+            //     number_format($row->invoice->payment_car_parking_fee->price ?? 0), // ค่าที่จอดรถยนต์
+            //     number_format($row->invoice->payment_motorcycle_parking_fee->price ?? 0), // ค่าที่จอดรถมอเตอร์ไซค์
+            //     0, // ส่วนกลาง
+            //     0, // ค่าไฟเกิน
+            //     0, // ค่ามัดจำการจอง
+            //     0, // คืนมัดจำ
+            //     0, // ค่าประกันห้อง
+            //     0, // หักค่ามัดจำจอง
+            //     0, // ค่าน้ำย้ายออก
+            //     0, // ค่าไฟย้ายออก
+            //     0  // คืนเงินประกัน
+            // ], null, 'A' . $rowIndex++);
+
+             $sheet->fromArray([
+                $row->name,
+                number_format($row->rent_bill_rent->payment_rent_room->price ?? 0),
                 $row->water_amount,
                 $row->electricity_amount,
-                number_format($row->invoice->payment_car_parking_fee->price ?? 0), // ค่าที่จอดรถยนต์
-                number_format($row->invoice->payment_motorcycle_parking_fee->price ?? 0), // ค่าที่จอดรถมอเตอร์ไซค์
+                number_format($row->rent_bill_rent->payment_car_parking_fee->price ?? 0), // ค่าที่จอดรถยนต์
+                number_format($row->rent_bill_rent->payment_motorcycle_parking_fee->price ?? 0), // ค่าที่จอดรถมอเตอร์ไซค์
                 0, // ส่วนกลาง
                 0, // ค่าไฟเกิน
-                0, // ค่ามัดจำการจอง
+                number_format($row->rent_bill_booking->total_amount ?? 0), // ค่ามัดจำการจอง
                 0, // คืนมัดจำ
-                0, // ค่าประกันห้อง
-                0, // หักค่ามัดจำจอง
+                number_format($row->rent_bill_deposit->total_amount ?? 0), // ค่าประกันห้อง
+                number_format($row->rent_bill_booking->total_amount ?? 0), // หักค่ามัดจำจอง
                 0, // ค่าน้ำย้ายออก
                 0, // ค่าไฟย้ายออก
                 0  // คืนเงินประกัน
