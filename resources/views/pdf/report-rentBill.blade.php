@@ -94,7 +94,7 @@
     </thead>
     <tbody>
         @forelse ($list_data as $row)
-            <tr class="even table-success" align="center">
+            {{-- <tr class="even table-success" align="center">
                 <td class="control" tabindex="0" style="display: none;">
                 </td>
                 <td class="sorting_1">{{ $row->room_name }}</td>
@@ -110,7 +110,6 @@
                     @endif     
                 </span></td>
                 <td><span>{{ $row->user->name }}</span></td>
-                {{-- <td><span>{{ $row->rent }}</span></td> --}}
                 <td><span>{{ $row->water_amount }}</span></td>
                 <td><span>{{ $row->electricity_amount }}</span></td>
                 <td><span> - </span></td>
@@ -120,6 +119,52 @@
                 <td><span>{{ number_format($row->total_amount) }}</span></td>
                 <td><span class="badge bg-label-success"
                         text-capitalized="">ชำระแล้ว</span></td>
+            </tr> --}}
+
+            <tr class="even table-success" align="center">
+                <td class="control" tabindex="0" style="display: none;">
+                </td>
+                <td class="sorting_1">{{ $row->room->name }}</td>
+                <td><span class="text-truncate">
+                    @if (@$row->room->room_for_rent_main->renter)
+                    {{ $row->room->room_for_rent_main->renter->fullName(); }}    
+                    @endif
+                    </span>
+                </td>
+                <td><span>{{ @$row->receipt_number ?? '-' }}</span></td>
+                <td style="padding: 0 22px;"><span>
+                    @if ($row->payment_date)
+                        {{ date('d/m/Y', strtotime($row->payment_date)) }}
+                    @endif
+                </span></td>
+                <td>
+                    @if ($row->ref_status_id == 5)
+                        <span>
+                        @if ($row->payment_method == 1)
+                            เงินสด
+                        @else
+                            โอนเงิน
+                        @endif    
+                        </span>
+                    @endif    
+
+                </td>
+                <td>
+                    <span>
+                        @if ($row->ref_status_id == 5)
+                            {{ $row->user->name }}
+                        @endif    
+                    </span>
+                </td>
+                <td><span>{{ number_format($row->payment_rent_room->price ?? 0) }}</span></td>
+                <td><span>{{ $row->water_amount }}</span></td>
+                <td><span>{{ $row->electricity_amount }}</span></td>
+                <td><span> - </span></td>
+                <td><span> - </span></td>
+                <td><span> - </span></td>
+                <td><span>{{ number_format($row->total_amount) }}</span></td>
+                <td><span class="badge bg-label-{{ $row->status->color }}"
+                        text-capitalized="">{{ $row->status->name }}</span></td>
             </tr>
             @empty
 
