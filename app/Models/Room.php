@@ -54,7 +54,7 @@ class Room extends Model
     }
     public function contract()
     {
-        return $this->hasOne('App\Models\Contract', 'ref_room_id', 'id');
+        return $this->hasOne('App\Models\Contract', 'ref_room_id', 'id')->latest('id');
     }
     public function room_for_rent_main()
     {

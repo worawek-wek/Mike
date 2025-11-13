@@ -175,76 +175,76 @@
             ชำระเงิน
         </h5>
         <div class="row g-3 p-4 pt-1">
-                                                <div class="col-sm-12">
-                                                    <div>
-                                                        <label for="exampleFormControlInput31" class="form-label">วิธีการชำระเงิน</label>
-                                                    </div>
-                                                    {{-- <div class="ms-3">
-                                                    <input
-                                                        name="payment_method"
-                                                        class="form-check-input"
-                                                        type="radio"
-                                                        value="1"
-                                                        id="defaultRadio1"
-                                                        checked />
-                                                    <label class="form-check-label" for="defaultRadio1">&nbsp; เงินสด </label>
-                                                    <input
-                                                        name="payment_method"
-                                                        class="form-check-input ms-2"
-                                                        type="radio"
-                                                        value="2"
-                                                        id="tranfer" />
-                                                    <label class="form-check-label" for="tranfer">&nbsp; โอนเงิน </label>
-                                                    </div> --}}
-                                                    {{-- ///////////////////////////////////////////////////// --}}
-                                                    <div class="col-sm-11 mb-3">
-                                                        <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
-                                                        <label class="form-check-label" for="reservation_payByCash"> เงินสด </label>
-                                                    </div>
+            <div class="col-sm-12">
+                <div>
+                    <label for="exampleFormControlInput31" class="form-label">วิธีการชำระเงิน</label>
+                </div>
+                {{-- <div class="ms-3">
+                <input
+                    name="payment_method"
+                    class="form-check-input"
+                    type="radio"
+                    value="1"
+                    id="defaultRadio1"
+                    checked />
+                <label class="form-check-label" for="defaultRadio1">&nbsp; เงินสด </label>
+                <input
+                    name="payment_method"
+                    class="form-check-input ms-2"
+                    type="radio"
+                    value="2"
+                    id="tranfer" />
+                <label class="form-check-label" for="tranfer">&nbsp; โอนเงิน </label>
+                </div> --}}
+                {{-- ///////////////////////////////////////////////////// --}}
+                <div class="col-sm-11 mb-3">
+                    <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
+                    <label class="form-check-label" for="reservation_payByCash"> เงินสด </label>
+                </div>
 
-                                                    <div id="paymentChanel_Res2">
-                                                        <div class="col-sm-6 mb-3">
-                                                            <label for="payment_date">วันที่ชำระเงิน</label>
-                                                            <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
-                                                        </div>
-                                                    </div>
+                <div id="paymentChanel_Res2">
+                    <div class="col-sm-6 mb-3">
+                        <label for="payment_date">วันที่ชำระเงิน</label>
+                        <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                    </div>
+                </div>
 
-                                                    <div class="col-sm-11 mb-3">
-                                                        <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
-                                                        <label class="form-check-label" for="reservation_payByTransfer"> โอนเงิน </label>
-                                                    </div>
+                <div class="col-sm-11 mb-3">
+                    <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByTransfer" value="2">
+                    <label class="form-check-label" for="reservation_payByTransfer"> โอนเงิน </label>
+                </div>
 
-                                                    <!-- แสดงเมื่อเลือก โอนเงิน -->
-                                                    <div id="paymentChanel_Res" style="display:none;">
-                                                        <div class="col-sm-6 mb-2">
-                                                            <label>เลือกบัญชีธนาคาร</label><span class="text-danger"> *</span>
-                                                            <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
-                                                                @foreach ($bank as $r_bank)
-                                                                    <option value="{{ $r_bank->id }}">{{ $r_bank->bank.' '.$r_bank->bank_account_name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-sm-3 mb-2">
-                                                            <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
-                                                            <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
-                                                        </div>
-                                                        <div class="col-sm-6 mb-2">
-                                                            <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                                                            <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
-                                                        </div>
-                                                        <div class="col-sm-10 mt-3">
-                                                            <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                                                            <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
-                                                            <div class="preview-container">
-                                                                <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    {{-- ///////////////////////////////////////////////////// --}}
-                                                </div>
-        </div>
+                <!-- แสดงเมื่อเลือก โอนเงิน -->
+                <div id="paymentChanel_Res" style="display:none;">
+                    <div class="col-sm-6 mb-2">
+                        <label>เลือกบัญชีธนาคาร</label><span class="text-danger"> *</span>
+                        <select class="select2 form-select mb-2" name="ref_bank_id" id="exampleFormControlSelect1">
+                            @foreach ($bank as $r_bank)
+                                <option value="{{ $r_bank->id }}">{{ $r_bank->bank.' '.$r_bank->bank_account_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
+                        <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
+                    </div>
+                    <div class="col-sm-6 mb-2">
+                        <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                        <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                    </div>
+                    <div class="col-sm-10 mt-3">
+                        <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
+                        <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
+                        <div class="preview-container">
+                            <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
+                        </div>
+                    </div>
+                </div>
+                {{-- ///////////////////////////////////////////////////// --}}
+            </div>
         </div>
     </div>
+</div>
     {{-- @if (count($room_for_rent) == 0)
         <script>
             setTimeout(() => {

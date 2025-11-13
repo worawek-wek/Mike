@@ -90,7 +90,7 @@
                             <tr>
                                 <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
 
-                                    {{ $payment_list_item->title }}
+                                    {{ $payment_list_item->title }} 111
 
                             @if (strpos($payment_list_item->title, 'Water rate') !== false) 
                                     <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">

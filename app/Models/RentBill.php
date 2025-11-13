@@ -20,6 +20,10 @@ class RentBill extends Model
     {
         return $this->hasOne('App\Models\User', 'id', 'ref_user_id');
     }
+    public function contract()
+    {
+        return $this->hasOne('App\Models\Contract', 'id', 'ref_contract_id');
+    }
     public function room()
     {
         return $this->hasOne('App\Models\Room', 'id', 'ref_room_id');
@@ -99,6 +103,27 @@ class RentBill extends Model
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
                     ->where('discount', 0);
+    }
+    public function payment_rent_room_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
+    }
+    public function payment_meter_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where(function ($query) {
+                        $query->where('title', 'like', '%ค่าน้ำ%')
+                            ->orWhere('title', 'like', '%ค่าไฟฟ้า%');
+                    });
+    }
+    public function payment_parking_fee_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('title', 'like', '%ค่าที่จอดรถยนต์%');
     }
     public function payment_rent_room()
     {
