@@ -70,9 +70,9 @@
                         <span class="ti ti-droplet me-2 m-auto"></span>
                         <input type="number" name="id_room[]" id="room{{ $row->meters_id }}" class="form-control form-control-sm room{{$key}}"
                             value="{{ intval($row->water_unit) }}" onkeydown="handleInput(event,{{ $row->meters_id }}, this.value, {{ $key }})"
-                            oninput="editRoom({{ $row->meters_id }}, this.value, {{ $row->meterPrevious->water_unit }})" style="background-color: #d6f7fb;border-color: #00bad1;"
+                            oninput="editRoom({{ $row->meters_id }}, this.value, {{ $row->start_value_of_new_meter ?? 0 }})" style="background-color: #d6f7fb;border-color: #00bad1;"
                             onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                            min="{{ $row->meterPrevious->water_unit }}"
+                            min="{{ $row->water_unit }}"
                             @if ($permission_meter_water)
                                 readonly
                             @endif
