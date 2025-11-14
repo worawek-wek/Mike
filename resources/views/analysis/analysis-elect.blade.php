@@ -580,6 +580,7 @@
 <script>
     var options02 = {
         series: [{
+            name:'กำไร/ขาดทุนของค่าไฟฟ้า',
             data: [] // เริ่มต้นว่าง รอ AJAX โหลด
         }],
         chart: {
@@ -662,6 +663,7 @@
 <script>
     var options = {
         series: [{
+            name : 'รายจ่ายการไฟฟ้า',
             data: [] // ← เริ่มต้นให้ว่างไว้ แล้วไปโหลดจริงจาก AJAX
         }],
         chart: {
@@ -710,7 +712,7 @@
         tooltip: {
             y: {
                 formatter: function(val) {
-                    return "฿ " + val
+                    return "฿ " + Math.floor(val).toLocaleString()
                 }
             }
         }

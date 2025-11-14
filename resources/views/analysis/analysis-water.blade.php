@@ -689,7 +689,7 @@
         tooltip: {
             y: {
                 formatter: function(val) {
-                    return "฿ " + val
+                    return "฿ " + Math.floor(val).toLocaleString();
                 }
             }
         }
