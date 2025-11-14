@@ -58,16 +58,10 @@
             <tbody>
                 @foreach ($list_data as $key => $row)
                     <tr class="odd">
-                        <td class="text-center">
-                            {{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}
-                        </td>
-                        <td class="text-center">
-                            {{ $row->prefix.' '.$row->name.' '.$row->surname }}
-                        </td>
-                        <td class="text-center">{{ @$row->room_name ?? '-' }}
-                        </td>
-                        <td class="text-center">{{ $row->phone }}
-                        </td>
+                        <td class="text-center">{{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}</td>
+                        <td class="text-left">{{ $row->prefix.' '.$row->name.' '.$row->surname }}</td>
+                        <td class="text-center">{{ @$row->room_name ?? '-' }}</td>
+                        <td class="text-center">{{ $row->phone }}</td>
                         <td class="text-center">
                             @php
                                 echo @App\Models\Vehicle::where('ref_room_id', $row->room_id)->first()->car_registration;
