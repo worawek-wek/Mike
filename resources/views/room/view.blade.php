@@ -429,10 +429,12 @@
         });
     }
     function get_move_out(){
+            document.getElementById('loadingOverlay').style.display = 'flex';
         $.ajax({
             type: "GET",
             url: "{{ $page_url }}/get-move-out/{{$room->id}}",
             success: function(data) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 $("#navs-pills-top-MoveOut").html(data.html);
                 calculateTotal()
                 if(data.invoice_move_out == 0){

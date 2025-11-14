@@ -716,11 +716,11 @@
 
                                             </tbody>
                                             <tfoot>
-                                                    <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ $move_invoice_6->payment_list->sum('price') }}">
+                                                    <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ $move_invoice_6->total_amount }}">
                                                 <tr>
                                                     <th>รวม</th>
                                                     <th class="text-end mb-0 fw-bold total-price_3">
-                                                        {{ $move_invoice_6->payment_list->sum('price') }}
+                                                        {{ $move_invoice_6->total_amount }}
                                                     </th>
                                                 </tr>
                                             </tfoot>

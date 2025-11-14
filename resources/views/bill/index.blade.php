@@ -310,7 +310,7 @@
                                             <div class="d-flex align-items-center mb-2 mb-md-0">
                                                 <label class="">Show</label>
                                                 <select onchange='loadData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_search" style="width:100px">
-                                                    <option value="10">10</option>
+                                                    <option value="25">25</option>
                                                     <option value="50">50</option>
                                                     <option value="100">100</option>
                                                     <option value="150">150</option>
@@ -422,7 +422,7 @@
                 </div>
                 @if(Auth::user()->user_has_branch->position->id == 1)
                     <div class="modal-footer rounded-0 justify-content-center" @if($permission_bill_confirm_payment) style="display: none;" @endif>
-                        <button class="btn btn-success buttons-collection  btn-info waves-effect waves-light change_status_all_check"
+                        <button class="btn btn-success buttons-collection waves-effect waves-light change_status_all_check"
                                 type="button"
                                 onclick="changeStatusAllCheck()"
                                 disabled
@@ -444,16 +444,55 @@
                 <form id="payment_bill_form_all" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <div class="p-2">
-                            <label class="h5 mb-1">เลือกรายการจากใบแจ้งหนี้</label>
-                            <select name="ref_renter_id" class="select-room-payment-bill" onchange="payMultipleRentBills(this.value)" required>
-                                {{-- <option selected hidden value="no">เลือกรายการจากใบแจ้งหนี้</option> --}}
-                                {{-- @foreach ($renter as $rent) --}}
-                                    <option value="payment_rent_room_array">ค่าเช่าห้อง</option>
-                                    <option value="payment_meter_array">ค่าน้ำ-ค่าไฟฟ้า</option>
-                                    <option value="payment_parking_fee_array">ค่าที่จอดรถ</option>
-                                {{-- @endforeach --}}
-                            </select>
+                        <div class="p-2"><label class="h5 mb-1 d-block">เลือกรายการจากใบแจ้งหนี้</label>
+                            <div class="d-flex flex-wrap gap-4">
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input bill-list-checkbox" type="checkbox"
+                                        value="payment_list"
+                                        id="payment_list"
+                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        checked
+                                        >
+                                    <label class="form-check-label" for="payment_list">
+                                        เต็มจำนวน
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
+                                        value="payment_rent_room_array"
+                                        id="payment_rent_room_array"
+                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        >
+                                    <label class="form-check-label" for="payment_rent_room_array">
+                                        ค่าเช่าห้อง
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
+                                        value="payment_meter_array"
+                                        id="payment_meter_array"
+                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        >
+                                    <label class="form-check-label" for="payment_meter_array">
+                                        ค่าน้ำ-ค่าไฟฟ้า
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
+                                        value="payment_parking_fee_array"
+                                        id="payment_parking_fee_array"
+                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        >
+                                    <label class="form-check-label" for="payment_parking_fee_array">
+                                        ค่าที่จอดรถ
+                                    </label>
+                                </div>
+
+                            </div>
                         </div>
                         <div id="div-form-payment-rent-bill-all" class="p-2">
                             <div colspan="20" class="text-center text-muted py-4">
@@ -464,7 +503,7 @@
                     </div>
                     <div class="modal-footer rounded-0 justify-content-center">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" id="submit_payment_bill_form_all" class="btn btn-main">บันทึก</button>
+                        <button type="submit" id="submit_payment_bill_form_all" class="btn btn-main" disabled>บันทึก</button>
                     </div>
                 </form>
             </div>
@@ -475,12 +514,30 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
-        new TomSelect(".select-room-payment-bill", {
-            create: false,
-            maxItems: 1,
-            allowEmptyOption: true,
-            sortField: { field: "text", direction: "desc" }
-        });checkCheckInvoice
+        // เมื่อเลือก "เต็มจำนวน"
+            document.getElementById("payment_list").addEventListener("change", function () {
+                if (this.checked) {
+                    // ยกเลิกการเลือกอย่างอื่นทั้งหมด
+                    document.querySelectorAll(".list-check-box").forEach(ch => ch.checked = false);
+                }
+                payMultipleRentBills();
+            });
+
+            // เมื่อเลือก option อื่น ๆ
+            document.querySelectorAll(".list-check-box").forEach(ch => {
+                ch.addEventListener("change", function () {
+                    if (this.checked) {
+                        document.getElementById("payment_list").checked = false; // ยกเลิก "เต็มจำนวน"
+                    }
+                    payMultipleRentBills();
+                });
+            });
+        // new TomSelect(".select-room-payment-bill", {
+        //     create: false,
+        //     maxItems: 1,
+        //     allowEmptyOption: true,
+        //     sortField: { field: "text", direction: "desc" }
+        // });
         function checkCheckInvoice(list) // modal ชำระเงินหลายห้อง
         {                               // ดึงห้องที่ ติ๊ก มาแสดง
             let invoice_ids = [];
@@ -492,16 +549,21 @@
                 Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
                 return;
             }
-            payMultipleRentBills('payment_rent_room_array')
+            payMultipleRentBills('payment_list')
             var myModal = new bootstrap.Modal(document.getElementById('modal-payment-bill-all'));
                 myModal.show();
 
         }
-        function payMultipleRentBills(list) // modal ชำระเงินหลายห้อง
+        function payMultipleRentBills() // modal ชำระเงินหลายห้อง
         {                               // ดึงห้องที่ ติ๊ก มาแสดง
             let invoice_ids = [];
             $('.ids_invoice:checked').each(function() {
                 invoice_ids.push($(this).val());
+            });
+
+            let list = [];
+            $('.bill-list-checkbox:checked').each(function() {
+                list.push($(this).val());
             });
 
             $.ajax({
@@ -512,7 +574,13 @@
                     list: list
                 },
                 success: function(data) {
+                    // $("#div-form-payment-rent-bill-all").html(data.html);
                     $("#div-form-payment-rent-bill-all").html(data);
+                    // if(data.have == 1){
+                    //     $('#submit_payment_bill_form_all').prop('disabled', false);
+                    // }else{
+                    //     $('#submit_payment_bill_form_all').prop('disabled', true);
+                    // }
                 }
             });
         }
@@ -935,14 +1003,25 @@
                         processData: false,
                         success: function(response) {
                             if (response == true) {
-                                var modalEl = document.getElementById('reservation');
+                                var modalEl = document.getElementById('modal-payment-bill-all');
                                 var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
                                 if (modalInstance) {
                                     modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
                                 }
-                                Swal.fire('ชำระเงิน ค่าเช่าห้อง เรียบร้อยแล้ว', '', 'success').then((result) => {
-                                    location.reload();
+                                // Swal.fire('ชำระเงิน ค่าเช่าห้อง เรียบร้อยแล้ว', '', 'success').then((result) => {
+                                //     location.reload();
+                                // });
+                                Swal.fire({
+                                    title: 'ชำระเงิน ค่าเช่าห้อง เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
                                 });
+                                location.reload();
                                 loadData(page);
                                 summary()
                             }
@@ -1081,6 +1160,7 @@
                         },
                         success: function(response) {
                             if(response == true){
+                                loadData(page);
                                 Swal.fire('คอนเฟิร์มบิล ทั้งหมด เรียบร้อยแล้ว', '', 'success');
                             }
                         },

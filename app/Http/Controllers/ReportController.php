@@ -269,7 +269,7 @@ class ReportController extends Controller
     {
         $results = Receipt::orderBy('id','ASC')
                             ->where('ref_status_id', 5)
-                            ->where('ref_type_id', 4)
+                            ->where('ref_type_id', 7)
                             ->whereHas('room.floor.building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             });
@@ -282,7 +282,7 @@ class ReportController extends Controller
 
         $limit = $request->limit ?? 15;
 
-        $results = $results->paginate($limit);
+        return $results = $results->paginate($limit);
 
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();

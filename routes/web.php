@@ -273,6 +273,7 @@ Route::middleware('auth')->group(function() {
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
         Route::post('room/move-out-submit', 'move_out_submit')->name('move-out-submit');    //////////////////////////
+        Route::post('room/move-out-form-all', 'move_out_form_all')->name('move-out-form-all');    //////////////////////////
         Route::post('room/save-move-out-receipt', 'save_move_out_receipt')->name('save-move-out-receipt');    //////////////////////////
         Route::post('room/update-deposit-refund', 'update_deposit_refund')->name('update-deposit-refund');    //////////////////////////
         Route::post('room/save-move-out-bad-debt-bill', 'save_move_out_bad_debt_bill')->name('save-move-out-bad-debt-bill');    //////////////////////////

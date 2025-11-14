@@ -77,7 +77,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                 </td>
                 <td class="dt-checkboxes-cell-t">
                     {{-- @if ($row_2->ref_status_id == 2) --}}
-                        <input type="checkbox" class="dt-checkboxes form-check-input ids_invoice" value="{{ $row_2->id }}">
+                        <input type="checkbox" class="dt-checkboxes form-check-input ids_invoice" id="check-table-{{ $row_2->id }}" value="{{ $row_2->id }}">
                     {{-- @endif --}}
                 </td>
                 <td class="dt-checkboxes-cell-t" {{ $click }}>

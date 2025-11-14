@@ -16,7 +16,9 @@
     </h5>
     <div class="px-4 pb-4">
         @foreach ($room as $key => $row)
-        <input type="hidden" name="invoice_id" value="{{ @$row['move_invoice_4']->id }}">
+        <input type="hidden" name="ref_renter_id" value="{{ @$row->rent_bill_rent->ref_renter_id }}">
+        <input type="hidden" name="receipt_invoice_id" value="{{ @$row['move_invoice_4']->id }}">
+        <input type="hidden" name="deposit_refuninvoice_id" value="{{ @$row['move_invoice_4']->id }}">
         <label class="my-4 text-success" style="font-weight: 500;font-size: large;" for="">
             {{ $row->name }}
         </label>
@@ -32,16 +34,18 @@
                         @php
                             $amount_receipt = 0;
                         @endphp
-                        @forelse ($row['move_invoice_4']->payment_list ?? [] as $key => $row)
+                        @forelse ($row['move_invoice_4']->payment_list ?? [] as $key => $receipt)
                         @php
-                            $amount_receipt += $row->price;
+                            $amount_receipt += $receipt->price;
                         @endphp
-                            <tr>
+                            <tr style="pointer-events: none;  /* ปิดคลิก */
+                                opacity: 0.6;          /* ให้ดูจางลง */
+                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */">
                                 <td>
-                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $row->title }}">
+                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $receipt->title }}">
                                 </td>
                                 <td class="text-end">
-                                    <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase receipt-list" value="{{ (int)$row->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_receipt({{ $key }})">
+                                    <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase receipt-list" value="{{ (int)$receipt->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_receipt({{ $key }})">
                                 </td>
                             </tr>
                         @empty
@@ -73,11 +77,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                        @foreach ($row['move_invoice_6']->payment_list ?? [] as $k => $prakan)
+                        @foreach ($row['move_invoice_6']->payment_list as $k => $prakan)
                         @php
-                        if ($prakan->discount == 1) {
-                            continue;
-                        }
+                        // if ($prakan->discount == 1) {
+                        //     continue;
+                        // }
                             
                         @endphp
                             <tr>

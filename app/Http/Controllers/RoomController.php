@@ -1040,7 +1040,9 @@ class RoomController extends Controller
         $data['page_url'] = 'room';
         $room = Room::whereHas('room_for_rent_s', function ($query) use ($id) {
                     $query->where('ref_renter_id', $id);
-                })->get();
+                })
+                ->where('status', 2)
+                ->get();
         foreach($room as $row){
             
             $move_invoice_type_7 = RentBill::where('ref_contract_id', $row->contract->id)->where('ref_type_id', 7)->first(); // invoice ย้ายออก
@@ -1226,6 +1228,135 @@ class RoomController extends Controller
             return false;
         }
         //
+    }
+    // บันทึก ย้ายออก
+    public function move_out_form_all(Request $request)
+    {
+        // return $request->ref_renter_id;
+        try{
+            $room = Room::whereHas('room_for_rent_main', function ($query) use ($request) {
+                                                    $query->where('ref_renter_id', $request->ref_renter_id);
+                                                })->update([ 'status' => 0 ]);
+//             $meter = Meter::where('ref_room_id', $request->room_id)->orderBy('year', 'desc')->orderBy('month', 'desc')->first();	
+//             if($meter){
+//                 $room->move_out_electricity_meter = $meter->electricity_unit;
+//                 $room->move_out_water_meter = $meter->water_unit;
+//             }
+//             $room->save();
+            
+//             RoomForRents::where('ref_room_id', $request->room_id)->update(['status' => 0]);
+//             $invoice = RentBill::where('ref_room_id', $request->room_id)->where('ref_status_id', 3)->first();
+//             if(@$invoice){
+//                 RentBill::destroy($invoice->id);
+//                 PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
+//             }
+//             if($request->type_move_out == 2){
+//                     $up_renter = Renter::find($request->ref_renter_id);
+//                     $up_renter->blacklist_detail  =  "ผู้เช่าหนี";
+//                     $up_renter->blacklist_status  =  1;
+//                     $up_renter->blacklist_date  =  Carbon::now();
+//                     $up_renter->save();
+//             }
+//             RoomHasAsset::where('ref_room_id', $request->room_id)->delete();
+
+// // ใบเสร็จเกี่ยวกับสรุปย้ายออก
+//             $invoice_summarize = RentBill::find($request->invoice_id);
+//             PaymentList::where('ref_payment_id', $request->invoice_id)->where('document_type', 1)->delete();
+//             //////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+//                 $payment_date = Carbon::createFromFormat('d/m/Y', $request->payment_date)->format('Y-m-d');
+                
+//                 $image_name = "";
+//                 if($request->file('evidence_of_money_transfer')){
+//                     // return 3;
+//                         $request->validate([
+//                             'evidence_of_money_transfer' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+//                         ],[
+//                             'evidence_of_money_transfer.required' => 'กรุณาเลือกรูปภาพ',
+//                             'evidence_of_money_transfer.image' => 'ไฟล์ที่เลือกต้องเป็นรูปภาพเท่านั้น',
+//                             'evidence_of_money_transfer.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
+//                             'evidence_of_money_transfer.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+//                         ]);
+//                     $file = $request->file('evidence_of_money_transfer');
+//                     $nameExtension = $file->getClientOriginalName();
+//                     $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
+//                     $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
+//                     $path = "upload/receipt/";
+//                     $image_name = $img_name.rand().'.'.$extension;
+//                 }
+
+//                 $receipt = new Receipt;
+//                 $receipt->receipt_number =  $this->generateReceiptCode();
+//                 $receipt->ref_room_id  =  $room->id;
+//                 $receipt->ref_rent_bill_id  =  $request->invoice_id;
+//                 $receipt->ref_contract_id  =  $invoice_summarize->ref_contract_id;
+//                 $receipt->ref_renter_id  =  $request->ref_renter_id;
+//                 $receipt->payment_format  =  $request->payment_format;
+//                 $receipt->payment_channel  =  $request->receipt_payment_channel; // รูปแบบชำระเงิน 1=เงินสด / 2=โอนเงิน / 3/หักจากเงินประกัน
+//                 $receipt->ref_bank_id  =  $request->ref_bank_id;
+//                 $receipt->transfer_time  =  $request->transfer_time;
+//                 $receipt->payment_date  =  $payment_date;
+//                 $receipt->ref_type_id  =  7;
+//                 $receipt->ref_status_id  =  5;
+//                 $receipt->evidence_of_money_transfer  =  $image_name;
+//                 $receipt->ref_user_id =  Auth::id();
+//                 $receipt->amount  =  0;
+//                 $receipt->save();
+
+//             //////////////////////////////////////////////////////////////////////////////////////////////////////
+//             $move_invoice_6 = RentBill::where('ref_type_id', 6)->where('ref_room_id', $room->id)->latest()->first(); // เงินประกัน
+//             foreach($move_invoice_6->payment_list as $payment_list){
+
+//                     $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+//                     $pay_list->title  =  $payment_list->title;
+//                     $pay_list->price  =  $payment_list->price;
+//                     $pay_list->ref_payment_id  =  $request->invoice_id;
+//                     $pay_list->document_type  =  1;
+//                     $pay_list->save();
+
+//                     $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+//                     $pay_list->title  =  $payment_list->title;
+//                     $pay_list->price  =  $payment_list->price;
+//                     $pay_list->ref_payment_id  =  $receipt->id;
+//                     $pay_list->document_type  =  2;
+//                     $pay_list->save();
+
+//             }
+
+//             $receipt_move_out_deducted = Receipt::where('ref_contract_id', $invoice_summarize->ref_contract_id)->where('payment_channel', 3)->where('ref_type_id', 4)->latest()->first();
+//             if($receipt_move_out_deducted){
+//                 foreach($receipt_move_out_deducted->payment_list as $payment_list){
+//                         $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+//                         $pay_list->title  =  $payment_list->title;
+//                         $pay_list->price  =  $payment_list->price*-1;
+//                         $pay_list->ref_payment_id  =  $request->invoice_id;
+//                         $pay_list->document_type  =  1;
+//                         $pay_list->save();
+                        
+//                         $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+//                         $pay_list->title  =  $payment_list->title;
+//                         $pay_list->price  =  $payment_list->price*-1;
+//                         $pay_list->ref_payment_id  =  $receipt->id;
+//                         $pay_list->document_type  =  2;
+//                         $pay_list->save();
+//                 }
+//             }
+//             $invoice_summarize->ref_status_id  =  5;
+//             $invoice_summarize->save();
+            
+            // $request->merge([
+            //     'payment_channel' => $request->bad_debt_payment_channel,
+            // ]);
+            // return $request;
+            // return $this->payment_receipt_move_out_bill($request);
+            // new MoveOut();
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
     }
     // บันทึก ย้ายออก
     public function move_out_submit(Request $request)

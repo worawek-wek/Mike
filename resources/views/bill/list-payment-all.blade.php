@@ -49,19 +49,21 @@
                 @php
                     $amount = 0;
                 @endphp
-                @foreach ($invoice[$list] as $key_2 => $payment_list)
-                @php
-                    $total_amount += $payment_list->price;
-                    $amount += $payment_list->price;
-                @endphp
-                    <tr>
-                        <td>
-                            <input name="insert[{{ $key }}][payment_list][title][]" type="text" class="form-control payment_list_title" value="{{ $payment_list->title }}" placeholder="หัวข้อรายการ">
-                        </td>
-                        <td class="text-end">
-                            <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_2" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
-                        </td>
-                    </tr>
+                @foreach ($list as $item_list)
+                    @foreach ($invoice[$item_list] as $key_2 => $payment_list)
+                    @php
+                        $total_amount += $payment_list->price;
+                        $amount += $payment_list->price;
+                    @endphp
+                        <tr>
+                            <td>
+                                <input name="insert[{{ $key }}][payment_list][title][]" type="text" class="form-control payment_list_title" value="{{ $payment_list->title }}" placeholder="หัวข้อรายการ" readonly>
+                            </td>
+                            <td class="text-end">
+                                <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_2" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>
+                            </td>
+                        </tr>
+                    @endforeach
                 @endforeach
             </tbody>
             <tfoot>
@@ -69,7 +71,7 @@
                     <th>รวม</th>
                     <th class="text-end mb-0 fw-bold total-price_2">
                         <input name="insert[{{ $key }}][amount]" class="total-price" value="{{ $amount }}" type="hidden">
-                        {{ $amount }} บาท
+                        {{ number_format($amount) }} บาท
                     </th>
                 </tr>
             </tfoot>
@@ -143,6 +145,13 @@
         </div>
     </div>
 <script>
+        // setTimeout(() => {
+            if({{$total_amount}} > 0){
+                $('#submit_payment_bill_form_all').prop('disabled', false);
+            }else{
+                $('#submit_payment_bill_form_all').prop('disabled', true);
+            }
+        // }, 2000);
         $('#payment_date_lhai').datepicker({
             format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
             todayBtn: "linked",   // เพิ่มปุ่มวันนี้
@@ -188,6 +197,8 @@
     function deleteBillRoom(id){
         if ($('.billReserveRoom').length > 1) {
             $("#billReserveRoom"+id).remove();
+            document.getElementById("check-table-"+id).checked = false; // ยกเลิก "เต็มจำนวน"
+            payMultipleRentBills();
         } else {
             Swal.fire('ไม่สามารถลบได้', 'การชำระค่าจองต้องมีอย่างน้อย 1 ห้อง', 'warning');
         }

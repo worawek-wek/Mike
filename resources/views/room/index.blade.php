@@ -9,7 +9,17 @@
 </head>
 
 <div id="loadingOverlay" style="display: none;">
-  <div class="spinner"></div>
+  <div class="col">
+    <!-- Chase -->
+    <div class="sk-chase sk-primary m-auto">
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+    </div>
+</div>
 </div>
 
 <style>
@@ -20,7 +30,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.8);
+    background: rgba(234, 244, 255, 0.8);
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -128,6 +138,7 @@
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <!-- ก่อน </body> -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<link rel="stylesheet" href="../../assets/vendor/libs/spinkit/spinkit.css" />
 <body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
@@ -525,7 +536,7 @@
                     <h5 class="modal-title" id="exampleModalLabel1">ย้ายออกหลายห้อง</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="reservation_form_all" enctype="multipart/form-data"
+                <form id="move_out_form_all" enctype="multipart/form-data"
                     @if($permission_bill_reserve_confirm)
                         style="pointer-events: none;  /* ปิดคลิก */
                                 opacity: 0.6;          /* ให้ดูจางลง */
@@ -549,7 +560,7 @@
                     </div>
                     <div class="modal-footer rounded-0 justify-content-center">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" id="submit_reservation_form_all" class="btn btn-main" disabled>บันทึก</button>
+                        <button type="submit" id="submit_move_out_form_all" class="btn btn-main">บันทึก</button>
                     </div>
                 </form>
             </div>
@@ -1974,6 +1985,75 @@
             });
         });
         
+        $('#move_out_form_all').on('submit', function(event) {
+            event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+            if(!this.checkValidity()) {
+                // ถ้าฟอร์มไม่ถูกต้อง
+                this.reportValidity();
+                return console.log('ฟอร์มไม่ถูกต้อง');
+            }
+            // if(total_amount < 0){
+            //     return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
+            // }
+            var check = $('#check-rent-bell').val();
+            if(check == 1){
+                return Swal.fire('กรุณาเคลียร์บิลค่าเช่าก่อน.!', '', 'warning');
+            }
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ย้ายออก หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/room/move-out-form-all', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if(response == true){
+                                
+                                var modalEl = document.getElementById('roomMoveOut');
+                                var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                                if (modalInstance) {
+                                    modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                                }
+                                
+                                loadData(page);
+                                summary();
+                                Swal.fire('ย้ายออกเรียบร้อยแล้ว', '', 'success');
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+        });
         $('#reservation_form_all').on('submit', function(event) {
             event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
 

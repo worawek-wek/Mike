@@ -131,6 +131,10 @@ class BillController extends Controller
                                         ->get();
         // return 123;
         return view('bill/list-payment-all', $data);
+        
+        // $html = view('bill/list-payment-all', $data)->render();
+        // $have = count($invoice_alls) > 0 ? 1 : 0;
+        // return ['html' => $html, 'have' => $have];
     }
     public function waiting_for_confirmation(Request $request) // ดึง ใบเสร็จที่รอคอนเฟิร์มการชำระเงิน ref_status_id = 2
     {

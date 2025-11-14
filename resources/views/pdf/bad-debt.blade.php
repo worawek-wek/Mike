@@ -69,10 +69,10 @@
         }
         .total-table {
             width: 100%;
-            margin-top: 10px;
+            /* margin-top: 10px; */
         }
         .total-table td {
-            padding: 1px;
+            padding: 7px;
             font-size: 10px;
         }
         .total-table td:nth-child(1) {
@@ -111,8 +111,8 @@
             font-size: 10px;
             margin-top: 10px;
         }
-        .pdt-5px {
-            padding-top: 7px !important;
+        .pt-5 {
+            /* padding-top: 4px !important; */
         }
         .pdb-5px {
             padding-bottom: 7px !important;
@@ -164,85 +164,96 @@
                 </td>
             </tr>
         </table>
+            
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
         <div class="full-width">
             <table class="table">
                 <tr>
-                    <th width="1px">ลำดับ(#)</th>
+                    <th width="1px">ลำดับ</th>
                     <th>รายการรับ </th>
                     <th>ราคา (Price)</th>
                 </tr>
-                @php
-                    $pd_5px = "";
-                @endphp
+                <tr>
+                    <td style=padding-top:2px;></td>
+                </tr>
                 @if (@$receipt_move_out_not_deducted)
                     @foreach ($receipt_move_out_not_deducted->payment_list as $key => $item_contract_payment_list)
                         <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
-                            <td class="{{ $pd_5px }}">
-                                {{ $item_contract_payment_list->title }}
+                            <td class="pt-5"> {{ $key+1 }} </td>
+                            <td class="pt-5">
+                                {{ $item_contract_payment_list->title }} 123
                             </td>
-                            <td class="{{ $pd_5px }}"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
+                            <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
                     <tr>
-                        <td class="{{ $pd_5px }}"> </td>
-                        <th class="{{ $pd_5px }}" align="center">
+                        <td style=padding-bottom:3px;></td>
+                    </tr>
+                    <tr>
+                        <td class="pt-5"> </td>
+                        <th class="pt-5" align="center">
                             รวมจำนวนเงินรับ
                         </th>
-                        <td class="{{ $pd_5px }}" width="90px"> {{ number_format($receipt_move_out_not_deducted->total_amount ?? 0.00 , 2) }}</td>
+                        <td class="pt-5" width="90px"> {{ number_format($receipt_move_out_not_deducted->total_amount ?? 0.00 , 2) }}</td>
                     </tr>
             </table>
+
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
             <table class="table">
                 <tr>
-                    <th width="1px">ลำดับ(#)</th>
+                    <th width="1px">ลำดับ</th>
                     <th>รายการคืน/หักเงินประกัน </th>
                     <th>ราคา (Price)</th>
                 </tr>
-                @php
-                    $pd_5px = "";
-                @endphp
+                <tr>
+                    <td style=padding-top:2px;></td>
+                </tr>
                 @foreach ($invoice_contract->payment_not_discount as $key => $item_contract_payment_list)
                     <tr>
-                        <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
-                        <td class="{{ $pd_5px }}">
+                        <td class="pt-5"> {{ $key+1 }} </td>
+                        <td class="pt-5">
                             {{ $item_contract_payment_list->title }}
                         </td>
-                        <td class="{{ $pd_5px }}"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
+                        <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                     </tr>
                 @endforeach
                 @if (@$receipt_move_out_deducted)
                     @foreach ($receipt_move_out_deducted->payment_list as $key2 => $item_payment_list)
-                        @php
-                            $pd_5px = "";
-                            // if ($loop->first){
-                            //     // $pd_5px = "pdt-5px";
-                            // }
-                            // if ($loop->last){
-                            //     $pd_5px .= " pdb-5px";
-                            // }
-                        @endphp
                         <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
-                            <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
+                            <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
+                            <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
-                            <td class="{{ $pd_5px }}">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
+                            <td class="pt-5">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
+                    <tr>
+                        <th style="padding: 14px 0;"></th>
+                        <th style="padding-left: 124px;">รวม</th>
+                        <th>{{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }}</th>
+                    </tr>
             </table>
         </div>
+
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
         <table class="total-table">
             <tr style="vertical-align: top;">
-                <td style="font-size: large;">({{ $amount_thai }})</td>
+                <td style="">({{ $amount_thai }})</td>
                 @if ($receipt_move_out_deducted_total > $invoice_contract->not_discount)
-                    <td>เก็บเงินผู้เช่าเพิ่ม</td>
-                    <td style="font-size: large;">
+                    <td>สรุป เก็บเงินผู้เช่าเพิ่ม</td>
+                    <td style="">
                         {{ number_format($receipt_move_out_deducted_total - $invoice_contract->not_discount, 2) }} บาท
                     </td>
                 @else
-                    <td>หอพักได้รับเงินประกัน</td>
-                    <td style="font-size: large;">
+                    <td>สรุป หอพักได้รับเงินประกัน</td>
+                    <td style="">
                         {{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }} บาท
                     </td>
                 @endif
@@ -266,12 +277,23 @@
                 </td>
             </tr>
         </table>
+
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
         @if(count($invoice_contract->payment_list) < 6)
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
             <div style="page-break-before: always;"></div>
             <div>&nbsp;</div>
         @endif
+
+        {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
         <div class="header">ใบย้ายออก</div>
         <table class="table-info">
@@ -295,48 +317,62 @@
                 </td>
             </tr>
         </table>
+            
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
         <div class="full-width">
             <table class="table">
                 <tr>
-                    <th width="1px">ลำดับ(#)</th>
+                    <th width="1px">ลำดับ</th>
                     <th>รายการรับ </th>
                     <th>ราคา (Price)</th>
                 </tr>
-                @php
-                    $pd_5px = "";
-                @endphp
+                <tr>
+                    <td style=padding-top:2px;></td>
+                </tr>
                 @if (@$receipt_move_out_not_deducted)
                     @foreach ($receipt_move_out_not_deducted->payment_list as $key => $item_contract_payment_list)
                         <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key+1 }} </td>
-                            <td class="{{ $pd_5px }}">
+                            <td class="pt-5"> {{ $key+1 }} </td>
+                            <td class="pt-5">
                                 {{ $item_contract_payment_list->title }}
                             </td>
-                            <td class="{{ $pd_5px }}"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
+                            <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
                     <tr>
-                        <td class="{{ $pd_5px }}"> </td>
-                        <th class="{{ $pd_5px }}" align="center">
+                        <td style=padding-bottom:3px;></td>
+                    </tr>
+                    <tr>
+                        <td class="pt-5"> </td>
+                        <th class="pt-5" align="center">
                             รวมจำนวนเงินรับ
                         </th>
-                        <td class="{{ $pd_5px }}" width="90px"> {{ number_format($receipt_move_out_not_deducted->total_amount ?? 0.00 , 2) }}</td>
+                        <td class="pt-5" width="90px"> {{ number_format($receipt_move_out_not_deducted->total_amount ?? 0.00 , 2) }}</td>
                     </tr>
             </table>
+            
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
             <table class="table">
                 <tr>
-                    <th width="1px">ลำดับ(#)</th>
+                    <th width="1px">ลำดับ</th>
                     <th>รายการคืน/หักเงินประกัน </th>
                     <th>ราคา (Price)</th>
                 </tr>
+                <tr>
+                    <td style=padding-top:2px;></td>
+                </tr>
                 @foreach ($invoice_contract->payment_not_discount as $key => $item_contract_payment_list)
                     <tr>
-                        <td class="{{ $pd_5px }}"> {{ $key+2 }} </td>
-                        <td class="{{ $pd_5px }}">
+                        <td class="pt-5"> {{ $key+2 }} </td>
+                        <td class="pt-5">
                             {{ $item_contract_payment_list->title }}
                         </td>
-                        <td class="{{ $pd_5px }}"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
+                        <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                     </tr>
                 @endforeach
                 @if (@$receipt_move_out_deducted)
@@ -351,25 +387,34 @@
                             // }
                         @endphp
                         <tr>
-                            <td class="{{ $pd_5px }}"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
-                            <td class="{{ $pd_5px }}"> {{ $item_payment_list->title }}
+                            <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
+                            <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
-                            <td class="{{ $pd_5px }}">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
+                            <td class="pt-5">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
+                    <tr>
+                        <th style="padding: 14px 0;"></th>
+                        <th style="padding-left: 124px;">รวม</th>
+                        <th>{{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }}</th>
+                    </tr>
             </table>
         </div>
+            
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+{{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
+
         <table class="total-table">
             <tr style="vertical-align: top;">
                 <td style="font-size: large;">({{ $amount_thai }})</td>
                 @if ($receipt_move_out_deducted_total > $invoice_contract->not_discount)
-                    <td>เก็บเงินผู้เช่าเพิ่ม</td>
+                    <td>สรุป เก็บเงินผู้เช่าเพิ่ม</td>
                     <td style="font-size: large;">
                         {{ number_format($receipt_move_out_deducted_total - $invoice_contract->not_discount, 2) }} บาท
                     </td>
                 @else
-                    <td>หอพักได้รับเงินประกัน</td>
+                    <td>สรุป หอพักได้รับเงินประกัน</td>
                     <td style="font-size: large;">
                         {{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }} บาท
                     </td>
