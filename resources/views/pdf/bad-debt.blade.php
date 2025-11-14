@@ -226,7 +226,8 @@
                 @if (@$receipt_move_out_deducted)
                     @foreach ($receipt_move_out_deducted->payment_list as $key2 => $item_payment_list)
                         <tr>
-                            <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
+                            {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
+                            <td class="pt-5"> {{ $key2+1 }} </td>
                             <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
                             <td class="pt-5">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
