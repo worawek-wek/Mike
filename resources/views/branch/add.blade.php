@@ -89,7 +89,7 @@
                 </div>
                 <div class="col-sm-6">
                     <label>เบอร์โทรติดต่อสาขา <span class="text-danger">*</span></label>
-                    <input name="phone" type="tel" class="form-control" id="" placeholder="เบอร์โทรติดต่อสาขา" pattern="^\d{9,10}$" required/>
+                    <input name="phone" type="tel" class="form-control" id="" placeholder="เบอร์โทรติดต่อสาขา" oninput="this.value=this.value.slice(0,10);" pattern="^\d{9,10}$" required/>
                 </div>
                 <div class="col-sm-6">
                     <label>อีเมลติดต่อสาขา </label>

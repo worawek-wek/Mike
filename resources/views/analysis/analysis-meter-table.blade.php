@@ -54,6 +54,7 @@
             <script>
                 var options = {
                     series: [{
+                        name: 'หน่วยที่ใช้',
                         data: @json($room->months['water'])
                     }],
                     chart: {
@@ -179,6 +180,7 @@
             <script>
                 var options = {
                     series: [{
+                        name: 'หน่วยที่ใช้',
                         data: @json($room->months['elect'])
                     }],
                     chart: {

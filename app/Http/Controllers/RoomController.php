@@ -1201,13 +1201,14 @@ class RoomController extends Controller
             $expenses->type  =  1;
             if($request->ref_type_id == 2){
                 $expenses->label  =  "ใบเสร็จค่าประกันห้อง";
+                $expenses->ref_category_id  =  2;
             }else{
                 $expenses->label  =  "ใบเสร็จค่าจองห้อง";
+                $expenses->ref_category_id  =  3;
             }
             $expenses->amount  =  0;
             $expenses->date  =  Carbon::now();
             $expenses->ref_room_id  =  $request->ref_room_id;
-            $expenses->ref_category_id  =  0;
             $expenses->name  =  $receipt->renter->fullName();
             $expenses->address  =  $receipt->renter->fullThaiAddress();
             $expenses->id_card_number  =  $receipt->renter->id_card_number;
@@ -1676,7 +1677,7 @@ class RoomController extends Controller
                 $expenses->amount  =  0;
                 $expenses->date  =  Carbon::now();
                 $expenses->ref_room_id  =  $invoice->ref_room_id;
-                $expenses->ref_category_id  =  0;
+                $expenses->ref_category_id  =  3;
                 $expenses->name  =  $receipt->renter->fullName();
                 $expenses->address  =  $receipt->renter->fullThaiAddress();
                 $expenses->id_card_number  =  $receipt->renter->id_card_number;
@@ -2684,7 +2685,7 @@ class RoomController extends Controller
                             $expenses->amount  =  0;
                             $expenses->date  =  Carbon::now();
                             $expenses->ref_room_id  =  $r_n->id;
-                            $expenses->ref_category_id  =  0;
+                            $expenses->ref_category_id  =  1;
                             $expenses->name  =  $receipt->renter->fullName();
                             $expenses->address  =  $receipt->renter->fullThaiAddress();
                             $expenses->id_card_number  =  $receipt->renter->id_card_number;
@@ -2830,7 +2831,7 @@ class RoomController extends Controller
                             $expenses->amount  =  0;
                             $expenses->date  =  Carbon::now();
                             $expenses->ref_room_id  =  $room;
-                            $expenses->ref_category_id  =  0;
+                            $expenses->ref_category_id  =  1;
                             $expenses->name  =  $receipt->renter->fullName();
                             $expenses->address  =  $receipt->renter->fullThaiAddress();
                             $expenses->id_card_number  =  $receipt->renter->id_card_number;

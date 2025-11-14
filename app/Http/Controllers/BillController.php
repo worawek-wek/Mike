@@ -524,7 +524,7 @@ class BillController extends Controller
             $expenses->amount  =  0;
             $expenses->date  =  Carbon::now();
             $expenses->ref_room_id  =  $request->ref_room_id;
-            $expenses->ref_category_id  =  0;
+            $expenses->ref_category_id  =  1;
             $expenses->name  =  $receipt->renter->fullName();
             $expenses->address  =  $receipt->renter->fullThaiAddress();
             $expenses->id_card_number  =  $receipt->renter->id_card_number;
