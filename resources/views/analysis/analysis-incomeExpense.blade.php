@@ -130,10 +130,10 @@
             xaxis: { categories: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
             yaxis: { title: { text: '฿ (บาท)', style: { fontSize: '12px', fontFamily: 'IBM plex sans thai', fontWeight: 600 } } },
             tooltip: { y: { formatter: val => "฿ " + val } },
-            series: [{ data: [] }]
+            series: [{name: "ยอดรายได้รวม", data: [] }]
         };
 
-        const chartOptions04 = {...chartOptions02, colors: ['#DBC4F0']};
+        const chartOptions04 = {...chartOptions02, colors: ['#DBC4F0'], series: [{name: "ยอดรายจ่ายรวม", data: [] }]};
 
         // สร้าง chart instance
         const chart02 = new ApexCharts(document.querySelector("#chart02"), chartOptions02);
