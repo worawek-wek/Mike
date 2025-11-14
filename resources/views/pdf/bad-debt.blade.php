@@ -183,9 +183,7 @@
                     @foreach ($receipt_move_out_not_deducted->payment_list as $key => $item_contract_payment_list)
                         <tr>
                             <td class="pt-5"> {{ $key+1 }} </td>
-                            <td class="pt-5">
-                                {{ $item_contract_payment_list->title }} 123
-                            </td>
+                            <td class="pt-5">{{ $item_contract_payment_list->title }}</td>
                             <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                         </tr>
                     @endforeach
@@ -201,7 +199,7 @@
                         <td class="pt-5" width="90px"> {{ number_format($receipt_move_out_not_deducted->total_amount ?? 0.00 , 2) }}</td>
                     </tr>
             </table>
-            @endif
+        @endif
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
@@ -214,20 +212,21 @@
                 <tr>
                     <td style=padding-top:2px;></td>
                 </tr>
-                @foreach ($invoice_contract->payment_not_discount as $key => $item_contract_payment_list)
+                @php 
+                $key_count2 = 1;
+                @endphp
+                @foreach ($invoice_contract->payment_not_discount as $key2 => $item_contract_payment_list)
                     <tr>
-                        <td class="pt-5"> {{ $key+1 }} </td>
-                        <td class="pt-5">
-                            {{ $item_contract_payment_list->title }}
-                        </td>
+                        <td class="pt-5"> {{ $key_count2++; }} </td>
+                        <td class="pt-5">{{ $item_contract_payment_list->title }}</td>
                         <td class="pt-5"> {{ (number_format($item_contract_payment_list->discount) == 1 ? "- " : '').number_format($item_contract_payment_list->price, 2) }}</td>
                     </tr>
                 @endforeach
+
                 @if (@$receipt_move_out_deducted)
                     @foreach ($receipt_move_out_deducted->payment_list as $key2 => $item_payment_list)
                         <tr>
-                            {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
-                            <td class="pt-5"> {{ $key2+1 }} </td>
+                            <td class="pt-5"> {{ $key_count2++ }} </td>
                             <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
                             <td class="pt-5">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
@@ -369,9 +368,12 @@
                 <tr>
                     <td style=padding-top:2px;></td>
                 </tr>
+                @php 
+                $key_count2_copy = 1;
+                @endphp
                 @foreach ($invoice_contract->payment_not_discount as $key => $item_contract_payment_list)
                     <tr>
-                        <td class="pt-5"> {{ $key+1 }} </td>
+                        <td class="pt-5"> {{ $key_count2_copy++ }} </td>
                         <td class="pt-5">
                             {{ $item_contract_payment_list->title }}
                         </td>
@@ -390,7 +392,7 @@
                             // }
                         @endphp
                         <tr>
-                            <td class="pt-5"> {{ $key2+1 }} </td>
+                            <td class="pt-5"> {{ $key_count2_copy++ }} </td>
                             {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
                             <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
