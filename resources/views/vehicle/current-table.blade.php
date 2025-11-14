@@ -1,53 +1,28 @@
-   <table class="datatables-basic table dataTable no-footer dtr-column"
-        id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
+    
+    <table class="datatables-basic table dataTable no-footer dtr-column table-custom" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         <thead class="border-top">
-            <tr class=" table-info">
-                <th class="text-center" tabindex="0" style="width: 40px;">
-                    วันที่เพิ่มข้อมูล
-                </th>
-                <th class="text-center">
-                    เลขห้อง
-                </th>
-                <th class="text-center">
-                    ผู้เช่า
-                </th>
-                <th class="text-center">
-                    ประเภทรถ
-                </th>
-                <th class="text-center">
-                    ทะเบียนรถ</th>
-                <th class="text-center">
-                    รายละเอียดรถ
-                </th>
-                <th class="text-center">
-                    หมายเหตุ
-                </th>
+            <tr class="table-info">
+                <th class="text-center" style="width: 4%;">#</th>
+                <th class="text-center" style="width: 10%;">วันที่เพิ่มข้อมูล</th>
+                <th class="text-center" style="width: 8%;">เลขห้อง</th>
+                <th class="text-center" style="width: 18%;">เช่า</th>
+                <th class="text-center" style="width: 10%;">ประเภทรถ</th>
+                <th class="text-center" style="width: 10%;">ทะเบียนรถ</th>
+                <th class="text-center" style="width: 25%;">รายละเอียดรถ</th>
+                <th class="text-center" style="width: 15%;">หมายเหตุ</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($list_data as $key => $row)
             <tr class="odd">
-                <td class="text-center">
-                    {{ date('d/m/Y',strtotime($row->created_at)) }}
-                </td>
-                <td class="text-center">
-                    {{ $row->renter->room_for_rent->room->name ?? '-' }}
-                </td>
-                <td class="text-center">
-                    {{ $row->renter->prefix ?? '' }} {{ $row->renter->name ?? '' }} {{ $row->renter->surname ?? '' }}
-                </td>
-                <td class="text-center">
-                    {{ $row->type->name }}
-                </td>
-                <td class="text-center">
-                    {{ $row->car_registration }}
-                </td>
-                <td class="text-center">
-                    {{ $row->detail }}
-                </td>
-                <td class="text-center">
-                    {{ $row->remark }}
-                </td>
+                <td class="text-center"> {{@$key+1}}</td>
+                <td class="text-center"> {{ date('d/m/Y',strtotime($row->created_at)) }}</td>
+                <td class="text-center">{{ $row->renter->room_for_rent->room->name ?? '-' }}</td>
+                <td class="text-left">{{ $row->renter->prefix ?? '' }} {{ $row->renter->name ?? '' }} {{ $row->renter->surname ?? '' }}</td>
+                <td class="text-center">{{ $row->type->name }}</td>
+                <td class="text-center">{{ $row->car_registration }}</td>
+                <td class="text-center">{{ $row->detail }}</td>
+                <td class="text-center">{{ $row->remark }}</td>
             </tr>
             @empty
 

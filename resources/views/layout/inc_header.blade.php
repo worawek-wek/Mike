@@ -65,3 +65,24 @@
 <script src="assets/vendor/js/template-customizer.js"></script>
 <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
 <script src="assets/js/config.js"></script>
+
+<style>
+    table.dataTable thead th {
+        padding: 6px 10px !important;
+        font-size: 13px;
+        line-height: 2.5;
+        white-space: nowrap;
+    }
+
+    .table-custom thead tr {
+        background: #e8f4ff !important;
+        border-bottom: 1px solid #d4e7f9;
+    }
+    .table-custom tbody td {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    .table-custom tbody tr:hover {
+        background: #f7fbff;
+    }
+</style>   
