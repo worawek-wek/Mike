@@ -253,7 +253,7 @@
                         {{ number_format($receipt_move_out_deducted_total - $invoice_contract->not_discount, 2) }} บาท
                     </td>
                 @else
-                    <td>สรุป หอพักได้รับเงินประกัน</td>
+                    <td>สรุป ยอดเงินประกันคืนผู้เช่า</td>
                     <td style="">
                         {{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }} บาท
                     </td>
@@ -370,7 +370,7 @@
                 </tr>
                 @foreach ($invoice_contract->payment_not_discount as $key => $item_contract_payment_list)
                     <tr>
-                        <td class="pt-5"> {{ $key+2 }} </td>
+                        <td class="pt-5"> {{ $key+1 }} </td>
                         <td class="pt-5">
                             {{ $item_contract_payment_list->title }}
                         </td>
@@ -389,7 +389,8 @@
                             // }
                         @endphp
                         <tr>
-                            <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td>
+                            <td class="pt-5"> {{ $key2+1 }} </td>
+                            {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
                             <td class="pt-5"> {{ $item_payment_list->title }}
                             </td>
                             <td class="pt-5">- {{  ($item_payment_list->discount == 1 ? "- " : '').number_format($item_payment_list->price, 2) }}</td>
@@ -416,7 +417,7 @@
                         {{ number_format($receipt_move_out_deducted_total - $invoice_contract->not_discount, 2) }} บาท
                     </td>
                 @else
-                    <td>สรุป หอพักได้รับเงินประกัน</td>
+                    <td>สรุป ยอดเงินประกันคืนผู้เช่า</td>
                     <td style="font-size: large;">
                         {{ number_format($invoice_contract->not_discount - $receipt_move_out_deducted_total, 2) }} บาท
                     </td>
