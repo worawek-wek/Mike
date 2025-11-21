@@ -528,9 +528,9 @@ class BillController extends Controller
             $expenses->name  =  $receipt->renter->fullName();
             $expenses->address  =  $receipt->renter->fullThaiAddress();
             $expenses->id_card_number  =  $receipt->renter->id_card_number;
-            $expenses->branch  =  0;
+            // $expenses->branch  =  0;
             $expenses->phone  =  $receipt->renter->phone;
-            $expenses->remark  =  0;
+            // $expenses->remark  =  0;
             $expenses->ref_receipt_id  =  $receipt->id;
             $expenses->ref_user_id  =  Auth::id();
             $expenses->ref_branch_id  =  session("branch_id");

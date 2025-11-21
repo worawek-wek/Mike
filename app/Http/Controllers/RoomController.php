@@ -462,7 +462,7 @@ class RoomController extends Controller
                                                 ->toArray();
         $data['address'] = $room_for_rent->addess.' '.@$subdistrict->name_in_thai.' '.@$district.' '.@$province.' '.@$subdistrict->zip_code;
         // return $room_for_rent->room_for_rent_id;
-        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
+        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_2 = RentBill::where('ref_type_id', 2)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_type_4 = RentBill::where('ref_type_id', 4)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
         $move_invoice_5 = RentBill::where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first();
@@ -1034,17 +1034,27 @@ class RoomController extends Controller
         return view('room/room-rental-reservation', $data);
     }
 //// ดึงห้อง ย้ายออกหลายห้อง
-    public function get_room_move_out($id)
+    public function get_room_move_out(Request $request, $renter_id)
     {
 
         $data['page_url'] = 'room';
-        $room = Room::whereHas('room_for_rent_s', function ($query) use ($id) {
-                    $query->where('ref_renter_id', $id);
-                })
-                ->where('status', 2)
+        $data['renter_id'] = $renter_id;
+        $room = Room::whereHas('room_for_rent_s', function ($query) use ($renter_id) {
+                    $query->where('ref_renter_id', $renter_id);
+                });
+        if($request->delete_move_out_rooms){
+            $room = $room->whereNotIn('id', $request->delete_move_out_rooms);
+        }
+        $room = $room->where('status', 2)
                 ->get();
+
+        $calculate = 0;
+
         foreach($room as $row){
-            
+            // if(!$row['move_invoice_4']){
+            //     continue;
+            // }
+            // return $row['move_invoice_4'];
             $move_invoice_type_7 = RentBill::where('ref_contract_id', $row->contract->id)->where('ref_type_id', 7)->first(); // invoice ย้ายออก
             
             $move_invoice_6 = RentBill::with('payment_list')->where('ref_type_id', 6)->where('ref_contract_id', $row->contract->id)->latest()->first(); // เงินประกัน
@@ -1104,7 +1114,19 @@ class RoomController extends Controller
                 $move_invoice_6 = RentBill::where('ref_type_id', 6)->where('ref_contract_id', $row->contract->id)->latest()->first(); // เงินประกัน
 
             }
+
+            $calculate += $move_invoice_6->total_amount ?? 0;
+
             $move_invoice_4 = RentBill::where('ref_type_id', 4)->where('ref_room_id', $row->id)->where('ref_contract_id', $row->contract->id)->first();
+            if($move_invoice_4){
+                $move_receipt_4 = Receipt::where('ref_rent_bill_id', $move_invoice_4->id)->where('payment_channel', 3)->first();
+                // $calculate -= $move_receipt_4->total_amount ?? 0;
+            }
+            // if(count($move_invoice_4->receipt ?? []) > 0){
+            //     return $move_invoice_4->receipt;
+            // }
+            // return $move_invoice_4;
+            
 
             $row['move_invoice_4'] = $move_invoice_4;
             $row['move_invoice_6'] = $move_invoice_6;
@@ -1112,6 +1134,18 @@ class RoomController extends Controller
         }
         DB::commit();
         $data['room'] = $room;
+        $data['calculate'] = $calculate;
+        $data['payment_channel'] = [ 1 => 'เงินสด', 2 => 'โอนเงิน', 3 => 'หักจากเงินประกัน'];
+
+        $data['days'] = [
+            'Sunday'    => 'อาทิตย์',
+            'Monday'    => 'จันทร์',
+            'Tuesday'   => 'อังคาร',
+            'Wednesday' => 'พุธ',
+            'Thursday'  => 'พฤหัสบดี',
+            'Friday'    => 'ศุกร์',
+            'Saturday'  => 'เสาร์',
+        ];
         // $data['move_invoice_type_7'] = $move_invoice_type_7;
         // $data['move_invoice_6'] = $move_invoice_6;
         // // $reservation_room_has = Contract::where('ref_renter_id', $id)->groupBy('ref_room_id')->get('ref_room_id')->toArray();
@@ -1212,9 +1246,9 @@ class RoomController extends Controller
             $expenses->name  =  $receipt->renter->fullName();
             $expenses->address  =  $receipt->renter->fullThaiAddress();
             $expenses->id_card_number  =  $receipt->renter->id_card_number;
-            $expenses->branch  =  0;
+            // $expenses->branch  =  0;
             $expenses->phone  =  $receipt->renter->phone;
-            $expenses->remark  =  0;
+            // $expenses->remark  =  0;
             $expenses->ref_user_id  =  Auth::id();
             $expenses->ref_receipt_id  =  $receipt->id;
             $expenses->ref_branch_id  =  session("branch_id");
@@ -1233,11 +1267,19 @@ class RoomController extends Controller
     // บันทึก ย้ายออก
     public function move_out_form_all(Request $request)
     {
-        // return $request->ref_renter_id;
+        // return $request;
         try{
-            $room = Room::whereHas('room_for_rent_main', function ($query) use ($request) {
-                                                    $query->where('ref_renter_id', $request->ref_renter_id);
-                                                })->update([ 'status' => 0 ]);
+            
+            foreach($request->room as $room){
+                
+                // $request->room_single;
+                $merged = array_merge($room, $request->insert_single);
+                $this->move_out_submit(new Request($merged));
+            }
+            return true;
+            // $room = Room::whereHas('room_for_rent_main', function ($query) use ($request) {
+            //                                         $query->where('ref_renter_id', $request->ref_renter_id);
+            //                                     })->update([ 'status' => 0 ]);
 //             $meter = Meter::where('ref_room_id', $request->room_id)->orderBy('year', 'desc')->orderBy('month', 'desc')->first();	
 //             if($meter){
 //                 $room->move_out_electricity_meter = $meter->electricity_unit;
@@ -1681,9 +1723,9 @@ class RoomController extends Controller
                 $expenses->name  =  $receipt->renter->fullName();
                 $expenses->address  =  $receipt->renter->fullThaiAddress();
                 $expenses->id_card_number  =  $receipt->renter->id_card_number;
-                $expenses->branch  =  0;
+                // $expenses->branch  =  0;
                 $expenses->phone  =  $receipt->renter->phone;
-                $expenses->remark  =  0;
+                // $expenses->remark  =  0;
                 $expenses->ref_user_id  =  Auth::id();
                 $expenses->ref_receipt_id  =  $receipt->id;
                 $expenses->ref_branch_id  =  session("branch_id");
@@ -2689,9 +2731,9 @@ class RoomController extends Controller
                             $expenses->name  =  $receipt->renter->fullName();
                             $expenses->address  =  $receipt->renter->fullThaiAddress();
                             $expenses->id_card_number  =  $receipt->renter->id_card_number;
-                            $expenses->branch  =  0;
+                            // $expenses->branch  =  0;
                             $expenses->phone  =  $receipt->renter->phone;
-                            $expenses->remark  =  0;
+                            // $expenses->remark  =  0;
                             $expenses->ref_user_id  =  Auth::id();
                             $expenses->ref_receipt_id  =  $receipt->id;
                             $expenses->ref_branch_id  =  session("branch_id");
@@ -2835,9 +2877,9 @@ class RoomController extends Controller
                             $expenses->name  =  $receipt->renter->fullName();
                             $expenses->address  =  $receipt->renter->fullThaiAddress();
                             $expenses->id_card_number  =  $receipt->renter->id_card_number;
-                            $expenses->branch  =  0;
+                            // $expenses->branch  =  0;
                             $expenses->phone  =  $receipt->renter->phone;
-                            $expenses->remark  =  0;
+                            // $expenses->remark  =  0;
                             $expenses->ref_user_id  =  Auth::id();
                             $expenses->ref_receipt_id  =  $receipt->id;
                             $expenses->ref_branch_id  =  session("branch_id");

@@ -70,7 +70,7 @@
                         <span class="ti ti-droplet me-2 m-auto"></span>
                         <input type="number" name="id_room[]" id="room{{ $row->meters_id }}" class="form-control form-control-sm room{{$key}}"
                             value="{{ intval($row->water_unit) }}" onkeydown="handleInput(event,{{ $row->meters_id }}, this.value, {{ $key }})"
-                            oninput="editRoom({{ $row->meters_id }}, this.value, {{ $row->start_value_of_new_meter ?? 0 }})" style="background-color: #d6f7fb;border-color: #00bad1;"
+                            oninput="editRoom({{ $row->meters_id }}, this.value, {{ $row->start_value_of_new_meter ?? 0 }}, {{ $row->meter_before_change ?? 0 }}, {{ $row->meterPrevious->water_unit ?? 0 }})" style="background-color: #d6f7fb;border-color: #00bad1;"
                             onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                             min="{{ $row->water_unit }}"
                             @if ($permission_meter_water)
@@ -200,8 +200,8 @@
             focus_input_room(1 + k);
         }
     }
-    function editRoom(id, v, p){
-        var c = v-p;
+    function editRoom(id, v, s, b, p){
+        var c = v-s+b-p;
         $('#current_month_usage_water_'+id).html(c);
         // if($('#water_unit' + id).val() != v){
         //     $('#updateRoom' + id).prop('disabled', false);

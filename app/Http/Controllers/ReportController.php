@@ -267,7 +267,7 @@ class ReportController extends Controller
     }
     public function move_out_datatable(Request $request)
     {
-        $results = Receipt::orderBy('id','ASC')
+        $results = Receipt::orderBy('id','DESC')
                             ->where('ref_status_id', 5)
                             ->where('ref_type_id', 7)
                             ->whereHas('room.floor.building', function ($query) {
@@ -282,7 +282,7 @@ class ReportController extends Controller
 
         $limit = $request->limit ?? 15;
 
-        return $results = $results->paginate($limit);
+        $results = $results->paginate($limit);
 
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();

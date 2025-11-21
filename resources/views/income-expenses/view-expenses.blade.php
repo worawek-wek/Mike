@@ -12,20 +12,28 @@
             <thead>
                 <tr>
                     <th width="75%">รายละเอียด</th>
-                    <th>{{ $income_expenses->label }}</th>
+                    <th class="text-end">{{ $income_expenses->label }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>ห้อง</td>
-                    <td>{{ $income_expenses->room->name ?? "รายจ่ายของ Office" }}</td>
+                    <td class="text-end">{{ $income_expenses->room->name ?? "รายจ่ายของ Office" }}</td>
+                </tr>
+                <tr>
+                    <td>เวลา</td>
+                    <td class="text-end">{{ date('H:i น.', strtotime($income_expenses->time)) }}</td>
+                </tr>
+                <tr>
+                    <td>วันที่</td>
+                    <td class="text-end">{{ date('d/m/Y', strtotime($income_expenses->date)) }}</td>
                 </tr>
             </tbody>
             @if ($income_expenses->type == 2)
                 <tbody>
                     <tr>
                         <td>หมวดหมู่</td>
-                        <td>{{ $income_expenses->category->name }}</td>
+                        <td class="text-end">{{ $income_expenses->category->name }}</td>
                     </tr>
                 </tbody>
             @endif
@@ -33,16 +41,16 @@
                 <tr>
                     <td>จำนวนเงิน</td>
                     @if ($income_expenses->type == 1)
-                        <td class="text-success">{{ number_format($income_expenses->receipt->total_amount ?? $income_expenses->total_amount) }} บาท</td>
+                        <td class="text-success text-end">{{ number_format($income_expenses->receipt->total_amount ?? $income_expenses->total_amount) }} บาท</td>
                     @else
-                        <td class="text-danger">- {{ $income_expenses->amount }} บาท</td>
+                        <td class="text-danger text-end">- {{ $income_expenses->amount }} บาท</td>
                     @endif
                 </tr>
             </tbody>
             <tbody>
                 <tr>
                     <td>โดย</td>
-                    <td>{{ $income_expenses->user->name }}</td>
+                    <td class="text-end">{{ $income_expenses->user->name }}</td>
                 </tr>
             </tbody>
         </table>
@@ -52,9 +60,9 @@
             <div class="d-flex">
                 <div class="flex-grow-1 ms-3">
                 <b class="text-black">รายละเอียดหัวบิล</b> <br>
-                    {{ $income_expenses->receipt->renter->fullName().' '.$income_expenses->receipt->renter->fullThaiAddress() }} <br>
-                    เลขประจำตัวผู้เสียภาษี {{ $income_expenses->receipt->renter->id_card_number }} <br>
-                    โทร {{ $income_expenses->receipt->renter->phone }}
+                    {{ $income_expenses->name.' '.$income_expenses->address.' '.$income_expenses->branch }} <br>
+                    เลขประจำตัวผู้เสียภาษี {{ $income_expenses->id_card_number }} <br>
+                    โทร {{ $income_expenses->phone }}
                 </div>
             </div>
         </div>
@@ -63,7 +71,7 @@
             <thead>
                 <tr>
                     <th>รายการ</th>
-                    <th>จำนวนเงิน (บาท)</th>
+                    <th class="text-end">จำนวนเงิน (บาท)</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,12 +83,12 @@
                                 {{ $payment_list_item->title }}
                             </td>
                             <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
-                            @if ($key == 1)
+                            {{-- @if ($key == 1)
                                 <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
                                     <span id="text_water_amount">
                                         - {{ number_format($payment_list_item->price) }}
                                     </span>
-                            @else
+                            @else --}}
                                 @if ($payment_list_item->discount == 1)
                                     {{ number_format(0-$payment_list_item->price) }}
                                     <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
@@ -88,7 +96,7 @@
                                     {{ number_format($payment_list_item->price) }}
                                     <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
                                 @endif
-                            @endif
+                            {{-- @endif --}}
                             </td>
                         </tr>
                     @endforeach
@@ -98,10 +106,20 @@
                 <tr>
                     <th>รวม</th>
                     <th class="text-end mb-0 fw-bold total-price">
-                        {{ $income_expenses->receipt->total_amount ?? $income_expenses->total_amount }}
+                        {{ number_format($income_expenses->receipt->total_amount ?? $income_expenses->total_amount) }}
                     </th>
                 </tr>
             </tfoot>
         </table>
+    <label class="mt-4"><b>หมายเหตุ :</b> {{ $income_expenses->remark }}</label>
+    @else
+        <label for="exampleFormControlInput1" class="form-label h4">หลักฐานการจ่ายเงิน</label>
+        <div class="col-sm-6 mb-3">
+            <img src="/upload/expenses/{{ $income_expenses->proof_of_payment }}" width="100%">
+        </div>
+        <label for="exampleFormControlInput1" class="form-label h4">หลักฐานการจ่ายเงิน</label>
+        <div class="col-sm-6">
+            <img src="/upload/expenses/{{ $income_expenses->payment_voucher }}" width="100%">
+        </div>
     @endif
 </div>

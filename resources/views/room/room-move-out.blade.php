@@ -1,8 +1,10 @@
-{{-- Form ชำระ ค่า จองหลายห้อง --}}
-{{-- @php
-    $id = []
-@endphp --}}
-
+{{-- ย้ายออก หลายห้อง --}}
+<style>
+    .table-detail-receipt th,
+    .table-detail-receipt td {
+        border: 1px solid #d9d9d9 !important;
+    }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
@@ -16,101 +18,221 @@
     </h5>
     <div class="px-4 pb-4">
         @foreach ($room as $key => $row)
-        <input type="hidden" name="ref_renter_id" value="{{ @$row->rent_bill_rent->ref_renter_id }}">
-        <input type="hidden" name="receipt_invoice_id" value="{{ @$row['move_invoice_4']->id }}">
-        <input type="hidden" name="deposit_refuninvoice_id" value="{{ @$row['move_invoice_4']->id }}">
-        <label class="my-4 text-success" style="font-weight: 500;font-size: large;" for="">
-            {{ $row->name }}
-        </label>
-        {{-- @if (@$row['move_invoice_4']->payment_list) --}}
-            <table class="table table-bordered table-detail mb-4" id="discount-table3" >
-                <thead>
-                    <tr>
-                        <th>รายการใบเสร็จย้ายออก</th>
-                        <th width="35%">จำนวนเงิน (บาท)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        @php
-                            $amount_receipt = 0;
-                        @endphp
-                        @forelse ($row['move_invoice_4']->payment_list ?? [] as $key => $receipt)
-                        @php
-                            $amount_receipt += $receipt->price;
-                        @endphp
-                            <tr style="pointer-events: none;  /* ปิดคลิก */
-                                opacity: 0.6;          /* ให้ดูจางลง */
-                                cursor: not-allowed;   /* เปลี่ยนเมาส์เป็นรูปห้าม */">
-                                <td>
-                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $receipt->title }}">
-                                </td>
-                                <td class="text-end">
-                                    <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase receipt-list" value="{{ (int)$receipt->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_receipt({{ $key }})">
-                                </td>
-                            </tr>
-                        @empty
+            <input type="hidden" name="room[{{$key}}][ref_renter_id]" value="{{ @$row->move_invoice_type_7->room_for_rent->ref_renter_id }}">
+            <input type="hidden" name="room[{{$key}}][invoice_id]" value="{{ @$row->move_invoice_type_7->id }}">
+            <input type="hidden" id="type_move_out" name="room[{{$key}}][type_move_out]" value="1">
+            <input type="hidden" name="room[{{$key}}][room_id]" value="{{ $row->id }}">
+            
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
+                <h4 class="my-3 text-success" style="font-weight: bold;text-align: center !important;" for="">
+                    <u>{{ $row->name }}</u>
+                </h4>
+                <a href="javascript:void(0)" onclick="deleteMoveOutRoom({{$row->id}})">
+                    <i class="fa fa-trash text-danger"></i>
+                </a>
+            </div>
+            <div></div>
+            <label class="mb-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">1</span>
+                ใบเสร็จย้ายออก
+            </label>
+            @if (@$row['move_invoice_4'])
+            
+                {{-- //////////////////////////////////////////////// --}}
+                    <div class="my-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                        <div class="d-flex">
+                            <div class="flex-grow-1 ms-3">
+                            <b class="text-black">รายละเอียดหัวบิล</b> <br>
+                                {{ $row['move_invoice_4']->name }} <br>
+                                เลขประจำตัวผู้เสียภาษี {{ $row['move_invoice_4']->id_card_number }} <br>
+                                โทร {{ $row['move_invoice_4']->phone }}
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-detail-receipt mb-4">
+                        <thead>
                             <tr>
-                                <td>
-                                    <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="">
-                                </td>
-                                <td class="text-end">
-                                    <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase receipt-list" value="0" placeholder="จำนวนเงิน" max="" oninput="calculate_receipt({{ $key }})">
-                                </td>
+                                <th>รายการ</th>
+                                <th width="30%">จำนวนเงิน (บาท)</th>
                             </tr>
-                        @endforelse
-                </tbody>
-                <tfoot>
-                        <input type="hidden" class="total-receipt{{ $key }}" value="{{ $amount_receipt }}">
-                    <tr>
-                        <th>รวม</th>
-                        <th class="text-end mb-0 fw-bold total-receipt{{ $key }}">
-                            {{ $amount_receipt }}
-                        </th>
-                    </tr>
-                </tfoot>
-            </table>
-            <table class="table table-bordered table-detail" id="discount-table3" >
-                <thead>
-                    <tr>
-                        <th>รายการคืนเงินประกัน</th>
-                        <th width="35%">จำนวนเงิน (บาท)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        @foreach ($row['move_invoice_6']->payment_list as $k => $prakan)
-                        @php
-                        // if ($prakan->discount == 1) {
-                        //     continue;
-                        // }
-                            
-                        @endphp
+                        </thead>
+                        <tbody>
+                            @foreach ($row['move_invoice_4']->payment_list as $key => $payment_list_item)
+                                <tr>
+                                    {{-- <td>ค่าเช่าห้อง (Room rate) {{ $row['move_invoice_4']->room_for_rent->room->name }} เดือน {{ $row['move_invoice_4']->month.'/'.$row['move_invoice_4']->year }}</td> --}}
+                                    <td>
+                                        {{ $payment_list_item->title }}
+                                    </td>
+                                    <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                        @if ($payment_list_item->discount == 1)
+                                            {{ number_format(0-$payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                        @else
+                                            {{ number_format($payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                        @endif
+                                        <input type="hidden" name="payment_list[price][]" class="{{ $payment_list_item->discount == 1 ? "" : "" ; }} calculate_2" value="{{ $payment_list_item->price }}">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
                             <tr>
-                                <td>
-                                    @if ($k == 0)
-                                        {{ $prakan->title }}
-                                        <input name="payment_list_p[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
-                                    @else
-                                        <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title deposit-list" placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <input type="number" name="payment_list_p[price][]" class="form-control calculate_3 price_increase deposit-list" value="{{ (int)$prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
-                                </td>
+                                <th>รวม</th>
+                                <th class="text-end mb-0 fw-bold total-price">
+                                    {{ number_format($row['move_invoice_4']->total_amount) }}
+                                </th>
                             </tr>
-                        @endforeach
-                    
+                        </tfoot>
+                    </table>
 
-                </tbody>
-                <tfoot>
-                        <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ isset($row['move_invoice_6']) ? $row['move_invoice_6']->payment_list->sum('price') : 0 }}">
-                    <tr>
-                        <th>รวม</th>
-                        <th class="text-end mb-0 fw-bold total-price_3">
-                            {{ isset($row['move_invoice_6']) ? $row['move_invoice_6']->payment_list->sum('price') : 0 }}
-                        </th>
-                    </tr>
-                </tfoot>
-            </table>
+
+                {{-- /////////////////////////////////////////////////////// --}}
+                @if (@$row['move_invoice_4']->receipt[0])
+
+                    <div class="p-4 mb-4" style="border: 1px solid #59d57a;border-radius: 5px;">
+                        <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $row['move_invoice_4']->receipt[0]->receipt_number }}</span></p>
+                            <table class="table table-detail table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td width="50%">
+                                            <span style="color: black; font-weight: 500;">รายละเอียดหัวบิล</span> <br>
+                                            {{ $row['move_invoice_4']->name }} <br>
+                                            เลขประจำตัวผู้เสียภาษี {{ $row['move_invoice_4']->id_card_number }} <br>
+                                            โทร {{ $row['move_invoice_4']->phone }}
+                                        </td>
+                                        <td style="color: black;">
+                                                    @php
+                                                        $date = new DateTime(date('Y-m-d', strtotime($row['move_invoice_4']->created_at)));
+                                                        $englishDay = $date->format('l');
+                                                        $payment_channel = [1 => 'เงินสด', 2 => 'โอนเงิน', 3 => 'หักจากเงินประกัน'];
+                                                    @endphp
+                                                        <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($row['move_invoice_4']->created_at)) !!}<br>
+                                                        <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; <span @if($row['move_invoice_4']->payment_channel == 3) class="text-danger" @endif>{{ $payment_channel[$row['move_invoice_4']->payment_channel] }}</span><br>
+                                                        <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $row['move_invoice_4']->user->name }}<br>
+                                                        &nbsp;
+                                        </td>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <table class="table table-detail table-bordered mt-4">
+                                <thead>
+                                    <tr>
+                                        <th width="70%" style="vertical-align: middle;font-weight: 500;">รายการ</th>
+                                        <th style="vertical-align: middle;font-weight: 500;">
+                                            จำนวนเงิน (บาท)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $amount = 0;
+                                    @endphp
+                                    @foreach ($row['move_invoice_4']->receipt[0]->payment_list as $key => $item_payment_list)
+                                    <tr>
+                                        <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                            {{ $item_payment_list->title }}
+                                        </td>
+
+                                            @if ($item_payment_list->discount == 1)
+                                                @php
+                                                    $amount -= $item_payment_list->price;
+                                                @endphp
+                                                <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+
+                                            @else
+                                                @php    
+                                                $amount += $item_payment_list->price;
+                                                @endphp
+                                                <td>{{ number_format($item_payment_list->price) }}</td>
+                                            @endif
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>รวม</th>
+                                        <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                                        {{ number_format($amount) }}
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            {{--  --}}
+                            <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
+                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_4']->id }})">
+                                    <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
+                                </button>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center text-warning mb-4">
+                            <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                            <input type="hidden" id="check_bill" value="1">
+                            โปรดชำระเงินใบเสร็จย้ายออก.!
+                        </div>
+                    @endif
+                @else
+                    <div class="text-center text-muted mb-4">
+                        <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                        ไม่พบใบเสร็จย้ายออก
+                    </div>
+                @endif
+
+    {{-- ///////////////////////////////////////////////////////////////////////// --}}
+    {{-- ///////////////////////////////////////////////////////////////////////// --}}
+    {{-- ///////////////////////////////////////////////////////////////////////// --}}
+                <div></div>
+                <label class="mb-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                    <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
+                    เงินประกัน
+                </label>
+                <table class="table table-bordered table-detail mb-4" id="discount-table3" >
+                    <thead>
+                        <tr>
+                            <th>รายการคืนเงินประกัน</th>
+                            <th width="35%">จำนวนเงิน (บาท)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            @foreach ($row['move_invoice_6']->payment_list as $k => $prakan)
+                            @php
+                            // if ($prakan->discount == 1) {
+                            //     continue;
+                            // }
+                                
+                            @endphp
+                                <tr>
+                                    <td>
+                                        @if ($k == 0)
+                                            {{ $prakan->title }}
+                                            <input name="payment_list_p[title][]" type="hidden" class="payment_list_title" value="{{ $prakan->title }}">
+                                        @else
+                                            <input name="payment_list_p[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $prakan->title }}">
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <input type="hidden" name="payment_list_p[price][]" class="form-control" value="{{ (int)$prakan->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_3Price()">
+                                        {{ number_format((int)$prakan->price) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        
+
+                    </tbody>
+                    <tfoot>
+                            <input type="hidden" class="total-price_3" id="deposit_amount" value="{{ isset($row['move_invoice_6']) ? $row['move_invoice_6']->payment_list->sum('price') : 0 }}">
+                        <tr>
+                            <th>รวม</th>
+                            <th class="text-end mb-0 fw-bold total-price_3">
+                                {{ isset($row['move_invoice_6']) ? number_format($row['move_invoice_6']->payment_list->sum('price')) : 0 }}
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+                @if(!$loop->last)
+                    <hr class="text-warning">
+                @endif
         {{-- @endif --}}
         @endforeach
     </div>
@@ -124,9 +246,10 @@
         <div class="mb-3 pb-4" style="border: 1px solid #dbdade;padding: 15px 2px;">
             <div class="d-flex">
                 <div class="flex-grow-1 ms-3 g-3 row">
+                    <input type="hidden" name="insert_single[payment_format]" value="1">
                     <b class="text-black">ช่องทางการชำระเงิน</b> <br>
                     <div class="col-sm-11">
-                        <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByCashLhai" value="1" checked>
+                        <input name="insert_single[receipt_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByCashLhai" value="1" checked>
                         <label class="form-check-label" for="reservation_payByCashLhai"> เงินสด </label>
                     </div>
 
@@ -138,7 +261,7 @@
                     </div>
 
                     <div class="col-sm-11">
-                        <input name="insert_single[payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByTransferLhai" value="2">
+                        <input name="insert_single[receipt_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByTransferLhai" value="2">
                         <label class="form-check-label" for="reservation_payByTransferLhai"> โอนเงิน </label>
                     </div>
 
@@ -170,10 +293,17 @@
                     </div>
 
                     <div class="col-sm-11 mt-3">
-                        <b id="totalpayfull2">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price-lhai">
-                            0
-                        </span> &nbsp;บาท</b>
-                        <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price-lhai_2">0</span> &nbsp;บาท</b>
+                        <h4 class="my-4" align="center">
+                            @if ($calculate >= 0)
+                            <span class="text-danger">
+                                ยอดเงินประกันคืนผู้เช่า
+                            @else
+                            <span class="text-success">
+                                เก็บเงินผู้เช่าเพิ่ม
+                            @endif
+                            &nbsp; {{ number_format(abs($calculate)) }}&nbsp; บาท
+                            </span>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -181,7 +311,11 @@
     </div>
 </div>
 
-  <script>
+  <script>    
+        function deleteMoveOutRoom(room_id) {
+            deleteMoveOutRooms.push(room_id);   // ✔ push room_id เข้า array
+            get_room_move_out("{{ $renter_id }}")
+        }
         function calculate_receipt(k){
             let total = 0;
 
@@ -257,89 +391,6 @@
         }
         handleFileInput('evidence_of_money_transfer', 'preview1');
 
-        calculateLhaiPrice();
-        
-        document.getElementById('add_discount2').addEventListener('click', function() {
-            const tableBody = document.querySelector('#discount-table2 tbody');
-            const newRow = document.createElement('tr');
-            newRow.style.backgroundColor = 'rgb(252 228 228)'; // Set background color
-            
-            newRow.innerHTML = `
-                <td>
-                    <input name="discount_title" type="text" class="form-control" placeholder="หัวข้อส่วนลด" required />
-                </td>
-                <td class="text-end">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="discount_lhai_price" type="number" class="form-control calculateLhai discount_lhai_price" oninput="calculateLhaiPrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
-                        <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
-                    </div>
-                </td>
-            `;
-            
-            tableBody.appendChild(newRow);
-            addRemoveEvent(newRow);
-        });
-
-        document.getElementById('add_expenses2').addEventListener('click', function() {
-            const tableBody = document.querySelector('#discount-table2 tbody');
-            const newRow = document.createElement('tr');
-            newRow.style.backgroundColor = 'rgb(255 240 225)'; // Set background color
-            console.log(newRow);
-            newRow.innerHTML = `
-                <td>
-                    <input name="expenses_title" type="text" class="form-control" placeholder="หัวข้อรายการ" required />
-                </td>
-                <td class="text-end">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="expenses_price" type="number" class="form-control calculateLhai add_expenses2_price" oninput="calculateLhaiPrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
-                        <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
-                    </div>
-                </td>
-            `;
-            
-            tableBody.appendChild(newRow);
-            addRemoveEvent(newRow);
-        });
-    
-        function addRemoveEvent(row) {
-            row.querySelector('.remove-row').addEventListener('click', function() {
-                row.remove();
-                calculateLhaiPrice();
-            });
-        }
-        
-        function calculateLhaiPrice() { 
-            const inputs = document.querySelectorAll('.calculateLhai');  // เลือกทุก input ที่มี class="calculateLhai"
-            let total = 0;
-
-            inputs.forEach(input => {
-                // ลบเครื่องหมายจุลภาคจากค่าที่รับมา
-                let value = input.value.replace(/,/g, ''); 
-                
-                if (value.trim() !== "" && !isNaN(value)) {
-                    // ตรวจสอบว่า input มี class="discount_lhai_price" หรือไม่
-                    if (input.classList.contains('discount_lhai_price')) {
-                        // ถ้ามี class="discount_lhai_price", ลบค่าออกจาก total
-                        total -= parseFloat(value.replace(/[^0-9.-]+/g, ""));
-                    } else {
-                        // ถ้าไม่มี class="discount_lhai_price", เพิ่มค่าเข้าไปใน total
-                        if (!isNaN(value) && value.trim() !== "") {
-                            total += parseFloat(value);
-                        }
-                    }
-                }
-            });
-            console.log(total);
-            $('.total-price-lhai').html(total.toLocaleString());
-            $('.total-price-lhai').val(total);
-
-            // อัปเดตค่า total ใน span#total-price-lhai
-            // document.getElementById('total-price-lhai').innerText = total.toLocaleString();
-        }
-        $('#select2RenterReservation').select2();
-
-        // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
-        // togglePaymentFields();
         
     function deleteBillReserveRoom(id){
         if ($('.billReserveRoom').length > 1) {

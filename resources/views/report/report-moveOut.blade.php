@@ -142,7 +142,7 @@
                                                             <input type="date" class="form-control">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
-                                                            <button
+                                                            {{-- <button
                                                                 class="btn btn-secondary add-new btn-label-primary me-2 ms-sm-0 waves-effect waves-light"
                                                                 tabindex="0" aria-controls="DataTables_Table_0"
                                                                 type="button">
@@ -151,7 +151,7 @@
                                                                     <span class="d-none d-sm-inline-block">พิมพ์
                                                                     </span>
                                                                 </span>
-                                                            </button>
+                                                            </button> --}}
                                                             <div class="btn-group">
                                                                 <button
                                                                     class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"

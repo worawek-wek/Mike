@@ -86,19 +86,19 @@
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <label for="" class="form-label">ชื่อบริษัท/ชื่อเต็ม<span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="" value="{{@$data->company_name}}" required />
+                                                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="ชื่อบริษัท/ชื่อเต็ม" value="{{@$data->company_name}}" required />
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <label for="" class="form-label">ที่อยู่</label>
-                                                    <textarea rows="3" id="address" name="address" class="form-control">{{@$data->address}}</textarea>
+                                                    <textarea rows="3" id="address" name="address" class="form-control" placeholder="ที่อยู่">{{@$data->address}}</textarea>
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <label for="" class="form-label">เลขประจำตัวผู้เสียภาษี</label>
-                                                    <input type="text" class="form-control" id="tax_no" name="tax_no" value="{{@$data->tax_no}}" placeholder="" />
+                                                    <input type="text" class="form-control" id="tax_no" name="tax_no" value="{{@$data->tax_no}}" placeholder="เลขประจำตัวผู้เสียภาษี" oninput="this.value=this.value.slice(0,13);" pattern="^\d{13}$" />
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <label for="" class="form-label">เบอร์โทร</label>
-                                                    <input type="text" class="form-control" id="phone" name="phone" value="{{@$data->phone}}" placeholder="" />
+                                                    <input type="text" class="form-control" id="phone" name="phone" value="{{@$data->phone}}" placeholder="เบอร์โทร" oninput="this.value=this.value.slice(0,10);" pattern="^\d{9,10}$" />
                                                 </div>
                                                 <div class="col-sm-6">
                                                     {{-- <label for="" class="form-label">อีเมล</label> --}}

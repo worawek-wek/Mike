@@ -199,19 +199,19 @@
                                                     <b class="text-black">รูปแบบการชำระเงิน</b> <br>
                                                             <div class="col-sm-11">
                                                                 <input name="payment_format" class="form-check-input" type="radio" id="payfull" value="1" 
-                                                                @if (count($move_invoice_7->receipt) == 0)
+                                                                {{-- @if (count($move_invoice_7->receipt) == 0) --}}
                                                                 checked    
-                                                                @else
+                                                                {{-- @else
                                                                 disabled
-                                                                @endif
+                                                                @endif --}}
                                                                 >
                                                                 <label class="form-check-label" for="payfull"> จ่ายเต็มจำนวน </label>
                                                             </div>
                                                             <div class="col-sm-11">
                                                                 <input name="payment_format" class="form-check-input" type="radio" id="checksplit" value="2"
-                                                                @if (count($move_invoice_7->receipt) > 0)
+                                                                {{-- @if (count($move_invoice_7->receipt) > 0)
                                                                 checked    
-                                                                @endif
+                                                                @endif --}}
                                                                 disabled
                                                                 > 
                                                                 <label class="form-check-label" for="checksplit"> แบ่งจ่าย </label>
@@ -840,7 +840,7 @@
                                         </span>
                                         {{-- <h4 class="my-4 amount">  </h4> --}}
                                         <h4 class="my-4">
-                                            @if ($cal > 0)
+                                            @if ($cal >= 0)
                                             <span class="text-danger">
                                                 ยอดเงินประกันคืนผู้เช่า
                                             @else
@@ -1065,7 +1065,7 @@
                                                     </script>
 
                                                     <h4 class="text-center">
-                                                        @if ($cal > 0)
+                                                        @if ($cal >= 0)
                                                         <span class="text-danger">
                                                             ยอดเงินประกันคืนผู้เช่า
                                                         @else

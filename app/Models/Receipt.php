@@ -20,6 +20,10 @@ class Receipt extends Model
     {
         return $this->hasOne('App\Models\Renter', 'id', 'ref_renter_id');
     }
+    public function status()
+    {
+        return $this->hasOne('App\Models\StatusRentBill', 'id', 'ref_status_id');
+    }
     public function bank()
     {
         return $this->hasOne('App\Models\Bank', 'id', 'ref_bank_id');
@@ -27,6 +31,14 @@ class Receipt extends Model
     public function invoice()
     {
         return $this->hasOne('App\Models\RentBill', 'id', 'ref_rent_bill_id');
+    }
+    public function receipt_move_out() // บิลย้ายออก
+    {
+        return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 4);
+    }
+    public function deposit_move_out() // บิลคืนเงินประกิน
+    {
+        return $this->hasOne(RentBill::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 6);
     }
     public function room()
     {

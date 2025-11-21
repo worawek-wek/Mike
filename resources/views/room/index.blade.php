@@ -9,17 +9,17 @@
 </head>
 
 <div id="loadingOverlay" style="display: none;">
-  <div class="col">
-    <!-- Chase -->
-    <div class="sk-chase sk-primary m-auto">
-        <div class="sk-chase-dot"></div>
-        <div class="sk-chase-dot"></div>
-        <div class="sk-chase-dot"></div>
-        <div class="sk-chase-dot"></div>
-        <div class="sk-chase-dot"></div>
-        <div class="sk-chase-dot"></div>
+    <div class="col">
+        <!-- Chase -->
+        <div class="sk-chase sk-primary m-auto">
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+        </div>
     </div>
-</div>
 </div>
 
 <style>
@@ -909,6 +909,8 @@
             // var myModal = new bootstrap.Modal(document.getElementById('reservation'));
             //     myModal.show();
         }
+        let deleteMoveOutRooms = []; // สร้าง array ไว้ข้างนอก
+
         function get_room_move_out(id){ // Show form ชำระค่าจอง หลายห้อง
             if(id == 'no'){
                 $("#room-move-out").html('');
@@ -918,6 +920,9 @@
             $.ajax({
                 type: "GET",
                 url: "{{ $page_url }}/get-room-move-out/"+id,
+                data: {
+                    delete_move_out_rooms : deleteMoveOutRooms
+                },
                 success: function(data) {
 
                     $("#room-move-out").html(data);
@@ -962,12 +967,12 @@
                     //     dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
                     //     width: '100%'
                     // });
-                    $('#select2month').select2({
-                        placeholder: 'เลือกเดือน',
-                        allowClear: true,
-                        dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                        width: '100%'
-                    });
+                    // $('#select2month').select2({
+                    //     placeholder: 'เลือกเดือน',
+                    //     allowClear: true,
+                    //     dropdownParent: $('#insurance'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
+                    //     width: '100%'
+                    // });
                 }
             });
         }
@@ -1995,9 +2000,9 @@
             // if(total_amount < 0){
             //     return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
             // }
-            var check = $('#check-rent-bell').val();
+            var check = $('#check_bill').val();
             if(check == 1){
-                return Swal.fire('กรุณาเคลียร์บิลค่าเช่าก่อน.!', '', 'warning');
+                return Swal.fire('กรุณาเคลียร์บิลใบเสร็จย้ายออกก่อน.!', '', 'warning');
             }
             Swal.fire({
                 title: 'ยืนยันการดำเนินการ?',

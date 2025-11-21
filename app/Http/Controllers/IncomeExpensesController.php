@@ -127,11 +127,11 @@ class IncomeExpensesController extends Controller
                         'proof_of_payment.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
                     ]);
                 // return 123;
-                $file = $request->file('proof_of_payment');
-                $nameExtension = $file->getClientOriginalName();
+                $p_file = $request->file('proof_of_payment');
+                $nameExtension = $p_file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
                 $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
-                $path = "upload/expenses/";
+                $p_path = "upload/expenses/";
                 $proof_of_payment = $img_name.rand().'.'.$extension;
                 $insert_income_expenses->proof_of_payment = $proof_of_payment;
             }
@@ -145,11 +145,11 @@ class IncomeExpensesController extends Controller
                         'payment_voucher.mimes' => 'รูปภาพต้องเป็นไฟล์ประเภท: jpeg, png, jpg, gif หรือ webp',
                         'payment_voucher.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
                     ]);
-                $file = $request->file('payment_voucher');
-                $nameExtension = $file->getClientOriginalName();
+                $v_file = $request->file('payment_voucher');
+                $nameExtension = $v_file->getClientOriginalName();
                 $extension = pathinfo($nameExtension, PATHINFO_EXTENSION);
                 $img_name = pathinfo($nameExtension, PATHINFO_FILENAME);
-                $path = "upload/expenses/";
+                $v_path = "upload/expenses/";
                 $payment_voucher = $img_name.rand().'.'.$extension;
                 $insert_income_expenses->payment_voucher = $payment_voucher;
             }
@@ -199,6 +199,8 @@ class IncomeExpensesController extends Controller
                     $pay_list->save();
                 }
             }
+            if(@$p_file) $p_file->move($p_path, $proof_of_payment);
+            if(@$v_file) $v_file->move($v_path, $payment_voucher);
             
             DB::commit();
             return 1;

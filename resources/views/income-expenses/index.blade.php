@@ -363,19 +363,19 @@
                     <div class="row g-3">
                         <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">รายละเอียด <span class="text-danger">*</span></label>
-                            <input name="label" type="text" class="form-control" id="exampleFormControlInput1" placeholder="รายละเอียด" />
+                            <input name="label" type="text" class="form-control" id="exampleFormControlInput1" placeholder="รายละเอียด" required/>
                         </div>
                         {{-- <div class="col-sm-12">
                             <label for="exampleFormControlInput1" class="form-label">จำนวนเงิน (บาท) <span class="text-danger">*</span></label>
                             <input name="amount" type="text" class="form-control" id="exampleFormControlInput1" placeholder="จำนวนเงิน" />
                         </div> --}}
-                        <div class="col-sm-6">
-                            <label for="bs-datepicker-format-2" class="form-label">เวลา <span class="text-danger">*</span></label>
-                            <input name="time" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="เวลา" autocomplete="off"/>
+                        <div class="col-sm-2">
+                            <label for="time" class="form-label">เวลา <span class="text-danger">*</span></label>
+                            <input name="time" type="time" class="form-control" id="time" placeholder="เวลา" autocomplete="off" required/>
                         </div>
                         <div class="col-sm-6">
                             <label for="bs-datepicker-format-2" class="form-label">วันที่ <span class="text-danger">*</span></label>
-                            <input name="date" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="วันที่" autocomplete="off"/>
+                            <input name="date" type="text" class="form-control" id="bs-datepicker-format-2" placeholder="วันที่" autocomplete="off" required/>
                         </div>
                         {{-- <div class="col-sm-6">
                             <label for="C" class="form-label">หมวดหมู่ <span class="text-danger">*</span></label>
@@ -389,7 +389,7 @@
                         </div> --}}
                         <div class="col-sm-12">
                             <label for="selectRoomIncome" class="form-label">รายรับของห้อง <span class="text-danger">*</span></label>
-                            <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" onchange="get_room_rental(this.value)" data-allow-clear="true">
+                            <select name="ref_room_id" id="selectRoomIncome" class="select2 form-select form-select-lg" onchange="get_room_rental(this.value)" data-allow-clear="true" required>
                                 <option value="0">รายรับของ Office</option>
                                 @foreach ($room as $r)
                                         <option value="{{$r->id}}">{{$r->name}}</option>
@@ -430,7 +430,7 @@
                                     <tr style="background-color: rgb(255, 240, 225);">
                                         <td><input class="form-control" name="payment_sd_list[title][]" type="text" placeholder="หัวข้อรายการ" required /></td>
                                         <td>
-                                            <input class="form-control calculate" name="payment_sd_list[price][]"  oninput="calculatePrice()" type="number" placeholder="จำนวนเงิน"/>
+                                            <input class="form-control insert_calculate" name="payment_sd_list[price][]"  oninput="calculatePrice()" type="number" placeholder="จำนวนเงิน"/>
                                             <input type="hidden" name="payment_sd_list[discount][]" value='0'>
                                         </td>
                                     </tr>
@@ -487,7 +487,7 @@
     <!--set rent Modal -->
     <div class="modal fade modalHeadDecor" id="insurance" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content rounded-0" id="view">
+            <div class="modal-content rounded-0 pb-4" id="view">
                 
             </div>
         </div>
@@ -710,7 +710,7 @@
                 </td>
                 <td class="text-end">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="payment_sd_list[price][]" type="number" class="form-control calculate discount_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
+                        <input name="payment_sd_list[price][]" type="number" class="form-control insert_calculate discount_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
                         <input type="hidden" name="payment_sd_list[discount][]" value='1'>
                         <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
                     </div>
@@ -732,7 +732,7 @@
                 </td>
                 <td class="text-end">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <input name="payment_sd_list[price][]" type="number" class="form-control calculate add_expenses_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
+                        <input name="payment_sd_list[price][]" type="number" class="form-control insert_calculate add_expenses_price" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
                         <input type="hidden" name="payment_sd_list[discount][]" value='0'>
                         <button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button>
                     </div>
@@ -751,10 +751,10 @@
         }
 
         function calculatePrice() { 
-            var water_amount = ($('#water_unit').val()-0)*18
-            $('#text_water_amount').html(water_amount.toLocaleString());
-            $('#water_amount').val(water_amount);
-            const inputs = document.querySelectorAll('.calculate');  // เลือกทุก input ที่มี class="calculate"
+            // var water_amount = ($('#water_unit').val()-0)*18
+            // $('#text_water_amount').html(water_amount.toLocaleString());
+            // $('#water_amount').val(water_amount);
+            const inputs = document.querySelectorAll('.insert_calculate');  // เลือกทุก input ที่มี class="calculate"
             let total = 0;
 
             inputs.forEach(input => {
