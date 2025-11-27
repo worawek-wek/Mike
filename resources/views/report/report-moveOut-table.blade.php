@@ -37,11 +37,108 @@
                         </button>
                       </h2>
 
-                      <div id="accordionWithIcon-1{{ $row->id }}" class="accordion-collapse collapse">
+                      <div id="accordionWithIcon-1{{ $row->id }}" class="accordion-collapse collapse show">
                         <div class="accordion-body">
-                          {{-- Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing
-                          marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping
-                          soufflé. Wafer gummi bears marshmallow pastry pie. --}}
+                          @if (@$row->receipt_rent_bill_move_out)
+                          <style>
+                            .table-receipt th {
+                                text-align: center !important;
+                            }
+                          </style>
+                            {{-- <div class="p-4 mb-4" style="border: 1px solid #59d57a;border-radius: 5px;"> --}}
+                                <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $row->receipt_rent_bill_move_out->receipt_number }}</span></p>
+                                    <table class="table table-detail table-bordered mt-4 table-receipt">
+                                        <thead>
+                                            <tr style="background-color: antiquewhite;">
+                                                <th>วันที่</th>
+                                                <th>
+                                                    รับชำระโดย
+                                                </th>
+                                                <th>
+                                                    รูปแบบชำระ
+                                                </th>
+                                                <th>
+                                                    ช่องทางการชำระ
+                                                </th>
+                                                <th>
+                                                    รายการชำระ
+                                                </th>
+                                                <th>
+                                                    จำนวนเงิน (บาท)
+                                                </th>
+                                                <th>
+                                                    รวม
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $rowCount = count($row->receipt_rent_bill_move_out->payment_list);
+                                            @endphp
+                                            @foreach ($row->receipt_rent_bill_move_out->payment_list as $key => $item_payment_list)
+                                                <tr>
+                                                    {{-- แสดงช่องทางการชำระเงินเฉพาะแถวแรก --}}
+                                                    @if($key === 0)
+                                                    <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
+                                                        {{ date('d/m/Y', strtotime($row->receipt_rent_bill_move_out->payment_date)) }}
+                                                    </td>
+                                                    <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
+                                                        {{ $row->receipt_rent_bill_move_out->user->name }}
+                                                    </td>
+                                                    <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
+                                                        {{ $row->receipt_rent_bill_move_out->payment_channel == 3 ? "-" : "จ่ายเต็ม" ; }}
+                                                    </td>
+                                                    <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
+                                                        @switch($row->receipt_rent_bill_move_out->payment_channel)
+                                                            @case(1)
+                                                                เงินสด
+                                                                @break
+
+                                                            @case(2)
+                                                                โอนเงิน
+                                                                @break
+
+                                                            @case(3)
+                                                                หักจากเงินประกัน
+                                                                @break
+
+                                                        @endswitch
+                                                    </td>
+                                                    @endif
+
+                                                    <td>{{ $item_payment_list->title }}</td>
+                                                    @if ($item_payment_list->discount == 1)
+                                                        <td align="right" class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+                                                    @else
+                                                        <td align="right">{{ number_format($item_payment_list->price) }}</td>
+                                                    @endif
+                                                    {{-- แสดงรวมเฉพาะแถวแรก --}}
+                                                    @if($key === 0)
+                                                        <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
+                                                            {{ number_format($row->receipt_rent_bill_move_out->total_amount, 0) }}
+                                                        </td>
+                                                    @endif
+                                                </tr>
+                                            @endforeach
+                                            </tr>
+                                            {{-- @endforeach --}}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr style="background-color: #e5e5e5;">
+                                                <th colspan="6">รวม</th>
+                                                <th align="right" class=" mb-0 fw-bold" style="color: #28c76f !important;text-align: right">
+                                                {{ number_format($row->receipt_rent_bill_move_out->total_amount) }}
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    {{-- <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
+                                        <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row->receipt_rent_bill_move_out->id }})">
+                                            <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
+                                        </button>
+                                    </div> --}}
+                                {{-- </div> --}}
+                            @endif
                         </div>
                       </div>
                     </div>
@@ -53,7 +150,7 @@
                           class="accordion-button collapsed"
                           data-bs-toggle="collapse"
                           data-bs-target="#accordionWithIcon-2{{ $row->id }}"
-                          aria-expanded="false">
+                          aria-expanded="true">
                           ใบเสร็จย้ายออก
                         </button>
                       </h2>
@@ -106,7 +203,7 @@
                                                         {{ $row->receipt_move_out->user->name }}
                                                     </td>
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                        {{ $row->receipt_move_out->payment_channel == 3 ? "หักจากเงินประกัน" : "จ่ายเต็ม" ; }}
+                                                        {{ $row->receipt_move_out->payment_channel == 3 ? "-" : "จ่ายเต็ม" ; }}
                                                     </td>
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
                                                         @switch($row->receipt_move_out->payment_channel)
@@ -119,7 +216,7 @@
                                                                 @break
 
                                                             @case(3)
-                                                                -
+                                                                หักจากเงินประกัน
                                                                 @break
 
                                                         @endswitch
@@ -174,7 +271,7 @@
                           เงินประกัน
                         </button>
                       </h2>
-                      <div id="accordionWithIcon-3{{ $row->id }}" class="accordion-collapse collapse">
+                      <div id="accordionWithIcon-3{{ $row->id }}" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                           @if (@$row->deposit_move_out)
 
@@ -236,7 +333,7 @@
                   </div>
                 </div>
                                     @php
-                                        $calculate = $row->deposit_move_out->total_amount - ($row->receipt_move_out->total_amount ?? 0);
+                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_move_out->total_amount ?? 0) - ($row->receipt_rent_bill_move_out->total_amount ?? 0);
                                     @endphp
                                   <div class="col-sm-11 mt-3">
                                       <h4 class="my-4" align="center">

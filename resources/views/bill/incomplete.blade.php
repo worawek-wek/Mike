@@ -92,13 +92,13 @@
 
                                     {{ $payment_list_item->title }}
 
-                            @if (strpos($payment_list_item->title, 'Water rate') !== false) 
-                                    <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
-                                    <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
-                                        type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
-                                        &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
-                                        = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
-                                @endif
+                                    @if (strpos($payment_list_item->title, 'Water rate') !== false) 
+                                        <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
+                                        <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
+                                            type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
+                                            &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
+                                            = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
+                                    @endif
                                 </td>
                                 <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
                                 @if ($key == 1)

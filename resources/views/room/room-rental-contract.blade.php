@@ -233,8 +233,8 @@
                         <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                     </div>
                     <div class="col-sm-10 mt-3">
-                        <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label>
-                        <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*">
+                        <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label><span class="text-danger"> *</span>
+                        <input type="file" name="evidence_of_money_transfer" class="form-control mb-2" id="evidence_of_money_transfer" accept="image/*" required>
                         <div class="preview-container">
                             <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
                         </div>
@@ -254,6 +254,24 @@
     @endif --}}
     
     <script>
+        document.getElementById('evidence_of_money_transfer').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview1');
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+                preview.style.display = "none";
+            }
+        });
         $('#contract_date').datepicker({
                 format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
                 autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
@@ -288,6 +306,7 @@
                 $('#ref_bank_id').attr('required', true);
                 $('#transfer_time').attr('required', true);
                 $('#payment_date2').attr('required', true);
+                $('#evidence_of_money_transfer').attr('required', true);
             } else {
                 // แสดงช่องเงินสด
                 $('#paymentChanel_Res').hide();
@@ -297,6 +316,7 @@
                 $('#ref_bank_id').removeAttr('required');
                 $('#transfer_time').removeAttr('required');
                 $('#payment_date2').removeAttr('required');
+                $('#evidence_of_money_transfer').removeAttr('required');
             }
         });
 

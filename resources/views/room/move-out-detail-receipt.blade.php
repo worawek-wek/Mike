@@ -182,6 +182,8 @@
                             </button>
                         </div>
                     </div>
+            @else
+            <input type="hidden" id="check_payment_receipt_move_out" value="1">
             @endif
 
                                     <form id="payment_receipt_move_out_bill" enctype="multipart/form-data">
@@ -415,59 +417,4 @@
                                         });
                                     });
                                     
-                                    function changeDeleteReceipt(receipt_id, invoice_id){
-                                        Swal.fire({
-                                            title: 'ยืนยันการดำเนินการ?',
-                                            text: 'คุณต้องการ ยกเลิก ใบเสร็จ หรือไม่?',
-                                            icon: 'warning',
-                                            showCancelButton: true,
-                                            confirmButtonText: 'ตกลง',
-                                            cancelButtonText: 'ยกเลิก',
-                                            showDenyButton: false,
-                                            didOpen: () => {
-                                                // โฟกัสที่ปุ่ม confirm
-                                                Swal.getConfirmButton().focus();
-                                            }
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: "bill/delete-receipt/"+receipt_id,
-                                                    data: {
-                                                        _token: "{{ csrf_token() }}",
-                                                    },
-                                                    success: function(response) {
-                                                        if(response == true){
-                                                            Swal.fire('ยกเลิก ใบเสร็จ เรียบร้อยแล้ว', '', 'success');
-                                                            get_move_out();
-                                                            calculateTotal()
-                                                            calculate_2Price()
-                                                            loadData(page);
-                                                            summary();
-                                                        }
-                                                    
-                                                    },
-                                                    error: function (xhr) {
-                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                                                            let messages = '';
-                                                            $.each(xhr.responseJSON.errors, function (key, value) {
-                                                                messages += value + '<br>';
-                                                            });
-
-                                                            Swal.fire({
-                                                                title: 'เกิดข้อผิดพลาด',
-                                                                html: messages,
-                                                                icon: 'error',
-                                                            });
-                                                        } else {
-                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                                                            console.error('เกิดข้อผิดพลาด:', xhr);
-                                                        }
-                                                    }
-                                                });
-                                            } else if (result.isDismissed) {
-                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
-                                            }
-                                        });
-                                    }
                                 </script>

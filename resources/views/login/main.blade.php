@@ -143,7 +143,20 @@
             email: email,
             password: password
         }).then(res => {
-            location.href = '/branch/manage'
+          Swal.fire({
+                    title: 'เข้าสู่ระบบเรียบร้อย',
+                    icon: 'success',
+                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                    timerProgressBar: true, 
+                    showConfirmButton: false,
+                    customClass: {
+                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                    },
+                }).then((result) => {
+                  
+                    location.href = '/branch/manage'
+
+                                });
         }).catch(err => {
             $('#btn-login').html('Login')
 

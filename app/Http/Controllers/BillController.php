@@ -126,6 +126,7 @@ class BillController extends Controller
                                         ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
                                         // ->with('payment_rent_room_array')
                                         ->whereIn('rent_bills.id', $request->invoice_ids)
+                                        ->whereNotIn('rent_bills.ref_status_id', [3,5])
                                         ->where('rent_bills.ref_type_id', 1)
                                         ->select('rent_bills.*')
                                         ->get();
@@ -135,6 +136,17 @@ class BillController extends Controller
         // $html = view('bill/list-payment-all', $data)->render();
         // $have = count($invoice_alls) > 0 ? 1 : 0;
         // return ['html' => $html, 'have' => $have];
+    }
+    
+    function get_list_payment_by_id(Request $request) // ดึง ห้อง   // ข้อมูลชำระเงินห้อง ที่ติ๊ก
+    {
+        $data['list'] = $request->list;
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
+        // return $request->invoice_ids;
+        $data['invoice'] = RentBill::find($request->invoice_id);
+        // return 123;
+        return view('bill/list-payment-by-id', $data);
+        
     }
     public function waiting_for_confirmation(Request $request) // ดึง ใบเสร็จที่รอคอนเฟิร์มการชำระเงิน ref_status_id = 2
     {
@@ -215,6 +227,7 @@ class BillController extends Controller
     
     public function datatable(Request $request)
     {
+        // return RentBill::find(96)->payment_list;
         $results = RentBill::orderBy('rooms.name')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
@@ -413,6 +426,7 @@ class BillController extends Controller
             $receipt->payment_date  =  $payment_date;
             $receipt->amount  =  $amount;
             $receipt->ref_type_id  =  $request->ref_type_id;
+            $receipt->paid_on_checkout  =  $request->paid_on_checkout ?? 0;
             $receipt->ref_status_id  =  2;
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
@@ -455,6 +469,8 @@ class BillController extends Controller
                 if(@$request->payment_sd_list['title']){
                     foreach($request->payment_sd_list['title'] as $key => $payment_sd_list_title){
 
+                        PaymentList::where('id', $request->payment_sd_list['id'][$key])->update(['paid' => 1]);
+
                         $pay_list = new PaymentList;
                         $pay_list->title  =  $payment_sd_list_title;
                         $pay_list->price  =  $request->payment_sd_list['price'][$key];
@@ -481,11 +497,15 @@ class BillController extends Controller
                     }
                 }
 
+                // $rent_bill->paid_on_checkout  =  $request->paid_on_checkout ?? 0;
                 $rent_bill->ref_status_id = 2;
 
             }else{
 
                 foreach($request->payment_list['title'] as $key => $payment_list_title){
+                    
+                    PaymentList::where('id', $request->payment_list['id'][$key])->update(['paid' => 1]);
+
                     $pay_list = new PaymentList;
                     $pay_list->title  =  $payment_list_title;
                     $pay_list->price  =  $request->payment_list['price'][$key];

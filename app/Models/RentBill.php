@@ -98,22 +98,40 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1);
     }
+    public function payment_list_not_paid() // รายการที่ยังไม่ชำระ
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1)->where('paid', 0);
+    }
     public function payment_not_discount()
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
                     ->where('discount', 0);
     }
+    public function payment_other_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('paid', 0)
+                    ->where(function ($query) {
+                        $query->where('title', 'NOT LIKE', '%ค่าเช่าห้อง (Room rate)%')
+                                ->where('title', 'NOT LIKE', '%ค่าน้ำ%')
+                                ->where('title', 'NOT LIKE', '%ค่าไฟฟ้า%')
+                                ->where('title', 'NOT LIKE', '%ค่าที่จอดรถยนต์%');
+                    });
+    }
     public function payment_rent_room_array()
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
+                    ->where('paid', 0)
                     ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
     }
     public function payment_meter_array()
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
+                    ->where('paid', 0)
                     ->where(function ($query) {
                         $query->where('title', 'like', '%ค่าน้ำ%')
                             ->orWhere('title', 'like', '%ค่าไฟฟ้า%');
@@ -123,12 +141,14 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
+                    ->where('paid', 0)
                     ->where('title', 'like', '%ค่าที่จอดรถยนต์%');
     }
     public function payment_rent_room()
     {
         return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
+                    ->where('paid', 0)
                     ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
     }
     public function payment_car_parking_fee()

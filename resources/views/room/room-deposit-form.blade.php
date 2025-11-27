@@ -115,6 +115,7 @@
                                             value="{{ (int) $bill_list['price'] }}" placeholder="จำนวนเงิน" max="" oninput="calculatePPrice()">
                                             {{-- @if ($bill_list['discount'] == 1) --}}
                                                 <input name="payment_list[discount][]" type="hidden" value="{{ $bill_list['discount'] }}">
+                                                <input name="payment_list[id][]" type="hidden" value="{{ $bill_list['id'] }}">
                                             {{-- @endif --}}
                                         </td>
                                     </tr>

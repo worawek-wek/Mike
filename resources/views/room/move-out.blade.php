@@ -77,7 +77,7 @@
         $('#move-out-tab').removeClass('btn-label-warning');
         $('#move-out-tab').addClass('active btn-warning');
 
-        $('#type_move_out').val(1);
+        $('#move_out_type').val(1);
         $('.showMoveOut').show();
         $('.label-move-out').css('background-color', '#54BAB9');
         $('#moveOutReceipt').show();
@@ -96,7 +96,7 @@
         $('#bad-debt-bill').removeClass('btn-label-danger');
         $('#bad-debt-bill').addClass('active btn-danger');
 
-        $('#type_move_out').val(2);
+        $('#move_out_type').val(2);
         $('.showMoveOut').hide();
         $('.label-move-out').css('background-color', '#d34c4d');
         $('#badDebtBill').show();
@@ -159,7 +159,7 @@
                                                   </button>
                                                   <ul class="dropdown-menu" aria-labelledby="paymentDropdown">
                                                     <li><a class="dropdown-item" href="javascript:void(0)" onclick="pay(1)">ชำระเงิน</a></li>
-                                                    {{-- <li><a class="dropdown-item" href="javascript:void(0)" onclick="pay(2)">หักจากเงินประกัน</a></li> --}}
+                                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="pay(2)">หักจากเงินประกัน</a></li>
                                                   </ul>
                                                 </div>
                                             </td>
@@ -171,10 +171,10 @@
                                         $('#pay_or').css('border', '1px solid rgb(219, 218, 222)');
                                         if(id == 1){
                                             $('#pay1').show();
-                                            $('#pay2').hide();
+                                            $('#payment_rent_bill').hide();
                                         }else{
                                             $('#pay1').hide();
-                                            $('#pay2').show();
+                                            $('#payment_rent_bill').show();
                                         }
                                     }
                                   </script>
@@ -190,247 +190,261 @@
                                         <input name="ref_renter_id" type="hidden" value="{{ $move_contract->ref_renter_id }}">
                                         <input name="ref_type_id" type="hidden" value="1">
                                         <input name="amount" class="total-price" type="hidden">
+                                        <input name="paid_on_checkout" type="hidden" value="1" >
 
                                         <input type="hidden" name="id" value="{{$move_invoice_7->id}}">
-                                    <div class="mt-3" id="pay1" style="display: none;">
-                                        <div class="mb-3" style="padding: 15px 2px;">
-                                            <div class="d-flex">
-                                                <div class="flex-grow-1 ms-3 g-3 row">
-                                                    <b class="text-black">รูปแบบการชำระเงิน</b> <br>
-                                                            <div class="col-sm-11">
-                                                                <input name="payment_format" class="form-check-input" type="radio" id="payfull" value="1" 
-                                                                {{-- @if (count($move_invoice_7->receipt) == 0) --}}
-                                                                checked    
-                                                                {{-- @else
-                                                                disabled
-                                                                @endif --}}
+                                        <div class="mt-3" id="pay1" style="display: none;">
+                                            <div class="mb-3" style="padding: 15px 2px;">
+                                                <div class="d-flex">
+                                                    <div class="flex-grow-1 ms-3 g-3 row">
+                                                        <b class="text-black">รูปแบบการชำระเงิน</b> <br>
+                                                                <div class="col-sm-11">
+                                                                    <input name="payment_format" class="form-check-input" type="radio" id="payfull" value="1" 
+                                                                    {{-- @if (count($move_invoice_7->receipt) == 0) --}}
+                                                                    checked    
+                                                                    {{-- @else
+                                                                    disabled
+                                                                    @endif --}}
+                                                                    >
+                                                                    <label class="form-check-label" for="payfull"> จ่ายเต็มจำนวน </label>
+                                                                </div>
+                                                                <div class="col-sm-11">
+                                                                    <input name="payment_format" class="form-check-input" type="radio" id="checksplit" value="2"
+                                                                    {{-- @if (count($move_invoice_7->receipt) > 0)
+                                                                    checked    
+                                                                    @endif --}}
+                                                                    disabled
+                                                                    > 
+                                                                    <label class="form-check-label" for="checksplit"> แบ่งจ่าย </label>
+                                                                </div>
+                                                    
+                                                                <div class="col-sm-11" id="divsplit"
+                                                                    {{-- @if (count($move_invoice_7->receipt) == 0)
+                                                                        style="display: none;"
+                                                                    @endif --}}
                                                                 >
-                                                                <label class="form-check-label" for="payfull"> จ่ายเต็มจำนวน </label>
-                                                            </div>
-                                                            <div class="col-sm-11">
-                                                                <input name="payment_format" class="form-check-input" type="radio" id="checksplit" value="2"
-                                                                {{-- @if (count($move_invoice_7->receipt) > 0)
-                                                                checked    
-                                                                @endif --}}
-                                                                disabled
-                                                                > 
-                                                                <label class="form-check-label" for="checksplit"> แบ่งจ่าย </label>
-                                                            </div>
-                                                
-                                                            <div class="col-sm-11" id="divsplit"
-                                                                {{-- @if (count($move_invoice_7->receipt) == 0)
-                                                                    style="display: none;"
-                                                                @endif --}}
-                                                            >
-                                                                
-                                                                <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
-                                                                    <div class="d-flex">
-                                                                        <div class="flex-grow-1 ms-3">
-                                                                        <b class="text-black">รายละเอียดหัวบิล</b> <br>
-                                                                            {{ $move_invoice_7->room_for_rent->renter->prefix.' '.$move_invoice_7->room_for_rent->renter->name.' '.$move_invoice_7->room_for_rent->renter->surname }} <br>
-                                                                            เลขประจำตัวผู้เสียภาษี {{ $move_invoice_7->room_for_rent->renter->id_card_number }} <br>
-                                                                            โทร {{ $move_invoice_7->room_for_rent->renter->phone }}
+                                                                    
+                                                                    <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                                                                        <div class="d-flex">
+                                                                            <div class="flex-grow-1 ms-3">
+                                                                            <b class="text-black">รายละเอียดหัวบิล</b> <br>
+                                                                                {{ $move_invoice_7->room_for_rent->renter->prefix.' '.$move_invoice_7->room_for_rent->renter->name.' '.$move_invoice_7->room_for_rent->renter->surname }} <br>
+                                                                                เลขประจำตัวผู้เสียภาษี {{ $move_invoice_7->room_for_rent->renter->id_card_number }} <br>
+                                                                                โทร {{ $move_invoice_7->room_for_rent->renter->phone }}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                                <table class="table table-detail table-bordered" id="discount-table2" >
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>รายการ</th>
-                                                                            <th width="35%">จำนวนเงิน (บาท)</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                    @foreach ($move_invoice_7->payment_list as $key => $payment_list_item)
-                                                                        <tr>
-                                                                            {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
-                                                                            <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="align-items: center;">
+                                                                    <table class="table table-detail table-bordered" id="discount-table2" >
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>รายการ</th>
+                                                                                <th width="35%">จำนวนเงิน (บาท)</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                        @foreach ($move_invoice_7->payment_list as $key => $payment_list_item)
+                                                                            <tr>
+                                                                                {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
+                                                                                <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="align-items: center;">
 
-                                                                                {{ $payment_list_item->title }}@if (strpos($payment_list_item->title, 'Water rate') !== false){{ number_format($payment_list_item->unit) }}&nbsp;- &nbsp;{{ $move_invoice_7->previous_water_unit ?? 0 }} = {{ $payment_list_item->unit-$move_invoice_7->previous_water_unit }} ยูนิต)@endif
-                                                                            </td>
-                                                                            <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
-                                                                            @if ($key == 1)
-                                                                                <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
-                                                                                    <span id="text_water_amount">
-                                                                                        {{ number_format($payment_list_item->price) }}
-                                                                                    </span>
-                                                                            @else
-                                                                                @if ($payment_list_item->discount == 1)
-                                                                                    {{ number_format(0-$payment_list_item->price) }}
-                                                                                    <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                                                                    {{ $payment_list_item->title }}@if (strpos($payment_list_item->title, 'Water rate') !== false){{ number_format($payment_list_item->unit) }}&nbsp;- &nbsp;{{ $move_invoice_7->previous_water_unit ?? 0 }} = {{ $payment_list_item->unit-$move_invoice_7->previous_water_unit }} ยูนิต)@endif
+                                                                                </td>
+                                                                                <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                                                                @if ($key == 1)
+                                                                                    <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
+                                                                                        <span id="text_water_amount">
+                                                                                            {{ number_format($payment_list_item->price) }}
+                                                                                        </span>
                                                                                 @else
-                                                                                    {{ number_format($payment_list_item->price) }}
-                                                                                    <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                                                                    @if ($payment_list_item->discount == 1)
+                                                                                        {{ number_format(0-$payment_list_item->price) }}
+                                                                                        <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                                                                    @else
+                                                                                        {{ number_format($payment_list_item->price) }}
+                                                                                        <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                                                                    @endif
                                                                                 @endif
-                                                                            @endif
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                    </tbody>
-                                                                    <tfoot>
-                                                                        <tr>
-                                                                            <th>รวม</th>
-                                                                            <th class="text-end mb-0 fw-bold total-price">
-                                                                                {{ number_format($move_invoice_7->total_amount) }}
-                                                                            </th>
-                                                                        </tr>
-                                                                    </tfoot>
-                                                                </table>
-                                                                
-                                                                <div class="col-sm-12 mt-3 mb-3">
-                                                                    <label>หมายเหตุ</label>
-                                                                    <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
-                                                                </div>
-                                                    
-                                                        {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
-                                                    </div>
-                                                            <div class="row mt-2" id="expenses-split-container">
-                                                            </div>
-                                                    <script>
-                                                        document.getElementById('checksplit').addEventListener('change', function() {
-                                                            document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
-                                                            document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
-                                                            document.getElementById('totalpayfull').style.display = this.checked ? 'none' : 'block';
-                                                            $('.payment_list_title').attr('required', true);
-                                                        });
-
-                                                        document.getElementById('payfull').addEventListener('change', function() {
-                                                            document.getElementById('divsplit').style.display = this.checked ? 'none' : 'block';
-                                                            document.getElementById('totalsplit').style.display = this.checked ? 'none' : 'block';
-                                                            document.getElementById('totalpayfull').style.display = this.checked ? 'block' : 'none';
-                                                            $('.payment_list_title').removeAttr('required');
-
-                                                        });
-                                                    </script>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3 pb-4" style="padding: 15px 2px;">
-                                            <div class="d-flex">
-                                                <div class="flex-grow-1 ms-3 g-3 row">
-                                                    <b class="text-black">ช่องทางการชำระเงิน</b> <br>
-                                                    <div class="col-sm-11">
-                                                        <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio1" value="1" checked onclick="togglePaymentFields()">
-                                                        <label class="form-check-label" for="defaultRadio1"> เงินสด </label>
-                                                    </div>
-                                                    
-                                                    <div id="paymentDetails2">
-                                                        <div class="col-sm-6 mb-2">
-                                                            <label for="payment_date">วันที่ชำระเงิน</label>
-                                                            <input type="text" name="payment_date" class="form-control datepicker" placeholder="" id="payment_date" required autocomplete="off" value="{{date('d/m/Y')}}"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-11">
-                                                        <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio2" value="2" onclick="togglePaymentFields()"> 
-                                                        <label class="form-check-label" for="defaultRadio2"> โอนเงิน </label>
-                                                    </div>
-                                        
-                                                    <!-- แสดงเมื่อเลือก โอนเงิน -->
-                                                    <div id="paymentDetails" style="display:none;">
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <th>รวม</th>
+                                                                                <th class="text-end mb-0 fw-bold total-price">
+                                                                                    {{ number_format($move_invoice_7->total_amount) }}
+                                                                                </th>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                    
+                                                                    <div class="col-sm-12 mt-3 mb-3">
+                                                                        <label>หมายเหตุ</label>
+                                                                        <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
+                                                                    </div>
                                                         
-                                                        <div class="col-sm-6 mb-2">
-                                                            <label>เลือกบัญชีธนาคาร</label>
-                                                            <select class="select2 form-select mb-2" name="bank" id="exampleFormControlSelect1">
-                                                                {{-- <option value="" disabled="" selected="selected">บัญชีธนาคาร</option> --}}
-                                                                @foreach ($move_bank as $move_r_bank)
-                                                                    <option value="{{ $move_r_bank->id }}">{{ $move_r_bank->bank.' '.$move_r_bank->bank_account_name }}</option>
-                                                                @endforeach
+                                                            {{-- <b>ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }}</span> &nbsp;บาท</b> --}}
                                                         </div>
-                                                        <div class="col-sm-4 mb-2">
-                                                            <input type="hidden" name="">
-                                                        </div>
-                                                            <div class="col-sm-3 mb-2">
-                                                                <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
-                                                                <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
-                                                            </div>
-                                                            <div class="col-sm-6 mb-2">
-                                                                <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                                                                <input type="text" name="payment_date2" class="form-control datepicker" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
-                                                            </div>
-                                                        <div class="col-sm-10 mt-3">
-                                                            <label for="paymentReceipt">แนบหลักฐานการโอน</label>
-                                                            <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt" accept="image/*">
-                                                            <div class="preview-container">
-                                                                <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                        
-                                                    <div class="col-sm-11 mt-2">
-                                                        <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($move_invoice_7->balance_amount) }}</span> &nbsp;บาท</b>
-                                                        <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                                                                <div class="row mt-2" id="expenses-split-container">
+                                                                </div>
+                                                        <script>
+                                                            document.getElementById('checksplit').addEventListener('change', function() {
+                                                                document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
+                                                                document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
+                                                                document.getElementById('totalpayfull').style.display = this.checked ? 'none' : 'block';
+                                                                $('.payment_list_title').attr('required', true);
+                                                            });
+
+                                                            document.getElementById('payfull').addEventListener('change', function() {
+                                                                document.getElementById('divsplit').style.display = this.checked ? 'none' : 'block';
+                                                                document.getElementById('totalsplit').style.display = this.checked ? 'none' : 'block';
+                                                                document.getElementById('totalpayfull').style.display = this.checked ? 'block' : 'none';
+                                                                $('.payment_list_title').removeAttr('required');
+
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <script>
-                                            function togglePaymentFields() {
-                                                const paymentChannel = document.querySelector('input[name="payment_channel"]:checked').value;
-                                                const paymentDetails = document.getElementById('paymentDetails');
-                                                const paymentDetails2 = document.getElementById('paymentDetails2');
-                                                // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
-                                                if (paymentChannel == '2') {
-                                                    paymentDetails.style.display = 'block';
-                                                    paymentDetails2.style.display = 'none';
-                                                    $('#ref_bank_id').attr('required', true);
-                                                    $('#transfer_time').attr('required', true);
-                                                    $('#payment_date2').attr('required', true);
-                                                } else {
-                                                    paymentDetails.style.display = 'none';
-                                                    paymentDetails2.style.display = 'block';
-                                                    $('#ref_bank_id').removeAttr('required');
-                                                    $('#transfer_time').removeAttr('required');
-                                                    $('#payment_date2').removeAttr('required')
-                                                }
-                                            }
-                                            function handleFileInput(fileInputId, previewId) {
-                                                const fileInput = document.getElementById(fileInputId);
-                                                const previewImage = document.getElementById(previewId);
 
-                                                fileInput.addEventListener('change', function () {
-                                                    const file = fileInput.files[0];
-
-                                                    if (file) {
-                                                        const reader = new FileReader();
-
-                                                        reader.onload = function (e) {
-                                                            previewImage.src = e.target.result;
-                                                            previewImage.style.display = 'block';  // แสดงภาพพรีวิว
-                                                        };
-
-                                                        reader.readAsDataURL(file);
+                                            <div class="mb-3 pb-4" style="padding: 15px 2px;">
+                                                <div class="d-flex">
+                                                    <div class="flex-grow-1 ms-3 g-3 row">
+                                                        <b class="text-black">ช่องทางการชำระเงิน</b> <br>
+                                                        <div class="col-sm-11">
+                                                            <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio1" value="1" checked onclick="togglePaymentFields()">
+                                                            <label class="form-check-label" for="defaultRadio1"> เงินสด </label>
+                                                        </div>
+                                                        
+                                                        <div id="paymentDetails2">
+                                                            <div class="col-sm-6 mb-2">
+                                                                <label for="payment_date">วันที่ชำระเงิน</label>
+                                                                <input type="text" name="payment_date" class="form-control datepicker" placeholder="" id="payment_date" required autocomplete="off" value="{{date('d/m/Y')}}"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-11">
+                                                            <input name="payment_channel" class="form-check-input" type="radio" id="defaultRadio2" value="2" onclick="togglePaymentFields()"> 
+                                                            <label class="form-check-label" for="defaultRadio2"> โอนเงิน </label>
+                                                        </div>
+                                            
+                                                        <!-- แสดงเมื่อเลือก โอนเงิน -->
+                                                        <div id="paymentDetails" style="display:none;">
+                                                            
+                                                            <div class="col-sm-6 mb-2">
+                                                                <label>เลือกบัญชีธนาคาร</label>
+                                                                <select class="select2 form-select mb-2" name="bank" id="exampleFormControlSelect1">
+                                                                    {{-- <option value="" disabled="" selected="selected">บัญชีธนาคาร</option> --}}
+                                                                    @foreach ($move_bank as $move_r_bank)
+                                                                        <option value="{{ $move_r_bank->id }}">{{ $move_r_bank->bank.' '.$move_r_bank->bank_account_name }}</option>
+                                                                    @endforeach
+                                                            </div>
+                                                            <div class="col-sm-4 mb-2">
+                                                                <input type="hidden" name="">
+                                                            </div>
+                                                                <div class="col-sm-3 mb-2">
+                                                                    <label for="transfer_time">เวลาโอนเงิน</label><span class="text-danger"> *</span>
+                                                                    <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
+                                                                </div>
+                                                                <div class="col-sm-6 mb-2">
+                                                                    <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                                                                    <input type="text" name="payment_date2" class="form-control datepicker" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                                                                </div>
+                                                            <div class="col-sm-10 mt-3">
+                                                                <label for="paymentReceipt">แนบหลักฐานการโอน</label>
+                                                                <input name="evidence_of_money_transfer" type="file" class="form-control mb-2" id="paymentReceipt" accept="image/*">
+                                                                <div class="preview-container">
+                                                                    <img id="preview1" src="" alt="Preview 1" style="display: none; width:30%">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                            
+                                                        <div class="col-sm-11 mt-2">
+                                                            <b id="totalpayfull">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price">{{ number_format($move_invoice_7->balance_amount) }}</span> &nbsp;บาท</b>
+                                                            <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <script>
+                                                function togglePaymentFields() {
+                                                    const paymentChannel = document.querySelector('input[name="payment_channel"]:checked').value;
+                                                    const paymentDetails = document.getElementById('paymentDetails');
+                                                    const paymentDetails2 = document.getElementById('paymentDetails2');
+                                                    // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม
+                                                    if (paymentChannel == '2') {
+                                                        paymentDetails.style.display = 'block';
+                                                        paymentDetails2.style.display = 'none';
+                                                        $('#ref_bank_id').attr('required', true);
+                                                        $('#transfer_time').attr('required', true);
+                                                        $('#payment_date2').attr('required', true);
                                                     } else {
-                                                        previewImage.style.display = 'none'; // ซ่อนพรีวิวถ้าไม่ได้เลือกไฟล์
+                                                        paymentDetails.style.display = 'none';
+                                                        paymentDetails2.style.display = 'block';
+                                                        $('#ref_bank_id').removeAttr('required');
+                                                        $('#transfer_time').removeAttr('required');
+                                                        $('#payment_date2').removeAttr('required')
                                                     }
-                                                });
-                                            }
-                                        
-                                            handleFileInput('paymentReceipt', 'preview1');
-                                            // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
-                                            togglePaymentFields();
-                                        </script>
+                                                }
+                                                function handleFileInput(fileInputId, previewId) {
+                                                    const fileInput = document.getElementById(fileInputId);
+                                                    const previewImage = document.getElementById(previewId);
 
-                                        <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($move_invoice_7->total_amount - $move_invoice_7->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท
-                                        
-                                        
-                                        <div class="modal-footer rounded-0 justify-content-center">
-                                            {{-- <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ยกเลิก</button> --}}
-                                            <button class="btn btn-info" type="submit">
-                                                <span>
-                                                <i class="ti-md ti ti-report-money"></i>
-                                                <b class="dam">
-                                                ชำระ
-                                                </b>
-                                            </span></button>
-                                        </div>
-                                </div>
+                                                    fileInput.addEventListener('change', function () {
+                                                        const file = fileInput.files[0];
+
+                                                        if (file) {
+                                                            const reader = new FileReader();
+
+                                                            reader.onload = function (e) {
+                                                                previewImage.src = e.target.result;
+                                                                previewImage.style.display = 'block';  // แสดงภาพพรีวิว
+                                                            };
+
+                                                            reader.readAsDataURL(file);
+                                                        } else {
+                                                            previewImage.style.display = 'none'; // ซ่อนพรีวิวถ้าไม่ได้เลือกไฟล์
+                                                        }
+                                                    });
+                                                }
+                                            
+                                                handleFileInput('paymentReceipt', 'preview1');
+                                                // เรียกใช้ฟังก์ชั่นเริ่มต้นเมื่อเพจโหลด
+                                                togglePaymentFields();
+                                            </script>
+
+                                            <h4 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span class="">{{ number_format($move_invoice_7->total_amount - $move_invoice_7->receipt->pluck('payment_list')->flatten()->sum('price')) }}</span> &nbsp;บาท
+                                            
+                                            
+                                            <div class="modal-footer rounded-0 justify-content-center">
+                                                {{-- <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ยกเลิก</button> --}}
+                                                <button class="btn btn-info" type="submit">
+                                                    <span>
+                                                    <i class="ti-md ti ti-report-money"></i>
+                                                    <b class="dam">
+                                                    ชำระ
+                                                    </b>
+                                                </span></button>
+                                            </div>
+                                    </div>
                                 </form>
-                                <form method="POST" action="/deduct-from-deposit" class="p-4 rounded" id="pay2" style="display: none;">
+                                <form method="POST" class="p-4 rounded" id="payment_rent_bill" style="display: none;">
+                                    @csrf
+                                        <input name="ref_room_for_rent_id" type="hidden" value="{{ $room_for_rent->id }}">
+                                        <input name="ref_room_id" type="hidden" value="{{ $move_contract->ref_room_id }}">
+                                        <input name="ref_rent_bill_id" type="hidden" value="{{ $move_invoice_7->id }}">
+                                        <input name="ref_contract_id" type="hidden" value="{{ $move_contract->id }}">
+                                        <input name="ref_renter_id" type="hidden" value="{{ $move_contract->ref_renter_id }}">
+                                        <input name="ref_type_id" type="hidden" value="1">
+                                        <input name="amount" class="total-price" type="hidden">
+                                        <input name="payment_format" type="hidden" value="1" >
+                                        <input name="payment_channel" type="hidden" value="3" >
+                                        <input name="paid_on_checkout" type="hidden" value="1" >
+                                        <input type="hidden" name="id" value="{{$move_invoice_7->id}}">
+
                                     <!-- หัวเรื่อง -->
                                     <h5 class="mb-3">บิลค้างชำระ</h5>
-                                <hr>
+                                    <hr>
                                     <!-- รายละเอียด -->
                                     <p><strong>เคลียร์บิลค้างชำระด้วยการนำไปหักจากเงินประกัน</strong></p>
                                     <div style="display: flex; justify-content: space-between;">
@@ -442,7 +456,7 @@
                                     <!-- วันที่หักเงิน -->
                                     <div class="mb-3">
                                         <label for="deduct_date" class="form-label" style="font-size: medium;"><strong>วันที่หักเงินประกัน</strong></label>
-                                        <input type="text" id="deduct_date" name="deduct_date" class="form-control datepicker" value="21/04/2025" readonly>
+                                        <input type="text" id="deduct_date" name="payment_date2" class="form-control datepicker" value="{{ date('d/m/Y') }}" readonly>
                                     </div>
                                 
                                     <!-- ปุ่ม -->
@@ -451,6 +465,80 @@
                                         <button type="submit" class="btn btn-success">ตกลง</button>
                                     </div>
                                 </form>
+                                <script>
+                                    $('#payment_rent_bill').on('submit', function(event) {
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        // return alert(123);
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ ชำระเงิน หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+
+                                                var formData = new FormData($('#payment_rent_bill')[0]);
+
+                                                $.ajax({
+                                                    url: 'bill/payment_bill', // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                                                    type: 'POST',
+                                                    data: formData,
+                                                    processData: false,
+                                                    contentType: false,
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            // $('#invoice').modal('hide');
+                                                            // summary();
+                                                            loadData(page);
+                                                            Swal.fire({
+                                                                        title: 'ชำระเงินเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
+                                                            get_move_out()
+                                                        }
+                                                    },
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
+                                </script>
                             </div>
                                 <div class="my-5 p-2 text-white" style="background-color: rgb(255, 73, 73);" align="center">
                                     ยอดค้างชำระ {{ number_format($move_invoice_7->balance_amount) }}
@@ -476,7 +564,7 @@
                                                                     
                                                                 @endphp
                                                                     <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($receipt_1->created_at)) !!}<br>
-                                                                    <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; {{ $receipt_1->payment_channel == 1 ? "เงินสด": "โอนเงิน"; }}<br>
+                                                                    <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; {{ $payment_channel[$receipt_1->payment_channel] }}<br>
                                                                     <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $receipt_1->user->name }}<br>
                                                                     &nbsp;
                                                     </td>
@@ -506,13 +594,13 @@
                                                             @php
                                                                 $amount -= $item_payment_list->price;
                                                             @endphp
-                                                            <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+                                                            <td class="text-end text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
 
                                                         @else
                                                             @php    
                                                             $amount += $item_payment_list->price;
                                                             @endphp
-                                                            <td>{{ number_format($item_payment_list->price) }}</td>
+                                                            <td class="text-end">{{ number_format($item_payment_list->price) }}</td>
                                                         @endif
                                                 </tr>
                                                 @endforeach
@@ -520,17 +608,25 @@
                                             <tfoot>
                                                 <tr>
                                                     <th>รวม</th>
-                                                    <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                                                    <th class=" mb-0 fw-bold text-end" style="color: #28c76f !important;">
                                                     {{ number_format($amount) }}
                                                     </th>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                         {{--  --}}
-                                        <div class="modal-footer rounded-0 justify-content-start mt-2 pb-0">
+                                        <div class="modal-footer rounded-0 justify-content-between mt-2 pb-0">
                                             <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{$receipt_1->id}})"><span
                                                     class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
+                                            <button type="button" class="btn btn-danger me-2" onclick="changeDeleteReceipt({{ $receipt_1->id }}, {{ $receipt_1->ref_rent_bill_id }})">
+                                                <span>
+                                                    <i class="ti ti-x"></i>
+                                                    ยกเลิกใบเสร็จ
+                                                </span>
+                                            </button>
                                         </div>
+                                        
+
                                     </div>
                                 @else
                                     <div class="no-data-box">
@@ -831,7 +927,7 @@
                                 {{-- /////////////////////////////// --}}
                                 <form id="move_out_submit" class="mb-5">
                                     @csrf
-                                    <input type="hidden" id="type_move_out" name="type_move_out" value="1">
+                                    <input type="hidden" id="move_out_type" name="move_out_type" value="1">
                                     <input type="hidden" name="room_id" value="{{ $room->id }}">
                                     <input type="hidden" name="ref_renter_id" value="{{ @$contract->ref_renter_id }}">
                                     <div class="text-center">
@@ -839,8 +935,8 @@
                                             สรุปการย้ายออก
                                         </span>
                                         {{-- <h4 class="my-4 amount">  </h4> --}}
-                                        <h4 class="my-4">
-                                            @if ($cal >= 0)
+                                        <h4 class="my-4 move-out-summary">
+                                            {{-- @if ($cal >= 0)
                                             <span class="text-danger">
                                                 ยอดเงินประกันคืนผู้เช่า
                                             @else
@@ -848,7 +944,7 @@
                                                 เก็บเงินผู้เช่าเพิ่ม
                                             @endif
                                             &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
-                                            </span>
+                                            </span> --}}
                                         </h4>
                                         <table class="table table-bordered mt-4 table-detail" style="width: 60%;margin: auto;">
                                             <thead>
@@ -1064,8 +1160,8 @@
                                                         togglePaymentBadDebtFields();
                                                     </script>
 
-                                                    <h4 class="text-center">
-                                                        @if ($cal >= 0)
+                                                    <h4 class="text-center move-out-summary">
+                                                        {{-- @if ($cal >= 0)
                                                         <span class="text-danger">
                                                             ยอดเงินประกันคืนผู้เช่า
                                                         @else
@@ -1073,7 +1169,7 @@
                                                             เก็บเงินผู้เช่าเพิ่ม
                                                         @endif
                                                              &nbsp; {{ number_format(abs($cal)) }}&nbsp; บาท
-                                                        </span>
+                                                        </span> --}}
                                                     </h4>
                                                 </div>
                                                 <div class="modal-footer rounded-0 justify-content-center">
@@ -1139,19 +1235,26 @@
                                         // calculateUsed();
                                         // $('#view-edit-meter').html($('#v-edit-meter').html());
                                     }
-                                    $('#move_out_submit').on('submit', function(event) {
+                                    $('#move_out_submit').on('submit', function(event) { // บันทึกการ ย้ายออก // form สุดท้าย
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {
                                             // ถ้าฟอร์มไม่ถูกต้อง
                                             this.reportValidity();
                                             return console.log('ฟอร์มไม่ถูกต้อง');
                                         }
-                                        // if(total_amount < 0){
-                                        //     return Swal.fire('โปรดชำระเงินให้ครบก่อน.!', '', 'warning');
-                                        // }
-                                        var check = $('#check-rent-bell').val();
-                                        if(check == 1){
-                                            return Swal.fire('กรุณาเคลียร์บิลค่าเช่าก่อน.!', '', 'warning');
+                                        var move_out_type = $("#move_out_type").val();
+                                        if(move_out_type == 1){
+                                            var cprmo = $('#check_payment_receipt_move_out').val();
+                                            if(cprmo){
+                                                return Swal.fire('โปรดเคลียร์ใบเสร็จย้ายออก.!', '', 'warning');
+                                            }
+                                            // if(total_amount < 0){
+                                            //     return Swal.fire('โปรดเคลียร์ให้ครบก่อน.!', '', 'warning');
+                                            // }
+                                            var check = $('#check-rent-bell').val();
+                                            if(check == 1){
+                                                return Swal.fire('กรุณาเคลียร์บิลค่าเช่าห้อง.!', '', 'warning');
+                                            }
                                         }
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
@@ -1182,7 +1285,16 @@
                                                             
                                                             loadData(page);
                                                             summary();
-                                                            Swal.fire('ย้ายออกเรียบร้อยแล้ว', '', 'success');
+                                                            Swal.fire({
+                                                                        title: 'ย้ายออกเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
                                                         }
                                                     },
                                                     error: function (xhr) {
@@ -1253,7 +1365,16 @@
                                                             calculate_2Price()
                                                             loadData(page);
                                                             summary();
-                                                            Swal.fire('บันทึกใบเสร็จย้ายออกเรียบร้อยแล้ว', '', 'success');
+                                                            Swal.fire({
+                                                                        title: 'บันทึกใบเสร็จย้ายออกเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
                                                         }
                                                     },
                                                     error: function (xhr) {
@@ -1279,7 +1400,7 @@
                                             }
                                         });
                                     });
-                                    $('#form_edit_deposit_refund').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                    $('#form_edit_deposit_refund').on('submit', function(event) { // บันทึก รายการคืนเงินประกัน
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {
                                             // ถ้าฟอร์มไม่ถูกต้อง
@@ -1324,7 +1445,16 @@
                                                             calculate_2Price()
                                                             loadData(page);
                                                             summary();
-                                                            Swal.fire('บันทึกรายการคืนเงินเรียบร้อยแล้ว', '', 'success');
+                                                            Swal.fire({
+                                                                        title: 'บันทึกรายการคืนเงินเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
                                                         }
                                                     },
                                                     error: function (xhr) {
@@ -1350,7 +1480,7 @@
                                             }
                                         });
                                     });
-                                    $('#form_bad_debt_bill').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                    $('#form_bad_debt_bill').on('submit', function(event) { // บันทึกรายการหนี้สูญ ผู้เช่าหนี้
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {
                                             // ถ้าฟอร์มไม่ถูกต้อง
@@ -1398,7 +1528,16 @@
                                                                 loadData(page);
                                                                 summary();
                                                             }, 1000);
-                                                            Swal.fire('บันทึกรายการหนี้สูญเรียบร้อยแล้ว', '', 'success');
+                                                            Swal.fire({
+                                                                        title: 'บันทึกรายการหนี้สูญเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
                                                         }
                                                     },
                                                     error: function (xhr) {
@@ -1505,7 +1644,7 @@
                                         // return alert(123);
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
-                                            text: 'คุณต้องการ บันทึกการเปลี่ยนแปลง หรือไม่?',
+                                            text: 'คุณต้องการ ชำระเงิน หรือไม่?',
                                             icon: 'warning',
                                             showCancelButton: true,
                                             confirmButtonText: 'ตกลง',
@@ -1531,7 +1670,16 @@
                                                             // $('#invoice').modal('hide');
                                                             // summary();
                                                             loadData(page);
-                                                            Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+                                                            Swal.fire({
+                                                                        title: 'ชำระเงินเรียบร้อยแล้ว',
+                                                                        icon: 'success',
+                                                                        timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                                                        timerProgressBar: true, 
+                                                                        showConfirmButton: false,
+                                                                        customClass: {
+                                                                            title: 'custom-title', // กำหนดคลาสให้กับ title
+                                                                        },
+                                                                    });
                                                             get_move_out()
                                                         }
                                                     },

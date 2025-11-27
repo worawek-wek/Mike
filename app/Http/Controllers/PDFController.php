@@ -56,25 +56,39 @@ class PDFController extends Controller
     public function invoice($invoice_id)
     {
         $data['setting_bill'] = Setting_bill::first();
+        
         $invoice = RentBill::find($invoice_id);
-        $receipt_move_out_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', 3)->where('ref_type_id', 4)->latest()->first();
-        $receipt_move_out_not_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', '!=', 3)->where('ref_type_id', 4)->latest()->first();
-        $invoice_contract = RentBill::where('ref_contract_id', $invoice->ref_contract_id)->where('ref_type_id', 6)->latest()->first();
-        // return $invoice_contract->payment_not_discount;
+        
+        $receipt_rent_room_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', 3)->where('ref_type_id', 1)->where('paid_on_checkout', 1)->latest()->first(); // ใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
+        $receipt_rent_room_not_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', '!=', 3)->where('ref_type_id', 1)->where('paid_on_checkout', 1)->latest()->first(); // ใบเสร็จค่าเช่าห้อง ที่ชำระปกติ ไม่ หักจากเงินประกัน
+
+        $receipt_move_out_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', 3)->where('ref_type_id', 4)->latest()->first(); // ใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
+        $receipt_move_out_not_deducted = Receipt::where('ref_contract_id', $invoice->ref_contract_id)->where('payment_channel', '!=', 3)->where('ref_type_id', 4)->latest()->first(); // ใบเสร็จย้ายออก ที่ชำระปกติ ไม่ หักจากเงินประกัน
+        
+        $invoice_contract = RentBill::where('ref_contract_id', $invoice->ref_contract_id)->where('ref_type_id', 6)->latest()->first(); // บิลเงินประกันคืนผู้เช่า
+
         $data['invoice'] = $invoice;
+        $data['receipt_rent_room_deducted'] = $receipt_rent_room_deducted;
+        $data['receipt_rent_room_not_deducted'] = $receipt_rent_room_not_deducted;
         $data['receipt_move_out_deducted'] = $receipt_move_out_deducted;
         $data['receipt_move_out_not_deducted'] = $receipt_move_out_not_deducted;
         $data['invoice_contract'] = $invoice_contract;
+
         $data['branch'] = Branch::find(session("branch_id"));
         $data['renter'] = Renter::find($invoice->room_for_rent->ref_renter_id);
         $data['amount_thai'] = $this->convertToThaiBaht($invoice->total_amount);
-        // $data['deposit_amount'] = $invoice_contract->total_amount;
-        if(in_array($invoice->ref_type_id, [7])){
-            $receipt_move_out_deducted_total = $receipt_move_out_deducted->total_amount ?? 0;
-            $data['receipt_move_out_deducted_total'] = $receipt_move_out_deducted_total;
-            $cal = abs($invoice_contract->total_amount-$receipt_move_out_deducted_total);
-            $data['amount_thai'] = $this->convertToThaiBaht($cal);
 
+        if(in_array($invoice->ref_type_id, [7])){
+        // คำนวนยอดสรุปการย้ายออก เริ่ม
+            $receipt_rent_room_deducted_total = $receipt_rent_room_deducted->total_amount ?? 0; // ยอดใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
+            $receipt_move_out_deducted_total = $receipt_move_out_deducted->total_amount ?? 0; // ยอดใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
+            $data['receipt_rent_room_deducted_total'] = $receipt_rent_room_deducted_total;
+            $data['receipt_move_out_deducted_total'] = $receipt_move_out_deducted_total;
+            $cal = $invoice_contract->total_amount-$receipt_move_out_deducted_total-$receipt_rent_room_deducted_total; // บิลเงินประกันคืนผู้เช่า ลบ ยอดใบเสร็จ ที่ชำระโดย หักจากเงินประกัน
+            
+            $data['cal'] = $cal;
+            $data['amount_thai'] = $this->convertToThaiBaht(abs($cal));
+        // คำนวนยอดสรุปการย้ายออก จบ
             return view('pdf/bad-debt', $data);
         }
             return view('pdf/invoice', $data);

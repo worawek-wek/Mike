@@ -474,7 +474,8 @@
             success: function(data) {
                 calculateTotal()
                 calculate_2Price()
-                $("#form_moveout_receipt").html(data);
+                $("#form_moveout_receipt").html(data.move_out_receipt_bill);
+                $(".move-out-summary").html(data.cal);
             }
         });
     }
@@ -496,7 +497,8 @@
             success: function(data) {
                 calculateTotal()
                 calculate_2Price()
-                $("#form_bad_debt_bill").html(data);
+                $("#form_bad_debt_bill").html(data.bad_debt_bill);
+                $(".move-out-summary").html(data.cal);
             }
         });
     }

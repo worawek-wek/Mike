@@ -31,9 +31,155 @@
                     <i class="fa fa-trash text-danger"></i>
                 </a>
             </div>
-            <div></div>
             <label class="mb-4 text-black" style="font-weight: 500;font-size: large;" for="">
                 <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">1</span>
+                รายการบิล
+            </label>
+            @if (@$row['move_invoice_1'])
+            
+                {{-- //////////////////////////////////////////////// --}}
+                    <div class="my-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
+                        <div class="d-flex">
+                            <div class="flex-grow-1 ms-3">
+                            <b class="text-black">รายละเอียดหัวบิล</b> <br>
+                                {{ $row['move_invoice_1']->name }} <br>
+                                เลขประจำตัวผู้เสียภาษี {{ $row['move_invoice_1']->id_card_number }} <br>
+                                โทร {{ $row['move_invoice_1']->phone }}
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-detail-receipt mb-4">
+                        <thead>
+                            <tr>
+                                <th>รายการ</th>
+                                <th width="30%">จำนวนเงิน (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($row['move_invoice_1']->payment_list as $key => $payment_list_item)
+                                <tr>
+                                    {{-- <td>ค่าเช่าห้อง (Room rate) {{ $row['move_invoice_1']->room_for_rent->room->name }} เดือน {{ $row['move_invoice_1']->month.'/'.$row['move_invoice_1']->year }}</td> --}}
+                                    <td>
+                                        {{ $payment_list_item->title }}
+                                    </td>
+                                    <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                        @if ($payment_list_item->discount == 1)
+                                            {{ number_format(0-$payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                        @else
+                                            {{ number_format($payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                        @endif
+                                        <input type="hidden" name="payment_list[price][]" class="{{ $payment_list_item->discount == 1 ? "" : "" ; }} calculate_2" value="{{ $payment_list_item->price }}">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>รวม</th>
+                                <th class="text-end mb-0 fw-bold total-price">
+                                    {{ number_format($row['move_invoice_1']->total_amount) }}
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+
+                {{-- /////////////////////////////////////////////////////// --}}
+                @if (@$row['move_invoice_paid_1']->receipt[0])
+
+                    <div class="p-4 mb-4" style="border: 1px solid #59d57a;border-radius: 5px;">
+                        <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $row['move_invoice_paid_1']->receipt[0]->receipt_number }}</span></p>
+                            <table class="table table-detail table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td width="50%">
+                                            <span style="color: black; font-weight: 500;">รายละเอียดหัวบิล</span> <br>
+                                            {{ $row['move_invoice_paid_1']->name }} <br>
+                                            เลขประจำตัวผู้เสียภาษี {{ $row['move_invoice_paid_1']->id_card_number }} <br>
+                                            โทร {{ $row['move_invoice_paid_1']->phone }}
+                                        </td>
+                                        <td style="color: black;">
+                                                    @php
+                                                        $date = new DateTime(date('Y-m-d', strtotime($row['move_invoice_paid_1']->created_at)));
+                                                        $englishDay = $date->format('l');
+                                                        $payment_channel = [1 => 'เงินสด', 2 => 'โอนเงิน', 3 => 'หักจากเงินประกัน'];
+                                                    @endphp
+                                                        <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($row['move_invoice_paid_1']->created_at)) !!}<br>
+                                                        <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; <span @if($row['move_invoice_paid_1']->payment_channel == 3) class="text-danger" @endif>{{ $payment_channel[$row['move_invoice_paid_1']->payment_channel] }}</span><br>
+                                                        <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $row['move_invoice_paid_1']->user->name }}<br>
+                                                        &nbsp;
+                                        </td>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <table class="table table-detail table-bordered mt-4">
+                                <thead>
+                                    <tr>
+                                        <th width="70%" style="vertical-align: middle;font-weight: 500;">รายการ</th>
+                                        <th style="vertical-align: middle;font-weight: 500;">
+                                            จำนวนเงิน (บาท)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $amount = 0;
+                                    @endphp
+                                    @foreach ($row['move_invoice_paid_1']->receipt[0]->payment_list as $key => $item_payment_list)
+                                    <tr>
+                                        <td class="{{$item_payment_list->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                            {{ $item_payment_list->title }}
+                                        </td>
+
+                                            @if ($item_payment_list->discount == 1)
+                                                @php
+                                                    $amount -= $item_payment_list->price;
+                                                @endphp
+                                                <td class="text-danger fw-bold">{{ number_format(0-$item_payment_list->price) }}</td>
+
+                                            @else
+                                                @php    
+                                                $amount += $item_payment_list->price;
+                                                @endphp
+                                                <td>{{ number_format($item_payment_list->price) }}</td>
+                                            @endif
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>รวม</th>
+                                        <th class=" mb-0 fw-bold" style="color: #28c76f !important;">
+                                        {{ number_format($amount) }}
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            {{--  --}}
+                            <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
+                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_paid_1']->id }})">
+                                    <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
+                                </button>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center text-warning mb-4">
+                            <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                            <input type="hidden" id="check_bill" value="1">
+                            โปรดชำระเงินใบเสร็จค้างชำระ.!
+                        </div>
+                    @endif
+                @else
+                    <div class="text-center text-muted mb-4">
+                        <i class="ti ti-file-search" style="font-size: 24px;"></i><br>
+                        ไม่พบใบเสร็จค้างชำระ
+                    </div>
+                @endif
+            <div></div>
+            <label class="mb-4 text-black" style="font-weight: 500;font-size: large;" for="">
+                <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
                 ใบเสร็จย้ายออก
             </label>
             @if (@$row['move_invoice_4'])
@@ -184,7 +330,7 @@
     {{-- ///////////////////////////////////////////////////////////////////////// --}}
                 <div></div>
                 <label class="mb-4 text-black" style="font-weight: 500;font-size: large;" for="">
-                    <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">2</span>
+                    <span class="badge badge-center rounded-pill me-1 label-move-out" style="background-color: #54BAB9 !important;">3</span>
                     เงินประกัน
                 </label>
                 <table class="table table-bordered table-detail mb-4" id="discount-table3" >
@@ -231,7 +377,7 @@
                     </tfoot>
                 </table>
                 @if(!$loop->last)
-                    <hr class="text-warning">
+                    <hr style="height: 15px; border-radius: 3px; background-color: var(--bs-warning); border: none;">
                 @endif
         {{-- @endif --}}
         @endforeach

@@ -449,12 +449,11 @@
 
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input bill-list-checkbox" type="checkbox"
-                                        value="payment_list"
-                                        id="payment_list"
-                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        value="payment_list_not_paid"
+                                        id="payment_list_not_paid1"
                                         checked
                                         >
-                                    <label class="form-check-label" for="payment_list">
+                                    <label class="form-check-label" for="payment_list_not_paid1">
                                         เต็มจำนวน
                                     </label>
                                 </div>
@@ -462,10 +461,9 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
                                         value="payment_rent_room_array"
-                                        id="payment_rent_room_array"
-                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        id="payment_rent_room_array1"
                                         >
-                                    <label class="form-check-label" for="payment_rent_room_array">
+                                    <label class="form-check-label" for="payment_rent_room_array1">
                                         ค่าเช่าห้อง
                                     </label>
                                 </div>
@@ -473,10 +471,9 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
                                         value="payment_meter_array"
-                                        id="payment_meter_array"
-                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        id="payment_meter_array1"
                                         >
-                                    <label class="form-check-label" for="payment_meter_array">
+                                    <label class="form-check-label" for="payment_meter_array1">
                                         ค่าน้ำ-ค่าไฟฟ้า
                                     </label>
                                 </div>
@@ -484,11 +481,20 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
                                         value="payment_parking_fee_array"
-                                        id="payment_parking_fee_array"
-                                        {{-- onchange="payMultipleRentBills()" --}}
+                                        id="payment_parking_fee_array1"
                                         >
-                                    <label class="form-check-label" for="payment_parking_fee_array">
+                                    <label class="form-check-label" for="payment_parking_fee_array1">
                                         ค่าที่จอดรถ
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input bill-list-checkbox list-check-box" type="checkbox"
+                                        value="payment_other_array"
+                                        id="payment_other_array1"
+                                        >
+                                    <label class="form-check-label" for="payment_other_array1">
+                                        อื่น ๆ
                                     </label>
                                 </div>
 
@@ -515,7 +521,7 @@
     @include('layout/inc_js')
     <script>
         // เมื่อเลือก "เต็มจำนวน"
-            document.getElementById("payment_list").addEventListener("change", function () {
+            document.getElementById("payment_list_not_paid1").addEventListener("change", function () {
                 if (this.checked) {
                     // ยกเลิกการเลือกอย่างอื่นทั้งหมด
                     document.querySelectorAll(".list-check-box").forEach(ch => ch.checked = false);
@@ -527,7 +533,7 @@
             document.querySelectorAll(".list-check-box").forEach(ch => {
                 ch.addEventListener("change", function () {
                     if (this.checked) {
-                        document.getElementById("payment_list").checked = false; // ยกเลิก "เต็มจำนวน"
+                        document.getElementById("payment_list_not_paid1").checked = false; // ยกเลิก "เต็มจำนวน"
                     }
                     payMultipleRentBills();
                 });
@@ -549,7 +555,7 @@
                 Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
                 return;
             }
-            payMultipleRentBills('payment_list')
+            payMultipleRentBills('payment_list_not_paid')
             var myModal = new bootstrap.Modal(document.getElementById('modal-payment-bill-all'));
                 myModal.show();
 
@@ -809,7 +815,16 @@
                             if(response == true){
                                 $('#invoice').modal('hide');
                                 loadData(page);
-                                Swal.fire(title+' เรียบร้อยแล้ว', '', 'success');
+                                Swal.fire({
+                                    title: title+' เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
                             }
                         },
                         error: function (xhr) {
@@ -859,7 +874,16 @@
                         success: function(response) {
                             if(response == true){
                                 loadData(page);
-                                Swal.fire('ยกเลิก ใบเสร็จ เรียบร้อยแล้ว', '', 'success');
+                                Swal.fire({
+                                    title: 'ยกเลิก ใบเสร็จ เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
                                 view(invoice_id,'table');
                             }
                         
@@ -1086,7 +1110,16 @@
                                 $('#invoice').modal('hide');
                                 loadData(page);
                                 waitingForConfirmation();
-                                Swal.fire('ชำระเงินทั้งหมด เรียบร้อยแล้ว', '', 'success');
+                                Swal.fire({
+                                    title: 'ชำระเงินทั้งหมด เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
                             }
                         },
                         error: function (xhr) {
@@ -1161,7 +1194,16 @@
                         success: function(response) {
                             if(response == true){
                                 loadData(page);
-                                Swal.fire('คอนเฟิร์มบิล ทั้งหมด เรียบร้อยแล้ว', '', 'success');
+                                Swal.fire({
+                                    title: 'คอนเฟิร์มบิล ทั้งหมด เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
                             }
                         },
                         error: function (xhr) {
@@ -1236,7 +1278,16 @@
                                 $('#invoice').modal('hide');
                                 loadData(page);
                                 waitingForConfirmation();
-                                Swal.fire('ชำระเงินทั้งหมด เรียบร้อยแล้ว', '', 'success');
+                                Swal.fire({
+                                    title: 'ชำระเงินทั้งหมด เรียบร้อยแล้ว',
+                                    icon: 'success',
+                                    timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                    timerProgressBar: true, 
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        title: 'custom-title', // กำหนดคลาสให้กับ title
+                                    },
+                                });
                             }
                         },
                         error: function (xhr) {

@@ -245,14 +245,13 @@
                                             
                                                 <div class="row g-3 p-2">
                                                     <div class="col-sm-9"></div>
-                                                    <div class="col-sm-3">
-                                                        
+                                                    <div class="col-sm-3 text-end">
                                                         <button type="button" class="btn btn-info" onclick="window.location.href='/room/check-in/{{ $room_id }}'" data-bs-toggle="modal" data-bs-target="#insertCheckIn">
                                                             <i class="fa-solid fa-right-to-bracket me-2"></i>เปลี่ยนเป็นเข้าพัก
                                                         </button>
                                                     </div>
                                                 </div>
-                                            
+                                            <input type="hidden" class="count-room-reserve">
                                             @endif
                                         <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
                                             <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);;">
@@ -584,8 +583,9 @@
                                                             let roomText = $('#room_text').val().trim();
 
                                                             if (selectChannel == '1' && roomText !== '') {
-                                                                let value = $('#room_text').val();       // ดึงค่าใน input
-                                                                count = value.split(',').length;     // แยกด้วย comma แล้วนับจำนวน
+                                                                count = $('.count-room-reserve').length;       // ดึงค่าใน input
+                                                                // let value = $('#room_text').val();       // ดึงค่าใน input
+                                                                // count = value.split(',').length;     // แยกด้วย comma แล้วนับจำนวน
                                                                 // console.log('#room_text = '+ $('#room_text').val());
                                                             }
                                                             var reserve_deposit_total_amount = reserve_deposit*count;
@@ -764,13 +764,19 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function (res) {
-                if (!res.found) {
                 let tags = $('.bootstrap-tagsinput span.tag');
-                    tags.each(function () {
-                        if ($(this).text().trim() === value) {
-                            $(this).addClass('invalid');
-                        }
-                    });
+                if (!res.found) {
+                        tags.each(function () {
+                            if ($(this).text().trim() === value) {
+                                $(this).addClass('invalid');
+                            }
+                        });
+                }else{
+                        tags.each(function () {
+                            if ($(this).text().trim() === value) {
+                                $(this).addClass('count-room-reserve');
+                            }
+                        });
                 }
                 cal_total_amount();
             },
@@ -909,10 +915,18 @@ $(document).ready(function() {
                                 $('#reserve_one_room')[0].reset();
                                 // Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success');
                                 
-                                Swal.fire('เพิ่มการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
-                                    window.location.href = '/room';
-                                    // location.reload();
-                                });
+                                Swal.fire({
+                                            title: 'เพิ่มการจองเรียบร้อยแล้ว',
+                                            icon: 'success',
+                                            timer: 1500, // ตั้งเวลาเป็น 1500 มิลลิวินาที (1.5 วินาที)
+                                            timerProgressBar: true, 
+                                            showConfirmButton: false,
+                                            customClass: {
+                                                title: 'custom-title', // กำหนดคลาสให้กับ title
+                                            }}).then((result) => {
+                                                window.location.href = '/room';
+                                                // location.reload();
+                                            });
                             }else{
                                 Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
                             }

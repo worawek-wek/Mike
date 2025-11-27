@@ -236,7 +236,7 @@
     <input name="ref_renter_id" type="hidden" value="{{ $contract->ref_renter_id }}">
     <input name="ref_type_id" type="hidden" value="1">
     <input name="amount" class="total-price" type="hidden">
-
+    {{-- <input type="hidden" name="id_invoice" value="{{ $invoice->id }}"> --}}
     <input type="hidden" name="id" value="{{$invoice->id}}">
         {{-- ////////////////////////////////////////////////// --}}
         <div class="tab-content" style="box-shadow: unset;padding:0px">
@@ -272,6 +272,63 @@
                                                 @endif
                                             >
                                                 
+                                            <div class="p-2">
+                                                <label class="h5 mb-2 d-block">เลือกรายการจากใบแจ้งหนี้</label>
+                                                <div class="d-flex flex-wrap gap-4 mb-2">
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input bill-list-payment-checkbox" type="checkbox"
+                                                            value="payment_list_not_paid"
+                                                            id="payment_list_not_paid"
+                                                            checked
+                                                            >
+                                                        <label class="form-check-label" for="payment_list_not_paid">
+                                                            เต็มจำนวน
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input bill-list-payment-checkbox list-payment-check-box" type="checkbox"
+                                                            value="payment_rent_room_array"
+                                                            id="payment_rent_room_array"
+                                                            >
+                                                        <label class="form-check-label" for="payment_rent_room_array">
+                                                            ค่าเช่าห้อง
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input bill-list-payment-checkbox list-payment-check-box" type="checkbox"
+                                                            value="payment_meter_array"
+                                                            id="payment_meter_array"
+                                                            >
+                                                        <label class="form-check-label" for="payment_meter_array">
+                                                            ค่าน้ำ-ค่าไฟฟ้า
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input bill-list-payment-checkbox list-payment-check-box" type="checkbox"
+                                                            value="payment_parking_fee_array"
+                                                            id="payment_parking_fee_array"
+                                                            >
+                                                        <label class="form-check-label" for="payment_parking_fee_array">
+                                                            ค่าที่จอดรถ
+                                                        </label>
+                                                    </div>
+                                                    
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input bill-list-payment-checkbox list-payment-check-box" type="checkbox"
+                                                            value="payment_other_array"
+                                                            id="payment_other_array"
+                                                            >
+                                                        <label class="form-check-label" for="payment_other_array">
+                                                            อื่น ๆ
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                                 <div class="mb-3" style="border: 1px solid #dbdade;padding: 15px 2px;">
                                                     <div class="d-flex">
                                                         <div class="flex-grow-1 ms-3">
@@ -282,6 +339,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            <div id="div-form-payment-rent-bill">
                                                 <table class="table table-bordered" id="discount-table2" >
                                                     <thead>
                                                         <tr>
@@ -329,8 +387,9 @@
                                                         </tr>
                                                     </tfoot>
                                                 </table>
+                                            </div>
                                                 
-                                                <div align="right">
+                                                {{-- <div align="right">
                                                     <button id="add_discount2"
                                                             style="padding-right: 14px;padding-left: 14px;"
                                                             class="btn btn-sm buttons-collection btn-label-danger waves-effect waves-light me-2 mt-2"
@@ -348,13 +407,62 @@
                                                             aria-expanded="false">
                                                         <i class="ti ti-plus"></i> เพิ่มรายการ
                                                     </button>
-                                                </div>
+                                                </div> --}}
                                                 <div class="col-sm-11 mt-3 mb-3">
                                                     <label>หมายเหตุ</label>
                                                     <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
                                                 </div>
                                                 
                                                 <script>
+                                                    payPaymentMultipleRentBills();
+                                                    document.getElementById("payment_list_not_paid").addEventListener("change", function () {
+                                                        if (this.checked) {
+                                                            // ยกเลิกการเลือกอย่างอื่นทั้งหมด
+                                                            document.querySelectorAll(".list-payment-check-box").forEach(ch => ch.checked = false);
+                                                        }
+                                                        payPaymentMultipleRentBills();
+                                                    });
+
+                                                    // เมื่อเลือก option อื่น ๆ
+                                                    document.querySelectorAll(".list-payment-check-box").forEach(ch => {
+                                                        ch.addEventListener("change", function () {
+                                                            if (this.checked) {
+                                                                document.getElementById("payment_list_not_paid").checked = false; // ยกเลิก "เต็มจำนวน"
+                                                            }
+                                                            payPaymentMultipleRentBills();
+                                                        });
+                                                    });
+                                                // new TomSelect(".select-room-payment-bill", {
+                                                //     create: false,
+                                                //     maxItems: 1,
+                                                //     allowEmptyOption: true,
+                                                //     sortField: { field: "text", direction: "desc" }
+                                                // });
+                                                function payPaymentMultipleRentBills() // modal ชำระเงินหลายห้อง
+                                                {
+                                                    let list = [];
+                                                    $('.bill-list-payment-checkbox:checked').each(function() {
+                                                        list.push($(this).val());
+                                                    });
+
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: "{{$page_url}}/get-list-payment-by-id",
+                                                        data: {
+                                                            invoice_id: {{ $invoice->id }},
+                                                            list: list
+                                                        },
+                                                        success: function(data) {
+                                                            // $("#div-form-payment-rent-bill").html(data.html);
+                                                            $("#div-form-payment-rent-bill").html(data);
+                                                            // if(data.have == 1){
+                                                            //     $('#submit_payment_bill_form_all').prop('disabled', false);
+                                                            // }else{
+                                                            //     $('#submit_payment_bill_form_all').prop('disabled', true);
+                                                            // }
+                                                        }
+                                                    });
+                                                }
                                                 document.getElementById('add_expenses2').addEventListener('click', function() {
                                                     const tableBody = document.querySelector('#discount-table2 tbody');
                                                     const newRow = document.createElement('tr');
@@ -584,7 +692,7 @@
                                 </button>
                             </div>
                             <div>
-                                <button class="btn btn-info" type="submit">
+                                <button class="btn btn-info" type="submit" id="submit_payment">
                                     <span>
                                         <i class="ti-md ti ti-report-money"></i>
                                         <b class="dam">ชำระ</b>
@@ -638,6 +746,11 @@
                     }
                 }
             });
+            if(total > 0){
+                $('#submit_payment').prop('disabled', false);
+            }else{
+                $('#submit_payment').prop('disabled', true);
+            }
             $('.total-price_2').html(total.toLocaleString());
 
             // อัปเดตค่า total ใน span#total-price

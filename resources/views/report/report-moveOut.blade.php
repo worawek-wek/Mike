@@ -89,7 +89,7 @@
                                                             <div class="badge rounded bg-label-danger me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-danger">0 บาท</h5>
+                                                                <h5 class="mb-0 text-danger">{{ number_format($yod_kun) }} บาท</h5>
                                                                 <small>รวมจำนวนเงินที่คืนผู้เช่า</small>
                                                             </div>
                                                         </div>
@@ -99,7 +99,7 @@
                                                             <div class="badge rounded bg-label-success me-3 p-2"><i
                                                                     class="ti ti-currency-dollar ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-success">0 บาท</h5>
+                                                                <h5 class="mb-0 text-success">{{ number_format(abs($keb)) }} บาท</h5>
                                                                 <small>รวมที่เก็บจากผู้เช่าเพิ่ม</small>
                                                             </div>
                                                         </div>

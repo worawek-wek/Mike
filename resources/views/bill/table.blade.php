@@ -95,7 +95,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                         {{
                             number_format($row_2->total_amount)
                         }}
-                        {{$row_2->total_fine_amount}}
+                        {{-- {{$row_2->total_fine_amount}} --}}
                          {{-- // total_amount ไม่ใช่ collomn ใน database แต่มาจาก Function ใน Model payment_list(), getTotalAmountAttribute() --}}
                     </span>
                     @if (count($row_2->receipt ?? []) > 0 & $row_2->ref_status_id != 5)

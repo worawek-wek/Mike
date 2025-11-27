@@ -32,13 +32,21 @@ class Receipt extends Model
     {
         return $this->hasOne('App\Models\RentBill', 'id', 'ref_rent_bill_id');
     }
+    public function receipt_rent_bill_move_out() // บิลย้ายออก
+    {
+        return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 1)->where('paid_on_checkout', 1);
+    }
     public function receipt_move_out() // บิลย้ายออก
     {
         return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 4);
     }
+    public function receipt_bad_debt() // บิลหนี้สูญ
+    {
+        return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 5);
+    }
     public function deposit_move_out() // บิลคืนเงินประกิน
     {
-        return $this->hasOne(RentBill::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 6);
+        return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 6);
     }
     public function room()
     {

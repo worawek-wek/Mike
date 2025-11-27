@@ -9,7 +9,7 @@
                 @endphp
     @forelse ($invoice_alls as $key => $invoice)
     @php 
-        if(count($invoice->receipt) > 0){
+        if($invoice->balance_amount <= 0){
             continue;
         }
     @endphp
@@ -61,6 +61,7 @@
                             </td>
                             <td class="text-end">
                                 <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_2" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>
+                                <input type="hidden" name="insert[{{ $key }}][payment_list][id][]" value="{{ $payment_list->id }}">
                             </td>
                         </tr>
                     @endforeach

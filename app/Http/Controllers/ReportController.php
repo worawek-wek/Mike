@@ -270,6 +270,7 @@ class ReportController extends Controller
         $results = Receipt::orderBy('id','DESC')
                             ->where('ref_status_id', 5)
                             ->where('ref_type_id', 7)
+                            ->where('move_out_type', 1)
                             ->whereHas('room.floor.building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             });
@@ -297,12 +298,39 @@ class ReportController extends Controller
         $data['page_url'] = 'report/move-out';
 
         $data['all_room'] = Receipt::orderBy('id','ASC')
-                            ->where('ref_status_id', 5)
-                            ->where('ref_type_id', 4)
-                            ->whereHas('room.floor.building', function ($query) {
-                                $query->where('ref_branch_id', session("branch_id"));
-                            })
-                            ->count();
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })
+                                    ->count();
+
+        $yod_kun = Receipt::orderBy('id','ASC')
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                    })
+                                    ->get()
+                                    ->filter(function ($r) {
+                                        return $r->total_amount > 0;
+                                    });
+
+        $data['yod_kun'] = $yod_kun->sum('total_amount');
+
+        $keb = Receipt::orderBy('id','ASC')
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                    })
+                                    ->get()
+                                    ->filter(function ($r) {
+                                        return $r->total_amount < 0;
+                                    });
+
+        $data['keb'] = $keb->sum('total_amount');
+
         return view('report/report-moveOut', $data);
     }
     public function badDebt(Request $request)
@@ -352,40 +380,24 @@ class ReportController extends Controller
     }
     public function badDebt_datatable(Request $request)
     {
-        // $receipt = Receipt:;
-        $results = RentBill::orderBy('rooms.name', 'ASC')
-                            ->join('room_for_rents', function ($join) {
-                                $join->on('rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
-                                    ->where('room_for_rents.status', 0); // ใส่เงื่อนไขเพิ่มตรงนี้
-                            })
-                            ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
-                            ->where('rent_bills.ref_type_id', 1)
-                            ->where('rent_bills.ref_status_id', '!=', 5)
-                            ->where('room_for_rents.move_out_type', 2)
-                            ->select(
-                                'rent_bills.*',
-                                'room_for_rents.payment_method as payment_method',
-                                'room_for_rents.date_stay as date_stay',
-                                'rooms.name as room_name',
-                                'rooms.rent'
-                            )
-                            ->with('payment_water')
-                            ->distinct('rent_bills.id');
+        $results = Receipt::orderBy('id','DESC')
+                            ->where('ref_status_id', 5)
+                            ->where('ref_type_id', 7)
+                            ->where('move_out_type', 2)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            });
 
-                        // ตรวจสอบว่า $request->month มีค่าและอยู่ในรูปแบบที่ถูกต้อง
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
         }
 
-                        // จัดการเรื่อง limit
         $limit = $request->limit ?? 15;
 
         $results = $results->paginate($limit);
+        return $results[0]->receipt_bad_debt;
 
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();

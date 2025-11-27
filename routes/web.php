@@ -364,6 +364,7 @@ Route::middleware('auth')->group(function() {
         Route::get('bill/summary', 'bill_summary')->name('bill.summary');    //////////////////////////
         Route::get('bill/datatable', 'datatable')->name('bill.datatable');    //////////////////////////
         Route::get('bill/get-room-for-payment', 'get_room_for_payment')->name('bill.get-room-for-payment');    //////////////////////////
+        Route::get('bill/get-list-payment-by-id', 'get_list_payment_by_id')->name('bill.get-list-payment-by-id');    //////////////////////////
         Route::get('bill/waiting-for-confirmation', 'waiting_for_confirmation')->name('bill.waiting-for-confirmation');    //////////////////////////
         Route::get('bill/confirmation', 'confirmation')->name('bill.confirmation');    //////////////////////////
         Route::get('bill/export/excel', 'export_excel')->name('bill.export-excel');    //////////////////////////
