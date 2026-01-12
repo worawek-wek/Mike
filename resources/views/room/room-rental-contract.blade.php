@@ -3,6 +3,8 @@
     {{-- ทำสัญญาหลายห้อง --}}
     {{-- ทำสัญญาหลายห้อง --}}
 
+<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
     <input type="hidden" name="ref_renter_id" value="{{ $renter->id }}">
     <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
         <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
@@ -27,8 +29,8 @@
                 <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ $renter->id_card_number }}" />
             </div>
             <div class="col-sm-6">
-                <label for="contract_date" class="form-label">วันที่ทำสัญญา</label>
-                <input type="text" name="contract_date" class="form-control" placeholder="" id="contract_date" value="{{ date('d/m/Y') }}" required autocomplete="off"/>
+                <label for="contract_date_all" class="form-label">วันที่ทำสัญญา</label>
+                <input type="text" name="contract_date" class="form-control date_contract_all" placeholder="" id="contract_date_all" value="{{ date('d/m/Y') }}" required autocomplete="off"/>
             </div>
             <div class="col-sm-6">
                 <label class="form-label">ระยะเวลาทำสัญญา(เดือน)</label>
@@ -36,8 +38,8 @@
             </div>
             
             <div class="col-sm-6">
-                <label for="contract_date_to" class="form-label">วันที่สิ้นสุดสัญญา </label>
-                <input type="text" name="contract_date_to" class="form-control" placeholder="" id="contract_date_to" required autocomplete="off" value=""/>
+                <label for="contract_date_to_all" class="form-label">วันที่สิ้นสุดสัญญา </label>
+                <input type="text" name="contract_date_to" class="form-control date_contract_all" placeholder="" id="contract_date_to_all" required autocomplete="off" value=""/>
             </div>
             <div class="col-sm-12">
                 <label for="remark" class="form-label">หมายเหตุ</label>
@@ -79,7 +81,7 @@
 
         @endphp
 
-        <div class="row g-3 p-4 pt-1 contractRoom" id="contractRoom{{$item->id}}">
+        <div class="row g-3 p-4 pt-1 contractRoom contractRoomBox{{$item->id}}" id="contractRoom{{$item->id}}">
         <input type="hidden" name="contract[{{$key}}][ref_room_for_rent_id]" value="{{ $item->id }}">
         <input type="hidden" name="contract[{{$key}}][ref_room_id]" value="{{ $item->ref_room_id }}">
             <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
@@ -138,8 +140,8 @@
                 <input type="text" name="contract[{{$key}}][deduction_booking_amount]" class="form-control" id="deduction_booking_amount" placeholder="" value="{{ @$contract->deposit }}" />
             </div>
             <div class="col-sm-6">
-                <label for="deduction_booking_date" class="form-label">หักค่าจองห้องเมื่อวันที่</label>
-                <input type="text" name="contract[{{$key}}][deduction_booking_date]" class="form-control" id="deduction_booking_date{{$item->id}}" placeholder="" autocomplete="off" value="{{ @$contract->payment_received_date != null ? date('d/m/Y', strtotime($contract->payment_received_date)) : ''; }}"/>
+                <label for="deduction_booking_date_all{{$item->id}}" class="form-label">หักค่าจองห้องเมื่อวันที่</label>
+                <input type="text" name="contract[{{$key}}][deduction_booking_date]" class="form-control date_contract_all" id="deduction_booking_date_all{{$item->id}}" placeholder="" autocomplete="off" value="{{ @$contract->payment_received_date != null ? date('d/m/Y', strtotime($contract->payment_received_date)) : ''; }}"/>
             </div>
             <div class="col-sm-6">
                 <label for="receipt_no" class="form-label">อ้างอิงจากใบเสร็จค่าจองเลขที่</label>
@@ -156,15 +158,10 @@
             </div>
         </div>
         <script>
-            $('#deduction_booking_date{{$item->id}}').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
                 $('#submit_insert_contract').prop('disabled', false);
         </script>
             @if (!$loop->last)
-                <hr>
+                <hr class="contractRoomBox{{$item->id}}">
             @endif
         @endforeach
     </div>
@@ -179,23 +176,6 @@
                 <div>
                     <label for="exampleFormControlInput31" class="form-label">วิธีการชำระเงิน</label>
                 </div>
-                {{-- <div class="ms-3">
-                <input
-                    name="payment_method"
-                    class="form-check-input"
-                    type="radio"
-                    value="1"
-                    id="defaultRadio1"
-                    checked />
-                <label class="form-check-label" for="defaultRadio1">&nbsp; เงินสด </label>
-                <input
-                    name="payment_method"
-                    class="form-check-input ms-2"
-                    type="radio"
-                    value="2"
-                    id="tranfer" />
-                <label class="form-check-label" for="tranfer">&nbsp; โอนเงิน </label>
-                </div> --}}
                 {{-- ///////////////////////////////////////////////////// --}}
                 <div class="col-sm-11 mb-3">
                     <input name="payment_channel" class="form-check-input me-1 reservation_payment_channel" type="radio" id="reservation_payByCash" value="1" checked>
@@ -204,8 +184,8 @@
 
                 <div id="paymentChanel_Res2">
                     <div class="col-sm-6 mb-3">
-                        <label for="payment_date">วันที่ชำระเงิน</label>
-                        <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date" autocomplete="off" value="{{date('d/m/Y')}}"/>
+                        <label for="payment_date_all">วันที่ชำระเงิน</label>
+                        <input type="text" name="payment_date" class="form-control date_contract_all" placeholder="" id="payment_date_all" autocomplete="off" value="{{date('d/m/Y')}}"/>
                     </div>
                 </div>
 
@@ -229,8 +209,8 @@
                         <input type="time" name="transfer_time" class="form-control" placeholder="" id="transfer_time" autocomplete="off"/>
                     </div>
                     <div class="col-sm-6 mb-2">
-                        <label for="payment_date2">วันที่โอนเงิน</label><span class="text-danger"> *</span>
-                        <input type="text" name="payment_date" class="form-control" placeholder="" id="payment_date2" autocomplete="off" value="{{date('d/m/Y')}}" required/>
+                        <label for="payment_date2_all">วันที่โอนเงิน</label><span class="text-danger"> *</span>
+                        <input type="text" name="payment_date" class="form-control date_contract_all" placeholder="" id="payment_date2_all" autocomplete="off" value="{{date('d/m/Y')}}" required/>
                     </div>
                     <div class="col-sm-10 mt-3">
                         <label for="evidence_of_money_transfer">แนบหลักฐานการโอน</label><span class="text-danger"> *</span>
@@ -245,14 +225,6 @@
         </div>
     </div>
 </div>
-    {{-- @if (count($room_for_rent) == 0)
-        <script>
-            setTimeout(() => {
-                alert(123);
-            }, 2000);
-        </script>
-    @endif --}}
-    
     <script>
         document.getElementById('evidence_of_money_transfer').addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -272,22 +244,7 @@
                 preview.style.display = "none";
             }
         });
-        $('#contract_date').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-        $('#contract_date_to').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-        $('#payment_date').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-        $('#payment_date2').datepicker({
+        $('.date_contract_all').datepicker({
                 format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
                 autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
                 todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
@@ -305,7 +262,7 @@
                 // ใส่ required
                 $('#ref_bank_id').attr('required', true);
                 $('#transfer_time').attr('required', true);
-                $('#payment_date2').attr('required', true);
+                $('#payment_date2_all').attr('required', true);
                 $('#evidence_of_money_transfer').attr('required', true);
             } else {
                 // แสดงช่องเงินสด
@@ -315,7 +272,7 @@
                 // เอา required ออก
                 $('#ref_bank_id').removeAttr('required');
                 $('#transfer_time').removeAttr('required');
-                $('#payment_date2').removeAttr('required');
+                $('#payment_date2_all').removeAttr('required');
                 $('#evidence_of_money_transfer').removeAttr('required');
             }
         });
@@ -327,9 +284,9 @@
     </script>
     <script>
         function updateContractDateTo() {
-            const contractDate = $('#contract_date').val();
+            const contractDate = $('#contract_date_all').val();
             const periodMonths = parseInt($('#period').val(), 10);
-            const contractDateToField = $('#contract_date_to');
+            const contractDateToField = $('#contract_date_to_all');
 
             if (contractDate && periodMonths && !isNaN(periodMonths)) {
                 const dateParts = contractDate.split('/');
@@ -341,7 +298,7 @@
         }
 
         function initContractFormScript() {
-            $('#contract_date').on('input', updateContractDateTo);
+            $('#contract_date_all').on('input', updateContractDateTo);
             $('#period').on('input', updateContractDateTo);
             updateContractDateTo(); // คำนวณครั้งแรก
         }
@@ -354,7 +311,7 @@
     <script>
         function deleteContractRoom(id){
             if ($('.contractRoom').length > 1) {
-                $("#contractRoom"+id).remove();
+                $(".contractRoomBox"+id).remove();
             } else {
                 Swal.fire('ไม่สามารถลบได้', 'การทำสัญญาต้องมีอย่างน้อย 1 ห้อง', 'warning');
             }

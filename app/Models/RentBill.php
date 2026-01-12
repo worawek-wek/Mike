@@ -108,7 +108,14 @@ class RentBill extends Model
                     ->where('document_type', 1)
                     ->where('discount', 0);
     }
-    public function payment_other_array()
+    public function payment_discount_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('discount', 1)
+                    ->where('paid', 0);
+    }
+    public function payment_other_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
@@ -120,14 +127,14 @@ class RentBill extends Model
                                 ->where('title', 'NOT LIKE', '%ค่าที่จอดรถยนต์%');
                     });
     }
-    public function payment_rent_room_array()
+    public function payment_rent_room_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
                     ->where('paid', 0)
                     ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
     }
-    public function payment_meter_array()
+    public function payment_meter_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
@@ -137,7 +144,7 @@ class RentBill extends Model
                             ->orWhere('title', 'like', '%ค่าไฟฟ้า%');
                     });
     }
-    public function payment_parking_fee_array()
+    public function payment_parking_fee_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)

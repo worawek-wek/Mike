@@ -28,15 +28,16 @@ class IncomeExpensesController extends Controller
     {
         $data['page_url'] = 'income-expenses';
         $data['room'] = Room::orderBy('rooms.name', 'ASC')
+                            ->where('status', 2)
                             ->whereHas('floor.building', function ($query) {
                                 $query->where('ref_branch_id', session("branch_id"));
                             })->get();
         $data['category'] = Category::get();
-        $income = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 1)->sum('amount');
-        $expenses = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 2)->sum('amount');
-        $data['income'] = $income;
-        $data['expenses'] = $expenses;
-        $data['total'] = $income-$expenses;
+        // return $income = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 1)->sum('amount');
+        // $expenses = IncomeExpenses::where('ref_branch_id', session("branch_id"))->where('type', 2)->sum('amount');
+        // $data['income'] = $income;
+        // $data['expenses'] = $expenses;
+        // $data['total'] = $income-$expenses;
         // $data['title'] = 'Profile';
         
         return view('income-expenses/index', $data);
@@ -198,6 +199,35 @@ class IncomeExpensesController extends Controller
                     $pay_list->discount  =  $request->payment_sd_list['discount'][$key];
                     $pay_list->save();
                 }
+            }else{
+                // 2. เพิ่มใบเสร็จรับเงิน
+                $receipt = new Receipt;
+                $receipt->receipt_number =  $this->generateReceiptCode();
+                $receipt->ref_room_id  =  $request->ref_room_id;
+                $receipt->ref_rent_bill_id  =  0;
+                $receipt->ref_contract_id  =  0;
+                $receipt->ref_renter_id  =  0;
+                $receipt->payment_format  =  0;
+                $receipt->payment_channel  =  0; // รูปแบบชำระเงิน 1=เงินสด / 2=โอนเงิน
+                $receipt->ref_bank_id  =  0;
+                $receipt->transfer_time  =  0;
+                $receipt->payment_date  =  $date;
+                $receipt->amount  =  0;
+                $receipt->ref_type_id  =  0;
+                $receipt->evidence_of_money_transfer  =  0;
+                $receipt->ref_user_id =  Auth::id();
+                $receipt->save();
+                
+                $insert_income_expenses->ref_receipt_id  =  $receipt->id;
+                $insert_income_expenses->save(); 
+                    // 2.2 เพิ่ม รายการ ใบเสร็จรับเงิน
+                    $pay_list = new PaymentList;
+                    $pay_list->title  =  $request->label;
+                    $pay_list->price  =  $request->amount ?? 0;
+                    $pay_list->ref_payment_id  =  $receipt->id;
+                    $pay_list->document_type  =  2; // Receipt ใบเสร็จรับเงิน
+                    $pay_list->discount  =  1;
+                    $pay_list->save();
             }
             if(@$p_file) $p_file->move($p_path, $proof_of_payment);
             if(@$v_file) $v_file->move($v_path, $payment_voucher);

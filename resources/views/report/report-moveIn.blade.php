@@ -89,7 +89,7 @@
                                                             <div class="badge rounded bg-label-danger me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-danger">0 บาท</h5>
+                                                                <h5 class="mb-0 text-danger">{{ number_format($sum['income_3']) }} บาท</h5>
                                                                 <small>หักเงินมัดจำจองทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -99,7 +99,7 @@
                                                             <div class="badge rounded bg-label-success me-3 p-2"><i
                                                                     class="ti ti-currency-dollar ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-success">{{ number_format($sum['income']) }} บาท</h5>
+                                                                <h5 class="mb-0 text-success">{{ number_format($sum['income']+$sum['income_3']) }} บาท</h5>
                                                                 <small>รายรับทั้งหมด</small>
                                                             </div>
                                                         </div>
@@ -131,8 +131,9 @@
                                                     <div class="dataTables_length mx-n2 ms-2"
                                                         id="DataTables_Table_0_length">
                                                         <label>Show
-                                                            <select name="DataTables_Table_0_length"
-                                                                aria-controls="DataTables_Table_0" class="form-select">
+                                                            <select onchange='loadData("{{$page_url}}/datatable")' name="limit" class="form-select ms-2 me-2 p_search" style="width:100px">
+                                                            {{-- <select name="DataTables_Table_0_length"
+                                                                aria-controls="DataTables_Table_0" class="form-select"> --}}
                                                                 <option value="25">25</option>
                                                                 <option value="50">50</option>
                                                                 <option value="100">100</option>

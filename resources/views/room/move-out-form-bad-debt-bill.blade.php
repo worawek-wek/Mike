@@ -5,7 +5,7 @@
             <input type="hidden" name="invoice_id" value="{{ @$invoice->id }}">
             <input name="ref_room_for_rent_id" type="hidden" value="{{ $invoice->ref_room_for_rent_id ?? $room->room_for_rent_main->id }}">
             <input name="ref_room_id" type="hidden" value="{{ $invoice->ref_room_id ?? $room->id }}">
-            <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id }}">
+            <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id ?? $room->contract->id }}">
             <div class="row g-2 pt-1"
             @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */
@@ -94,6 +94,10 @@
                     </tr>
                 </tfoot>
             </table>
+                <div class="col-sm-12">
+                    <label for="renter_remark" class="form-label">หมายเหตุ</label>
+                    <textarea name="remark" class="form-control" id="renter_bad_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
+                </div>
         <div class="mt-4 text-end col-12"
         @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */

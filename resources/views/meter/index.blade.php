@@ -315,6 +315,15 @@ table {
                                                                     </span>
                                                             </button>
                                                         </div>
+                                                        <div class="mt-3" style="padding-right: unset !important;" id="movingMeterElectricityRoom">
+                                                            <button onclick="showMovingMeterElectricityRoomCount()"
+                                                                    style="padding-right: 14px; padding-left: 14px;"
+                                                                    class="btn btn-warning buttons-collection me-2">
+                                                                    <i class="ti ti-alert-triangle me-1"></i>
+                                                                        พบห้องว่างมีการเคลื่อนไหวมิเตอร์ (<span id="movingMeterElectricityRoomCount"></span>)
+                                                                    </span>
+                                                            </button>
+                                                        </div>
                                                     
                                                 </div>
                                                 <div class="card-body px-0 pt-0">
@@ -567,27 +576,44 @@ table {
                 } else {
                     $('#movingMeterWaterRoom').hide();
                 }
+
+                if (data.electricity && data.electricity.length > 0) {
+                    $('#movingMeterElectricityRoom').show();
+                    document.getElementById('movingMeterElectricityRoomCount').innerText = data.electricity.length;
+                } else {
+                    $('#movingMeterElectricityRoom').hide();
+                }
                 
-                if (callback) callback(data.water);
+                if (callback) callback(data);
             }
         });
     }
+    
 
     function showMovingMeterRoomCount() {
+        // alert(123);
         getMovingMeterRoomCount(function(room) {
-            alertMovingMeterRoomCount(room);
+            alertMovingMeterRoomCount(room.water);
+        });
+    }
+
+    function showMovingMeterElectricityRoomCount() {
+        // alert(123);
+        getMovingMeterRoomCount(function(room) {
+            alertMovingMeterRoomCount(room.electricity);
         });
     }
 
     function alertMovingMeterRoomCount(room) {
         const movingRooms = room || [];
+        // console.log(room);
         const count = movingRooms.length;
 
         if (count > 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'ห้องที่มีการเคลื่อนไหวมิเตอร์',
-                html: movingRooms.map(r => `ห้อง ${r}`).join('<br>'),
+                html: movingRooms.map(r => `${r}`).join('<br>'),
                 confirmButtonText: 'ตกลง'
             });
         } else {

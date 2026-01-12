@@ -122,14 +122,21 @@ class BillController extends Controller
         $data['list'] = $request->list;
         $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         // return $request->invoice_ids;
-        $data['invoice_alls'] = RentBill::orderBy('rooms.name')
+        // if($request->delete_list_id){
+        //     $request->
+        // }
+        $invoice_alls = RentBill::orderBy('rooms.name')
                                         ->join('rooms', 'rent_bills.ref_room_id', '=', 'rooms.id')
                                         // ->with('payment_rent_room_array')
                                         ->whereIn('rent_bills.id', $request->invoice_ids)
-                                        ->whereNotIn('rent_bills.ref_status_id', [3,5])
-                                        ->where('rent_bills.ref_type_id', 1)
+                                        ->whereNotIn('rent_bills.ref_status_id', [3,5]);
+        if(@$request->delete_list_id){
+            $invoice_alls = $invoice_alls->whereNotIn('rent_bills.id', $request->delete_list_id);
+        }
+        $invoice_alls = $invoice_alls->where('rent_bills.ref_type_id', 1)
                                         ->select('rent_bills.*')
                                         ->get();
+        $data['invoice_alls'] = $invoice_alls; 
         // return 123;
         return view('bill/list-payment-all', $data);
         
@@ -357,7 +364,7 @@ class BillController extends Controller
     public function confirm_bill_all(Request $request)
     {
         try{
-            RentBill::whereIn('id', explode(',', $request->id))->where('ref_status_id', 3)->update(['ref_status_id' => 7]);
+            RentBill::whereIn('id', $request->id)->where('ref_status_id', 3)->update(['ref_status_id' => 7]);
             
             DB::commit();
             return true;
@@ -427,6 +434,7 @@ class BillController extends Controller
             $receipt->amount  =  $amount;
             $receipt->ref_type_id  =  $request->ref_type_id;
             $receipt->paid_on_checkout  =  $request->paid_on_checkout ?? 0;
+            $receipt->remark  =  $request->remark;
             $receipt->ref_status_id  =  2;
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
@@ -439,7 +447,33 @@ class BillController extends Controller
                 }
             }
             $receipt->save();
-            
+
+            $payment_list_rent_bad = PaymentList::whereHas('invoice', function ($query) use ($room) {
+                                            $query->where('ref_type_id', 5)->where('ref_contract_id', $room->contract->id);
+                                        })
+                                        ->where('document_type', 1)
+                                        ->get();
+            if($payment_list_rent_bad->isNotEmpty()){
+                // return "มี";
+                foreach($payment_list_rent_bad as $p_rent_bad){
+                    if($p_rent_bad->bad_debt_rent_status == 1){
+                        PaymentList::destroy($p_rent_bad->id);
+                    }
+                }
+                // return $payment_list_rent_bad;
+            }
+
+            $bad_debt = RentBill::where('ref_type_id', 5)->where('ref_contract_id', $room->contract->id)->get();
+            if($bad_debt->isNotEmpty()){
+                // return "มี";
+                foreach($bad_debt as $bad){
+                    if(count($bad->payment_list) == 0){
+                        RentBill::destroy($bad->id);
+                    }
+                }
+                // return $payment_list_rent_bad;
+            }
+
             
             $total = Room::find($request->ref_room_id)->rent;
 
@@ -563,6 +597,24 @@ class BillController extends Controller
             return false;
         }
         //
+    }
+//// ดึงห้อง ชำระเงินหลายห้อง
+    public function get_room_rent_bill(Request $request, $renter_id)
+    {
+
+        $data['page_url'] = 'room';
+        $data['renter_id'] = $renter_id;
+        $roomIds = RentBill::where('ref_type_id', 1)
+                                ->whereHas('room_for_rent', function ($query) use ($renter_id) {
+                                    $query->where('ref_renter_id', $renter_id)
+                                            ->where('status', 1);
+                                })
+                                ->pluck('id')
+                                ->toArray();
+                                
+        $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
+        
+        return $roomIds;
     }
     public function calculate_total($total, $discount, $price)
     {
@@ -736,8 +788,13 @@ class BillController extends Controller
         // return $request;
         try{
                 $re_del = Receipt::find($id);
+                foreach($re_del->payment_list as $payment_list){
+                    
+                    PaymentList::where('ref_payment_id', $re_del->ref_rent_bill_id)->where('document_type', 1)->Where('title', $payment_list->title)->update(['paid' => 0]); // แก้ไข paid ของรายการ ใบแจ้งหนี้ ให้เป็น 0 
+                    
+                }
+                    PaymentList::where('ref_payment_id', $re_del->id)->where('document_type', 2)->delete(); // ลบรายการ ใบเสร็จ
 
-                PaymentList::where('ref_payment_id', $re_del->id)->where('document_type', 2)->delete();
                 
                 IncomeExpenses::where('ref_receipt_id', $id)->delete();
 

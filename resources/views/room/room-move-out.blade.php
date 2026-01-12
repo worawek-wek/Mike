@@ -159,7 +159,7 @@
                             </table>
                             {{--  --}}
                             <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
-                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_paid_1']->id }})">
+                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_paid_1']->receipt[0]->id }})">
                                     <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
                                 </button>
                             </div>
@@ -306,7 +306,7 @@
                             </table>
                             {{--  --}}
                             <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
-                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_4']->id }})">
+                                <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row['move_invoice_4']->receipt[0]->id }})">
                                     <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
                                 </button>
                             </div>

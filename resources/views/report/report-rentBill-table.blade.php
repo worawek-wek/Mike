@@ -17,10 +17,10 @@
             <th class="text-center" style="width: 150px;">
                 วันที่รับชำระ
             </th>
-            <th class="text-nowrap text-center">
+            <th class="text-nowrap text-center" style="padding: 0 20px !important;">
                 ช่องทาง
             </th>
-            <th class="text-nowrap text-center">
+            <th class="text-nowrap text-center" style="padding: 0 50px !important;">
                 รับชำระโดย
             </th>
             {{-- <th class="text-center">
@@ -42,7 +42,7 @@
                 ค่าที่จอด <br> รถมอเตอร์ไซค์
             </th>
             <th class="text-nowrap text-center">
-                ส่วนกลาง
+                อื่น ๆ
             </th>
             <th class="text-center">
                 รวม
@@ -73,9 +73,9 @@
                     @endif
                 </span></td>
                 <td>
-                    @if ($row->ref_status_id == 5)
+                    @if (in_array($row->ref_status_id,[2,5]))
                         <span>
-                        @if ($row->payment_method == 1)
+                        @if ($row->payment_channel == 1)
                             เงินสด
                         @else
                             โอนเงิน
@@ -86,17 +86,17 @@
                 </td>
                 <td>
                     <span>
-                        @if ($row->ref_status_id == 5)
+                        @if (in_array($row->ref_status_id,[2,5]))
                             {{ $row->user->name }}
                         @endif    
                     </span>
                 </td>
-                <td><span>{{ number_format($row->payment_rent_room->price ?? 0) }}</span></td>
-                <td><span>{{ $row->water_amount }}</span></td>
-                <td><span>{{ $row->electricity_amount }}</span></td>
-                <td><span> - </span></td>
-                <td><span> - </span></td>
-                <td><span> - </span></td>
+                <td><span>{{ number_format(@$row->payment_rent_room->price ?? 0) }}</span></td>
+                <td><span>{{ number_format(@$row->payment_water->price ?? 0) }}</span></td>
+                <td><span>{{ number_format(@$row->payment_electricity->price ?? 0) }}</span></td>
+                <td><span>{{ number_format(@$row->payment_car_parking_fee->price ?? 0) }}</span></td>
+                <td><span>{{ number_format(@$row->payment_motorcycle_parking_fee->price ?? 0) }}</span></td>
+                <td><span>{{ number_format(@$row->payment_other_total_amount ?? 0) }}</span></td>
                 <td><span>{{ number_format($row->total_amount) }}</span></td>
                 <td><span class="badge bg-label-{{ $row->status->color }}"
                         text-capitalized="">{{ $row->status->name }}</span></td>

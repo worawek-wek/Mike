@@ -113,13 +113,28 @@
         </table>
     <label class="mt-4"><b>หมายเหตุ :</b> {{ $income_expenses->remark }}</label>
     @else
-        <label for="exampleFormControlInput1" class="form-label h4">หลักฐานการจ่ายเงิน</label>
-        <div class="col-sm-6 mb-3">
-            <img src="/upload/expenses/{{ $income_expenses->proof_of_payment }}" width="100%">
-        </div>
-        <label for="exampleFormControlInput1" class="form-label h4">หลักฐานการจ่ายเงิน</label>
-        <div class="col-sm-6">
-            <img src="/upload/expenses/{{ $income_expenses->payment_voucher }}" width="100%">
+        <div class="row">
+            @php
+                $proofPath = public_path('upload/expenses/' . $income_expenses->proof_of_payment);
+            @endphp
+
+            @if(!empty($income_expenses->proof_of_payment) && file_exists($proofPath))
+                <div class="col-sm-6 mb-3">
+                <label class="form-label h4">หลักฐานการจ่ายเงิน</label>
+                    <img src="/upload/expenses/{{ $income_expenses->proof_of_payment }}" width="80%">
+                </div>
+            @endif
+            
+            @php
+                $voucherPath = public_path('upload/expenses/' . $income_expenses->payment_voucher);
+            @endphp
+
+            @if(!empty($income_expenses->payment_voucher) && file_exists($voucherPath))
+                <div class="col-sm-6 mb-3">
+                <label class="form-label h4">หลักฐานการจ่ายเงิน</label>
+                    <img src="/upload/expenses/{{ $income_expenses->payment_voucher }}" width="80%">
+                </div>
+            @endif
         </div>
     @endif
 </div>

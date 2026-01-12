@@ -68,6 +68,70 @@ class Receipt extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('fine', 0)->where('document_type', 2);
     }
+    public function payment_parking_fee_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('paid', 0)
+                    ->where('title', 'like', '%ค่าที่จอดรถยนต์%');
+    }
+    public function payment_rent_room()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('paid', 0)
+                    ->where('title', 'like', '%ค่าเช่าห้อง (Room rate)%');
+    }
+    public function payment_car_parking_fee()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('title', 'like', '%ค่าที่จอดรถยนต์%');
+    }
+    public function payment_motorcycle_parking_fee()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('title', 'like', '%ค่าที่จอดมอเตอร์ไซค์%');
+    }
+    public function payment_water()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('title', 'like', '%ค่าน้ำ%');
+    }
+
+    public function payment_electricity()
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('title', 'like', '%ค่าไฟฟ้า%');
+    }
+    public function payment_other_array()
+    {
+        return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 2)
+                    ->where('paid', 0)
+                    ->where(function ($query) {
+                        $query->where('title', 'NOT LIKE', '%ค่าเช่าห้อง (Room rate)%')
+                                ->where('title', 'NOT LIKE', '%ค่าน้ำ%')
+                                ->where('title', 'NOT LIKE', '%ค่าไฟฟ้า%')
+                                ->where('title', 'NOT LIKE', '%ค่าที่จอดรถยนต์%');
+                    });
+    }
+    public function getPaymentOtherTotalAmountAttribute()
+    {
+        $lists = $this->payment_other_array; // relation ที่คุณมีอยู่แล้ว
+
+        if ($lists->isEmpty()) {
+            return 0;
+        }
+
+        $total = $lists->where('discount', 0)->sum('price');
+        $discount = $lists->where('discount', 1)->sum('price');
+
+        return $total - $discount;
+    }
     public function getTotalAmountAttribute()
     {
 

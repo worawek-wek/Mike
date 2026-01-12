@@ -48,7 +48,7 @@
                         วันสิ้นสุดสัญญาเช่า
                     </th>
                     <th class="text-center">
-                        อายุสัญญา
+                        อายุสัญญา(เดือน)
                     </th>
                     {{-- <th class="text-center">
                         
@@ -63,9 +63,16 @@
                         <td class="text-center">{{ @$row->room_name ?? '-' }}</td>
                         <td class="text-center">{{ $row->phone }}</td>
                         <td class="text-center">
+                            @foreach ($row->vehicles as $vehicles)
                             @php
-                                echo @App\Models\Vehicle::where('ref_room_id', $row->room_id)->first()->car_registration;
+                                if ($vehicles->ref_room_id != $row->room_id){
+                                    continue;
+                                }
                             @endphp
+                                {{ $vehicles->car_registration." ".$vehicles->detail }}
+                                <br>
+                            @endforeach
+                            
                             {{-- {{@$row->vehicle->car_registration ?? '-'}} --}}
                         </td>
                         <td class="text-center">

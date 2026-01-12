@@ -73,13 +73,13 @@
         }
         .total-table td {
             padding: 1px;
-            font-size: 10px;
+            font-size: 15px !important;
         }
         .total-table td:nth-child(2) {
-            text-align: left;
+            text-align: right;
         }
         .total-table td:nth-child(3) {
-            text-align: left;
+            text-align: right;
             font-weight: bold;
             border-bottom: 1px solid #000;
         }
@@ -197,15 +197,17 @@
                 <td style="font-size: large;width: 20%;" rowspan="2">
                     <img src="/upload/qr-code/{{ $receipt->room->floor->building->qr_code }}" alt="" width="65%" >
                 </td>
-                <td style="font-size: large;">({{ $amount_thai }})</td>
-                <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                <td style="font-size: large;">
+                {{-- <td style="font-size: large;">({{ $amount_thai }})</td> --}}
+                <td style="font-size: 12px !important;">จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
+                <td style="font-size: 12px !important;">
                     {{ number_format($receipt->total_amount) }} บาท
+                    <br>
+                    ({{ $amount_thai }})
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ $receipt->remark }}</span></div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
@@ -280,15 +282,16 @@
                 <td style="font-size: large;width: 20%;" rowspan="2">
                     <img src="/upload/qr-code/{{ $receipt->room->floor->building->qr_code }}" alt="" width="65%" >
                 </td>
-                <td style="font-size: large;">({{ $amount_thai }})</td>
-                <td>จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                <td style="font-size: large;">
+                <td style="font-size: 12px !important;">จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
+                <td style="font-size: 12px !important;">
                     {{ number_format($receipt->total_amount) }} บาท
+                    <br>
+                    ({{ $amount_thai }})
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <div class="note">หมายเหตุ(Note) </div>
+                    <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ $receipt->remark }}</span></div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>

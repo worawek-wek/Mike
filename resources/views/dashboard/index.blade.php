@@ -171,7 +171,7 @@
                                                         <h6 class="mb-0 fw">จ่ายล่าช้าแบบนัดเวลา</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0">{{ number_format($summary_month['all_receipt_late_with_appointment']) }} บาท</h6>
+                                                        <h6 class="text-light-success mb-0" style="color: #ffb975;">{{ number_format($summary_month['all_receipt_late_with_appointment']) }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>
@@ -186,7 +186,7 @@
                                                         <h6 class="mb-0 fw">จ่ายล่าช้าแบบไม่ได้นัดเวลา</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0">{{ number_format($summary_month['all_receipt_late']) }} บาท</h6>
+                                                        <h6 class="text-light-danger mb-0">{{ number_format($summary_month['all_receipt_late']) }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>
@@ -198,7 +198,7 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <h5>ผู้เช่าค้างชำระค่าเช่า</h5>
-                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ number_format($summary['overdue_this_month'] < 0 ? 0 : $summary['overdue_this_month']) }} บาท</h6>
+                                            <h6 class="text-danger text-end">รวมเป็นเงิน {{ number_format($summary['overdue_this_month']) }} บาท</h6>
                                         </div>
                                         <div class="card card-body bg-light-primary border-0 shadow-none py-5">
                                             <h2 class="text-center fw-semibold mb-0 text-white"><span

@@ -77,31 +77,31 @@
                                                 <div class="row justify-content-center py-4">
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-primary me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-primary me-3 p-2"><i
                                                                     class="ti ti-door-exit ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-primary">{{ $count_room }} ห้อง</h5>
+                                                                <h5 class="mb-0 text-primary">{{ $all_room }} ห้อง</h5>
                                                                 <small>ย้ายออกทั้งหมด</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-info me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-danger me-3 p-2"><i
                                                                     class="ti ti-database ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-info">{{ number_format($totalAmount) }} บาท</h5>
-                                                                <small>รวมจํานวนเงินที่ต้องเก็บเพิ่มจากผู้เช่า</small>
+                                                                <h5 class="mb-0 text-danger">{{ number_format($yod_kun) }} บาท</h5>
+                                                                <small>รวมจำนวนเงินที่คืนผู้เช่า</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="badge rounded bg-success me-3 p-2"><i
+                                                            <div class="badge rounded bg-label-success me-3 p-2"><i
                                                                     class="ti ti-currency-dollar ti-lg"></i></div>
                                                             <div class="card-info">
-                                                                <h5 class="mb-0 text-success">0 บาท</h5>
-                                                                <small>รวมจํานวนเงินที่ต้องคืนให้ผู้เช่า</small>
+                                                                <h5 class="mb-0 text-success">{{ number_format(abs($keb)) }} บาท</h5>
+                                                                <small>รวมที่เก็บจากผู้เช่าเพิ่ม</small>
                                                             </div>
                                                         </div>
                                                     </div>

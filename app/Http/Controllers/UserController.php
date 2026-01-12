@@ -413,29 +413,32 @@ class UserController extends Controller
         
         $pghub = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', session("branch_id"))->where('ref_user_id', $id)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
 
-        // if($pghub->isNotEmpty()){
-        //     $permission_id_1 = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', 1)->where('ref_user_id', 1)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
-        // }
+        $check = 0;
+        if(count($pghub) == 0){
+            $check = 1;
+            $pghub = PermissionGroupHasUserBranch::with('permission','permission_group')->where('ref_branch_id', 1)->where('ref_user_id', 1)->orderBy('ref_permission_group_id')->orderBy('ref_permission_id')->get();
+        }
 
         $permission = [];
 
         // จัดกลุ่มตาม ref_permission_group_id
         foreach ($pghub as $item) {
-            
-            // $branch = UserHasBranch::get();
-            // foreach($branch as $bra){
-            //     if($bra->ref_user_id == $id && $bra->ref_branch_id == session("branch_id")){
+            if($check == 1){
+                $branch = UserHasBranch::get();
+                foreach($branch as $bra){
+                    if($bra->ref_user_id == $id && $bra->ref_branch_id == session("branch_id")){
 
-            //     }else{
-            //         $insert = new PermissionGroupHasUserBranch();
-            //         $insert->ref_user_id = $bra->ref_user_id;
-            //         $insert->ref_branch_id = $bra->ref_branch_id;
-            //         $insert->ref_permission_group_id = $item['ref_permission_group_id'];
-            //         $insert->ref_permission_id = $item['ref_permission_id'];
-            //         $insert->status = 1;
-            //         $insert->save();
-            //     }
-            // }
+                    }else{
+                        $insert = new PermissionGroupHasUserBranch();
+                        $insert->ref_user_id = $bra->ref_user_id;
+                        $insert->ref_branch_id = $bra->ref_branch_id;
+                        $insert->ref_permission_group_id = $item['ref_permission_group_id'];
+                        $insert->ref_permission_id = $item['ref_permission_id'];
+                        $insert->status = 1;
+                        $insert->save();
+                    }
+                }
+            }
 
             $groupId = $item['ref_permission_group_id'];
 

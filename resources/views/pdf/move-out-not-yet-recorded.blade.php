@@ -146,9 +146,7 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก
-            {{-- (ผู้เช่าหนี) --}}
-        </div>
+        <div class="header">ใบย้ายออก</div>
         <table class="table-info">
             <tr>
                 <td>
@@ -164,7 +162,7 @@
                 <td style="text-align: right;">
                     <strong>ต้นฉบับ (Original)</strong><br>
                     เลขที่(ID) {{ $invoice_contract->invoice_number }}<br>
-                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice_contract->created_at)) }}<br>
+                    วันที่(Date) {{ date('d/m/Y') }}<br>
                     ห้อง(Room) {{ $invoice_contract->room_for_rent->room->name }}<br>
                     พนักงาน(Staff) {{ $invoice_contract->user->name }}<br>
                 </td>
@@ -236,11 +234,11 @@
                 @foreach ($invoice_contract->payment_not_discount as $key2 => $ic_list)
                     <tr>
                         <td class="pt-5"> {{ $key_count2++; }} </td>
-                        <td class="pt-5">{{ $ic_list->title }}</td>
+                        <td class="pt-5">{{ $ic_list->title }} 123</td>
                         <td class="pt-5"> {{ number_format($ic_list->price, 2) }}</td>
                     </tr>
                 @endforeach
-
+                    {{-- รายการใบเสร็จค่าเช่าห้อง ที่ชำระโดยหักเงินประกัน --}}
                 @if (@$receipt_rent_room_deducted)
                     @foreach ($receipt_rent_room_deducted->payment_list as $key2 => $rmod_list)
                         <tr>
@@ -251,7 +249,7 @@
                         </tr>
                     @endforeach
                 @endif
-                
+                    {{-- รายการใบเสร็จย้ายออก ที่ชำระโดยหักเงินประกัน --}}
                 @if (@$receipt_bad_debt_deducted)
                     @foreach ($receipt_bad_debt_deducted->payment_list as $key2 => $rmod_list)
                         <tr>
@@ -295,7 +293,7 @@
                     <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
                 </td>
                 <td width="80%" style="padding: 0px 40px;">
-                    <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ @$invoice->receipt[0]->remark }}</span></div>
+                    <div class="note">หมายเหตุ(Note) </div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>
@@ -328,9 +326,7 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก
-            {{-- (ผู้เช่าหนี) --}}
-        </div>
+        <div class="header">ใบย้ายออก</div>
         <table class="table-info">
             <tr>
                 <td>
@@ -346,7 +342,7 @@
                 <td style="text-align: right;">
                     <strong>สำเนา (Copy)</strong><br>
                     เลขที่(ID) {{ $invoice_contract->invoice_number }}<br>
-                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice_contract->created_at)) }}<br>
+                    วันที่(Date) {{ date('d/m/Y') }}<br>
                     ห้อง(Room) {{ $invoice_contract->room_for_rent->room->name }}<br>
                     พนักงาน(Staff) {{ $invoice_contract->user->name }}<br>
                 </td>
@@ -426,7 +422,7 @@
                         <td class="pt-5"> {{ number_format($icpl->price, 2) }}</td>
                     </tr>
                 @endforeach
-
+                {{-- รายการใบเสร็จค่าเช่าห้อง ที่ชำระโดยหักเงินประกัน --}}
                 @if (@$receipt_rent_room_deducted)
                     @foreach ($receipt_rent_room_deducted->payment_list as $key2 => $rmod_list)
                         <tr>
@@ -437,18 +433,14 @@
                         </tr>
                     @endforeach
                 @endif
-                
+                    {{-- รายการใบเสร็จย้ายออก ที่ชำระโดยหักเงินประกัน --}}
                 @if (@$receipt_bad_debt_deducted)
-                    @foreach ($receipt_bad_debt_deducted->payment_list as $key2 => $ip_list)
-                        @php
-                            $pd_5px = "";
-                        @endphp
+                    @foreach ($receipt_bad_debt_deducted->payment_list as $key2 => $rmod_list)
                         <tr>
-                            <td class="pt-5"> {{ $key_count2_copy++ }} </td>
-                            {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
-                            <td class="pt-5"> {{ $ip_list->title }}
+                            <td class="pt-5"> {{ $key_count2++ }} </td>
+                            <td class="pt-5"> {{ $rmod_list->title }}
                             </td>
-                            <td class="pt-5">{{  ($ip_list->discount == 1 ? "" : "-").number_format($ip_list->price, 2) }}</td>
+                            <td class="pt-5">{{  ($rmod_list->discount == 1 ? "" : "-").number_format($rmod_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
@@ -485,7 +477,7 @@
                     <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
                 </td>
                 <td width="80%" style="padding: 0px 40px;">
-                    <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ @$invoice->receipt[0]->remark }}</span></div>
+                    <div class="note">หมายเหตุ(Note) </div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
                             <span>ลงชื่อ ................................................. ผู้รับเงิน</span>

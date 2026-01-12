@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <!-- รายได้แยกตามประเภทการชำระ -->
-                            <div class="col-sm-4 d-flex align-items-stretch">
+                            {{-- <div class="col-sm-4 d-flex align-items-stretch">
                                 <div class="card mb-3 w-100">
                                     <div class="card-header d-flex justify-content-between">
                                         <div class="card-title mb-0">
@@ -121,7 +121,7 @@
                                         <div id="chart02"></div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             
                         </div>
                     </div>

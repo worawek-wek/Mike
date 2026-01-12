@@ -194,19 +194,46 @@
 
                             </div>
                             {{-- <button type="button" class="btn btn-success waves-effect waves-light mt-3 m-auto"></button> --}}
-                            <button class="btn btn-success waves-effect waves-light mt-3 m-auto"
-                                    tabindex="0" aria-controls="DataTables_Table_0"
-                                    type="button" aria-haspopup="dialog"
-                                    {{-- aria-expanded="false" data-bs-toggle="modal" data-bs-target="#addRenter" --}}
-                                    onclick="addRenter({{ $room->id }})"
-                                    >
-                                <span><i class="ti ti-plus"></i> เพิ่มข้อมูลผู้เช่า</span>
-                            </button>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <button class="btn btn-success waves-effect waves-light"
+                                        type="button"
+                                        onclick="addRenter({{ $room->id }})">
+                                    <span><i class="ti ti-plus"></i> เพิ่มข้อมูลผู้เช่า</span>
+                                </button>
 
+                                <button class="btn btn-danger waves-effect waves-light"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteReserve">
+                                    <span><i class="ti ti-x"></i> ยกเลิกการจอง</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
-
+<div class="modal fade modalHeadDecor" id="deleteReserve" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content rounded-0">
+            <div class="modal-header rounded-0">
+                <h5 class="modal-title" id="exampleModalLabel1">ยกเลิกการจอง</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            {{-- <form id="delete_reserve"> --}}
+                @csrf
+                <div class="modal-body">
+                    <div class="col-md-12">
+                        <label class="form-label">หมายเหตุ</label>
+                        <textarea name="remark" class="form-control" placeholder="หมายเหตุ" id="check_out_remark" ></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer rounded-0 justify-content-center">
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" id="submit_insert_contract" class="btn btn-main" onclick="deleteReserve()">ยกเลิกการจอง</button>
+                </div>
+            {{-- </form> --}}
+        </div>
+    </div>
+</div>
 {{-- ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า
@@ -437,13 +464,13 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
                 $("#navs-pills-top-MoveOut").html(data.html);
                 calculateTotal()
-                if(data.invoice_move_out == 0){
-                    // alert(111);
-                    editFormReceipt();   
-                }else{
-                    // alert(222);
+                // if(data.invoice_move_out == 0){
+                //     // alert(111);
+                //     editFormReceipt();   
+                // }else{
+                //     // alert(222);
                     get_move_out_detail_receipt();   
-                }
+                // }
                 new TomSelect("#select-renter", {
                     create: false,      // ไม่ให้พิมพ์เพิ่มเอง
                     maxItems: 1,        // จำกัดให้เลือกได้ 1 ค่า
@@ -462,6 +489,7 @@
             url: "{{ $page_url }}/get-move-out-form-receipt/{{$room->id}}",
             success: function(data) {
                 $("#form_moveout_receipt").html(data);
+                // $(".move-out-summary").html(data.cal);
                 calculateTotal()
                 calculate_2Price()
             }
@@ -859,5 +887,62 @@
         // $('#select2RenterDetail').select2();
         $('#select2RenterContract').select2();
         // $('#select2RenterContract2').select2();
+        
+        function deleteReserve() 
+        {
+            // var deposit_reserve_refund = $('input[name="deposit_reserve_refund"]:checked').val();
+            Swal.fire({
+                title: 'ยืนยันการดำเนินการ?',
+                text: 'คุณต้องการ ยกเลิก การจอง หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                showDenyButton: false,
+                didOpen: () => {
+                    // โฟกัสที่ปุ่ม confirm
+                    Swal.getConfirmButton().focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{$page_url}}/delete-reserve/{{ $room->occupancy_id }}", // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                        type: 'POST',
+                        data: {
+                            _token : "{{ csrf_token() }}",
+                            deposit_reserve_refund : 2
+                        },
+                        success: function(response) {
+                            if(response.message == null){
+                                Swal.fire('ยกเลิกการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
+                                    window.location.href = '/room';
+                                });
+                            }else{
+                                Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                let messages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    messages += value + '<br>';
+                                });
+
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด',
+                                    html: messages,
+                                    icon: 'error',
+                                });
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+                } else if (result.isDismissed) {
+                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                }
+            });
+        }
 
 </script>

@@ -144,9 +144,13 @@ class VehicleController extends Controller
 
         $rowNum = 4; // เริ่มเขียนข้อมูลแถวที่ 4
 
+        $room_id = null;
         foreach ($results as $room) {
             // return $room;
             // return $room;
+            if($room->ref_renter_id == $room_id){
+                continue;
+            }
             foreach ($room->room->room_for_rent_s as $rentData) {
                 $renter = $rentData->renter;
                 $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
@@ -159,8 +163,8 @@ class VehicleController extends Controller
                             $room->room->name,                             // เลขห้อง
                             $renterName,                             // ผู้เช่า
                             $room->type->name,                   // ประเภทรถ
-                            $vehicle->car_registration,             // ทะเบียนรถ
-                            $vehicle->detail,                        // รายละเอียดรถ
+                            (string) " $vehicle->car_registration",             // ทะเบียนรถ
+                            (string) $vehicle->detail,                        // รายละเอียดรถ
                             $vehicle->remark                         // หมายเหตุ
                         ], null, 'A' . $rowNum);
                         $rowNum++;
@@ -179,6 +183,7 @@ class VehicleController extends Controller
                     $rowNum++;
                 }
             }
+            $room_id = $room->ref_renter_id;
         }
 
         // บันทึกไฟล์

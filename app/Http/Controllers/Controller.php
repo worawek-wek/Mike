@@ -14,6 +14,7 @@ use App\Models\RentBill;
 use App\Models\Receipt;
 use App\Models\Renter;
 use App\Models\Contract;
+use App\Models\PaymentList;
 use Carbon\Carbon;
 
 class Controller extends BaseController
@@ -61,6 +62,17 @@ class Controller extends BaseController
                                         });
 
 // ------------------------------------------------------------------------------------- //
+        // ยอดชำระเงิน ค่าเช่าห้อง ทั้งหมด
+        $all_rent_bill_receipt = Receipt::whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                            $query->where('ref_branch_id', $branch_id);
+                                        })
+                                        ->where('ref_type_id', 1)
+                                        ->get()
+                                        ->sum(function ($receipt) {
+                                            return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                                        });
+
+// ------------------------------------------------------------------------------------- //
         // ยอดชำระเงิน ค่าปรับ ทั้งหมด
         $all_receipt_fine = Receipt::whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
@@ -93,7 +105,7 @@ class Controller extends BaseController
         }
         $all_receipt_on_time = $all_receipt_on_time->where('ref_type_id', 1)
                                                     ->where('payment_on_time', 1)
-                                                    ->where('ref_status_id', 5)
+                                                    // ->where('ref_status_id', 5)
                                                     ->get() // ดึงข้อมูลออกมาเป็น Collection
                                                     ->sum(function ($receipt) {
                                                         return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
@@ -112,7 +124,7 @@ class Controller extends BaseController
         }
         $all_receipt_late_with_appointment = $all_receipt_late_with_appointment->where('ref_type_id', 1)
                                                     ->where('payment_on_time', 2)
-                                                    ->where('ref_status_id', 5)
+                                                    // ->where('ref_status_id', 5)
                                                     ->get() // ดึงข้อมูลออกมาเป็น Collection
                                                     ->sum(function ($receipt) {
                                                         return $receipt->total_amount; // ใช้ accessor ที่คุณเขียนไว้
@@ -129,8 +141,7 @@ class Controller extends BaseController
                                                 });
         }
         $all_receipt_late = $all_receipt_late->where('ref_type_id', 1)
-                                            ->where('ref_type_id', 1)
-                                            ->where('ref_status_id', 5)
+                                            // ->where('ref_status_id', 5)
                                             ->where('payment_on_time', 3)
                                             ->get() // ดึงข้อมูลออกมาเป็น Collection
                                             ->sum(function ($receipt) {
@@ -171,7 +182,7 @@ class Controller extends BaseController
                                             $query->where('ref_branch_id', $branch_id);
                                         })
                                         ->where('ref_type_id', 1)
-                                        ->where('ref_status_id', 5)
+                                        // ->where('ref_status_id', 5)
                                         ->get()
                                         ->sum(function ($receipt) {
                                             return $receipt->total_amount; // <-- ใช้ accessor ได้ที่นี่
@@ -321,40 +332,57 @@ class Controller extends BaseController
                                 ->whereIn('rent_bills.ref_status_id', [2, 7])
                                 ->distinct()
                                 ->count('rooms.id'); // ✅ ใช้ count กับคอลัมน์ตรง ๆ
-// บิลค่าเช่าทั้งหมด
+// ยอดบิลค่าเช่าห้องทั้งหมด
+        $all_rent_bill_invoice = RentBill::whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                                $query->where('ref_branch_id', $branch_id);
+                                            })
+                                            ->whereIn('ref_status_id', [2, 4, 5, 7])
+                                            ->where('ref_type_id', 1)
+                                            ->get()
+                                            ->sum(function ($invoice) {
+                                                return $invoice->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                                            });
 
 // บิลค้างชำระทั้งหมด               
-        $overdueData = RentBill::with('receipt.payment_list_not_fine', 'room_for_rent.room')
+        $overdueData = RentBill::with('receipt')
                                 ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                     $query->where('ref_branch_id', $branch_id);
                                 })
-                                ->whereIn('ref_status_id', [2, 4, 7])
-                                ->get();
-                                
-// บิลค่าเช่าค้างชำระทั้งหมด               
-        $overdueData_1 = RentBill::with('receipt.payment_list_not_fine', 'room_for_rent.room')
-                                ->where('year', $lastMonth->year)
-                                ->where('month', $lastMonth->month)
-                                ->whereHas('room.floor.building', function ($query) use ($branch_id) {
-                                    $query->where('ref_branch_id', $branch_id);
-                                })
-                                ->whereIn('ref_status_id', [2, 7])
+                                ->whereIn('ref_status_id', [2, 4, 5, 7])
                                 ->where('ref_type_id', 1)
-                                ->get()->sum->total_amount;
-                                // ->filter(function ($bill) {
-                                //     $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-                                //     return $paidAmount < $bill->total_amount;
-                                // });
+                                ->get()
+                                ->filter(function ($bill) {
+
+                                    // total ของ RentBill
+                                    $billTotal = $bill->total_amount;
+
+                                    // total ของ Receipt (hasMany)
+                                    $receiptTotal = $bill->receipt?->sum(fn ($r) => $r->total_amount) ?? 0;
+
+                                    return $billTotal > $receiptTotal;
+                                });
+                                
+        
+// ยอดบิลค่าเช่าห้องทั้งหมด เดือน ล่าสุด
+        $all_rent_bill_invoice_last_month = RentBill::whereHas('room.floor.building', function ($query) use ($branch_id) {
+                                                $query->where('ref_branch_id', $branch_id);
+                                            })
+                                            ->where('year', $lastMonth->year)
+                                            ->where('month', $lastMonth->month)
+                                            ->whereIn('ref_status_id', [2, 4, 5, 7])
+                                            ->where('ref_type_id', 1)
+                                            ->get()
+                                            ->sum(function ($invoice) {
+                                                return $invoice->total_amount; // <-- ใช้ accessor ได้ที่นี่
+                                            });
+                                            
+        $overdueData_1 = $all_rent_bill_invoice_last_month-$all_receipt_last_month;
 
         // นับจำนวนห้องไม่ซ้ำ
-        $overdueRoomCount = $overdueData->pluck('room_for_rent.room.id')->unique()->count();
+        $overdueRoomCount = $overdueData->pluck('ref_room_id')->unique()->count();
 
         // รวมยอดค้างชำระทั้งหมด
-        $overdueTotalAmount = $overdueData->sum(function ($bill) {
-            // $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-            // return $bill->total_amount - $paidAmount;
-            return $bill->total_amount;
-        });
+        $overdueTotalAmount = $all_rent_bill_invoice-$all_rent_bill_receipt;
 // บิลค่าเช่าค้างชำระทั้งหมด               
 
         $data['percent'] = 0; // อัตราเข้าพัก
@@ -398,8 +426,32 @@ class Controller extends BaseController
                                     ->sum(function ($item) {
                                         return $item->getTotalFromPaymentList();
                                     });
+        $income_2 = PaymentList::whereHas('receipt.room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
+                                // ->whereHas('receipt', function ($query) {
+                                //     $query->where('ref_type_id', 2);
+                                // })
+                                // ->where('discount', 0)->sum('price')-PaymentList::whereHas('receipt.room.floor.building', function ($query) {
+                                //     $query->where('ref_branch_id', session("branch_id"));
+                                // })
+                                // ->whereHas('receipt', function ($query) {
+                                //     $query->where('ref_type_id', 2);
+                                // })
+                                ->where('discount', 0)->sum('price');
+                                
+        $income_3 = PaymentList::whereHas('receipt.room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
+                                ->whereHas('receipt', function ($query) {
+                                    $query->where('ref_type_id', 2);
+                                })
+                                ->where('discount', 1)->sum('price');
+        
         $expenses = IncomeExpenses::where('type', 2)->where('ref_branch_id', session("branch_id"))->sum('amount');
+
         $data['income'] = $income;
+        $data['income_3'] = $income_3;
         $data['expenses'] = $expenses;
         $data['total'] = $income-$expenses;
         return $data;

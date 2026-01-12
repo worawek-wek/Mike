@@ -132,6 +132,8 @@
                                             </tr>
                                         </tfoot>
                                     </table>
+                                    <div class="my-2 mx-2" align="left"><b>หมายเหตุ: </b>{{ $row->receipt_rent_bill_move_out->remark }}</div>
+
                                     {{-- <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
                                         <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row->receipt_rent_bill_move_out->id }})">
                                             <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน
@@ -249,6 +251,7 @@
                                             </tr>
                                         </tfoot>
                                     </table>
+                                    <div class="my-2 mx-2" align="left"><b>หมายเหตุ: </b>{{ $row->receipt_move_out->remark }}</div>
                                     {{-- <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
                                         <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row->receipt_move_out->id }})">
                                             <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน

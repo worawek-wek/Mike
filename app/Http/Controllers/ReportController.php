@@ -12,6 +12,7 @@ use App\Models\Branch;
 use App\Models\Receipt;
 use App\Models\RentBill;
 use App\Models\Bank;
+use App\Models\PaymentList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -87,25 +88,25 @@ class ReportController extends Controller
     }
     public function rent_bill_datatable(Request $request)
     {
-        $results = RentBill::orderBy('rooms.id','ASC')
-                                ->leftJoin('receipts', 'rent_bills.id', '=', 'receipts.ref_rent_bill_id')
-                                ->leftJoin('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->leftJoin('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->whereHas('room.floor.building', function ($query) {
-                                    $query->where('ref_branch_id', session("branch_id"));
-                                })
-                                ->where('rent_bills.ref_type_id', 1)
-                                // ->where('rent_bills.ref_status_id', 5)
-                                ->distinct('rent_bills.id')
-                                ->select('rent_bills.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' 
-                                , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name')
-                                , 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone'
-                                , 'receipts.receipt_number as receipt_number', 'receipts.payment_date as payment_date');
+        $results = Receipt::orderBy(
+                                Room::select('name')
+                                    ->whereColumn('rooms.id', 'receipts.ref_room_id')
+                                    ->limit(1)
+                            )
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            })
+                            ->whereHas('invoice', function ($query) {
+                                $query->where('ref_type_id', 1);
+                            });
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
-            [$year, $month] = explode('-', $request->month);
-            // $results = $results->where('rent_bills.year', $year)
-            //                 ->where('rent_bills.month', $month);
+            // [$year, $month] = explode('-', $request->month);
+            $results = $results->whereHas('invoice', function ($query) use ($request) {
+                [$year, $month] = explode('-', $request->month);
+                                $query->where('year', $year)
+                                        ->where('month', $month);
+                            });
         }
 
         $limit = $request->limit ?? 15;
@@ -122,6 +123,71 @@ class ReportController extends Controller
     }
     public function rent_bill_summary(Request $request)
     {
+
+        $paid_wait_confirm = Receipt::with('payment_list') // เพื่อ preload
+                            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                            ->where('receipts.ref_status_id', 2)
+                            ->where('receipts.ref_type_id', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session('branch_id'));
+                            })
+                            ->select('receipts.*');
+        
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $paid_wait_confirm = $paid_wait_confirm->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }                    
+        $paid_wait_confirm = $paid_wait_confirm->get()->sum(function($receipt) {
+                                return $receipt->total_amount;
+                            });
+
+        ////////////////////////////////////////////////////////////////
+
+        $paid = Receipt::with('payment_list') // เพื่อ preload
+                            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                            ->where('receipts.ref_status_id', 5)
+                            ->where('receipts.ref_type_id', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session('branch_id'));
+                            })
+                            ->select('receipts.*');
+        
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $paid = $paid->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }                    
+        $paid = $paid->get()->sum(function($receipt) {
+                                return $receipt->total_amount;
+                            });
+        // return $overdue = $paid->get()->sum->total_amount;
+
+        ////////////////////////////////////////////////////////////////
+
+        $overdue = RentBill::with('payment_list')
+                            ->where('ref_status_id', "!=", 3)
+                            ->where('ref_type_id', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session('branch_id'));
+                            });
+                            
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $overdue = $overdue->where('rent_bills.year', $year)
+                            ->where('rent_bills.month', $month);
+        }                    
+            $overdue = $overdue->get()
+                            ->sum(function($rent_bill) {
+                                return $rent_bill->total_amount;
+                            });
+
+        $data['paid_wait_confirm'] = number_format($paid_wait_confirm).' บาท';
+        $data['paid'] = number_format($paid).' บาท';
+        $data['overdue'] = number_format($overdue-$paid-$paid_wait_confirm).' บาท';
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         $confirm_by_ceo = Receipt::with('payment_list')
@@ -158,51 +224,9 @@ class ReportController extends Controller
         $data['confirm_by_ceo'] = $confirm_by_ceo;
         $data['total_amount'] = $total_amount;
 
-
-
-        $paid = Receipt::with('payment_list') // เพื่อ preload
-                            ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-                            ->where('rent_bills.ref_status_id', 5)
-                            ->where('rent_bills.ref_type_id', 1)
-                            ->whereHas('room.floor.building', function ($query) {
-                                $query->where('ref_branch_id', session('branch_id'));
-                            })
-                            ->select('receipts.*');
         
-        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
-            [$year, $month] = explode('-', $request->month);
-            $paid = $paid->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
-        }                    
-        $paid = $paid->get()->sum(function($receipt) {
-                                return $receipt->total_amount;
-                            });                    
-        // return $overdue = $paid->get()->sum->total_amount;
-
-        ////////////////////////////////////////////////////////////////
-
-        $overdue = RentBill::with('payment_list')
-                            ->where('ref_status_id', "!=", 3)
-                            ->where('ref_type_id', 1)
-                            ->whereHas('room.floor.building', function ($query) {
-                                $query->where('ref_branch_id', session('branch_id'));
-                            });
-                            
-        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
-            [$year, $month] = explode('-', $request->month);
-            $overdue = $overdue->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
-        }                    
-            $overdue = $overdue->get()
-                            ->sum(function($rent_bill) {
-                                return $rent_bill->total_amount;
-                            });
-
-        $data['paid'] = number_format($paid).' บาท';
-        $data['overdue'] = number_format($overdue-$paid).' บาท';
-
         $transfer = array_sum(array_column($total_amount, 'amount'));
-        $cash = $this->summary(session("branch_id"), $month, $year)['cash'];
+        $cash = $confirm_by_ceo;
         // $cash_wait_for_confirm = $this->summary(session("branch_id"), $month, $year)['cash_wait_for_confirm'];
         
         $total_all = $transfer
@@ -221,22 +245,82 @@ class ReportController extends Controller
 
         $data['percent_transfer'] = number_format($percent_transfer ?? 0);
         $data['percent_cash'] = number_format($percent_cash ?? 0);
-        // $data['percent_cash_wait_for_confirm'] = number_format($percent_cash_wait_for_confirm ?? 0);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        // foreach ($values as $value) {
-        //         $percent = ($value / $total) * 100;
-        //         echo number_format($value, 2) . " = " . number_format($percent, 2) . "%<br>";
-        //     }
+        $cash_wait_for_confirm = Receipt::with('payment_list')
+                                    ->where('ref_status_id', 2)
+                                    ->where('receipts.payment_channel', 1)
+                                    ->whereIn('ref_type_id', [1])
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                    ->get()
+                                    ->sum('total_amount');
+
+        $transfer_wait_for_confirm = Receipt::with('payment_list')
+                                ->where('receipts.ref_status_id', 2)
+                                ->where('receipts.payment_channel', 2)
+                                ->whereIn('ref_type_id', [1])
+                                ->whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session('branch_id'));
+                                })
+                                ->get()
+                                ->filter(fn($bill) => $bill->total_amount)
+                                ->groupBy('ref_bank_id')
+                                ->map(fn($group) => $group->sum(fn($item) => $item->total_amount));; // ใช้ Accessor ได้ตรงนี้
+        $total_amount_wait_for_confirm = [];
+        foreach($transfer_wait_for_confirm as $bank_id => $amount){
+            $bank = Bank::find($bank_id);
+            $total_amount_wait_for_confirm[] = [ 'bank' => $bank, 'amount' => $amount];
+        }
+        // return $total_amount_wait_for_confirm;
+        // foreach ($total_amount_wait_for_confirm as $key => $item){
+        // // foreach($total_amount_wait_for_confirm as $total){
+        //     return $item['bank']->bank;
+        // }
+        $data['cash_wait_for_confirm'] = $cash_wait_for_confirm;
+        $data['total_amount_wait_for_confirm'] = $total_amount_wait_for_confirm;
+
+
+        
+        $transfer_wait_for_confirm = array_sum(array_column($total_amount_wait_for_confirm, 'amount'));
+        // $cash_wait_for_confirm = $cash_wait_for_confirm;
+        // $cash_wait_for_confirm_wait_for_confirm = $this->summary(session("branch_id"), $month, $year)['cash_wait_for_confirm_wait_for_confirm'];
+        
+        $total_all = $transfer_wait_for_confirm
+                     + $cash_wait_for_confirm;
+                    //  + $cash_wait_for_confirm_wait_for_confirm;
+
+        if($total_all > 0){
+            $percent_transfer_wait_for_confirm = $total_all > 0 ? ($transfer_wait_for_confirm / $total_all) * 100 : 0;
+            $percent_cash_wait_for_confirm    = $total_all > 0 ? ($cash_wait_for_confirm / $total_all) * 100 : 0;
+            // $percent_cash_wait_for_confirm_wait_for_confirm   = 100 - ($percent_transfer_wait_for_confirm + $percent_cash_wait_for_confirm);
+        }
+
+        $data['transfer_wait_for_confirm'] = $transfer_wait_for_confirm;
+        $data['cash_wait_for_confirm'] = $cash_wait_for_confirm;
+
+        $data['percent_transfer_wait_for_confirm'] = number_format($percent_transfer_wait_for_confirm ?? 0);
+        $data['percent_cash_wait_for_confirm'] = number_format($percent_cash_wait_for_confirm ?? 0);
 
         return view('report/report-header', $data);
     }
     public function move_in(Request $request)
     {
+        // return $income_2 = PaymentList::whereHas('receipt.room.floor.building', function ($query) {
+        //                             $query->where('ref_branch_id', session("branch_id"));
+        //                         })
+        //                         ->whereHas('receipt', function ($query) {
+        //                             $query->where('ref_type_id', 2);
+        //                         })
+        //                         ->where('discount', 1)->sum('price');
         $data['page_url'] = 'report/move-in';
         $data['sum'] = $this->summary_calculate();
-        $data['sum_room'] = Room::whereHas('floor.building', function ($query) {
-                                        $query->where('ref_branch_id', session("branch_id"));
-                                    })->where('status', 2)->count();
+        $data['sum_room'] = Contract::orderBy('created_at','desc')
+                                        ->whereHas('room.floor.building', function ($query) {
+                                            $query->where('ref_branch_id', session("branch_id"));
+                                        })->count();
 
         return view('report/report-moveIn', $data);
     }
@@ -374,6 +458,44 @@ class ReportController extends Controller
                                         ->sum(function ($bill) {
                                             return $bill->total_amount; // ใช้ accessor ที่คุณเขียนไว้
                                         });
+                                        
+        $data['all_room'] = Receipt::orderBy('id','ASC')
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->where('move_out_type', 2)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })
+                                    ->count();
+
+        $yod_kun = Receipt::orderBy('id','ASC')
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->where('move_out_type', 2)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                    })
+                                    ->get()
+                                    ->filter(function ($r) {
+                                        return $r->total_amount > 0;
+                                    });
+
+        $data['yod_kun'] = $yod_kun->sum('total_amount');
+
+        $keb = Receipt::orderBy('id','ASC')
+                                    ->where('ref_status_id', 5)
+                                    ->where('ref_type_id', 7)
+                                    ->where('move_out_type', 2)
+                                    ->whereHas('room.floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session('branch_id'));
+                                    })
+                                    ->get()
+                                    ->filter(function ($r) {
+                                        return $r->total_amount < 0;
+                                    });
+
+        $data['keb'] = $keb->sum('total_amount');
+
 
         $data['page_url'] = 'report/bad-debt';
         return view('report/report-badDebt', $data);
@@ -397,7 +519,6 @@ class ReportController extends Controller
         $limit = $request->limit ?? 15;
 
         $results = $results->paginate($limit);
-        return $results[0]->receipt_bad_debt;
 
         $data['list_data'] = $results->appends(request()->query());
         $data['query'] = request()->query();
@@ -407,7 +528,7 @@ class ReportController extends Controller
         
         return view('report/report-badDebt-table', $data);
     }
-        public function view_overview_excel(Request $request)
+    public function view_overview_excel(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -540,6 +661,77 @@ class ReportController extends Controller
         $writer->save($filePath);
 
         return redirect("upload/export_excel/{$fileName}");
+    }
+    public function move_out_export_excel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $results = Receipt::orderBy('id','DESC')
+                            ->where('ref_status_id', 5)
+                            ->where('ref_type_id', 7)
+                            ->where('move_out_type', 1)
+                            ->whereHas('room.floor.building', function ($query) {
+                                $query->where('ref_branch_id', session("branch_id"));
+                            });
+
+        if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
+            [$year, $month] = explode('-', $request->month);
+            $results = $results->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+        }
+
+        $results = $results->get();
+
+        $monthTH = [ 
+                "01" => "มกราคม",
+                "02" => "กุมภาพันธ์",
+                "03" => "มีนาคม",
+                "04" => "เมษายน",
+                "05" => "พฤษภาคม",
+                "06" => "มิถุนายน",
+                "07" => "กรกฎาคม",
+                "08" => "สิงหาคม",
+                "09" => "กันยายน",
+                "10" => "ตุลาคม",
+                "11" => "พฤศจิกายน",
+                "12" => "ธันวาคม"
+        ];
+        
+        $data = 
+        [
+            [
+                'ภาพรวมย้ายออก เดือน '.$monthTH[explode('-', $request->month)[1]].' '.explode('-', $request->month)[0]
+            ],
+            [
+                "ห้อง",
+                "ยอดบิลค่าเช่าห้อง",
+                "ยอดใบเสร็จย้ายออก",
+                "ยอดเงินประกันคืนผู้เช่า",
+                "สรุปการย้ายออก"
+            ]
+        ];
+        foreach($results as $key=>$row){
+            $data[] = [
+                        $row->room->name,
+                        $row->receipt_rent_bill_move_out->total_amount ?? "-",
+                        $row->receipt_move_out->total_amount ?? "-",
+                        $row->deposit_move_out->total_amount ?? "-",
+                        $row->total_amount >= 0 ? "ยอดเงินประกันคืนผู้เช่า ".abs($row->total_amount) : "เก็บเงินผู้เช่าเพิ่ม ".abs($row->total_amount)
+            ];
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data);
+        $sheet->getStyle(
+            'A1:' . 
+            $sheet->getHighestColumn() . 
+            $sheet->getHighestRow()
+        )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        $writer = new WriterXlsx($spreadsheet);
+        $writer->save("upload/export_excel/ภาพรวมย้ายออก(".$monthTH[explode('-', $request->month)[1]].'-'.explode('-', $request->month)[0].").xlsx");
+        return redirect("upload/export_excel/ภาพรวมย้ายออก(".$monthTH[explode('-', $request->month)[1]].'-'.explode('-', $request->month)[0].").xlsx");
     }
     public function badDebt_export_excel(Request $request)
     {
@@ -679,22 +871,25 @@ class ReportController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         
-         $results = Receipt::orderBy('rooms.id','ASC')
-                                ->join('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
-                                ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                                ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                                ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                                ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                                ->where('buildings.ref_branch_id', session("branch_id"))
+        $results = Receipt::orderBy('rooms.name','ASC')
+                                ->leftJoin('rent_bills', 'receipts.ref_rent_bill_id', '=', 'rent_bills.id')
+                                ->leftJoin('renters', 'receipts.ref_renter_id', '=', 'renters.id')
+                                ->leftJoin('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
+                                ->whereHas('room.floor.building', function ($query) {
+                                    $query->where('ref_branch_id', session("branch_id"));
+                                })
                                 ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', 5)
+                                // ->where('rent_bills.ref_status_id', 5)
                                 ->distinct('receipts.id')
-                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone');
+                                ->select('receipts.*','rent_bills.water_amount','rent_bills.electricity_amount', 'renters.prefix' 
+                                , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name')
+                                , 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'renters.phone'
+                                , 'receipts.receipt_number as receipt_number', 'receipts.payment_date as payment_date');
         
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->where('rent_bills.year', $year)
-                            ->where('rent_bills.month', $month);
+            // $results = $results->where('rent_bills.year', $year)
+            //                 ->where('rent_bills.month', $month);
         }
 
         $results = $results->get();
@@ -713,7 +908,7 @@ class ReportController extends Controller
                 "ค่าไฟ",
                 "ค่าที่จอด รถยนต์",
                 "ค่าที่จอด รถมอเตอร์ไซค์",
-                "ส่วนกลาง",
+                "อื่น ๆ",
                 "รวม",
                 "สถานะ"
             ]
@@ -726,12 +921,12 @@ class ReportController extends Controller
                         date("d/m/Y" , strtotime($row->payment_date)),
                         $row->payment_method == 1? "เงินสด" : "โอนเงิน",
                         $row->user->name,
-                        $row->water_amount,
-                        $row->electricity_amount,
-                        '-',
-                        '-',
-                        '-',
-                        '-',
+                        number_format(@$row->payment_rent_room->price ?? 0),
+                        number_format(@$row->payment_water->price ?? 0),
+                        number_format(@$row->payment_electricity->price ?? 0),
+                        number_format(@$row->payment_car_parking_fee->price ?? 0) ,
+                        number_format(@$row->payment_motorcycle_parking_fee->price ?? 0),
+                        number_format(@$row->payment_other_total_amount ?? 0),
                         $row->total_amount,
                         "ชำระแล้ว"
             ];

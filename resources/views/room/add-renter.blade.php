@@ -105,9 +105,10 @@
             <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
             <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="{{ @$renter_edit->zipcode }}" />
         </div>
-        <div class="col-sm-12">
+        <div class="col-sm-12"></div>
+        <div class="col-sm-3">
             <label for="birthdate" class="form-label">วันเดือนปีเกิดผู้จอง</label>
-            <input type="text" name="birthdate" class="form-control" id="add_birthdate" placeholder="วัน/เดือน/ปี" required value="{{ @$renter_edit->birthdate != null ? date('d/m/Y', strtotime($renter_edit->birthdate)) : ''; }}" autocomplete="off"/>
+            <input type="text" name="birthdate" class="form-control" id="add_birthdate" placeholder="วัน/เดือน/ปี" value="{{ @$renter_edit->birthdate != null ? date('d/m/Y', strtotime($renter_edit->birthdate)) : ''; }}" autocomplete="off"/>
         </div>
         {{-- <div class="col-sm-6">
             <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label>

@@ -325,13 +325,16 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <label for="exampleFormControlInput5" class="form-label">หลักฐานการจ่ายเงิน</label>
                             <input name="proof_of_payment" class="form-control" type="file" id="exampleFormControlInput5" accept="image/*" />
+                            <img id="preview_proof" src="" style="display:none; margin-top:10px; max-width:80%;" class="mx-auto">
                         </div>
-                        <div class="col-sm-12">
+
+                        <div class="col-sm-6">
                             <label for="exampleFormControlInput6" class="form-label">ใบสำคัญจ่าย</label>
                             <input name="payment_voucher" class="form-control" type="file" id="exampleFormControlInput6" accept="image/*" />
+                            <img id="preview_voucher" src="" style="display:none; margin-top:10px; max-width:80%;" class="mx-auto">
                         </div>
                     </div>
                 </div>
@@ -345,7 +348,34 @@
             </div>
         </div>
     </div>
+<script>
+    function previewImage(input, previewId) {
+        const file = input.files[0];
+        const preview = document.getElementById(previewId);
 
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+            preview.style.display = "none";
+        }
+    }
+
+    document.getElementById("exampleFormControlInput5")
+        .addEventListener("change", function () {
+            previewImage(this, "preview_proof");
+        });
+
+    document.getElementById("exampleFormControlInput6")
+        .addEventListener("change", function () {
+            previewImage(this, "preview_voucher");
+        });
+</script>
     <!--set rent Modal -->
     <div class="modal fade modalHeadDecor" id="income" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -533,7 +563,7 @@
                 }
             });
         }
-        get_room_rental("{{$room[0]->id}}")
+        get_room_rental("0")
         function get_room_rental(id){
             $.ajax({
                 type: "GET",

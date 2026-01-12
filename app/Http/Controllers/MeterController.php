@@ -79,7 +79,7 @@ class MeterController extends Controller
                 if(!$meter){
                     continue;
                 }
-                if($meter->year == '2025' && $meter->month == '11'){
+                if($meter->year == date("Y") && $meter->month == date('m')){
                     continue;
                 }
                     $insert_m = new Meter; 					
@@ -447,6 +447,7 @@ class MeterController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
+        
         $results = Room::orderBy('rooms.name')
                         ->leftJoin('meters', 'meters.ref_room_id', '=', 'rooms.id')
                         ->leftJoin('floors', 'floors.id', '=', 'rooms.ref_floor_id')
@@ -454,13 +455,25 @@ class MeterController extends Controller
                         ->Where('meters.month', $month)->Where('meters.year', $year)
                         ->where('ref_branch_id',session("branch_id"))
                         ->with([
-                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
                             'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
-                            ])
-                        // ->WhereHas('room_for_rent', function ($query) {
-                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
-                        // })
-                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        ])
+                        ->select('rooms.*',
+                                'rooms.name as room_name',
+                                'floors.name as floor_name',
+                                'meters.water_unit',
+                                'meters.meter_before_change',
+                                'meters.meter_electricity_before_change',
+                                'meters.start_value_of_new_meter',
+                                'meters.start_value_of_new_meter_electricity',
+                                'meters.electricity_unit',
+                                DB::raw("
+                                    CASE meters.ref_reason_id
+                                        WHEN 1 THEN 'มิเตอร์เต็ม'
+                                        WHEN 2 THEN 'เปลี่ยนมิเตอร์'
+                                        ELSE ''
+                                    END as reason_name
+                                "),
+                                'meters.id as meters_id');
                         
                         
         if ($request->building != "all") {
@@ -490,13 +503,16 @@ class MeterController extends Controller
             ]
         ];
         // return $data;
-        foreach($results as $key=>$row){
+        foreach($results as $key => $row){
+            
+                $ele_unit_used = intval($row->electricity_unit+$row->meter_before_change-$row->start_value_of_new_meter_electricity) - intval(@$row->meterPrevious->electricity_unit);
+                
             $data[] = [
                         $row->floor_name,
                         $row->room_name,
                         (string) intval(optional($row->meterPrevious)->electricity_unit),
                         (string) intval($row->electricity_unit),
-                        (string) (intval($row->electricity_unit ?? 0) - intval(optional($row->meterPrevious)->electricity_unit ?? 0)),
+                        (string) (intval($ele_unit_used)),
             ];
         }
 
@@ -539,13 +555,25 @@ class MeterController extends Controller
                         ->Where('meters.month', $month)->Where('meters.year', $year)
                         ->where('ref_branch_id',session("branch_id"))
                         ->with([
-                            // 'meterCurrent' => fn($q) => $q->where('month', $month)->where('year', $year),
                             'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
-                            ])
-                        // ->WhereHas('room_for_rent', function ($query) {
-                        //     $query->where('status', 0); // กรอง User ที่มี Position status = 'active'
-                        // })
-                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id');
+                        ])
+                        ->select('rooms.*',
+                                'rooms.name as room_name',
+                                'floors.name as floor_name',
+                                'meters.water_unit',
+                                'meters.meter_before_change',
+                                'meters.meter_electricity_before_change',
+                                'meters.start_value_of_new_meter',
+                                'meters.start_value_of_new_meter_electricity',
+                                'meters.electricity_unit',
+                                DB::raw("
+                                    CASE meters.ref_reason_id
+                                        WHEN 1 THEN 'มิเตอร์เต็ม'
+                                        WHEN 2 THEN 'เปลี่ยนมิเตอร์'
+                                        ELSE ''
+                                    END as reason_name
+                                "),
+                                'meters.id as meters_id');
                         
                         
         if ($request->building != "all") {
@@ -576,12 +604,14 @@ class MeterController extends Controller
         ];
         // return $data;
         foreach($results as $key=>$row){
+            
+                $water_unit_used = intval($row->water_unit+$row->meter_before_change-$row->start_value_of_new_meter) - intval(@$row->meterPrevious->water_unit);
             $data[] = [
                         $row->floor_name,
                         $row->room_name,
                         (string) intval(optional($row->meterPrevious)->water_unit),
                         (string) intval($row->water_unit),
-                        (string) (intval($row->water_unit ?? 0) - intval(optional($row->meterPrevious)->water_unit ?? 0)),
+                        (string) (intval($water_unit_used ?? 0)),
             ];
         }
 
@@ -625,8 +655,24 @@ class MeterController extends Controller
                         ->where('ref_branch_id',session("branch_id"))
                         ->with([
                             'meterPrevious' => fn($q) => $q->where('month', $month_previous)->where('year', $year_previous),
-                            ])
-                        ->select('rooms.*', 'floors.name as floor_name', 'rooms.name as room_name', 'meters.water_unit', 'meters.electricity_unit', 'meters.id as meters_id')
+                        ])
+                        ->select('rooms.*',
+                                'rooms.name as room_name',
+                                'floors.name as floor_name',
+                                'meters.water_unit',
+                                'meters.meter_before_change',
+                                'meters.meter_electricity_before_change',
+                                'meters.start_value_of_new_meter',
+                                'meters.start_value_of_new_meter_electricity',
+                                'meters.electricity_unit',
+                                DB::raw("
+                                    CASE meters.ref_reason_id
+                                        WHEN 1 THEN 'มิเตอร์เต็ม'
+                                        WHEN 2 THEN 'เปลี่ยนมิเตอร์'
+                                        ELSE ''
+                                    END as reason_name
+                                "),
+                                'meters.id as meters_id')
                         ->get();
         $data = 
         [
@@ -650,12 +696,14 @@ class MeterController extends Controller
 
             $water_unit_used = "0";
             $ele_unit_used = "0";
-            if(intval($row->water_unit) - intval(@$row->meterPrevious->water_unit) != 0){
-                $water_unit_used = intval($row->water_unit) - intval(@$row->meterPrevious->water_unit);
-            }
-            if(intval($row->electricity_unit) - intval(@$row->meterPrevious->electricity_unit) != 0){
-                $ele_unit_used = intval($row->electricity_unit) - intval(@$row->meterPrevious->electricity_unit);
-            }
+            // if(intval($row->water_unit) - intval(@$row->meterPrevious->water_unit) != 0){
+                $water_unit_used = intval($row->water_unit+$row->meter_before_change-$row->start_value_of_new_meter) - intval(@$row->meterPrevious->water_unit);
+            // }
+            // $current_month_usage = intval($row->water_unit+$row->meter_before_change-$row->start_value_of_new_meter) - intval($row->meterPrevious->water_unit);
+
+            // if(intval($row->electricity_unit) - intval(@$row->meterPrevious->electricity_unit) != 0){
+                $ele_unit_used = intval($row->electricity_unit+$row->meter_before_change-$row->start_value_of_new_meter_electricity) - intval(@$row->meterPrevious->electricity_unit);
+            // }
 
             $data[] = [
                         $row->floor_name,

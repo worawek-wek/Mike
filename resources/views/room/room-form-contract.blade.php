@@ -36,7 +36,7 @@
         
         <div class="col-sm-7">
             <label for="exampleFormControlInput2" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-            <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ @$contract->address }}" />
+            <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ @$address }}" />
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label>
@@ -307,7 +307,7 @@
         </div>
         <div class="col-sm-12">
             <label for="" class="form-label">หมายเหตุ</label>
-            <textarea name="remark" class="form-control"></textarea>
+            <textarea name="remark" class="form-control">{{ @$contract->contract_remark }}</textarea>
         </div>
         
         <!-- JavaScript คำนวณรวม -->

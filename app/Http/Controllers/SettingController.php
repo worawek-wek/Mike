@@ -1375,7 +1375,8 @@ class SettingController extends Controller
                                 return response()->json([ "title"=> "เกิดข้อผิดพลาด", "text"=> "คุณไม่สามารถลบข้อมูลของเจ้าของหอพักได้ !"],500);
                             }
                         }
-                        PermissionGroupHasUserBranch::where('ref_user_id', $uhb->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
+                        UserHasBranch::destroy($data->id);
+                        PermissionGroupHasUserBranch::where('ref_user_id', $data->ref_user_id)->where('ref_branch_id', session("branch_id"))->delete();
                     }
                 }
                 DB::commit();

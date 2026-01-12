@@ -145,7 +145,15 @@
                                                     </div>
                                                     <h5 class="mb-0 d-flex">ยอดในบัญชี
                                                         <button type="button"
-                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write change_status_all_check"
+                                                            class="btn btn-warning btn-sm rounded-2 mx-5 d-write"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#model-clear-balance"
+                                                            onclick="confirmation()">
+                                                            <i class="ti ti-refresh me-1"></i>
+                                                            เคลียร์ยอด
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn btn-main btn-sm rounded-2 ms-auto d-write"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#model-confirmation"
                                                             onclick="confirmation()">
@@ -338,7 +346,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-2 mt-1" style="padding-right: unset !important;">
-                                            <h4 id="thai-month-label">พฤษภาคม 2024</h4>
+                                            <h4 id="thai-month-label">{{-- แสดงเดือนที่เลือก--}}</h4>
                                         </div>
                                         <div class="col-md-2" style="padding-right: unset !important;">
                                             <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ date('Y-m') }}" />
@@ -348,8 +356,8 @@
                                                     class="btn btn-sm btn-primary buttons-collection waves-effect waves-light d-write me-2"
                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                     type="button" aria-haspopup="dialog"
-                                                    {{-- aria-expanded="false" data-bs-toggle="modal" data-bs-target="#modal-payment-bill-all" --}}
-                                                    onclick="checkCheckInvoice()"
+                                                    aria-expanded="false" data-bs-toggle="modal" data-bs-target="#modal-payment-bill-all"
+                                                    {{-- onclick="checkCheckInvoice()" --}}
                                                     >
                                                 <span><i class="ti ti-cash"></i> ชำระเงินหลายห้อง</span>
                                             </button>
@@ -394,6 +402,19 @@
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0" id="viewInvoice">
                 
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modalHeadDecor" id="model-clear-balance" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header rounded-0">
+                    <h5 class="modal-title" id="exampleModalLabel1">เคลียร์ยอด</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
             </div>
         </div>
     </div>
@@ -444,8 +465,19 @@
                 <form id="payment_bill_form_all" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
+                                <div class="p-2">
+                                    <label class="h5 mb-1">เลือกข้อมูลจากผู้เช่า</label>
+                                    <select name="ref_renter_id" id="select2Renter2" onchange="checkCheckInvoice(this.value)" required>
+                                        <option selected hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
+                                        @foreach ($renter as $rent)
+                                            <option {{$rent->contracts_id}} value="{{ $rent->id }}">{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                        @endforeach
+                                    </select>
+                                        
+                                </div>
                         <div class="p-2"><label class="h5 mb-1 d-block">เลือกรายการจากใบแจ้งหนี้</label>
                             <div class="d-flex flex-wrap gap-4">
+
 
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input bill-list-checkbox" type="checkbox"
@@ -520,6 +552,12 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
+            new TomSelect("#select2Renter2", {
+                            create: false,
+                            maxItems: 1,
+                            allowEmptyOption: true,
+                            sortField: { field: "text", direction: "asc" }
+                        });
         // เมื่อเลือก "เต็มจำนวน"
             document.getElementById("payment_list_not_paid1").addEventListener("change", function () {
                 if (this.checked) {
@@ -544,28 +582,45 @@
         //     allowEmptyOption: true,
         //     sortField: { field: "text", direction: "desc" }
         // });
-        function checkCheckInvoice(list) // modal ชำระเงินหลายห้อง
+        let invoice_ids = [];
+        function checkCheckInvoice(id) // modal ชำระเงินหลายห้อง
         {                               // ดึงห้องที่ ติ๊ก มาแสดง
-            let invoice_ids = [];
-            $('.ids_invoice:checked').each(function() {
-                invoice_ids.push($(this).val());
-            });
+            // let invoice_ids = [];
+            // $('.ids_invoice:checked').each(function() {
+            //     invoice_ids.push($(this).val());
+            // });
 
-            if (invoice_ids.length === 0) {
-                Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
-                return;
+            // if (invoice_ids.length === 0) {
+            //     Swal.fire('กรุณาเลือกอย่างน้อย 1 รายการ', '', 'warning');
+            //     return;
+            // }
+            
+            if(id == 'no'){
+                $("#room-move-out").html('');
+                $('#submit_payment_bill_form_all').prop('disabled', true);
+                return false;
             }
-            payMultipleRentBills('payment_list_not_paid')
-            var myModal = new bootstrap.Modal(document.getElementById('modal-payment-bill-all'));
-                myModal.show();
+            $.ajax({
+                type: "GET",
+                url: "{{ $page_url }}/get-room-rent-bill/"+id,
+                success: function(data) {
+                    invoice_ids = data;
+                    payMultipleRentBills('payment_list_not_paid')
+
+                }
+            });
+            // alert(123)
+            // var myModal = new bootstrap.Modal(document.getElementById('modal-payment-bill-all'));
+            //     myModal.show();
 
         }
+        let delete_list_id = [];
         function payMultipleRentBills() // modal ชำระเงินหลายห้อง
         {                               // ดึงห้องที่ ติ๊ก มาแสดง
-            let invoice_ids = [];
-            $('.ids_invoice:checked').each(function() {
-                invoice_ids.push($(this).val());
-            });
+            // let invoice_ids = [];
+            // $('.ids_invoice:checked').each(function() {
+            //     invoice_ids.push($(this).val());
+            // });
 
             let list = [];
             $('.bill-list-checkbox:checked').each(function() {
@@ -577,7 +632,8 @@
                 url: "{{$page_url}}/get-room-for-payment",
                 data: {
                     invoice_ids: invoice_ids,
-                    list: list
+                    list: list,
+                    delete_list_id: delete_list_id
                 },
                 success: function(data) {
                     // $("#div-form-payment-rent-bill-all").html(data.html);
@@ -589,6 +645,16 @@
                     // }
                 }
             });
+        }
+        function deleteBillRoom(id){
+            if ($('.billReserveRoom').length > 1) {
+                delete_list_id.push(id);
+                $("#billReserveRoom"+id).remove();
+                document.getElementById("check-table-"+id).checked = false; // ยกเลิก "เต็มจำนวน"
+                payMultipleRentBills();
+            } else {
+                Swal.fire('ไม่สามารถลบได้', 'การชำระค่าจองต้องมีอย่างน้อย 1 ห้อง', 'warning');
+            }
         }
         function printPdf(id) {
             $.ajax({
@@ -1156,10 +1222,10 @@
             // }
         }
         function confirmBillAll(){
-            // let ids = [];
-            // $('.ids_invoice:checked').each(function() {
-            //     ids.push($(this).val());
-            // });
+            let ids = [];
+            $('.ids_invoice:checked').each(function() {
+                ids.push($(this).val());
+            });
 
             // // ✅ ตรวจสอบก่อนส่ง
             // if (ids.length === 0) {
@@ -1186,7 +1252,7 @@
                         url: "{{ $page_url }}/confirm-bill-all",
                         data: {
                             _token: "{{ csrf_token() }}",
-                            id: $('#allIds').val(),
+                            id: ids,
                             // building: $('#selectpickerBuilding').val(),
                             // floor: $('#selectpickerFloor').val(),
                             status: 7

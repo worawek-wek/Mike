@@ -71,7 +71,7 @@
                                     </ul>
 <script>
     function showMoveOut(){
-        
+        // alert(456);
         $('#bad-debt-bill').removeClass('active btn-danger btn-warning');
         $('#bad-debt-bill').addClass('btn-label-danger');
         $('#move-out-tab').removeClass('btn-label-warning');
@@ -193,7 +193,7 @@
                                         <input name="paid_on_checkout" type="hidden" value="1" >
 
                                         <input type="hidden" name="id" value="{{$move_invoice_7->id}}">
-                                        <div class="mt-3" id="pay1" style="display: none;">
+                                        <div id="pay1" style="display: none;">
                                             <div class="mb-3" style="padding: 15px 2px;">
                                                 <div class="d-flex">
                                                     <div class="flex-grow-1 ms-3 g-3 row">
@@ -615,6 +615,7 @@
                                             </tfoot>
                                         </table>
                                         {{--  --}}
+                                        <div class="my-2 mx-2 text-black"><b>หมายเหตุ: </b>{{ $receipt_1->remark }}</div>
                                         <div class="modal-footer rounded-0 justify-content-between mt-2 pb-0">
                                             <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{$receipt_1->id}})"><span
                                                     class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบเสร็จรับเงิน</button>
@@ -856,10 +857,6 @@
                                                 <i class="ti ti-pencil me-1"></i> แก้ไขรายการคืนเงินประกัน
                                             </button>
                                         </div>
-                                        <div class="col-sm-11 mt-3 mb-3">
-                                            <label>หมายเหตุ</label>
-                                            <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
-                                        </div>
                                 </form>
                                         <script>
                                             function editFormDepositRefund(){
@@ -966,14 +963,14 @@
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
                                         </button>
 
-                                        <button id="print-bad-debt-btn" type="button" class="btn btn-label-primary waves-effect text-black"
+                                        {{-- <button id="print-bad-debt-btn" type="button" class="btn btn-label-primary waves-effect text-black"
                                         style="display: none!important;"
-                                         onclick="printPdfInvoice({{ @$bad_debt_invoice->id }})"
+                                         onclick="printPdfInvoice({{ @$move_invoice_type_7->id }})"
                                         >
                                         
                                          <span
                                                 class="ti-md ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
-                                        </button>
+                                        </button> --}}
                                         {{-- <button type="button" class="btn btn-main waves-effect ms-auto"
                                         onclick="payment_bad_debt()"
                                         >
@@ -987,7 +984,7 @@
                                         
                                         function printPdfInvoice(id) {
                                             $.ajax({
-                                                url: '/pdf/invoice/'+id,
+                                                url: '/pdf/invoice/move-out/not-yet-recorded/'+id,
                                                 type: 'GET',
                                                 success: function(html) {
                                                     const iframe = document.getElementById('print-iframe');
@@ -1046,7 +1043,7 @@
                                                             <div class="flex-grow-1 ms-3 g-3 row">
                                                                 <b class="text-black">ช่องทางการชำระเงิน</b> <br>
                                                                 <div class="col-sm-11">
-                                                                    <input name="receipt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt1" value="1" checked onclick="togglePaymentBadDebtFields()">
+                                                                    <input name="move_out_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt1" value="1" checked onclick="togglePaymentBadDebtFields()">
                                                                     <label class="form-check-label" for="radio_bad_debt1"> เงินสด </label>
                                                                 </div>
                                                                 
@@ -1057,7 +1054,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-sm-11">
-                                                                    <input name="receipt_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt2" value="2" onclick="togglePaymentBadDebtFields()"> 
+                                                                    <input name="move_out_payment_channel" class="form-check-input" type="radio" id="radio_bad_debt2" value="2" onclick="togglePaymentBadDebtFields()"> 
                                                                     <label class="form-check-label" for="radio_bad_debt2"> โอนเงิน </label>
                                                                 </div>
                                                     
@@ -1091,7 +1088,11 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                    
+                                                                
+                                                                <div class="col-sm-11 mt-3 mb-3">
+                                                                    <label>หมายเหตุ</label>
+                                                                    <input name="remark" type="text" class="form-control" placeholder="หมายเหตุ" />
+                                                                </div>
                                                                 {{-- <div class="col-sm-11 mt-2">
                                                                     <b id="totalsplit" style="display: none">ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
                                                                     @if ($cal > 0)
@@ -1115,7 +1116,8 @@
                                                             todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
                                                         });
                                                         function togglePaymentBadDebtFields() {
-                                                            const paymentChannel = document.querySelector('input[name="receipt_payment_channel"]:checked').value;
+                                                            // alert(456)
+                                                            const paymentChannel = document.querySelector('input[name="move_out_payment_channel"]:checked').value;
                                                             const bad_debtPaymentDetails = document.getElementById('bad_debtPaymentDetails');
                                                             const bad_debtPaymentDetails2 = document.getElementById('bad_debtPaymentDetails2');
                                                             // หากเลือก โอนเงิน (value=2) ให้แสดงฟอร์มเพิ่ม

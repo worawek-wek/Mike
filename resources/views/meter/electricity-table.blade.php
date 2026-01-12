@@ -36,7 +36,7 @@
                     $background = 'style="background-color: antiquewhite;"';
                 }
             @endphp
-            <tr>
+            <tr {!! $background !!}>
                 <td class="text-center">
                     {{ $row->name }}
                 </td>

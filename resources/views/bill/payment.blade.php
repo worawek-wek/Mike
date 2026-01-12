@@ -104,8 +104,8 @@
                     </tr>
                 </tfoot>
             </table>
-                        
-            <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
+            <div class="my-2 mx-2"><b>หมายเหตุ: </b>{{ $invoice->remark }}</div>
+            <div class="modal-footer d-flex justify-content-between rounded-0">
                 <div>
                     <button type="button" class="btn btn-primary waves-effect" onclick="printPdf({{ $invoice->id }})">
                         <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
@@ -550,7 +550,8 @@
                                         </div> --}}
                                 <script>
                                     document.getElementById('checksplit').addEventListener('change', function() {
-                                        calculate_2Price();
+                                        // calculate_2Price();
+                                        calculatePrice_2()
                                         document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
                                         document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
                                         document.getElementById('totalpayfull').style.display = this.checked ? 'none' : 'block';

@@ -791,6 +791,8 @@
         </div>
     </div>
 </div>
+<iframe id="print-iframe" style="display: none;"></iframe>
+
     {{-- ///////////////////////////////////////////////////////////// --}}
     {{-- @include('room/add-renter') --}}
     {{-- ///////////////////////////////////////////////////////////// --}}
@@ -798,6 +800,7 @@
 
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+
     <script>
         let tomProvince = null;
         let tomDistrict = null;
@@ -893,6 +896,29 @@
             });
         }
 
+        function printPdf(id) {
+            $.ajax({
+                url: '/pdf/receipt/'+id,
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
         function openReservation(rent_bill_id){ // show form ชำระค่าจอง
             $.ajax({
                 type: "GET",
@@ -1206,14 +1232,6 @@
                     $("#formRoomRentalContract").html(data);
                     document.getElementById('loadingOverlay').style.display = 'none';
                     $('#submit_insert_contract').prop('disabled', true);
-                    
-                    $('#select2Renter').select2({
-                        placeholder: 'เลือกข้อมูลจากผู้เช่า',
-                        allowClear: true,
-                        dropdownParent: $('#roomRentalContract'), // 💥 สำคัญมาก ถ้าอยู่ใน modal
-                        width: '100%'
-                    });
-
                 }
             });
         }

@@ -14,7 +14,7 @@
                       style="position:absolute; right:10px; top:50%; transform:translateY(-50%);"
                       onclick="printPdfInvoice({{ @$row->invoice->id }})"
                       >
-                      <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบย้ายออก
+                      <span class="ti-sm ti ti-printer me-2"></span>พิมพ์ใบย้ายออก(ผู้เช่าหนี)
                   </button>
               </th>
             </tr>
@@ -269,16 +269,16 @@
                   </div>
                 </div>
                                     @php
-                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_move_out->total_amount ?? 0) - ($row->receipt_rent_bill_move_out->total_amount ?? 0);
+                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_bad_debt->total_amount ?? 0) - ($row->receipt_rent_bill_move_out->total_amount ?? 0);
                                     @endphp
                                   <div class="col-sm-11 mt-3">
                                       <h4 class="my-4" align="center">
                                           @if ($calculate >= 0)
-                                          <span class="text-danger">
-                                              ยอดเงินประกันคืนผู้เช่า
-                                          @else
                                           <span class="text-success">
-                                              เก็บเงินผู้เช่าเพิ่ม
+                                              หอพักได้รับเงินประกัน
+                                          @else
+                                          <span>
+                                              หนี้สูญ
                                           @endif
                                           &nbsp; {{ number_format(abs($calculate)) }}&nbsp; บาท
                                           </span>

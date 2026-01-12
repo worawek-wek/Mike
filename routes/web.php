@@ -120,7 +120,8 @@ Route::middleware('auth')->group(function() {
         Route::get('report/move-out', 'move_out')->name('report.move_out');    //////////////////////////
         Route::get('report/bad-debt', 'badDebt')->name('report.bad_debt');    //////////////////////////
         Route::get('report/bad-debt/datatable', 'badDebt_datatable')->name('report.bad-debt-datatable');    //////////////////////////
-        Route::get('report/bad-debt/export/excel', 'badDebt_export_excel')->name('room.export_excel');    //////////////////////////
+        Route::get('report/move-out/export/excel', 'move_out_export_excel')->name('report.move-out-export-excel');    //////////////////////////
+        Route::get('report/bad-debt/export/excel', 'badDebt_export_excel')->name('report.bad-debt-export-excel');    //////////////////////////
         Route::get('report/monthly-booking', 'monthly_booking')->name('report.monthly_booking');    //////////////////////////
         Route::get('report/monthly-booking/datatable', 'monthly_booking_datatable')->name('report.monthly_booking-datatable');    //////////////////////////
         Route::get('report/monthly-booking/excel', 'monthly_booking_excel')->name('report.monthly_booking-excel');    //////////////////////////
@@ -244,8 +245,9 @@ Route::middleware('auth')->group(function() {
     });
     Route::controller(PDFController::class)->group(function() {                    //////////////////////////
         // Route::get('pdf', 'index')->name('dashboard');    //////////////////////////
-        Route::get('pdf/receipt/{receipt_id}', 'receipt')->name('pdf.receipt');    //////////////////////////
+        Route::get('pdf/receipt/{receipt_id}', 'receipt')->name('pdf.receipt');    ////////////////////////// 
         Route::get('pdf/invoice/{invoice_id}', 'invoice')->name('pdf.invoice');    //////////////////////////
+        Route::get('pdf/invoice/move-out/not-yet-recorded/{invoice_id}', 'move_out_not_yet_recorded')->name('pdf.invoice');    //////////////////////////
         Route::get('pdf/overdue/invoice/{room_id}', 'overdue_invoice')->name('pdf.overdue_invoice');    //////////////////////////
         Route::get('pdf/invoice-many/{invoice_id}', 'invoice_many')->name('pdf.invoice_many');    //////////////////////////
         Route::get('pdf/invoice-bill-all/{invoice_id}', 'invoice_bill')->name('pdf.invoice_bill');    //////////////////////////
@@ -269,6 +271,7 @@ Route::middleware('auth')->group(function() {
         
         Route::get('room/get-form-add-renter/{room_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
         Route::get('room/get-form-add-renter/{room_id}/{renter_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
+        Route::post('room/delete-reserve/{occupancy_id}', 'delete_reserve')->name('delete-reserve');    //////////////////////////
         Route::get('room/get-deposit', 'get_deposit')->name('get-deposit');    //////////////////////////
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
         Route::post('room', 'store')->name('insert');    //////////////////////////
@@ -361,6 +364,7 @@ Route::middleware('auth')->group(function() {
     });
     Route::controller(BillController::class)->group(function() {                    //////////////////////////
         Route::get('bill', 'index')->name('bill');    //////////////////////////
+        Route::get('bill/get-room-rent-bill/{id}', 'get_room_rent_bill')->name('get-room-rent-bill');    //////////////////////////
         Route::get('bill/summary', 'bill_summary')->name('bill.summary');    //////////////////////////
         Route::get('bill/datatable', 'datatable')->name('bill.datatable');    //////////////////////////
         Route::get('bill/get-room-for-payment', 'get_room_for_payment')->name('bill.get-room-for-payment');    //////////////////////////

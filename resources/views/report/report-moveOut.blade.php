@@ -139,7 +139,7 @@
                                                         class="dt-action-buttons d-flex flex-column align-items-start align-items-sm-center justify-content-sm-center pt-0 gap-sm-2 gap-sm-0 flex-sm-row">
                                                         <div id="DataTables_Table_0_filter"
                                                             class="dataTables_filter mx-n2 me-2">
-                                                            <input type="date" class="form-control">
+                                                            <input type="month" name="month" class="form-control p_search" onchange='loadData("{{$page_url}}/datatable")' value="{{ date('Y-m') }}">
                                                         </div>
                                                         <div class="dt-buttons btn-group flex-wrap d-flex mb-6 mb-sm-0">
                                                             {{-- <button
@@ -157,7 +157,8 @@
                                                                     class="btn btn-success buttons-collection  btn-label-warning waves-effect waves-light"
                                                                     tabindex="0" aria-controls="DataTables_Table_0"
                                                                     type="button" aria-haspopup="dialog"
-                                                                    aria-expanded="false">
+                                                                    aria-expanded="false"
+                                                                    onclick="export_excel()">
                                                                     <span><i class="ti ti-upload me-1"></i>ดาวน์โหลด
                                                                         Excel
                                                                     </span>
@@ -331,4 +332,17 @@
             });
         }
     
+        function export_excel() {
+            $('.p_search').each(function () {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                searchData[inputName] = inputValue;
+            });
+
+            // สร้าง query string
+            const queryString = new URLSearchParams(searchData).toString();
+
+            // เปิดลิงก์พร้อม query string ในแท็บใหม่
+            window.open('{{$page_url}}/export/excel?' + queryString, '_blank');
+        }
 </script>

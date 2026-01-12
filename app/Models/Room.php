@@ -54,7 +54,8 @@ class Room extends Model
     }
     public function contract()
     {
-        return $this->hasOne('App\Models\Contract', 'ref_room_id', 'id');
+        return $this->hasOne(Contract::class, 'ref_room_id', 'id')
+                    ->whereRaw('contracts.occupancy_id = ?', [$this->occupancy_id]);
     }
     public function room_for_rent_main()
     {
@@ -62,9 +63,9 @@ class Room extends Model
                     ->where('status', 1)
                     ->latest('id');
     }
-    public function room_for_rent()
+    public function room_for_rent() // สำหรับ ผู้เช่า ปัจจุบัน
     {
-        return $this->hasOne('App\Models\RoomForRents', 'ref_room_id', 'id')->where('status', 0);
+        return $this->hasOne('App\Models\RoomForRents', 'occupancy_id', 'occupancy_id');
     }
     public function room_for_rent_s()
     {

@@ -54,6 +54,8 @@
                 </tfoot>
             </table>
             
+            <div class="my-2 mx-2"><b>หมายเหตุ: </b>{{ $invoice->remark }}</div>
+            
             <div class="mt-4 col-12 d-flex justify-content-end gap-2"
                     @if($permission_bill_move_edit || @$receipt || $invoice->payment_channel == 4)
                         style="pointer-events: none;  /* ปิดคลิก */

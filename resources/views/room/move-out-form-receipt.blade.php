@@ -39,10 +39,6 @@
                     <label for="renter_id_card_number" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
                     <input type="text" name="id_card_number" class="form-control" id="renter_id_card_number" placeholder="หมายเลขบัตรประชาชนผู้เข้าพัก" value="{{ @$invoice->id_card_number }}" />
                 </div>
-                <div class="col-sm-12">
-                    <label for="renter_remark" class="form-label">หมายเหตุ</label>
-                    <textarea name="remark" class="form-control" id="renter_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
-                </div>
             </div>
             <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
                 รายการชำระเงิน
@@ -95,6 +91,12 @@
                     </tr>
                 </tfoot>
             </table>
+            
+            <div class="col-sm-12 mt-2">
+                <label for="renter_remark" class="form-label">หมายเหตุ</label>
+                <textarea name="remark" class="form-control" id="renter_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
+            </div>
+
         <div class="mt-4 text-end col-12"
         @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */

@@ -8,11 +8,16 @@
                     $total_amount = 0;
                 @endphp
     @forelse ($invoice_alls as $key => $invoice)
-    @php 
-        if($invoice->balance_amount <= 0){
-            continue;
-        }
-    @endphp
+        @php
+            foreach ($list as $item_list){
+                $count = 0;
+                $count += count($invoice[$item_list]);
+            }
+
+            if($count == 0){
+                continue;
+            }
+        @endphp
     <div class="mb-3 billReserveRoom" id="billReserveRoom{{$invoice->id}}">
     <input name="insert[{{ $key }}][ref_room_id]" type="hidden" value="{{ $invoice->ref_room_id }}">
     <input name="insert[{{ $key }}][ref_rent_bill_id]" type="hidden" value="{{ $invoice->id }}">
@@ -193,15 +198,4 @@
         $(document).ready(function() {
             $('.reservation_payment_channel_Lhai:checked').trigger('change');
         });
-</script>
-<script>
-    function deleteBillRoom(id){
-        if ($('.billReserveRoom').length > 1) {
-            $("#billReserveRoom"+id).remove();
-            document.getElementById("check-table-"+id).checked = false; // ยกเลิก "เต็มจำนวน"
-            payMultipleRentBills();
-        } else {
-            Swal.fire('ไม่สามารถลบได้', 'การชำระค่าจองต้องมีอย่างน้อย 1 ห้อง', 'warning');
-        }
-    }
 </script>

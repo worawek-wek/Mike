@@ -77,7 +77,7 @@ class DashboardController extends Controller
                                         ->whereHas('room_for_rent.room.floor.building', function ($query) {
                                             $query->where('ref_branch_id', session("branch_id"));
                                         })
-                                        ->whereIn('ref_status_id', [2, 4, 7])
+                                        ->whereIn('ref_status_id', [2, 7])
                                         ->get()
                                         ->sum('total_amount'); // ใช้ accessor ในการ sum
 
@@ -88,38 +88,55 @@ class DashboardController extends Controller
     }
     public function datatable(Request $request)
     {
-        
-        $perPage = $request->limit ?? 15;
-        $page = Paginator::resolveCurrentPage('page');
+            // 1️⃣ ดึง Room + RentBill + Receipt
+            $rooms = Room::with([
+                    'rent_bill' => function ($q) {
+                        $q->whereIn('ref_status_id', [2, 4, 5, 7])
+                        ->where('ref_type_id', 1)
+                        ->with('receipt');
+                    }
+                ])
+                ->whereHas('floor.building', function ($q) {
+                    $q->where('ref_branch_id', session('branch_id'));
+                })
+                ->get(); // ต้อง get ก่อน เพราะใช้ accessor
 
-        $overdueBills = Room::whereHas('floor.building', function ($query) {
-                                    $query->where('ref_branch_id', session('branch_id'));
-                                })
-                                ->whereHas('rent_bill', function ($query) {
-                                    $query->whereIn('ref_status_id', [2, 4, 7]);
-                                });
+            // 2️⃣ คำนวณยอดค้างต่อห้อง + กรองเฉพาะที่มียอดค้าง
+            $rooms = $rooms->map(function ($room) {
 
-        $limit = $request['limit'] ?? 15;
+                $totalOverdue = 0;
 
-        $overdueBills = $overdueBills->paginate($limit);
-                                    // ->filter(function ($bill) {
-                                    //     $paidAmount = $bill->receipt->flatMap->payment_list_not_fine->sum('price');
-                                    //     return $paidAmount < $bill->total_amount; // ยอดค้างชำระ
-                                    // })
-                                    // ->values();
+                foreach ($room->rent_bill as $bill) {
+                    $billTotal = $bill->total_amount ?? 0;
+                    $receiptTotal = $bill->receipt?->sum('total_amount') ?? 0;
 
-        // ทำ paginate หลังจาก filter
-        // $page = request()->get('page', 1);
-        // $perPage = $request->limit ?? 15;
-        // $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-        //     $overdueBills->forPage($page, $perPage),
-        //     $overdueBills->count(),
-        //     $perPage,
-        //     $page,
-        //     ['path' => request()->url(), 'query' => request()->query()]
-        // );
+                    $totalOverdue += ($billTotal - $receiptTotal);
+                }
 
-        $data['list_data'] = $overdueBills;
+                $room->total_overdue = $totalOverdue;
+
+                return $room;
+
+            })->filter(function ($room) {
+                return $room->total_overdue > 0;
+            })->values(); // รี index ใหม่
+
+            // 3️⃣ Pagination หลัง filter
+            $perPage = 10;
+            $page = $request->get('page', 1);
+
+            $paginatedRooms = new LengthAwarePaginator(
+                $rooms->forPage($page, $perPage),
+                $rooms->count(),
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query()
+                ]
+            );
+
+        $data['list_data'] = $paginatedRooms;
         $data['query'] = request()->query();
         $data['query']['limit'] = $request->limit ?? 15;
 
@@ -165,10 +182,23 @@ class DashboardController extends Controller
     public function invoice($room_id)
     {
         $room = Room::find($room_id);
-        $invoice = RentBill::with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])
-                            ->whereIn('ref_status_id', [2, 4, 7])
-                            ->where('ref_room_id', $room_id)
-                            ->get();
+        $branch_id = session('branch_id');
+
+        $invoice = RentBill::with(['room', 'receipt'])
+                                ->where('ref_room_id', $room_id)
+                                ->whereHas('room.floor.building', function ($q) use ($branch_id) {
+                                    $q->where('ref_branch_id', $branch_id);
+                                })
+                                ->whereIn('ref_status_id', [2, 4, 5, 7])
+                                ->where('ref_type_id', 1)
+                                ->get()
+                                ->filter(function ($bill) {
+
+                                    $billTotal = $bill->total_amount ?? 0;
+                                    $receiptTotal = $bill->receipt?->sum('total_amount') ?? 0;
+
+                                    return $billTotal > $receiptTotal; // ค้างจริง
+                                });
         // $receipt = Receipt::where('ref_rent_bill_id', $id)->get();
         // $fine_invoice = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
         // $data['fine_invoice_price'] = 0;

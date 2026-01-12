@@ -39,17 +39,28 @@
                 <th class="text-center">เดือน</th>
                 <th class="text-center">เลขที่เอกสาร</th>
                 <th class="text-center">ประเภท</th>
-                <th class="text-center">ยอดเงิน</th>
+                {{-- <th class="text-center">สถานะ</th> --}}
+                <th class="text-end">ยอดค้าง</th>
             </tr>
         </thead>
         <tbody>
+            @php
+                $sum_overdue = 0;
+            @endphp
             @foreach ($invoice as $key => $row)
+                @php
+                    $billTotal = $row->total_amount;
+                    $receiptTotal = $row->receipt?->sum('total_amount') ?? 0;
+                    $overdue = $billTotal - $receiptTotal;
+                    $sum_overdue += $overdue;
+                @endphp
                 <tr>
                     <td class="text-center">{{ $key+1 }}</td>
                     <td class="text-center">{{ $monthNames[$row->month].' '.$row->year }}</td>
                     <td class="text-center">{{ $row->invoice_number }}</td>
                     <td class="text-center">{{ $type[$row->ref_type_id] }}</td>
-                    <td class="text-end">{{ number_format($row->total_amount) }}</td>
+                    {{-- <td class="text-center text-{{ $row->status->color }}">{{ $row->status->name }}</td> --}}
+                    <td class="text-end text-danger">{{ number_format($overdue) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -57,7 +68,7 @@
             <tr class="table-danger">
                 <th colspan="4" class="text-center">รวม</th>
                 <th class="text-end mb-0 fw-bold total-price">
-                    {{ number_format($invoice->sum->total_amount) }}
+                    {{ number_format($sum_overdue) }}
                 </th>
             </tr>
         </tfoot>

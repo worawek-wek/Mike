@@ -45,6 +45,10 @@
                         <td>ค่าเช่าห้อง</td>
                         <td>{{ @number_format($room->rent+$room->furniture_rental+$room->air_rental) }}</td>
                     </tr>
+                    <tr>
+                        <td>หมายเหตุ</td>
+                        <td>{{ $contract->remark }}</td>
+                    </tr>
                 </tbody>    
             </table>
         
@@ -114,6 +118,7 @@
                                         <span style="color: black; font-weight: 500;">วันที่รับชำระเงิน</span> &nbsp; &nbsp; &nbsp; {!! $days[$englishDay].' &nbsp;'.date('d/m/Y', strtotime($item_receipt->created_at)) !!}<br>
                                         <span style="color: black; font-weight: 500;">ช่องทางการชำระเงิน</span> &nbsp; &nbsp; &nbsp; {{ $item_receipt->payment_channel == 1 ? "เงินสด": "โอนเงิน"; }}<br>
                                         <span style="color: black; font-weight: 500;">รับชำระโดย</span> &nbsp; &nbsp; &nbsp; {{ $item_receipt->user->name }}<br>
+                                        <span style="font-weight: 500;">สถานะ &nbsp; &nbsp; &nbsp; </span><span class="text-{{ $item_receipt->status->color }}">{{ $item_receipt->status->name }}</span>
                                         &nbsp;
                         </td>
                         
