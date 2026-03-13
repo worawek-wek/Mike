@@ -34,7 +34,11 @@ class Receipt extends Model
     }
     public function receipt_rent_bill_move_out() // บิลย้ายออก
     {
-        return $this->hasOne(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 1)->where('paid_on_checkout', 1);
+        return $this->hasMany(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 1)->where('paid_on_checkout', 1);
+    }
+    public function receipt_rent_bill_move_out_deduct_deposit() // บิลย้ายออก
+    {
+        return $this->hasMany(Receipt::class, 'ref_contract_id', 'ref_contract_id')->where('ref_type_id', 1)->where('payment_channel', 3)->where('paid_on_checkout', 1);
     }
     public function receipt_move_out() // บิลย้ายออก
     {

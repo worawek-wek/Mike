@@ -79,7 +79,27 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="paymentDropdown">
                         <li><a class="dropdown-item" href="javascript:void(0)" onclick="payReceiptMoveOut(1)">ชำระเงิน</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="payReceiptMoveOutByDeposit(1)">หักจากเงินประกัน</a></li>
+                        <li>
+                            <form id="payment_receipt_move_out_bill_deposit" enctype="multipart/form-data">
+                                @csrf
+                                
+                                <input type="hidden" name="invoice_id" value="{{ @$invoice->id }}">
+                                <input name="ref_room_for_rent_id" type="hidden" value="{{ $invoice->ref_room_for_rent_id }}">
+                                <input name="ref_room_id" type="hidden" value="{{ $invoice->ref_room_id }}">
+                                <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id }}">
+                                <input name="payment_format" type="hidden" value="1">
+                                
+                                <input name="ref_type_id" type="hidden" value="4">
+                                <input name="amount" class="total-price" type="hidden">
+
+                                <input type="hidden" name="id" value="{{$invoice->id}}">
+                                <input type="hidden" name="receipt_payment_channel" value="3">
+                                <input type="hidden" name="payment_date" value="{{date('d/m/Y')}}"/>
+                                <button type="submit" class="dropdown-item">
+                                    หักจากเงินประกัน
+                                </button>
+                            </form>
+                                {{-- <a class="dropdown-item" href="javascript:void(0)" onclick="payReceiptMoveOutByDeposit(1)">หักจากเงินประกัน</a></li> --}}
                         {{-- <li><a class="dropdown-item" href="javascript:void(0)" onclick="pay(2)">หักจากเงินประกัน</a></li> --}}
                     </ul>
                 </div>
@@ -360,6 +380,64 @@
                                         calculateTotal()
                                     }, 2000);
 
+                                    $('#payment_receipt_move_out_bill_deposit').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
+                                        event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
+                                        if(!this.checkValidity()) {
+                                            // ถ้าฟอร์มไม่ถูกต้อง
+                                            this.reportValidity();
+                                            return console.log('ฟอร์มไม่ถูกต้อง');
+                                        }
+                                        Swal.fire({
+                                            title: 'ยืนยันการดำเนินการ?',
+                                            text: 'คุณต้องการ หักจากเงินประกัน หรือไม่?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'ตกลง',
+                                            cancelButtonText: 'ยกเลิก',
+                                            showDenyButton: false,
+                                            didOpen: () => {
+                                                // โฟกัสที่ปุ่ม confirm
+                                                Swal.getConfirmButton().focus();
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '/room/payment-receipt-move-out-bill',
+                                                    type: 'POST',
+                                                    data: $(this).serialize(),
+                                                    success: function(response) {
+                                                        if(response == true){
+                                                            get_move_out();
+                                                            calculateTotal()
+                                                            calculate_2Price()
+                                                            loadData(page);
+                                                            summary();
+                                                            Swal.fire('หักจากเงินประกันเรียบร้อยแล้ว', '', 'success');
+                                                        }
+                                                    },
+                                                    error: function (xhr) {
+                                                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                                            let messages = '';
+                                                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                                                messages += value + '<br>';
+                                                            });
+
+                                                            Swal.fire({
+                                                                title: 'เกิดข้อผิดพลาด',
+                                                                html: messages,
+                                                                icon: 'error',
+                                                            });
+                                                        } else {
+                                                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                                            console.error('เกิดข้อผิดพลาด:', xhr);
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.isDismissed) {
+                                                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+                                            }
+                                        });
+                                    });
                                     $('#payment_receipt_move_out_bill').on('submit', function(event) { // บันทึกบิลย้ายออก ใบเสร็จย้ายออก function save_moveout_receipt()
                                         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
                                         if(!this.checkValidity()) {

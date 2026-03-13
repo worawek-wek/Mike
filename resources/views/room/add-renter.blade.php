@@ -30,8 +30,9 @@
     ];
 @endphp
 <input type="hidden" name="room_id" value="{{ $room->id }}">
-@if (@$renter_edit->id)
-    <input id="renter_edit" type="hidden" name="renter_id" value="{{ $renter_edit->id }}">
+@if (@$renter_edit->renter->id)
+    <input id="renter_edit" type="hidden" name="renter_id" value="{{ $renter_edit->renter->id }}">
+    <input id="room_for_rent_id" type="hidden" name="room_for_rent_id" value="{{ $renter_edit->id }}">
 @endif
 <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
     <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);;">
@@ -43,43 +44,43 @@
             <label for="exampleFormControlSelect1" class="form-label">คำนำหน้า</label>
             <select name="prefix" class="form-select" id="exampleFormControlSelect1"
                 aria-label="Default select example">
-                <option @if (@$renter_edit->prefix == 'บริษัท') selected @endif value="บริษัท" selected>บริษัท</option>
-                <option @if (@$renter_edit->prefix == 'นาย') selected @endif  value="นาย">นาย</option>
-                <option @if (@$renter_edit->prefix == 'นางสาว') selected @endif  value="นางสาว">นางสาว</option>
-                <option @if (@$renter_edit->prefix == 'นาง') selected @endif  value="นาง">นาง</option>
+                <option @if (@$renter_edit->renter->prefix == 'บริษัท') selected @endif value="บริษัท" selected>บริษัท</option>
+                <option @if (@$renter_edit->renter->prefix == 'นาย') selected @endif  value="นาย">นาย</option>
+                <option @if (@$renter_edit->renter->prefix == 'นางสาว') selected @endif  value="นางสาว">นางสาว</option>
+                <option @if (@$renter_edit->renter->prefix == 'นาง') selected @endif  value="นาง">นาง</option>
             </select>
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span>
-            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="ชื่อจริง" value="{{ @$renter_edit->name }}" required/>
+            <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="ชื่อจริง" value="{{ @$renter_edit->renter->name }}" required/>
         </div>
         <div class="col-sm-5">
             <label for="exampleFormControlInput2" class="form-label">นามสกุล</label><span class="text-danger">*</span>
-            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->surname }}" required/>
+            <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="นามสกุล" value="{{ @$renter_edit->renter->surname }}" required/>
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput6" class="form-label">เงินเดือน</label>
-            <input type="number" name="salary" class="form-control" id="exampleFormControlInput6" placeholder="เงินเดือน" value="{{ @$renter_edit->salary }}"/>
+            <input type="number" name="salary" class="form-control" id="exampleFormControlInput6" placeholder="เงินเดือน" value="{{ @$renter_edit->renter->salary }}"/>
         </div>
         <div class="col-sm-6"></div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label><span class="text-danger">*</span>
-            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->phone }}" required/>
+            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)" value="{{ @$renter_edit->renter->phone }}" required/>
         </div>
         <div class="col-sm-6">
             <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชน</label><span class="text-danger">*</span>
-            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="หมายเลขบัตรประชาชน" value="{{ @$renter_edit->id_card_number }}" required/>
+            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="หมายเลขบัตรประชาชน" value="{{ @$renter_edit->renter->id_card_number }}" required/>
         </div>
         <div class="col-sm-12">
             <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
-            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="{{ @$renter_edit->address }}"/>
+            <input type="text" name="address" class="form-control" id="exampleFormControlInput5" placeholder="เลขที่ ซอย ถนน อาคาร ห้องเลขที่ หรือหมู่บ้าน" value="{{ @$renter_edit->renter->address }}"/>
         </div>
         <div class="col-sm-4">
             <label>เลือกจังหวัด</label>
             <select name="ref_province_id" id="select2BasicAddRenter">
                 <option selected disabled hidden value="">เลือกจังหวัด</option>
                 @foreach ($province as $pro)
-                    <option value="{{ $pro->id }}" @if ($pro->id == @$renter_edit->ref_province_id) selected @endif>{{ $pro->name_in_thai }}</option>
+                    <option value="{{ $pro->id }}" @if ($pro->id == @$renter_edit->renter->ref_province_id) selected @endif>{{ $pro->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
@@ -88,7 +89,7 @@
             <select name="ref_district_id" id="select2DistrictAddRenter">
                 <option selected disabled hidden value="">เลือกอำเภอ</option>
                 @foreach ($district as $dis)
-                    <option value="{{ $dis->id }}" @if ($dis->id == @$renter_edit->ref_district_id) selected @endif>{{ $dis->name_in_thai }}</option>
+                    <option value="{{ $dis->id }}" @if ($dis->id == @$renter_edit->renter->ref_district_id) selected @endif>{{ $dis->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
@@ -97,18 +98,18 @@
             <select name="ref_subdistrict_id" id="select2SubdistrictAddRenter">
                 <option selected disabled hidden value="">เลือกตำบล</option>
                 @foreach ($subdistrict as $sub_dis)
-                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == @$renter_edit->ref_subdistrict_id) selected @endif>{{ $sub_dis->name_in_thai }}</option>
+                    <option value="{{ $sub_dis->id }}" @if ($sub_dis->id == @$renter_edit->renter->ref_subdistrict_id) selected @endif>{{ $sub_dis->name_in_thai }}</option>
                 @endforeach
             </select>
         </div>
         <div class="col-sm-6">
             <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="{{ @$renter_edit->zipcode }}" />
+            <input type="text" name="zipcode" class="form-control" id="zipcodeAddRenter" placeholder="รหัสไปรษณีย์" value="{{ @$renter_edit->renter->zipcode }}" />
         </div>
         <div class="col-sm-12"></div>
         <div class="col-sm-3">
             <label for="birthdate" class="form-label">วันเดือนปีเกิดผู้จอง</label>
-            <input type="text" name="birthdate" class="form-control" id="add_birthdate" placeholder="วัน/เดือน/ปี" value="{{ @$renter_edit->birthdate != null ? date('d/m/Y', strtotime($renter_edit->birthdate)) : ''; }}" autocomplete="off"/>
+            <input type="text" name="birthdate" class="form-control" id="add_birthdate" placeholder="วัน/เดือน/ปี" value="{{ @$renter_edit->renter->birthdate != null ? date('d/m/Y', strtotime($renter_edit->renter->birthdate)) : ''; }}" autocomplete="off"/>
         </div>
         {{-- <div class="col-sm-6">
             <label for="bs-datepicker-format2" class="form-label">วันที่จอง</label>
@@ -160,7 +161,7 @@
                 </div>
             </div>
         @endforeach
-            <div class="vehicle-group row g-3 mb-2">
+            {{-- <div class="vehicle-group row g-3 mb-2">
                 <div class="col-sm-2">
                     <label class="form-label">คันที่ {{ count($vehicles)+1 }}</label>
                     <select name="vehicles[{{ count($vehicles) }}][ref_type_id]" class="form-control w-100" data-style="btn-default" required>
@@ -181,7 +182,7 @@
                         <i class="ti ti-trash"></i> ลบ
                     </button>
                 </div>
-            </div>
+            </div> --}}
     </div>
 
     <!-- ปุ่มเพิ่ม -->
@@ -198,7 +199,7 @@
 
 <script>
     $(document).ready(function () {
-        let vehicleIndex = {{ count($vehicles) + 1 }};
+        let vehicleIndex = {{ count($vehicles) }};
 
         $('#add_vehicles').on('click', function () {
             vehicleIndex++;
@@ -322,7 +323,7 @@
                     url: '/get-zipcode/' + subdistrictsid,
                     type: 'GET',
                     success: function(data) {
-                        $('#zipcode').val(data);
+                        $('#zipcodeAddRenter').val(data);
                     }
                 });
             }

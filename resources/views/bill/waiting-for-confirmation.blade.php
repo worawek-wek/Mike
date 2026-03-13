@@ -96,6 +96,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $num = 1;
+                        @endphp
                         @foreach ($list_data as $key => $row_2)
                             {{-- <tr class="odd" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#invoice" onclick="view({{ $row_2->id }},'detail')"> --}}
                             <tr class="odd">
@@ -103,7 +106,7 @@
                                     <input type="checkbox" class="dt-checkboxes form-check-input ids_receipt" value="{{ $row_2->id }}">
                                 </td>
                                 <td class="  dt-checkboxes-cell">
-                                    {{ $key+1 }}
+                                    {{ $num++ }}
                                 </td>
                                 <td class="text-center">{{ $row_2->room->name }}</td>
                                 <td class="text-center"><span class="text-truncate">{{ $row_2->renter->fullName() }}</span>

@@ -39,14 +39,15 @@
 
                       <div id="accordionWithIcon-1{{ $row->id }}" class="accordion-collapse collapse show">
                         <div class="accordion-body">
-                          @if (@$row->receipt_rent_bill_move_out)
+                          {{-- @if (@$row->receipt_rent_bill_move_out) --}}
+                          @foreach (@$row->receipt_rent_bill_move_out ?? [] as $receipt_rent_bill_move_out)
                           <style>
                             .table-receipt th {
                                 text-align: center !important;
                             }
                           </style>
                             {{-- <div class="p-4 mb-4" style="border: 1px solid #59d57a;border-radius: 5px;"> --}}
-                                <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $row->receipt_rent_bill_move_out->receipt_number }}</span></p>
+                                <p align="right" style="color: black; font-weight: 500;">เลขที่ใบเสร็จ: &nbsp; <span class="text-success">{{ $receipt_rent_bill_move_out->receipt_number }}</span></p>
                                     <table class="table table-detail table-bordered mt-4 table-receipt">
                                         <thead>
                                             <tr style="background-color: antiquewhite;">
@@ -73,23 +74,23 @@
                                         </thead>
                                         <tbody>
                                             @php
-                                                $rowCount = count($row->receipt_rent_bill_move_out->payment_list);
+                                                $rowCount = count($receipt_rent_bill_move_out->payment_list);
                                             @endphp
-                                            @foreach ($row->receipt_rent_bill_move_out->payment_list as $key => $item_payment_list)
+                                            @foreach ($receipt_rent_bill_move_out->payment_list as $key => $item_payment_list)
                                                 <tr>
                                                     {{-- แสดงช่องทางการชำระเงินเฉพาะแถวแรก --}}
                                                     @if($key === 0)
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                        {{ date('d/m/Y', strtotime($row->receipt_rent_bill_move_out->payment_date)) }}
+                                                        {{ date('d/m/Y', strtotime($receipt_rent_bill_move_out->payment_date)) }}
                                                     </td>
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                        {{ $row->receipt_rent_bill_move_out->user->name }}
+                                                        {{ $receipt_rent_bill_move_out->user->name }}
                                                     </td>
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                        {{ $row->receipt_rent_bill_move_out->payment_channel == 3 ? "-" : "จ่ายเต็ม" ; }}
+                                                        {{ $receipt_rent_bill_move_out->payment_channel == 3 ? "-" : "จ่ายเต็ม" ; }}
                                                     </td>
                                                     <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                        @switch($row->receipt_rent_bill_move_out->payment_channel)
+                                                        @switch($receipt_rent_bill_move_out->payment_channel)
                                                             @case(1)
                                                                 เงินสด
                                                                 @break
@@ -115,7 +116,7 @@
                                                     {{-- แสดงรวมเฉพาะแถวแรก --}}
                                                     @if($key === 0)
                                                         <td rowspan="{{ $rowCount }}" style="vertical-align: middle;">
-                                                            {{ number_format($row->receipt_rent_bill_move_out->total_amount, 0) }}
+                                                            {{ number_format($receipt_rent_bill_move_out->total_amount, 0) }}
                                                         </td>
                                                     @endif
                                                 </tr>
@@ -127,12 +128,12 @@
                                             <tr style="background-color: #e5e5e5;">
                                                 <th colspan="6">รวม</th>
                                                 <th align="right" class=" mb-0 fw-bold" style="color: #28c76f !important;text-align: right">
-                                                {{ number_format($row->receipt_rent_bill_move_out->total_amount) }}
+                                                {{ number_format($receipt_rent_bill_move_out->total_amount) }}
                                                 </th>
                                             </tr>
                                         </tfoot>
                                     </table>
-                                    <div class="my-2 mx-2" align="left"><b>หมายเหตุ: </b>{{ $row->receipt_rent_bill_move_out->remark }}</div>
+                                    <div class="my-2 mx-2" align="left"><b>หมายเหตุ: </b>{{ $receipt_rent_bill_move_out->remark }}</div>
 
                                     {{-- <div class="modal-footer rounded-0 d-flex justify-content-between mt-2 pb-0">
                                         <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $row->receipt_rent_bill_move_out->id }})">
@@ -140,7 +141,7 @@
                                         </button>
                                     </div> --}}
                                 {{-- </div> --}}
-                            @endif
+                            @endforeach
                         </div>
                       </div>
                     </div>
@@ -336,7 +337,7 @@
                   </div>
                 </div>
                                     @php
-                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_move_out->total_amount ?? 0) - ($row->receipt_rent_bill_move_out->total_amount ?? 0);
+                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_move_out->total_amount ?? 0) - ($row->receipt_rent_bill_move_out_deduct_deposit->sum('total_amount') ?? 0);
                                     @endphp
                                   <div class="col-sm-11 mt-3">
                                       <h4 class="my-4" align="center">

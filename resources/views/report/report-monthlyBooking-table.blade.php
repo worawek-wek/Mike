@@ -8,8 +8,8 @@
             </th>
             <th class="text-center">
                 ชื่อผู้จอง</th>
-            <th class="text-center" style="width: 123px;">
-                หมายเลขการจอง</th>
+            {{-- <th class="text-center" style="width: 123px;">
+                หมายเลขการจอง</th> --}}
             <th class="text-center">
                 วันที่จอง
             </th>
@@ -36,24 +36,37 @@
         @forelse ($list_data as $row)
             <tr class="odd">
                 
-                <td class="text-center">{{ $row->room_name }}</td>
-                <td class="text-center"><span class="text-truncate">{{ $row->renter_name }}</span>
+                <td class="text-center">{{ $row->room->name }}</td>
+                <td class="text-center"><span class="text-truncate">{{ $row->room_for_rent->renter->fullName() }}</span>
                 </td>
-                <td class="text-center"><span>{{ $row->receipt_number }}</span></td>
-                <td class="text-center"><span>{{  date("d/m/Y" , strtotime($row->booking_date)) }}</span></td>
-                <td class="text-center"><span>{{  date("d/m/Y" , strtotime($row->date_stay)) }}</span></td>
+                {{-- <td class="text-center"><span>{{ $row->id }}</span></td> --}}
+                <td class="text-center"><span>{{  date("d/m/Y" , strtotime($row->room_for_rent->renter->booking_date)) }}</span></td>
+                <td class="text-center"><span>{{  date("d/m/Y" , strtotime($row->room_for_rent->date_stay)) }}</span></td>
                 <td class="text-center"><span> 
-                @if ($row->payment_method == 1)
-                    เงินสด
+                @if (@$row->room_for_rent->rent_bill_reserve)
+                    @if (@$row->room_for_rent->rent_bill_reserve->receipt[0]->payment_channel == 1)
+                        เงินสด
+                    @else
+                        โอนเงิน
+                    @endif 
                 @else
-                    โอนเงิน
-                @endif 
+                    -
+                @endif
                 </span></td>
-                <td class="text-center"><span>{{  $row->user->name }}</span></td>
-                <td class="text-center"><span>{{ $row->deposit }}</span></td>
+                <td class="text-center"><span>{{  $row->room_for_rent->user->name }}</span></td>
+                <td class="text-center"><span>{{ $row->room_for_rent->deposit }}</span></td>
                 {{-- <td class="text-center"><span>{{ $row->amount }}</span></td> --}}
-                <td class="text-center"><span class="badge bg-label-success"
-                        text-capitalized="">จองแล้ว</span></td>
+                <td class="text-center">
+                    @if ($row->status_cancel == 0)
+                    <span class="badge bg-label-success"
+                        text-capitalized="">จองแล้ว</span>
+                        
+                    @else
+                    <span class="badge bg-label-danger"
+                        text-capitalized="">ยกเลิก</span>
+
+                    @endif
+                </td>
             </tr>
         
             @empty
@@ -72,6 +85,8 @@
     @include('layout/pagination')
 <script>
     // setTimeout(() => {
-        $('#all-booking').html("{{ $list_data->total() }}");
+        // $('#all-booking').html("{{ $list_data->total() }}");
+        $('#all-booking').html("{{ $reserve }}");
+        $('#all-booking-cancel').html("{{ $cancel }}");
     // }, 2000);
 </script>

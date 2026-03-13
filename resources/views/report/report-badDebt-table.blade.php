@@ -277,7 +277,7 @@
                                           <span class="text-success">
                                               หอพักได้รับเงินประกัน
                                           @else
-                                          <span>
+                                          <span class="text-danger">
                                               หนี้สูญ
                                           @endif
                                           &nbsp; {{ number_format(abs($calculate)) }}&nbsp; บาท

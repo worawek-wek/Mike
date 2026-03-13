@@ -17,6 +17,7 @@ use App\Models\Bank;
 use App\Models\AdditionalCosts;
 use App\Models\RentBill;
 use App\Models\Branch;
+use App\Models\ClearBalance;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Room;
@@ -197,6 +198,7 @@ class BillController extends Controller
         $confirm_by_ceo = Receipt::with('payment_list')
                                     ->where('ref_status_id', 5)
                                     ->where('receipts.payment_channel', 1)
+                                    ->where('receipts.clear_balances', 0)
                                     ->whereIn('ref_type_id', [1,2,3])
                                     ->whereHas('room.floor.building', function ($query) {
                                         $query->where('ref_branch_id', session('branch_id'));
@@ -207,6 +209,7 @@ class BillController extends Controller
         $list_data = Receipt::with('payment_list')
                                 ->where('receipts.ref_status_id', 5)
                                 ->where('receipts.payment_channel', 2)
+                                ->where('receipts.clear_balances', 0)
                                 ->whereIn('ref_type_id', [1,2,3])
                                 ->whereHas('room.floor.building', function ($query) {
                                     $query->where('ref_branch_id', session('branch_id'));
@@ -422,6 +425,7 @@ class BillController extends Controller
             }
             $receipt = new Receipt;
             $receipt->receipt_number =  $this->generateReceiptCode();
+            // $receipt->ref_occupancy_id  =  $room->ref_occupancy_id;
             $receipt->ref_room_id  =  $request->ref_room_id;
             $receipt->ref_rent_bill_id  =  $request->ref_rent_bill_id;
             $receipt->ref_contract_id  =  $request->ref_contract_id;
@@ -435,7 +439,11 @@ class BillController extends Controller
             $receipt->ref_type_id  =  $request->ref_type_id;
             $receipt->paid_on_checkout  =  $request->paid_on_checkout ?? 0;
             $receipt->remark  =  $request->remark;
-            $receipt->ref_status_id  =  2;
+            if($request->payment_channel == 3){
+                $receipt->ref_status_id  =  5;
+            }else{
+                $receipt->ref_status_id  =  2;
+            }
             $receipt->evidence_of_money_transfer  =  $image_name;
             $receipt->ref_user_id =  Auth::id();
 
@@ -625,7 +633,7 @@ class BillController extends Controller
         }
         return $total;
     }
-    public function invoice($id)
+    public function invoice($id, $overdue = null)
     {
         
         $data['page_url'] = 'bill';
@@ -672,6 +680,10 @@ class BillController extends Controller
         $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
         
         $data['meterPrevious'] = Meter::where('ref_room_id', $contract->ref_room_id)->where('month', $prevMonth)->where('year', $prevYear)->first();
+
+        if(@$overdue == 1){
+            $data['overdue'] = 1;
+        }
 
         if($invoice->ref_status_id == 3){
             return view('bill/incomplete', $data);
@@ -732,6 +744,24 @@ class BillController extends Controller
         }
         //
     }
+    public function clear_balance(Request $request)
+    {
+        try{
+                // $clear_balance = new ClearBalance;
+                // $clear_balance->price = $request->price;
+                // $clear_balance->ref_branch_id = session("branch_id");
+                // $clear_balance->save();
+                Receipt::where('ref_status_id', 5)->update(['clear_balances' => 1]);
+                DB::commit();
+                return true;
+
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
     public function change_status_bill_invoice(Request $request, $id = null)
     {
         try{
@@ -745,9 +775,12 @@ class BillController extends Controller
             }
             // if($id == 'all'){
                 // Receipt::whereIn('id', $request->id)->update(['ref_status_id'=> 5]);
-                
+                // return $request->id;
+                if(!$request->id){
+                    $request->id = [$id];
+                }
                 $bills = RentBill::with(['receipt.payment_list', 'payment_list'])
-                                        ->where('id', $request->id)
+                                        ->whereIn('id', $request->id)
                                         ->get();
                 // foreach($request->id as $id){
                 //     $receict = Receipt::find($id);
@@ -840,7 +873,7 @@ class BillController extends Controller
         return $receiptCode;
         
     }
-    public function export_excel()
+    public function export_excel(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -855,8 +888,15 @@ class BillController extends Controller
                                 ->where('rent_bills.ref_type_id', 1)
                                 // ->where('rent_bills.ref_status_id', '!=', 3)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.id_card_number', 'renters.phone')
-                                ->get();
+                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
+                                'rooms.name as room_name', 'rooms.id as room_id', 'rooms.rent', 'rooms.furniture_rental', 'rooms.air_rental', 'renters.id_card_number', 'renters.phone');
+                                
+        if(@$request->month){
+            $results = $results->Where('rent_bills.year', explode('-', $request->month)[0])->Where('rent_bills.month', explode('-', $request->month)[1]);
+        }
+                                
+        $results = $results->get();
+
         $branch = Branch::find(session("branch_id"));
 
         $service = Service::where('ref_branch_id', session("branch_id"))
@@ -889,7 +929,7 @@ class BillController extends Controller
 
         $data = [
             [$branch->name],
-            ["บิลค่าเช่าห้องเดือน " . date('m-Y')],
+            ["บิลค่าเช่าห้องเดือน " . date('m-Y', strtotime($request->month))],
             array_merge($data_1, $service, $data_2)
         ];
 
@@ -986,16 +1026,16 @@ class BillController extends Controller
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/all-".date('m-Y', strtotime('-1 month')).".xlsx");
-        return redirect("upload/export_excel/all-".date('m-Y', strtotime('-1 month')).".xlsx");
+        $writer->save("upload/export_excel/all-".date('m-Y', strtotime($request->month)).".xlsx");
+        return redirect("upload/export_excel/all-".date('m-Y', strtotime($request->month)).".xlsx");
     }
-    public function export_excel_summary()
+    public function export_excel_summary(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // ตัวอย่างข้อมูล
         
-        $results = RentBill::orderBy('rooms.name','asc')
+        $results = RentBill::orderBy('rooms.name')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
                                 ->join('renters', 'room_for_rents.ref_renter_id', '=', 'renters.id')
                                 ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
@@ -1003,10 +1043,41 @@ class BillController extends Controller
                                 ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                                 ->where('buildings.ref_branch_id', session("branch_id"))
                                 ->where('rent_bills.ref_type_id', 1)
-                                ->where('rent_bills.ref_status_id', '!=', 3)
+                                ->where('room_for_rents.status', 1)
                                 ->distinct('rent_bills.id')
-                                ->select('rent_bills.*', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent')
-                                ->get();
+                                ->select('rent_bills.*', 'rent_bills.id as rent_bill_id', 'renters.prefix' , DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'), 'rooms.name as room_name', 'rooms.rent');
+                                
+        if(@$request->search){
+            $results = $results->Where(function ($query) use ($request) {
+                                    $query->whereRaw("CONCAT(renters.prefix ,' ' , renters.name, ' ', renters.surname) LIKE ?", ["%{$request->search}%"])
+                                        ->orWhere('rooms.name','LIKE','%'.$request->search.'%');
+                                });
+        }
+            // return 456;
+        if(@$request->ref_status_id != "all"){
+            // return 123;
+            $results = $results->Where('rent_bills.ref_status_id','LIKE','%'.$request->ref_status_id.'%');
+        }
+        if(@$request->room_name){
+            $results = $results->Where('rooms.name','LIKE','%'.$request->room_name.'%');
+        }
+        if(@$request->invoice_number){
+            $results = $results->Where('rent_bills.invoice_number','LIKE','%'.$request->invoice_number.'%');
+        }
+        if(@$request->room_rent){
+            $results = $results->Where('rent_bills.total', $request->room_rent);
+        }
+        if(@$request->building != "all"){
+            $results = $results->Where('room_for_rents.ref_building_id', $request->building);
+        }
+        if(@$request->floor != "all"){
+            $results = $results->Where('room_for_rents.ref_floor_id', $request->floor);
+        }
+        if(@$request->month){
+            $results = $results->Where('rent_bills.year', explode('-', $request->month)[0])->Where('rent_bills.month', explode('-', $request->month)[1]);
+        }
+                                
+        $results = $results->get();
 
         $branch = Branch::find(session("branch_id"));
         $data = 
@@ -1051,7 +1122,7 @@ class BillController extends Controller
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/ใบสรุปบิล-".date('m-Y', strtotime('-1 month')).".xlsx");
-        return redirect("upload/export_excel/ใบสรุปบิล-".date('m-Y', strtotime('-1 month')).".xlsx");
+        $writer->save("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime('-1 month')).".xlsx");
+        return redirect("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime('-1 month')).".xlsx");
     }
 }

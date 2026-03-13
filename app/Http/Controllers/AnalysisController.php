@@ -780,15 +780,16 @@ class AnalysisController extends Controller
                         // ->whereHas('room', function ($query) {
                         //     $query->where('status', '!=', 0);
                         // })
-                        ->whereYear('created_at', 2025)
+                        ->whereYear('created_at', $request->year)
                         ->groupBy(DB::raw('MONTH(created_at)'))
                         ->pluck('total','month');
 
-        $raw_out = Contract::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-                        ->whereHas('room', function ($query) {
-                            $query->where('status', 0);
-                        })
-                        ->whereYear('created_at', 2025)
+        $raw_out = Receipt::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                        // ->whereHas('room', function ($query) {
+                        //     $query->where('status', 0);
+                        // })
+                        ->where('ref_type_id', 7)
+                        ->whereYear('created_at', $request->year)
                         ->groupBy(DB::raw('MONTH(created_at)'))
                         ->pluck('total','month');
 

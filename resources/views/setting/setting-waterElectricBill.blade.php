@@ -148,12 +148,12 @@
                                             <div class="d-flex justify-content-end flex-column flex-md-row">
                                                 <button type="button"
                                                     class="btn btn-info waves-effect waves-light me-md-2 mb-2 mb-md-0"
-                                                    data-bs-toggle="modal" data-bs-target="#setWaterModal" onclick="view_water('all')">
+                                                    onclick="view_water('all')">
                                                     <span class="ti-xs ti ti-droplet me-2"></span>กำหนดค่าน้ำ
                                                 </button>
                                                 <button type="button"
                                                     class="btn btn-danger waves-effect waves-light me-md-2 mb-2 mb-md-0"
-                                                    data-bs-toggle="modal" data-bs-target="#setElectricModal" onclick="view_electric('all')">
+                                                    onclick="view_electric('all')">
                                                     <span class="ti-xs ti ti-plug me-2"></span>กำหนดค่าไฟ
                                                 </button>
                                                 {{-- <button type="button"
@@ -271,6 +271,12 @@
         }
         var update_id = 999999999999;
         function view_water(id){
+            if ($('.ids:checked').length === 0 && id == 'all') {
+                Swal.fire('กรุณาเลือกรายการอย่างน้อย 1 รายการ', '', 'warning');
+                return;
+            }
+            var myModal = new bootstrap.Modal(document.getElementById('setWaterModal'));
+                myModal.show();
             $.ajax({
                 type: "GET",
                 url: "setting/water-bill/"+id,
@@ -335,6 +341,15 @@
             });
         });
         function view_electric(id){
+            
+            if ($('.ids:checked').length === 0 && id == 'all') {
+                Swal.fire('กรุณาเลือกรายการอย่างน้อย 1 รายการ', '', 'warning');
+                return;
+            }
+
+            var myModal = new bootstrap.Modal(document.getElementById('setElectricModal'));
+                myModal.show();
+
             $.ajax({
                 type: "GET",
                 url: "setting/electric-bill/"+id,

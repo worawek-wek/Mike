@@ -9,7 +9,7 @@
     <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
         <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
             <i class="tf-icons ti ti-vocabulary text-main" style="font-size: 25px;"></i>
-            กรุณากรอกรายละเอียดสัญญาเช่า {{count($room_for_rent)}}
+            กรุณากรอกรายละเอียดสัญญาเช่า
         </h5>
         <div class="row g-3 p-4 pt-1">
             <div class="col-sm-5">
@@ -18,7 +18,7 @@
             </div>
             <div class="col-sm-7">
                 <label for="exampleFormControlInput2" class="form-label">ที่อยู่ผู้เข้าพัก</label>
-                <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $renter->address.' '.$address }}" />
+                <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ $renter->fullThaiAddress() }}" />
             </div>
             <div class="col-sm-6">
                 <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label>
@@ -41,6 +41,12 @@
                 <label for="contract_date_to_all" class="form-label">วันที่สิ้นสุดสัญญา </label>
                 <input type="text" name="contract_date_to" class="form-control date_contract_all" placeholder="" id="contract_date_to_all" required autocomplete="off" value=""/>
             </div>
+
+            <div class="col-sm-6">
+                <label for="deposit_all" class="form-label">เงินประกันห้อง(กำหนดยอดค่าประกันแต่ละห้อง) </label>
+                <input type="number" name="deposit_all" class="form-control" placeholder="" id="deposit_all" required autocomplete="off"/>
+            </div>
+
             <div class="col-sm-12">
                 <label for="remark" class="form-label">หมายเหตุ</label>
                 <input type="text" name="remark" class="form-control" id="remark" placeholder="" value="" value="" />
@@ -93,7 +99,7 @@
             <div class="col-sm-6">
                 <input type="hidden" name="contract[{{$key}}][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
                 <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท) <span class="text-danger">*</span></label>
-                <input type="number" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control" id="security_deposit" placeholder="" value="" required/>
+                <input type="number" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control security-deposit-room" id="security_deposit" placeholder="" value="" required/>
             </div>
             {{-- <div class="col-sm-6 d-flex align-items-end pb-1">
                 <button
@@ -251,6 +257,14 @@
             });
     </script>
     <script>
+        
+        $('#deposit_all').on('input', function () {
+            let depositValue = $(this).val();
+
+            $('.security-deposit-room').each(function () {
+                $(this).val(depositValue);
+            });
+        });
         $('.reservation_payment_channel').on('change', function() {
             const paymentChannel = $('.reservation_payment_channel:checked').val();
 

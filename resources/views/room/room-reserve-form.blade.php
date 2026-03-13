@@ -281,11 +281,11 @@
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <label for="exampleFormControlInput3" class="form-label">เบอร์โทรศัพท์ (ตัวอย่าง. 0815578945)</label><span class="text-danger">*</span></label>
-                                                    <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="{{ $t_phone }}" oninput="this.value=this.value.slice(0,10);" pattern="^\d{9,10}$" required/>
+                                                    <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="{{ $t_phone }}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10);" required/>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <label for="exampleFormControlInput4" class="form-label">เลขบัตรประชาชน/Passport</label><span class="text-danger">*</span></label>
-                                                    <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ $t_id_code_number }}" oninput="this.value=this.value.slice(0,13);" pattern="^\d{13}$" required/>
+                                                    <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ $t_id_code_number }}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,13);"  required/>
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <label for="exampleFormControlInput5" class="form-label">ที่อยู่ตามสำเนาทะเบียนบ้าน</label>
@@ -553,6 +553,17 @@
                                                 รายละเอียดการชำระเงิน
                                             </h5>
                                             <div class="row g-3 p-4 pt-1">
+                                                <div class="col-sm-2">
+                                                    <input name="deposit_status" class="form-check-input deposit_status me-1" type="radio" id="deposit_status_1" value="1" checked>
+                                                    <label class="form-check-label" for="deposit_status_1"> มีค่ามัดจำ </label>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <input name="deposit_status" class="form-check-input deposit_status me-1" type="radio" id="deposit_status_2" value="2">
+                                                    <label class="form-check-label" for="deposit_status_2"> ไม่มีค่ามัดจำ </label>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 p-4 pt-1" id="paymentSection" >
+
                                                 <div class="col-sm-12">
                                                     <label for="reserve_deposit" class="form-label">ค่ามัดจำ (บาท)</label>
                                                     <input type="number" name="deposit" class="form-control" id="reserve_deposit" placeholder="ค่ามัดจำ (บาท)" value="0" oninput="cal_total_amount()"/>
@@ -750,9 +761,33 @@
 </html>
 <iframe id="print-iframe" style="display: none;"></iframe>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
-
 <script>
 $(document).ready(function() {
+    
+        function toggleDepositSection() {
+            let depositStatus = $('input[name="deposit_status"]:checked').val();
+
+            if (depositStatus == 2) { // ไม่มีค่ามัดจำ
+                $('#paymentSection')
+                    .css('opacity', '0.5')
+                    .find('input, select, textarea, button')
+                    .prop('disabled', true);
+            } else { // มีค่ามัดจำ
+                $('#paymentSection')
+                    .css('opacity', '1')
+                    .find('input, select, textarea, button')
+                    .prop('disabled', false);
+            }
+        }
+
+        // โหลดครั้งแรก
+        toggleDepositSection();
+
+        // เปลี่ยน radio
+        $('input[name="deposit_status"]').on('change', function () {
+            toggleDepositSection();
+        });
+
         $('.user-tags').on('itemAdded', function (event) {
             // alert(12323);
             const value = event.item;
@@ -879,8 +914,11 @@ $(document).ready(function() {
             }
             
             var reserve_deposit = $('#reserve_deposit').val();
-            if(reserve_deposit < 1){
-                return Swal.fire('กรุณากรอก ค่ามัดจำ', '', 'warning');
+            let depositStatus = $('input[name="deposit_status"]:checked').val();
+            if(depositStatus == 1){
+                if(reserve_deposit < 1){
+                    return Swal.fire('กรุณากรอก ค่ามัดจำ', '', 'warning');
+                }
             }
             
             Swal.fire({

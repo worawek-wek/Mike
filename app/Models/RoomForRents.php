@@ -36,6 +36,11 @@ class RoomForRents extends Model
         return $this->hasOne('App\Models\RentBill', 'ref_room_for_rent_id', 'id');
     }
 
+    public function rent_bill_reserve()
+    {
+        return $this->hasOne('App\Models\RentBill', 'ref_room_for_rent_id', 'id')->where('ref_type_id', 3);
+    }
+
     public function branch()
     {
         return $this->hasOne('App\Models\Branch', 'id', 'ref_branch_id');
@@ -43,6 +48,11 @@ class RoomForRents extends Model
     public function renter()
     {
         return $this->hasOne('App\Models\Renter', 'id', 'ref_renter_id');
+    }
+
+    public function vehicles()
+    {
+        return $this->hasMany(\App\Models\Vehicle::class, 'ref_room_for_rent_id', 'id');
     }
     
     public function rent_bill_not_pay()

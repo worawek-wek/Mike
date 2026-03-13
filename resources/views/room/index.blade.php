@@ -761,7 +761,7 @@
                                         <input type="number" class="form-control water-old" oninput="calculateUsed(this)" readonly/>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control water-new" oninput="calculateUsed(this)" readonly/>
+                                        <input type="number" class="form-control water-new" oninput="calculateUsed(this)" />
                                     </td>
                                     <td>
                                         <input type="number" class="form-control water-used" readonly />

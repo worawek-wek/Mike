@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Booking;
+use App\Models\RoomForRents;
+use App\Models\Renter;
 use App\Models\Contract;
 use App\Models\Position;
 use App\Models\Branch;
@@ -714,7 +717,7 @@ class ReportController extends Controller
         foreach($results as $key=>$row){
             $data[] = [
                         $row->room->name,
-                        $row->receipt_rent_bill_move_out->total_amount ?? "-",
+                        $row->receipt_rent_bill_move_out->sum('total_amount') ?? "-",
                         $row->receipt_move_out->total_amount ?? "-",
                         $row->deposit_move_out->total_amount ?? "-",
                         $row->total_amount >= 0 ? "ยอดเงินประกันคืนผู้เช่า ".abs($row->total_amount) : "เก็บเงินผู้เช่าเพิ่ม ".abs($row->total_amount)
@@ -821,37 +824,27 @@ class ReportController extends Controller
     public function monthly_booking_datatable(Request $request)
     {
         // $receipt = Receipt:;
-        $results = Receipt::orderBy('rooms.name', 'ASC')
-                            ->join('renters', 'receipts.ref_renter_id', '=', 'renters.id')
-                            ->join('rooms', 'receipts.ref_room_id', '=', 'rooms.id')
-                            ->join('room_for_rents', function($join) {
-                                $join->on('receipts.ref_room_id', '=', 'room_for_rents.ref_room_id')
-                                    ->whereColumn('receipts.ref_renter_id', '=', 'room_for_rents.ref_renter_id');
-                            })
-                            ->join('floors', 'rooms.ref_floor_id', '=', 'floors.id')
-                            ->join('buildings', 'floors.ref_building_id', '=', 'buildings.id')
-                            ->where('buildings.ref_branch_id', session("branch_id"))
-                            ->where('receipts.ref_type_id', 3)
-                            ->select(
-                                'receipts.*',
-                                'renters.prefix',
-                                DB::raw('CONCAT(renters.name, " ", COALESCE(renters.surname, "")) as renter_name'),
-                                'renters.booking_date',
-                                'room_for_rents.payment_method as payment_method',
-                                'room_for_rents.date_stay as date_stay',
-                                'room_for_rents.deposit as deposit',
-                                'rooms.name as room_name',
-                                'rooms.rent'
-                            )
-                            ->distinct('receipts.id');
+        $results = Booking::orderBy(
+                                    DB::table('room_for_rents')
+                                        ->select('renters.booking_date')
+                                        ->join('renters', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                                        ->whereColumn('room_for_rents.id', 'bookings.ref_room_for_rent_id'),
+                                    'asc'
+                                            );
 
                         // ตรวจสอบว่า $request->month มีค่าและอยู่ในรูปแบบที่ถูกต้อง
         if (!empty($request->month) && preg_match('/^\d{4}-\d{2}$/', $request->month)) {
             [$year, $month] = explode('-', $request->month);
-            $results = $results->whereYear('renters.booking_date', $year)
-                            ->whereMonth('renters.booking_date', $month);
+            $results = $results->whereHas('room_for_rent.renter', function ($query) use ($year, $month) {
+                                    $query->whereYear('booking_date', $year)
+                                        ->whereMonth('booking_date', $month);
+                                });
         }
+        $reserveQuery = clone $results;
+        $cancelQuery  = clone $results;
 
+        $data['reserve'] = $reserveQuery->count();
+        $data['cancel']  = $cancelQuery->where('status_cancel', 1)->count();
                         // จัดการเรื่อง limit
         $limit = $request->limit ?? 15;
 

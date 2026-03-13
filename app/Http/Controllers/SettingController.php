@@ -794,7 +794,7 @@ class SettingController extends Controller
             $ref_room_id = explode(',',$request->ref_room_id);
             RoomHasDiscount::whereIn('ref_room_id', $ref_room_id)->delete();
             foreach($ref_room_id as $room_id){
-                foreach($request->ref_discount_id as $id){
+                foreach($request->ref_discount_id ?? [] as $id){
                     $insert = new RoomHasDiscount;
                     $insert->ref_room_id  =  $room_id;
                     $insert->ref_discount_id  =  $id;

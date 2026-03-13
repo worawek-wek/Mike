@@ -145,7 +145,9 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก</div>
+        <div class="header">ใบย้ายออก
+            {{-- (ผู้เช่าหนี) --}}
+        </div>
         <table class="table-info">
             <tr>
                 <td>
@@ -161,7 +163,7 @@
                 <td style="text-align: right;">
                     <strong>ต้นฉบับ (Original)</strong><br>
                     เลขที่(ID) {{ $invoice_contract->invoice_number }}<br>
-                    วันที่(Date) {{ date('d/m/Y') }}<br>
+                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice_contract->created_at)) }}<br>
                     ห้อง(Room) {{ $invoice_contract->room_for_rent->room->name }}<br>
                     พนักงาน(Staff) {{ $invoice_contract->user->name }}<br>
                 </td>
@@ -172,7 +174,7 @@
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
         <div class="full-width">
-            @if (@$receipt_rent_room_not_deducted || @$receipt_bad_debt_not_deducted)
+            @if (@$receipt_rent_room_not_deducted || @$receipt_move_out_not_deducted)
             <table class="table">
                 <tr>
                     <th width="1px">ลำดับ</th>
@@ -196,8 +198,8 @@
                         @endforeach
                     @endforeach
                 @endif
-                @if (@$receipt_bad_debt_not_deducted)
-                    @foreach ($receipt_bad_debt_not_deducted->payment_list as $key => $rmond_list)
+                @if (@$receipt_move_out_not_deducted)
+                    @foreach ($receipt_move_out_not_deducted->payment_list as $key => $rmond_list)
                         <tr>
                             <td class="pt-5"> {{ $num++ }} </td>
                             <td class="pt-5">{{ $rmond_list->title }}</td>
@@ -213,7 +215,7 @@
                         <th class="pt-5" align="center">
                             รวมจำนวนเงินรับ
                         </th>
-                        <td class="pt-5" width="90px"> {{ number_format(($receipt_bad_debt_not_deducted->total_amount ?? 0.00)+($receipt_rent_room_not_deducted->sum('total_amount') ?? 0.00) , 2) }}</td>
+                        <td class="pt-5" width="90px"> {{ number_format(($receipt_move_out_not_deducted->total_amount ?? 0.00)+($receipt_rent_room_not_deducted->sum('total_amount')  ?? 0.00) , 2) }}</td>
                     </tr>
             </table>
         @endif
@@ -239,7 +241,7 @@
                         <td class="pt-5"> {{ number_format($ic_list->price, 2) }}</td>
                     </tr>
                 @endforeach
-                    {{-- รายการใบเสร็จค่าเช่าห้อง ที่ชำระโดยหักเงินประกัน --}}
+
                 @if (@$receipt_rent_room_deducted)
                     @foreach ($receipt_rent_room_deducted as $deducted_row)
                         @foreach ($deducted_row->payment_list as $key2 => $rmod_list)
@@ -252,9 +254,9 @@
                         @endforeach
                     @endforeach
                 @endif
-                    {{-- รายการใบเสร็จย้ายออก ที่ชำระโดยหักเงินประกัน --}}
-                @if (@$receipt_bad_debt_deducted)
-                    @foreach ($receipt_bad_debt_deducted->payment_list as $key2 => $rmod_list)
+                
+                @if (@$receipt_move_out_deducted)
+                    @foreach ($receipt_move_out_deducted->payment_list as $key2 => $rmod_list)
                         <tr>
                             <td class="pt-5"> {{ $key_count2++ }} </td>
                             <td class="pt-5"> {{ $rmod_list->title }}
@@ -279,15 +281,15 @@
                 <td style="font-size: large;width: 20%;" rowspan="2">
                     <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="65%" >
                 </td>
-                @if ($cal <= 0)
-                    <td style="font-size: 12px !important;">สรุป เก็บเงินผู้เช่าเพิ่ม</td>
+                @if ($cal > 0)
+                    <td style="font-size: 12px !important;">สรุป คืนเงินประกันผู้เช่า</td>
                     <td>
                         <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
                         <br>
                         ({{ $amount_thai }})
                     </td>
                 @else
-                    <td style="font-size: 12px !important;">สรุป คืนเงินประกันผู้เช่า</td>
+                    <td style="font-size: 12px !important;">สรุป เก็บเงินผู้เช่าเพิ่ม</td>
                     <td>
                         <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
                         <br>
@@ -315,10 +317,10 @@
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
-        @if(@$receipt_rent_room_not_deducted || @$receipt_bad_debt_not_deducted)
+        @if(@$receipt_rent_room_not_deducted || $receipt_move_out_not_deducted)
             <div style="page-break-before: always;"></div>
             <div>&nbsp;</div>
-        @elseif(count(@$invoice_contract->payment_not_discount ?? [])+count(@$receipt_rent_room_deducted->payment_list ?? [])+count(@$receipt_bad_debt_deducted->payment_list ?? []) < 6)
+        @elseif(count($receipt_rent_room_deducted->payment_list ?? [])+count($receipt_move_out_deducted->payment_list ?? [])+count($invoice_contract->payment_not_discount) < 6)
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
             <div style="page-break-before: always;"></div>
@@ -333,7 +335,9 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก</div>
+        <div class="header">ใบย้ายออก
+            {{-- (ผู้เช่าหนี) --}}
+        </div>
         <table class="table-info">
             <tr>
                 <td>
@@ -349,7 +353,7 @@
                 <td style="text-align: right;">
                     <strong>สำเนา (Copy)</strong><br>
                     เลขที่(ID) {{ $invoice_contract->invoice_number }}<br>
-                    วันที่(Date) {{ date('d/m/Y') }}<br>
+                    วันที่(Date) {{ date('d/m/Y',strtotime($invoice_contract->created_at)) }}<br>
                     ห้อง(Room) {{ $invoice_contract->room_for_rent->room->name }}<br>
                     พนักงาน(Staff) {{ $invoice_contract->user->name }}<br>
                 </td>
@@ -360,7 +364,7 @@
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
        
         <div class="full-width">
-            @if (@$receipt_rent_room_not_deducted || @$receipt_bad_debt_not_deducted)
+            @if (@$receipt_rent_room_not_deducted || @$receipt_move_out_not_deducted)
             <table class="table">
                 <tr>
                     <th width="1px">ลำดับ</th>
@@ -384,8 +388,8 @@
                         @endforeach
                     @endforeach
                 @endif
-                @if (@$receipt_bad_debt_not_deducted)
-                    @foreach ($receipt_bad_debt_not_deducted->payment_list as $key => $rmond_list)
+                @if (@$receipt_move_out_not_deducted)
+                    @foreach ($receipt_move_out_not_deducted->payment_list as $key => $rmond_list)
                         <tr>
                             <td class="pt-5"> {{ $num++ }} </td>
                             <td class="pt-5">
@@ -403,7 +407,7 @@
                         <th class="pt-5" align="center">
                             รวมจำนวนเงินรับ
                         </th>
-                        <td class="pt-5" width="90px"> {{ number_format(($receipt_bad_debt_not_deducted->total_amount ?? 0.00)+($receipt_rent_room_not_deducted->sum('total_amount') ?? 0.00) , 2) }}</td>
+                        <td class="pt-5" width="90px"> {{ number_format(($receipt_move_out_not_deducted->total_amount ?? 0.00)+($receipt_rent_room_not_deducted->sum('total_amount') ?? 0.00) , 2) }}</td>
                     </tr>
             </table>
             @endif
@@ -431,7 +435,7 @@
                         <td class="pt-5"> {{ number_format($icpl->price, 2) }}</td>
                     </tr>
                 @endforeach
-                {{-- รายการใบเสร็จค่าเช่าห้อง ที่ชำระโดยหักเงินประกัน --}}
+
                 @if (@$receipt_rent_room_deducted)
                     @foreach ($receipt_rent_room_deducted as $deducted_row)
                         @foreach ($deducted_row->payment_list as $key2 => $rmod_list)
@@ -444,14 +448,18 @@
                         @endforeach
                     @endforeach
                 @endif
-                    {{-- รายการใบเสร็จย้ายออก ที่ชำระโดยหักเงินประกัน --}}
-                @if (@$receipt_bad_debt_deducted)
-                    @foreach ($receipt_bad_debt_deducted->payment_list as $key2 => $rmod_list)
+                
+                @if (@$receipt_move_out_deducted)
+                    @foreach ($receipt_move_out_deducted->payment_list as $key2 => $ip_list)
+                        @php
+                            $pd_5px = "";
+                        @endphp
                         <tr>
-                            <td class="pt-5"> {{ $key_count2++ }} </td>
-                            <td class="pt-5"> {{ $rmod_list->title }}
+                            <td class="pt-5"> {{ $key_count2_copy++ }} </td>
+                            {{-- <td class="pt-5"> {{ $key2+count($invoice_contract->payment_not_discount) }} </td> --}}
+                            <td class="pt-5"> {{ $ip_list->title }}
                             </td>
-                            <td class="pt-5">{{  ($rmod_list->discount == 1 ? "" : "-").number_format($rmod_list->price, 2) }}</td>
+                            <td class="pt-5">{{  ($ip_list->discount == 1 ? "" : "-").number_format($ip_list->price, 2) }}</td>
                         </tr>
                     @endforeach
                 @endif
@@ -465,21 +473,21 @@
             
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
-        
+
         <table class="total-table">
             <tr style="vertical-align: top;">
                 <td style="font-size: large;width: 20%;" rowspan="2">
                     <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="65%" >
                 </td>
-                @if ($cal <= 0)
-                    <td style="font-size: 12px !important;">สรุป เก็บเงินผู้เช่าเพิ่ม</td>
+                @if ($cal > 0)
+                    <td style="font-size: 12px !important;">สรุป คืนเงินประกันผู้เช่า</td>
                     <td>
                         <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
                         <br>
                         ({{ $amount_thai }})
                     </td>
                 @else
-                    <td style="font-size: 12px !important;">สรุป คืนเงินประกันผู้เช่า</td>
+                    <td style="font-size: 12px !important;">สรุป เก็บเงินผู้เช่าเพิ่ม</td>
                     <td>
                         <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
                         <br>

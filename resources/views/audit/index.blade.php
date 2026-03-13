@@ -178,7 +178,7 @@
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="col-md-3 mt-1" style="padding-right: unset !important;font-weight: 500;" align="right">
+                                                    <div class="col-md-1 mt-1" style="padding-right: unset !important;font-weight: 500;" align="right">
                                                         <span style="font-size: 18px"></span><span style="font-size: 16px"> วันที่</span>
                                                     </div>
                                                     <div class="col-md-2" style="padding-right: unset !important;">
@@ -203,6 +203,19 @@
                                                                     <i class="ti ti-upload"></i> 
                                                                     ดาวน์โหลด Excel
                                                                 </span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2" style="padding-right: unset !important;">
+                                                        <button
+                                                                style="padding-right: 14px;padding-left: 14px;"
+                                                                class="btn btn-label-primary buttons-collection waves-effect waves-light me-2 d-write"
+                                                                tabindex="0" aria-controls="DataTables_Table_0"
+                                                                type="button" aria-haspopup="dialog"
+                                                                aria-expanded="false"
+                                                                onclick="printPdfInvoice('all')"
+                                                                >
+                                                            <span>
+                                                            <i class="ti ti-file-upload"></i> พิมพ์หลายห้อง</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -270,7 +283,7 @@
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="col-md-3 mt-1" style="padding-right: unset !important;font-weight: 500;" align="right">
+                                                    <div class="col-md-1 mt-1" style="padding-right: unset !important;font-weight: 500;" align="right">
                                                         <span style="font-size: 18px"></span><span style="font-size: 16px"> วันที่</span>
                                                     </div>
                                                     <div class="col-md-2" style="padding-right: unset !important;">
@@ -294,6 +307,19 @@
                                                                     <i class="ti ti-upload"></i> 
                                                                     ดาวน์โหลด Excel
                                                                 </span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2" style="padding-right: unset !important;">
+                                                        <button
+                                                                style="padding-right: 14px;padding-left: 14px;"
+                                                                class="btn btn-label-success buttons-collection waves-effect waves-light me-2 d-write"
+                                                                tabindex="0" aria-controls="DataTables_Table_0"
+                                                                type="button" aria-haspopup="dialog"
+                                                                aria-expanded="false"
+                                                                onclick="printPdfReceipt('all')"
+                                                                >
+                                                            <span>
+                                                            <i class="ti ti-file-upload"></i> พิมพ์หลายห้อง</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -355,8 +381,19 @@
     loadReceiptData(receipt_page);
     
     function printPdfReceipt(id) {
+
+        let url = '/pdf/receipt/'+id;
+
+        if(id == "all"){
+            let ids = $('.ids_receipt:checked').map((i, el) => el.value).get();
+            if (ids.length === 0){
+                return Swal.fire('โปรดเลือกรายการใบเสร็จ', '', 'warning');
+            }
+            url = '/pdf/receipt_all/'+ids;
+        }
+
         $.ajax({
-            url: '/pdf/receipt/'+id,
+            url: url,
             type: 'GET',
             success: function(html) {
                 const iframe = document.getElementById('print-iframe');
@@ -379,8 +416,19 @@
     }
 
     function printPdfInvoice(id) {
+
+        let url = '/pdf/invoice/'+id;
+
+        if(id == "all"){
+            let ids = $('.ids_invoice:checked').map((i, el) => el.value).get();
+            if (ids.length === 0){
+                return Swal.fire('โปรดเลือกรายการใบแจ้งหนี้', '', 'warning');
+            }
+            url = '/pdf/invoice_all/'+ids;
+        }
+
         $.ajax({
-            url: '/pdf/invoice/'+id,
+            url: url,
             type: 'GET',
             success: function(html) {
                 const iframe = document.getElementById('print-iframe');

@@ -92,7 +92,7 @@ class RenterController extends Controller
                             ->where('renters.ref_branch_id', session("branch_id"))
                             // ->whereIn('rooms.status', [0])
                             ->whereIn('room_for_rents.status', [0])
-                            ->select('renters.*', 'rooms.name as room_name');
+                            ->select('renters.*', 'rooms.name as room_name', 'rooms.id as room_id');
         if(@$request->search){
 
             if(@$request->search_type == 1){ // ชื่อ - นามสกุล
@@ -157,7 +157,7 @@ class RenterController extends Controller
         // กำหนดสถานะและข้อความตาม status
         if ($status == '0') {
             // ผู้เช่าเก่า
-            $roomStatus = [0];
+            $roomStatus = [0,1,2];
             $roomForRentStatus = [0];
             $titleText = 'ผู้เช่าเก่า';
         } else {
@@ -167,103 +167,97 @@ class RenterController extends Controller
             $titleText = 'ผู้เช่าปัจจุบัน';
         }
         
-        $results = Room::whereIn('status', $roomStatus)
-                        ->whereHas('room_for_rent_s', function($query) use ($roomForRentStatus) {
-                            $query->whereIn('status', $roomForRentStatus);
-                        })
-                        ->whereHas('room_for_rent_s.renter.vehicles')
-                        ->with(['room_for_rent_s' => function($query) use ($roomForRentStatus) {
-                            $query->whereIn('status', $roomForRentStatus);
-                        }, 'room_for_rent_s.renter.vehicles'])
-                        ->orderBy('id', 'DESC')
-                        ->whereHas('floor.building', function ($query) {
-                            $query->where('ref_branch_id', session("branch_id"));
-                        })
+        $results = Renter::join('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
+                            ->join('rooms', 'room_for_rents.ref_room_id', '=', 'rooms.id')
+                            ->where('renters.ref_branch_id', session("branch_id"))
+                            ->whereIn('rooms.status', $roomStatus)
+                            ->whereIn('room_for_rents.status', $roomForRentStatus)
+                            ->select('renters.*', 'rooms.name as room_name', 'rooms.id as room_id')
                         ->get();
                         
-        $sheet->fromArray([
-            ['ข้อมูล' . $titleText],
-            ['ข้อมูล' . $titleText . ' วันที่ '.date('d/m/Y')],
-            ["ลำดับ","ชื่อผู้เช่า","ห้อง","เบอร์ติดต่อ","ยานพาหนะ","วันที่เข้าพัก","วันสิ้นสุดสัญญาเช่า","อายุสัญญา"]
-        ], null, 'A1');
+        // $sheet->fromArray([
+        //     ['ข้อมูล' . $titleText],
+        //     ['ข้อมูล' . $titleText . ' วันที่ '.date('d/m/Y')],
+        //     ["ลำดับ","ชื่อผู้เช่า","ห้อง","เบอร์ติดต่อ","ยานพาหนะ","วันที่เข้าพัก","วันสิ้นสุดสัญญาเช่า","อายุสัญญา"]
+        // ], null, 'A1');
 
-        $sheet->mergeCells('A1:H1');
-        $sheet->mergeCells('A2:H2');
-        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        // $sheet->mergeCells('A1:H1');
+        // $sheet->mergeCells('A2:H2');
+        // $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $rowNum = 4; // แถวเริ่มเขียน
-        $counter = 1;
+        // $rowNum = 4; // แถวเริ่มเขียน
+        // $counter = 1;
 
-        foreach ($results as $room) {
-            foreach ($room->room_for_rent_s as $rentData) {
-                $renter = $rentData->renter;
-                $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
-                $phone = $renter->phone;
-                $vehicles = $renter->vehicles ?? [];
+        // foreach ($results as $room) {
+        //     foreach ($room->room_for_rent_s as $rentData) {
+        //         $renter = $rentData->renter;
+        //         $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
+        //         $phone = $renter->phone;
+        //         $vehicles = $renter->vehicles ?? [];
 
 
-                $endDate = '-';
-                if(@$room->contract->contract_date){
-                        $contractDate = $room->contract->contract_date;
-                        $contract_date_text = date('d/m/Y', strtotime($contractDate));
-                        $period = $room->contract->period;
-                        $endDate = null;
+        //         $endDate = '-';
+        //         if(@$room->contract->contract_date){
+        //                 $contractDate = $room->contract->contract_date;
+        //                 $contract_date_text = date('d/m/Y', strtotime($contractDate));
+        //                 $period = $room->contract->period;
+        //                 $endDate = null;
 
-                        if ($contractDate && $period) {
-                            $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
-                        }
+        //                 if ($contractDate && $period) {
+        //                     $endDate = date('d/m/Y', strtotime("+{$period} months", strtotime($contractDate)));
+        //                 }
 
-                }else{
-                    $endDate = '-';
-                    $contract_date_text = '-';
-                }
+        //         }else{
+        //             $endDate = '-';
+        //             $contract_date_text = '-';
+        //         }
                         
-                $vehicleCount = max(1, count($vehicles)); // ถ้าไม่มีรถก็ 1 แถว
+        //         $vehicleCount = max(1, count($vehicles)); // ถ้าไม่มีรถก็ 1 แถว
 
-                // Merge cells สำหรับ ลำดับ, ชื่อผู้เช่า, ห้อง, เบอร์ติดต่อ
-                $mergeStart = $rowNum;
-                $mergeEnd = $rowNum + $vehicleCount - 1;
-                $sheet->mergeCells("A{$mergeStart}:A{$mergeEnd}");
-                $sheet->mergeCells("B{$mergeStart}:B{$mergeEnd}");
-                $sheet->mergeCells("C{$mergeStart}:C{$mergeEnd}");
-                $sheet->mergeCells("D{$mergeStart}:D{$mergeEnd}");
+        //         // Merge cells สำหรับ ลำดับ, ชื่อผู้เช่า, ห้อง, เบอร์ติดต่อ
+        //         $mergeStart = $rowNum;
+        //         $mergeEnd = $rowNum + $vehicleCount - 1;
+        //         $sheet->mergeCells("A{$mergeStart}:A{$mergeEnd}");
+        //         $sheet->mergeCells("B{$mergeStart}:B{$mergeEnd}");
+        //         $sheet->mergeCells("C{$mergeStart}:C{$mergeEnd}");
+        //         $sheet->mergeCells("D{$mergeStart}:D{$mergeEnd}");
 
-                // ใส่ข้อมูลในเซลล์ที่ merge
-                $sheet->setCellValue("A{$mergeStart}", $counter++);
-                $sheet->setCellValue("B{$mergeStart}", $renterName);
-                $sheet->setCellValue("C{$mergeStart}", $room->name);
-                $sheet->setCellValue("D{$mergeStart}", $phone);
+        //         // ใส่ข้อมูลในเซลล์ที่ merge
+        //         $sheet->setCellValue("A{$mergeStart}", $counter++);
+        //         $sheet->setCellValue("B{$mergeStart}", $renterName);
+        //         $sheet->setCellValue("C{$mergeStart}", $room->name);
+        //         $sheet->setCellValue("D{$mergeStart}", $phone);
 
-                if(!empty($vehicles)){
-                    foreach($vehicles as $vehicle){
-                        $sheet->setCellValue("E{$rowNum}", $vehicle->car_registration . ' (' . $vehicle->detail . ')');
-                        $sheet->setCellValue("F{$rowNum}", $contract_date_text);
-                        $sheet->setCellValue("G{$rowNum}", $endDate);
-                        $sheet->setCellValue("H{$rowNum}", $room->contract->period);
+        //         if(!empty($vehicles)){
+        //             foreach($vehicles as $vehicle){
+        //                 $sheet->setCellValue("E{$rowNum}", $vehicle->car_registration . ' (' . $vehicle->detail . ')');
+        //                 $sheet->setCellValue("F{$rowNum}", $contract_date_text);
+        //                 $sheet->setCellValue("G{$rowNum}", $endDate);
+        //                 $sheet->setCellValue("H{$rowNum}", $room->contract->period);
 
-                        $rowNum++;
-                    }
-                } else {
-                    $sheet->setCellValue("E{$rowNum}", '');
-                    $sheet->setCellValue("F{$rowNum}", $contract_date_text);
-                    $sheet->setCellValue("G{$rowNum}", $endDate);
-                    $sheet->setCellValue("H{$rowNum}", $room->contract->period);
+        //                 $rowNum++;
+        //             }
+        //         } else {
+        //             $sheet->setCellValue("E{$rowNum}", '');
+        //             $sheet->setCellValue("F{$rowNum}", $contract_date_text);
+        //             $sheet->setCellValue("G{$rowNum}", $endDate);
+        //             $sheet->setCellValue("H{$rowNum}", $room->contract->period);
 
-                    $rowNum++;
-                }
-            }
-        }
+        //             $rowNum++;
+        //         }
+        //     }
+        // }
 
-        // ปรับความกว้างคอลัมน์อัตโนมัติ
-        foreach(range('A','H') as $col){
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        // // ปรับความกว้างคอลัมน์อัตโนมัติ
+        // foreach(range('A','H') as $col){
+        //     $sheet->getColumnDimension($col)->setAutoSize(true);
+        // }
 
-        $writer = new WriterXlsx($spreadsheet);
-        $filename = "ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx";
-        $writer->save("upload/export_excel/".$filename);
+        // $writer = new WriterXlsx($spreadsheet);
+        // $filename = "ข้อมูลผู้ใช้งาน".date('m-Y', strtotime('-1 month')).".xlsx";
+        // $writer->save("upload/export_excel/".$filename);
 
-        return redirect("upload/export_excel/".$filename);
+        // return redirect("upload/export_excel/".$filename);
 
         $data = 
         [
@@ -316,12 +310,20 @@ class RenterController extends Controller
                 $endDate = '-';
                 $contract_date_text = '-';
             }
+            $vehicles_text = "";
+            foreach ($row->vehicles as $vehicles){
+                
+                if ($vehicles->ref_room_id != $row->room_id){
+                    continue;
+                }
+                $vehicles_text .= "$vehicles->car_registration $vehicles->detail |";
+            }
             $data[] = [
                         $key+1,
                         $row->prefix.' '.$row->name.' '.$row->surname,
                         $row->room_for_rent->room->name,
                         $row->phone,
-                        @$row->vehicle->car_registration ?? '-',
+                        $vehicles_text,
                         $contract_date_text,
                         $endDate,
                         $row->room_for_rent->room->contract->period ?? '-',

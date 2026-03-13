@@ -89,7 +89,7 @@
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <label for="yearSelect">ปี</label>
                                             
-                                            <select id="yearSelect" class="form-control"></select>
+                                            <select id="yearSelect" class="form-control p_search" name="year" onchange="loadData()"></select>
 
                                                 <script>
                                                 const yearSelect = document.getElementById("yearSelect");
@@ -201,12 +201,12 @@
                 var inputValue = $(this).val();
                 searchData[inputName] = inputValue;
             });
-
             $.ajax({
                 type: "GET",
                 url: pages,
                 data: searchData,
                 success: function(res) {
+                    // alert(456)
                     chart1.updateSeries([
                                 { name: "ผู้เช่าเข้า", data: res.rentIn },
                                 { name: "ผู้เช่าออก", data: res.rentOut }

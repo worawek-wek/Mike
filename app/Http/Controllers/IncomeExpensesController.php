@@ -48,19 +48,23 @@ class IncomeExpensesController extends Controller
         
         if(@$request->search){
             $results = $results->Where(function ($query) use ($request) {
-                                    $query->where('label','LIKE','%'.$request->search.'%');
-                                        // ->orWhere('email','LIKE','%'.$request->search.'%');
+                                    $query->where('label','LIKE','%'.$request->search.'%')
+                                            ->orWhereHas('receipt', function ($q) use ($request) {
+                                                $q->where('receipt_number', 'LIKE', '%' . $request->search . '%');
+                                            });
                                 });
         }
 
         if(@$request->ref_category_id != "all"){
+            $results = $results->WhereHas('receipt', function ($q) use ($request) {
+                                    $q->where('ref_type_id', $request->ref_category_id);
+                                });
+            // if($request->ref_category_id == 2){
+            //     $results = $results->whereIN('ref_category_id',[0,$request->ref_category_id]);
 
-            if($request->ref_category_id == 2){
-                $results = $results->whereIN('ref_category_id',[0,$request->ref_category_id]);
-
-            }else{
-                $results = $results->Where('ref_category_id', $request->ref_category_id);
-            }
+            // }else{
+            //     $results = $results->Where('ref_category_id', $request->ref_category_id);
+            // }
         }
 
         if(@$request->type != "all"){

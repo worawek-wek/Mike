@@ -6,6 +6,11 @@
         id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
         <thead class="border-top">
             <tr class=" table-info">
+                <th class="sorting_disabled invoice-dt-checkboxes-cell-t invoice-dt-checkboxes-select-all-t"
+                    rowspan="1" colspan="1" style="width: 0px;"
+                    data-col="1" aria-label="">
+                    <input id="checkAll-T" type="checkbox" class="form-check-input">
+                </th>
                 <th class="text-center" tabindex="0" style="width: 40px;">
                     วันที่
                 </th>
@@ -41,6 +46,11 @@
         <tbody>
             @forelse ($list_data as $key => $row)
             <tr class="odd">
+                <td class="invoice-dt-checkboxes-cell-t">
+                    {{-- @if ($row_2->ref_status_id == 2) --}}
+                        <input type="checkbox" class="dt-checkboxes form-check-input ids_invoice" id="check-table-{{ $row->id }}" value="{{ $row->id }}">
+                    {{-- @endif --}}
+                </td>
                 <td class="text-center">
                     {{ date('d/m/Y', strtotime($row->created_at)) }}
                 </td>
@@ -156,3 +166,44 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        // เมื่อคลิกที่ checkbox ใน <th>
+        $('.invoice-dt-checkboxes-select-all-t input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบสถานะของ checkbox ใน <th>
+            var isChecked = $(this).prop('checked');
+            
+            // ทำให้ checkbox ทุกอันใน <td> ถูกเช็คหรือยกเลิกการเช็ค
+            $('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]').prop('checked', isChecked);
+            invoiceCheckNoCheckedT();
+        });
+
+        // เมื่อคลิกที่ checkbox ใน <td> (ตรวจสอบสถานะของทุก checkbox)
+        $('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]').on('change', function () {
+            // ตรวจสอบว่า checkbox ใน <td> ถูกเช็คหรือไม่
+            var allChecked = $('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]').length === $('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]:checked').length;
+            
+            // ถ้าทุก checkbox ใน <td> ถูกเช็ค จะทำให้ checkbox ใน <th> ถูกเช็ค
+            $('.invoice-dt-checkboxes-select-all-t input[type="checkbox"]').prop('checked', allChecked);
+            invoiceCheckNoCheckedT();
+        });
+        
+    });
+    invoiceCheckNoCheckedT();
+    // function floorCheckedT() {
+    //     $('.invoice-dt-checkboxes-select-all-t input[type="checkbox"]').prop('checked', true);
+    //         $('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]').prop('checked', true);
+    //         invoiceCheckNoCheckedT();
+    //     // });
+    // }
+    function invoiceCheckNoCheckedT() {
+        if ($('td.invoice-dt-checkboxes-cell-t input[type="checkbox"]:checked').length === 0) {
+        // ทำให้ปุ่มถูก disabled
+            $('#edit-rent').prop('disabled', true);
+        } else {
+            // ถ้ามี checkbox ถูกเช็ค ให้เปิดใช้งานปุ่ม
+            $('#edit-rent').prop('disabled', false);
+        }
+    }
+</script>

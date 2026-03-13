@@ -164,7 +164,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @foreach ($renter as $key => $rorc)
+                                @foreach ($room->room_for_rent_all as $key => $rorc)
                                     
                                 <div class="d-flex mb-2">
                                     <div class="col-sm-2">
@@ -172,7 +172,7 @@
                                     </div>
                                     <div class="col-sm-9 px-4">
                                         <b class="dam border-bottom border-light mb-2" style="display: block;">
-                                            {{ $rorc->prefix.' '.$rorc->full_name }}
+                                            {{ $rorc->renter->fullName() }}
                                             <span class="text-main mx-2" style="cursor: pointer;" onclick="addRenter({{ $room->id }}, {{ $rorc->id }})"><i class="ti ti-search"></i></span>
                                             @if ($key > 0)
                                                 <span class="text-danger" style="cursor: pointer;" onclick="deleteRenter({{ $room->id }}, {{ $rorc->id }})"><i class="ti ti-trash"></i></span>
@@ -181,14 +181,14 @@
                                             <b class="dam-l">
                                                 เบอร์โทร :
                                             </b>
-                                            <span>{{ $rorc->phone }}</span>
+                                            <span>{{ $rorc->renter->phone }}</span>
                                             <br>
                                             <b class="dam-l">
                                                 เลขบัตรประชาชน :
                                             </b>
-                                            <span>{{ $rorc->id_card_number }}</span>
+                                            <span>{{ $rorc->renter->id_card_number }}</span>
                                             
-                                        </div>
+                                    </div>
                                 </div>
                                 @endforeach
 
@@ -200,26 +200,26 @@
                                         onclick="addRenter({{ $room->id }})">
                                     <span><i class="ti ti-plus"></i> เพิ่มข้อมูลผู้เช่า</span>
                                 </button>
-
-                                <button class="btn btn-danger waves-effect waves-light"
-                                        type="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteReserve">
-                                    <span><i class="ti ti-x"></i> ยกเลิกการจอง</span>
-                                </button>
+                                @if ($room->status == 1)
+                                    <button class="btn btn-danger waves-effect waves-light"
+                                            type="button"
+                                            {{-- data-bs-toggle="modal"
+                                            data-bs-target="#deleteReserve" --}}
+                                            onclick="deleteReserve({{ $room->id }})">
+                                        <span><i class="ti ti-x"></i> ยกเลิกการจอง</span>
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>
                     
-<div class="modal fade modalHeadDecor" id="deleteReserve" tabindex="-1" aria-hidden="true">
+{{-- <div class="modal fade modalHeadDecor" id="deleteReserve" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content rounded-0">
             <div class="modal-header rounded-0">
                 <h5 class="modal-title" id="exampleModalLabel1">ยกเลิกการจอง</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            {{-- <form id="delete_reserve"> --}}
-                @csrf
                 <div class="modal-body">
                     <div class="col-md-12">
                         <label class="form-label">หมายเหตุ</label>
@@ -230,10 +230,9 @@
                     <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">ปิด</button>
                     <button type="button" id="submit_insert_contract" class="btn btn-main" onclick="deleteReserve()">ยกเลิกการจอง</button>
                 </div>
-            {{-- </form> --}}
         </div>
     </div>
-</div>
+</div> --}}
 {{-- ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า สัญญาเช่า
@@ -253,7 +252,7 @@
                                 </h5>
                                 <div class="row g-2 p-4 pt-1">
                                     <div class="col-sm-12">
-                                        <select name="ref_renter_id" id="select2RenterContract2" class="" onchange="get_room_rental_contract(this.value)" required>
+                                        <select name="ref_renter_id" id="select2RenterContract2" class="" onchange="get_reserve_room_by_renter(this.value)" required>
                                             <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                                             @foreach ($renter as $rent)
                                                 <option value="{{ $rent->id }}" selected>{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
@@ -437,6 +436,69 @@
     </div>
       
 <script>
+    
+    function deleteReserve() 
+    {
+        // var deposit_reserve_refund = $('input[name="deposit_reserve_refund"]:checked').val();
+        Swal.fire({
+            title: 'ยืนยันการดำเนินการ?',
+            text: 'คุณต้องการ ยกเลิก การจอง หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก',
+            showDenyButton: false,
+            didOpen: () => {
+                // โฟกัสที่ปุ่ม confirm
+                Swal.getConfirmButton().focus();
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //  Swal.fire('ยกเลิกการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
+                //                 return location.reload();
+                //                 // window.location.href = '/room';
+                //             });
+                // return ;
+                $.ajax({
+                    url: "{{$page_url}}/delete-reserve/{{ $room->occupancy_id }}", // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+                    type: 'POST',
+                    data: {
+                        _token : "{{ csrf_token() }}"
+                        // deposit_reserve_refund : deposit_reserve_refund
+                    },
+                    success: function(response) {
+                        if(response.message == null){
+                            Swal.fire('ยกเลิกการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
+                                window.location.href = '/room';
+                            });
+                        }else{
+                            Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            let messages = '';
+                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                messages += value + '<br>';
+                            });
+
+                            Swal.fire({
+                                title: 'เกิดข้อผิดพลาด',
+                                html: messages,
+                                icon: 'error',
+                            });
+                        } else {
+                            Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                            console.error('เกิดข้อผิดพลาด:', xhr);
+                        }
+                    }
+                });
+            } else if (result.isDismissed) {
+                // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+            }
+        });
+    }
+
     get_bill($('#select2month').val());
     function editAssetModal(){
             var myModal = new bootstrap.Modal(document.getElementById('editAssetModal'));
@@ -888,61 +950,61 @@
         $('#select2RenterContract').select2();
         // $('#select2RenterContract2').select2();
         
-        function deleteReserve() 
-        {
-            // var deposit_reserve_refund = $('input[name="deposit_reserve_refund"]:checked').val();
-            Swal.fire({
-                title: 'ยืนยันการดำเนินการ?',
-                text: 'คุณต้องการ ยกเลิก การจอง หรือไม่?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'ตกลง',
-                cancelButtonText: 'ยกเลิก',
-                showDenyButton: false,
-                didOpen: () => {
-                    // โฟกัสที่ปุ่ม confirm
-                    Swal.getConfirmButton().focus();
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{$page_url}}/delete-reserve/{{ $room->occupancy_id }}", // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
-                        type: 'POST',
-                        data: {
-                            _token : "{{ csrf_token() }}",
-                            deposit_reserve_refund : 2
-                        },
-                        success: function(response) {
-                            if(response.message == null){
-                                Swal.fire('ยกเลิกการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
-                                    window.location.href = '/room';
-                                });
-                            }else{
-                                Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
-                            }
-                        },
-                        error: function (xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.errors) {
-                                let messages = '';
-                                $.each(xhr.responseJSON.errors, function (key, value) {
-                                    messages += value + '<br>';
-                                });
+        // function deleteReserve() 
+        // {
+        //     // var deposit_reserve_refund = $('input[name="deposit_reserve_refund"]:checked').val();
+        //     Swal.fire({
+        //         title: 'ยืนยันการดำเนินการ?',
+        //         text: 'คุณต้องการ ยกเลิก การจอง หรือไม่?',
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'ตกลง',
+        //         cancelButtonText: 'ยกเลิก',
+        //         showDenyButton: false,
+        //         didOpen: () => {
+        //             // โฟกัสที่ปุ่ม confirm
+        //             Swal.getConfirmButton().focus();
+        //         }
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             $.ajax({
+        //                 url: "{{$page_url}}/delete-reserve/{{ $room->occupancy_id }}", // เปลี่ยน URL เป็นจุดหมายที่ต้องการ
+        //                 type: 'POST',
+        //                 data: {
+        //                     _token : "{{ csrf_token() }}",
+        //                     deposit_reserve_refund : 2
+        //                 },
+        //                 success: function(response) {
+        //                     if(response.message == null){
+        //                         Swal.fire('ยกเลิกการจองเรียบร้อยแล้ว', '', 'success').then((result) => {
+        //                             window.location.href = '/room';
+        //                         });
+        //                     }else{
+        //                         Swal.fire({ html: `<div style="color:red; font-size: 20px;">${response.message}</div>`, icon: 'error'} );
+        //                     }
+        //                 },
+        //                 error: function (xhr) {
+        //                     if (xhr.responseJSON && xhr.responseJSON.errors) {
+        //                         let messages = '';
+        //                         $.each(xhr.responseJSON.errors, function (key, value) {
+        //                             messages += value + '<br>';
+        //                         });
 
-                                Swal.fire({
-                                    title: 'เกิดข้อผิดพลาด',
-                                    html: messages,
-                                    icon: 'error',
-                                });
-                            } else {
-                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                                console.error('เกิดข้อผิดพลาด:', xhr);
-                            }
-                        }
-                    });
-                } else if (result.isDismissed) {
-                    // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
-                }
-            });
-        }
+        //                         Swal.fire({
+        //                             title: 'เกิดข้อผิดพลาด',
+        //                             html: messages,
+        //                             icon: 'error',
+        //                         });
+        //                     } else {
+        //                         Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+        //                         console.error('เกิดข้อผิดพลาด:', xhr);
+        //                     }
+        //                 }
+        //             });
+        //         } else if (result.isDismissed) {
+        //             // Swal.fire('ยกเลิกการดำเนินการ', '', 'info');
+        //         }
+        //     });
+        // }
 
 </script>

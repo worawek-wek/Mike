@@ -43,7 +43,7 @@
             <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
                 รายการชำระเงิน
             </label>
-            <table class="table table-bordered mt-2 table-detail" id="discount-table2"
+            <table class="table table-bordered mt-2 table-detail" id="form-receipt-move-out-discount-table2"
             @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */
                         opacity: 0.6;          /* ให้ดูจางลง */
@@ -75,8 +75,11 @@
                                 <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" required>
                             </td>
                             <td class="text-end">
-                                <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
-                                <input type="hidden" name="payment_list[discount][]" value="0">
+                                <div class="d-flex">
+                                    <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2 me-2" value="" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
+                                    <input type="hidden" name="payment_list[discount][]" value="0">
+                                    <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
+                                </div>
                             </td>
                         </tr>
 
@@ -85,7 +88,7 @@
                 <tfoot>
                     <tr>
                         <th>รวม</th>
-                        <th class="text-end mb-0 fw-bold total-price_2" id="amount_receipt_move_out">
+                        <th class="text-end mb-0 fw-bold receipt-total-price_2" id="amount_receipt_move_out">
                             0
                         </th>
                     </tr>
@@ -152,7 +155,7 @@
                 }
             </style>
             <script>
-
+                    get_room_rental_move_out("{{$renter[0]->id}}");
                 function addRow(title = '', price = '', isDiscount = 0) {
                     // alert(isDiscount);
                     const discountClass = isDiscount ? 'form-price_increase' : 'form-discount-value';
@@ -171,7 +174,7 @@
                                 </div>
                             </td>
                         </tr>`;
-                    $('#discount-table2 tbody').append(html);
+                    $('#form-receipt-move-out-discount-table2 tbody').append(html);
                     calculate_2Price();
                 }
 
@@ -187,28 +190,45 @@
                     const waterOld = parseFloat(document.querySelector('.water-old')?.value) || 0;
                     const waterNew = parseFloat(document.querySelector('.water-new')?.value) || 0;
                     const waterUsed = Math.max(waterNew - waterOld, 0);
-                    const waterPricePerUnit = 20; // ใส่ราคาต่อหน่วยจริง
-                    const waterPrice = waterUsed * waterPricePerUnit;
 
                     // ดึงค่ามิเตอร์ไฟฟ้า
                     const electricOld = parseFloat(document.querySelector('.electric-old')?.value) || 0;
                     const electricNew = parseFloat(document.querySelector('.electric-new')?.value) || 0;
                     const electricUsed = Math.max(electricNew - electricOld, 0);
-                    const electricPricePerUnit = 5; // ใส่ราคาต่อหน่วยจริง
-                    const electricPrice = electricUsed * electricPricePerUnit;
+                                            
+                    $.ajax({
+                        url: '/meter/unit-rate/{{ $room->id }}',
+                        type: 'GET',
+                        success: function(response) {
+                            
+                            const waterPricePerUnit = response.water_baht_per_unit; // ใส่ราคาต่อหน่วยจริง
+                            const waterPrice = waterUsed * waterPricePerUnit;
 
-                    var modalEl = document.getElementById('move-out-edit-meter');
-                    var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
-                    if (modalInstance) {
-                        modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
-                    }
-                    // เพิ่มรายการลงในตาราง
-                    if (waterUsed > 0) {
-                        addRow(`ค่าน้ำ (${waterNew} - ${waterOld} = ${waterUsed} ยูนิต)`, waterPrice.toFixed(2), 0);
-                    }
-                    if (electricUsed > 0) {
-                        addRow(`ค่าไฟฟ้า (${electricNew} - ${electricOld} = ${electricUsed} ยูนิต)`, electricPrice.toFixed(2), 0);
-                    }
+                            const electricPricePerUnit = response.ele_baht_per_unit; // ใส่ราคาต่อหน่วยจริง
+                            const electricPrice = electricUsed * electricPricePerUnit;
+                            
+                            var modalEl = document.getElementById('move-out-edit-meter');
+                            var modalInstance = bootstrap.Modal.getInstance(modalEl); // <-- ดึง instance ที่เปิดอยู่
+                            if (modalInstance) {
+                                modalInstance.hide(); // <-- ซ่อน modal ที่เปิดอยู่จริง
+                            }
+                            // เพิ่มรายการลงในตาราง
+                            if (waterUsed > 0) {
+                                addRow(`ค่าน้ำ (${waterNew} - ${waterOld} = ${waterUsed} ยูนิต)`, waterPrice.toFixed(2), 0);
+                            }
+                            if (electricUsed > 0) {
+                                addRow(`ค่าไฟฟ้า (${electricNew} - ${electricOld} = ${electricUsed} ยูนิต)`, electricPrice.toFixed(2), 0);
+                            }
+
+                        },
+                        error: function (xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                                console.error('เกิดข้อผิดพลาด:', xhr);
+                            }
+                        }
+                    });
+
                 }
 
                 // ลบแถวรายการ

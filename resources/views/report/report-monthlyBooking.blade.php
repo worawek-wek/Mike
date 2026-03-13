@@ -83,7 +83,11 @@
                                                                     <i class="ti ti-x ti-26px"></i>
                                                                 </span>
                                                             </div>
-                                                            <h4 class="mb-0 me-2 text-danger">ถูกยกเลิกทั้งหมด 0 การจอง
+                                                            <h4 class="mb-0 me-2 text-danger">ถูกยกเลิกทั้งหมด 
+                                                                <span id="all-booking-cancel">
+
+                                                                </span>
+                                                                การจอง
                                                             </h4>
                                                         </div>
                                                     </div>

@@ -10,7 +10,7 @@
             font-size: 12px;
             margin: 0;
             padding: 0;
-            display: flex;
+            /* display: flex; */
             justify-content: center;
             align-items: flex-start;
         }
@@ -80,7 +80,7 @@
         }
         .total-table td:nth-child(3) {
             text-align: right;
-            font-weight: bold;
+            /* font-weight: bold; */
             border-bottom: 1px solid #000;
         }
         .total-table td:nth-child(4) {
@@ -199,8 +199,8 @@
                 </td>
                 {{-- <td style="font-size: large;">({{ $amount_thai }})</td> --}}
                 <td style="font-size: 12px !important;">จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                <td style="font-size: 12px !important;">
-                    {{ number_format($receipt->total_amount) }} บาท
+                <td>
+                    <b style="font-size: 12px !important;">{{ number_format($receipt->total_amount) }} บาท</b>
                     <br>
                     ({{ $amount_thai }})
                 </td>
@@ -283,8 +283,8 @@
                     <img src="/upload/qr-code/{{ $receipt->room->floor->building->qr_code }}" alt="" width="65%" >
                 </td>
                 <td style="font-size: 12px !important;">จำนวนเงินรวมทั้งหมด <br>(Total amount)</td>
-                <td style="font-size: 12px !important;">
-                    {{ number_format($receipt->total_amount) }} บาท
+                <td>
+                    <b style="font-size: 12px !important;">{{ number_format($receipt->total_amount) }} บาท</b>
                     <br>
                     ({{ $amount_thai }})
                 </td>
@@ -323,5 +323,9 @@
             </div>
         </div> --}}
     </div>
+
 </body>
 </html>
+@if ($last == 0)
+    <div style="page-break-before: always;"></div>
+@endif

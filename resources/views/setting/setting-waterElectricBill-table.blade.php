@@ -493,8 +493,6 @@
                     <td class="d-flex flex-row">
                         <button type="button"
                             class="btn btn-info btn-sm rounded-pill waves-effect waves-light me-md-2 mb-2 mb-md-0"
-                            data-bs-toggle="modal"
-                            data-bs-target="#setWaterModal"
                             onclick="view_water({{ $row->id }})"
                             >
                             <span
@@ -502,8 +500,6 @@
                         </button>
                         <button type="button"
                             class="btn btn-danger btn-sm rounded-pill waves-effect waves-light me-md-2 mb-2 mb-md-0"
-                            data-bs-toggle="modal"
-                            data-bs-target="#setElectricModal"
                             onclick="view_electric({{ $row->id }})"
                             >
                             <span

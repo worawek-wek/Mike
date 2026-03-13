@@ -56,7 +56,7 @@
             <h5 class="mb-0" style="color: black;">ข้อมูลเงินประกันห้อง</h5>
             <button class="btn btn-warning" onclick="openDe({{ @$rent_bill->id }} , {{ $contract->contract_id }})"
                 role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract-edit" aria-controls="navs-pills-top-contract-edit" aria-selected="false" tabindex="-1"
-                @if(($contract->security_deposit-$contract->deduction_booking_amount) <= $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount)
+                @if(($invoice_deposit_and_jong->sum->total_amount) <= $receipt_deposit_and_jong->sum->total_amount)
                     disabled
                 @endif
                 >
@@ -67,9 +67,9 @@
         </div>
 
 {{--  --}}
-            @if($receipt->sum->total_amount+@$receipt_jong->total_amount??0 > 0)
+            @if($receipt_deposit_and_jong->sum->total_amount ?? 0 > 0)
                 <h5 class="text-center text-success">ชำระเงินแล้ว&nbsp; <span>
-                    {{ number_format($receipt->sum->total_amount+@$receipt_jong->total_amount??0) }}
+                    {{ number_format($receipt->sum->total_amount+@$receipt_jong->total_amount ?? 0) }}
                     {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
                     </span> &nbsp;บาท
                 </h5>
@@ -81,9 +81,9 @@
                     </span> &nbsp;บาท
                 </h5>
             @endif
-            @if(($contract->security_deposit-$contract->deduction_booking_amount) > $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount+@$receipt_jong->total_amount??0)
+            @if(($invoice_deposit_and_jong->sum->total_amount) > $receipt_deposit_and_jong->sum->total_amount ?? 0)
                 <h5 class="text-center text-danger">ยอดค้างชำระเงินทั้งหมด&nbsp; <span>
-                    {{ number_format(($contract->security_deposit-$contract->deduction_booking_amount) - $receipt_wait_for_confirm->sum->total_amount+$receipt->sum->total_amount+@$receipt_jong->total_amount??0) }}
+                    {{ number_format(($invoice_deposit_and_jong->sum->total_amount) - $receipt_deposit_and_jong->sum->total_amount ?? 0) }}
                     {{-- {{ number_format($invoice->room_for_rent->room->rent + $invoice->water_amount+$invoice->electricity_amount) }} --}}
                     </span> &nbsp;บาท
                 </h5>

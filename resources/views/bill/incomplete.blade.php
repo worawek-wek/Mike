@@ -92,7 +92,7 @@
 
                                     {{ $payment_list_item->title }}
 
-                                    @if (strpos($payment_list_item->title, 'Water rate') !== false) 
+                                    @if (strpos($payment_list_item->title, 'Water rate') !== false)
                                         <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
                                         <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
                                             type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />

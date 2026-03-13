@@ -35,18 +35,20 @@
                     </span>
                     </button>
                 </li>
-                @if ($invoice->total_amount - $invoice->total_not_discount_amount > 0)
-                    <li class="nav-item" role="presentation">
-                        <button type="button" class="btn btn-outline-info nav-link"
-                        role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
-                        <span>
-                            <i class="ti-md ti ti-report-money"></i>
-                            <b class="dam">
-                            ชำระเงิน
-                            </b>
-                        </span>
-                        </button>
-                    </li>
+                @if (@$overdue == null)
+                    @if ($invoice->total_amount - $invoice->total_not_discount_amount > 0)
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="btn btn-outline-info nav-link"
+                            role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-contract" aria-controls="navs-pills-top-contract" aria-selected="false" tabindex="-1">
+                            <span>
+                                <i class="ti-md ti ti-report-money"></i>
+                                <b class="dam">
+                                ชำระเงิน
+                                </b>
+                            </span>
+                            </button>
+                        </li>
+                    @endif
                 @endif
             </ul>
         </div>
@@ -111,14 +113,16 @@
                         <span class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้
                     </button>
                 </div>
-                    @if(Auth::user()->user_has_branch->position->id == 1)
-                        @if ($invoice->ref_status_id == 7 & count($invoice->receipt) == 0)
-                            <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกใบแจ้งหนี้')">
-                                <span>
-                                    <i class="ti-md ti ti-x"></i>
-                                    ยกเลิกใบแจ้งหนี้
-                                </span>
-                            </button>
+                    @if (@$overdue == null)
+                        @if(Auth::user()->user_has_branch->position->id == 1)
+                            @if ($invoice->ref_status_id == 7 & count($invoice->receipt) == 0)
+                                <button class="btn btn-danger" onclick="changeStatusBill({{ $invoice->id }},3,'ยกเลิกใบแจ้งหนี้')">
+                                    <span>
+                                        <i class="ti-md ti ti-x"></i>
+                                        ยกเลิกใบแจ้งหนี้
+                                    </span>
+                                </button>
+                            @endif
                         @endif
                     @endif
                     @foreach ($invoice->receipt as $key => $item_receipt)
@@ -210,7 +214,7 @@
                             @if ($key+1 < count($invoice->receipt))
                                 <hr class="mb-4">
                             @endif
-                            @if ($invoice->ref_status_id != 5)
+                            {{-- @if ($invoice->ref_status_id != 5) --}}
                             @php
                                 $permission_cancel_confirm = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 24)->where('status', 0)->first();
                             @endphp
@@ -220,13 +224,14 @@
                                         ยกเลิกใบเสร็จ
                                     </span>
                                 </button>
-                            @endif
+                            {{-- @endif --}}
                     @endforeach
                 </div>
                 </div>
             </div>
           </div>
         </div>
+        
 <form id="payment_bill" enctype="multipart/form-data">
     @csrf
     
@@ -705,7 +710,7 @@
                 </div>
             </div>
         </div>
-    </form>               
+    </form>        
     </div>
 <script>
     

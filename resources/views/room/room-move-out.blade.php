@@ -20,7 +20,7 @@
         @foreach ($room as $key => $row)
             <input type="hidden" name="room[{{$key}}][ref_renter_id]" value="{{ @$row->move_invoice_type_7->room_for_rent->ref_renter_id }}">
             <input type="hidden" name="room[{{$key}}][invoice_id]" value="{{ @$row->move_invoice_type_7->id }}">
-            <input type="hidden" id="type_move_out" name="room[{{$key}}][type_move_out]" value="1">
+            <input type="hidden" id="move_out_type" name="room[{{$key}}][move_out_type]" value="1">
             <input type="hidden" name="room[{{$key}}][room_id]" value="{{ $row->id }}">
             
             <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
@@ -395,7 +395,7 @@
                     <input type="hidden" name="insert_single[payment_format]" value="1">
                     <b class="text-black">ช่องทางการชำระเงิน</b> <br>
                     <div class="col-sm-11">
-                        <input name="insert_single[receipt_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByCashLhai" value="1" checked>
+                        <input name="insert_single[move_out_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByCashLhai" value="1" checked>
                         <label class="form-check-label" for="reservation_payByCashLhai"> เงินสด </label>
                     </div>
 
@@ -407,7 +407,7 @@
                     </div>
 
                     <div class="col-sm-11">
-                        <input name="insert_single[receipt_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByTransferLhai" value="2">
+                        <input name="insert_single[move_out_payment_channel]" class="form-check-input me-1 reservation_payment_channel_Lhai" type="radio" id="reservation_payByTransferLhai" value="2">
                         <label class="form-check-label" for="reservation_payByTransferLhai"> โอนเงิน </label>
                     </div>
 

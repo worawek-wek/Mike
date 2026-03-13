@@ -152,6 +152,9 @@ class VehicleController extends Controller
                 continue;
             }
             foreach ($room->room->room_for_rent_s as $rentData) {
+                if($rentData->status == 0){
+                    continue;
+                }
                 $renter = $rentData->renter;
                 $renterName = $renter->prefix . ' ' . $renter->name . ' ' . $renter->surname;
                 $vehicles = $renter->vehicles ?? [];

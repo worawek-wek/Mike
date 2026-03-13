@@ -195,6 +195,14 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal fade modalHeadDecor" id="invoice-detail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content rounded-0" id="viewInvoiceDetail">
+                
+            </div>
+        </div>
+    </div>
 
     <iframe id="print-iframe" style="display: none;"></iframe>    
 
@@ -205,6 +213,60 @@
         var searchData = {};
         loadData(page);
 
+        function view_detail(id,de){
+            // alert(46);
+            // if(de == 'table'){
+            //     status_detail_waiting_confirm = 0;
+            // }else{
+            //     status_detail_waiting_confirm = 1;
+            // }
+            $.ajax({
+                type: "GET",
+                url: "bill/"+id+"/1",
+                success: function(data) {
+                    $("#viewInvoiceDetail").html(data);
+                }
+            });
+        }
+
+
+        function printPdfReceipt(id) {
+            $.ajax({
+                url: '/pdf/receipt/'+id,
+                type: 'GET',
+                success: function(html) {
+                    const iframe = document.getElementById('print-iframe');
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+
+                    // รอโหลดก่อนค่อยพิมพ์
+                    iframe.onload = function () {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    };
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let messages = '';
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            messages += value + '<br>';
+                        });
+
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด',
+                            html: messages,
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
+                        console.error('เกิดข้อผิดพลาด:', xhr);
+                    }
+                }
+            });
+        }
+        
         function view(id){
             $.ajax({
                 type: "GET",
@@ -239,7 +301,8 @@
         
         function printPdf(id) {
             $.ajax({
-                url: '/pdf/overdue/invoice/'+id,
+                url: '/pdf/invoice/'+id,
+                // url: '/pdf/overdue/invoice/'+id,
                 type: 'GET',
                 success: function(html) {
                     const iframe = document.getElementById('print-iframe');

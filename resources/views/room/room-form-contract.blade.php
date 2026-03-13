@@ -20,11 +20,11 @@
                 </select>
             </div>
             <div class="col-sm-5">
-                <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label><span class="text-danger">*</span>
+                <label for="exampleFormControlInput1" class="form-label">ชื่อจริง</label> <span class="text-danger">*</span>
                 <input type="text" name="name" class="form-control" id="exampleFormControlInput1" placeholder="" value="" required/>
             </div>
             <div class="col-sm-5">
-                <label for="exampleFormControlInput2" class="form-label">นามสกุล</label><span class="text-danger">*</span>
+                <label for="exampleFormControlInput2" class="form-label">นามสกุล</label> <span class="text-danger">*</span>
                 <input type="text" name="surname" class="form-control" id="exampleFormControlInput2" placeholder="" value="" />
             </div>
         @else
@@ -39,23 +39,23 @@
             <input type="text" name="address" class="form-control" id="exampleFormControlInput2" placeholder="" value="{{ @$address }}" />
         </div>
         <div class="col-sm-6">
-            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label>
-            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" placeholder="" value="{{ @$contract->phone }}" />
+            <label for="exampleFormControlInput3" class="form-label">เบอร์โทรผู้เข้าพัก</label> <span class="text-danger">*</span>
+            <input type="text" name="phone" class="form-control" id="exampleFormControlInput3" value="{{ @$contract->phone }}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10);" required />
         </div>
         <div class="col-sm-6">
-            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label>
-            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ @$contract->id_card_number }}" />
+            <label for="exampleFormControlInput4" class="form-label">หมายเลขบัตรประชาชนผู้เข้าพัก</label> <span class="text-danger">*</span>
+            <input type="text" name="id_card_number" class="form-control" id="exampleFormControlInput4" placeholder="" value="{{ @$contract->id_card_number }}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,13);" required/>
         </div>
         <div class="col-sm-6">
-            <label for="contract_date" class="form-label">วันที่ทำสัญญา</label>
+            <label for="contract_date" class="form-label">วันที่ทำสัญญา</label> <span class="text-danger">*</span>
             <input type="text" name="contract_date" class="form-control" placeholder="" id="contract_date" required autocomplete="off" value="{{ @$contract->contract_date != null ? date('d/m/Y', strtotime($contract->contract_date)) : date('d/m/Y'); }}"/>
         </div>
         <div class="col-sm-6">
-            <label class="form-label">ระยะเวลาสัญญา(เดือน)</label>
+            <label class="form-label">ระยะเวลาสัญญา(เดือน)</label> <span class="text-danger">*</span>
             <input type="number" name="period" class="form-control" placeholder="" value="{{ @$contract->period }}" required id="period"/>
         </div>
         <div class="col-sm-6">
-            <label for="contract_date_to" class="form-label">วันที่สิ้นสุดสัญญา </label>
+            <label for="contract_date_to" class="form-label">วันที่สิ้นสุดสัญญา </label> <span class="text-danger">*</span>
             <input type="text" name="contract_date_to" class="form-control" placeholder="" id="contract_date_to" required autocomplete="off" value=""/>
         </div>
         <div></div>
@@ -206,7 +206,7 @@
             <div class="col-md-12 deposit-item mb-2">
                 <input type="hidden" name="contract[1][deposit][0][title]" class="form-control" required value="เงินประกันห้อง" />
                 <div class="col-md-12">
-                    <label class="form-label">เงินประกันห้อง (บาท)</label>
+                    <label class="form-label">เงินประกันห้อง (บาท)</label> <span class="text-danger">*</span>
                     <input type="number" name="contract[1][deposit][0][security_deposit]" class="form-control" placeholder="เงินประกันห้อง (บาท)" required />
                 </div>
             </div>
@@ -298,11 +298,11 @@
 
         <div></div>
         <div class="col-sm-6">
-            <label for="water_meter_start_living" class="form-label">เลขมิเตอร์น้ำประปา(เข้าพัก)*</label>
+            <label for="water_meter_start_living" class="form-label">เลขมิเตอร์น้ำประปา(เข้าพัก)</label> <span class="text-danger">*</span>
             <input type="text" name="contract[1][water_meter_start_living]" class="form-control" id="water_meter_start_living" placeholder="" value="{{ (int) $meter->water_unit ?? (int) @$contract->water_meter_start_living }}" min="0" />
         </div>
         <div class="col-sm-6">
-            <label for="electricity_meter_start_living" class="form-label">เลขมิเตอร์ค่าไฟ(เข้าพัก)*</label>
+            <label for="electricity_meter_start_living" class="form-label">เลขมิเตอร์ค่าไฟ(เข้าพัก)</label> <span class="text-danger">*</span>
             <input type="text" name="contract[1][electricity_meter_start_living]" class="form-control" placeholder="" required value="{{ (int) $meter->electricity_unit ?? (int) @$contract->electricity_meter_start_living }}" min="0" />
         </div>
         <div class="col-sm-12">

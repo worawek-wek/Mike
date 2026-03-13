@@ -62,7 +62,8 @@
                     @endphp
                         <tr>
                             <td>
-                                <input name="insert[{{ $key }}][payment_list][title][]" type="text" class="form-control payment_list_title" value="{{ $payment_list->title }}" placeholder="หัวข้อรายการ" readonly>
+                                {{-- {{ $total_amount }} --}}
+                                <input name="insert[{{ $key }}][payment_list][title][]" type="text" class="form-control payment_list_title" value="{{ $payment_list->title }}@if (strpos($payment_list->title, 'Water rate') !== false){{(int)$payment_list->unit}}&nbsp; - &nbsp;{{ $invoice->previous_water_unit ?? 0 }} = &nbsp;{{ $payment_list->unit-$invoice->previous_water_unit }}&nbsp; ยูนิต)@endif" placeholder="หัวข้อรายการ" readonly>
                             </td>
                             <td class="text-end">
                                 <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_2" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>

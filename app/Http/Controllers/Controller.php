@@ -189,7 +189,9 @@ class Controller extends BaseController
                                         });
 
 // ------------------------------------------------------------------------------------- //
-        $confirm_by_ceo = Receipt::with('payment_list')->where('ref_status_id', 5)->whereIn('ref_type_id', [1,2,3])
+        $confirm_by_ceo = Receipt::with('payment_list')->where('ref_status_id', 5)
+                                        ->where('clear_balances', 0)
+                                        ->whereIn('ref_type_id', [1,2,3])
                                         ->whereHas('room.floor.building', function ($query) use ($branch_id) {
                                             $query->where('ref_branch_id', $branch_id);
                                         })

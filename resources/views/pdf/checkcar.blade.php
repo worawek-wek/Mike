@@ -52,7 +52,7 @@
         @foreach ($list_data as $room)
             @foreach ($room->room_for_rent_s as $rent)
                 @php
-                    $vehicles = $rent->renter->vehicles ?? [];
+                    $vehicles = $rent->vehicles ?? [];
                     $rowspan = count($vehicles) > 0 ? count($vehicles) : 1;
                 @endphp
 
@@ -73,7 +73,7 @@
                         </tr>
                         @php $current_rows++; @endphp
                     @endforeach
-                @else
+                {{-- @else
                     <tr>
                         <td>-</td>
                         <td>{{ $room->name }}</td>
@@ -83,7 +83,7 @@
                         <td></td>
                         <td></td>
                     </tr>
-                    @php $current_rows++; @endphp
+                    @php $current_rows++; @endphp --}}
                 @endif
             @endforeach
         @endforeach

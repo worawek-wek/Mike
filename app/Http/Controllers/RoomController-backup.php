@@ -596,8 +596,12 @@ class RoomController extends Controller
                                                     ->orderBy('room_for_rents.created_at', 'desc') // หรือใช้ 'id' ตามที่ต้องการ
                                                     ->first();
 
-        $receipt_1 = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->orderBy('id','DESC')->where('paid_on_checkout', 1)->latest()->get();
+        $receipt_1 = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->orderBy('id','DESC')->where('paid_on_checkout', 1)->latest()->first();
         $data['receipt_1'] = $receipt_1;
+        // $invoice = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first(); // บิลย้ายออก
+        // if($invoice->receipt_move_out){
+        //     $amount_move = 
+        // }
 
         $data['renter'] = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                                     ->where('room_for_rents.ref_room_id', $id)
@@ -609,7 +613,7 @@ class RoomController extends Controller
                                         $query->where('ref_room_id', $id); // with โดยแค่อันที่ห้องนี้มี
                                     }])->whereIn('id',[1,2])->get();
 
-        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_type_id', 1)->where('ref_contract_id', $contract->id)->get(); // บิลค่าเช่า ที่ค้างชำระ
+        $move_invoice_7 = RentBill::where('ref_status_id', 7)->where('ref_type_id', 1)->where('ref_room_for_rent_id', $room_for_rent->room_for_rent_id)->first(); // บิลค่าเช่า ที่ค้างชำระ
         $move_invoice_6 = RentBill::where('ref_type_id', 6)->where('ref_contract_id', $contract->id)->latest()->first(); // เงินประกัน
         
         if(!$move_invoice_type_7){
@@ -676,9 +680,9 @@ class RoomController extends Controller
         if(@$receipt_move_out_deducted){
             $cal = $cal-($receipt_move_out_deducted->total_amount ?? 0); // 2. เอามาลบยอดใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
         }
-        foreach($receipt_1 as $row){
-            if($row->payment_channel == 3){
-                $cal = $cal-($row->total_amount ?? 0); // 3. และลบยอดใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
+        if(@$receipt_1){
+            if($receipt_1->payment_channel == 3){
+                $cal = $cal-($receipt_1->total_amount ?? 0); // 3. และลบยอดใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
             }
         }
         // คำนวนยอดสรุปการย้ายออก จบ
@@ -728,14 +732,6 @@ class RoomController extends Controller
         ];
             DB::commit();
         // return view('room/move-out', $data);
-        
-        $month_thai = [
-            "0","มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-        ];
-        
-        $data['month_thai'] = $month_thai;
-
         return [
                     'html' => view('room/move-out', $data)->render(),
                     'invoice_move_out' => $move_invoice_type_4 == null ? 0 : 1
@@ -756,7 +752,7 @@ class RoomController extends Controller
         
         $move_invoice_6 = RentBill::with('payment_list')->where('ref_type_id', 6)->where('ref_room_id', $id)->where('ref_room_for_rent_id', $renter_ids)->latest()->first(); // เงินประกัน
 
-        $receipt_1 = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->where('paid_on_checkout', 1)->where('payment_channel', 3)->get(); // ใบเสร็จค่าห้องที่ค้างชำระ
+        $receipt_1 = Receipt::where('ref_contract_id', $contract->id)->where('ref_type_id', 1)->orderBy('id','DESC')->where('paid_on_checkout', 1)->latest()->first(); // ใบเสร็จค่าห้องที่ค้างชำระ
 
         $invoice = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->where('ref_contract_id', $contract->id)->first(); // invoice ใบเสร็จย้ายออก
         
@@ -765,8 +761,8 @@ class RoomController extends Controller
 
         // if(@$receipt_1){
             // return $receipt_1->payment_channel;
-            if(count($receipt_1) > 0){
-                $cal = $cal-($receipt_1->sum('total_amount') ?? 0); // 2. เอามาลบยอดใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
+            if(@$receipt_1->payment_channel == 3){
+                $cal = $cal-($receipt_1->total_amount ?? 0); // 2. เอามาลบยอดใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
             }
         // }
 
@@ -2589,8 +2585,8 @@ class RoomController extends Controller
                 $contract->electricity_meter_start_living  =  @$row['electricity_meter_start_living'];
                 $contract->save();
 
-                $prevMonth = (int)date('m') - 1;
-                $prevYear = (int)date('Y');
+                $prevMonth = 10;
+                $prevYear = 2025;
 
                 if ($prevMonth < 1) {
                     $prevMonth = 12;
@@ -2613,8 +2609,8 @@ class RoomController extends Controller
                 
                 $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
                 $r_b_room->ref_room_for_rent_id  =  $r_f_r->id;
-                $r_b_room->month  =  date('m');
-                $r_b_room->year  =  date('Y');
+                $r_b_room->month  =  11;
+                $r_b_room->year  =  2025;
                 $r_b_room->previous_electricity_unit  =  (int)$row['electricity_meter_start_living'];
                 $r_b_room->electricity_unit  =  $meter->electricity_unit;
                 $r_b_room->electricity_amount  =  $room->ele_baht_per_unit*$current_month_usage_electricity;
@@ -2708,6 +2704,460 @@ $sequence++;
 
                 $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
                 $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน 11 (".(int)$meter->electricity_unit." - ".(int)$row['electricity_meter_start_living']." = ".(int)$meter->electricity_unit-(int)$row['electricity_meter_start_living']." ยูนิต)";
+                $pay_list->unit  =  (int)$meter->electricity_unit;
+                $pay_list->price  =  $room->ele_baht_per_unit*(int)$current_month_usage_electricity;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                RoomHasService::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบค่าบริการห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_service_id){
+                    foreach($request->ref_service_id as $ser){ // for เพื่อสร้าง ค่าบริการห้องใหม่
+                        
+                        $insert = new RoomHasService;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_service_id  =  $ser;
+                        $insert->price  =  $request->service_price[$ser];
+                        $insert->save();
+
+                        $payment_list_title = Service::find($ser)->name;
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->service_price[$ser];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1;
+                        $pay_list->save();
+                    }
+                }
+                RoomHasDiscount::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบส่วนลดห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_discount_id){
+                    foreach($request->ref_discount_id as $dis){ // for เพื่อสร้าง ส่วนลดห้อง ใหม่
+
+                        $insert = new RoomHasDiscount;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_discount_id  =  $dis;
+                        $insert->price  =  $request->discount_price[$dis];
+                        $insert->save();
+
+                        $payment_list_title = Discount::find($dis)->name;
+
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->discount_price[$dis];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1; // 1 = ใบแจ้งหนี้ หรือ ใบเรียกเก็บเงิน
+                        $pay_list->discount  =  1; // 1 = ส่วนลด
+                        $pay_list->save();
+
+                    }
+                }
+                
+                $update_r_1 = RentBill::find($r_b_room->id);
+                $update_r_1->total = $update_r_1->total_amount;
+                $update_r_1->save();
+
+                $update_r_2 = RentBill::find($r_b->id);
+                $update_r_2->total = $update_r_2->total_amount;
+                $update_r_2->save();
+                // return 333;
+
+                $room->status = 2;
+                $room->save();
+
+                if(@$request->payment_channel){
+
+                    $pay['payment_format']  =  1;
+                    $pay['ref_room_id']  =  $room->id;
+                    $pay['ref_rent_bill_id']  =  $r_b->id;
+                    $pay['ref_contract_id']  =  $contract->id;
+                    $pay['ref_renter_id']  =  $request->ref_renter_id;
+                    $pay['amount']  =  $update_r_2->total_amount;
+                    $pay['ref_type_id']  =  2;
+
+                    $merged = array_merge($pay, $request->all());
+                    $this->insert_receipt(new Request($merged));
+
+                }
+                
+            }
+
+            foreach($request->contract as $row){
+                $pay = [];
+            // return $row;
+                $room = Room::find($row['ref_room_id'] ?? $request->ref_room_id); //save อยู่ข้างล่าง
+                if(@$row['deduction_booking_date']){
+                    $deduction_booking_date = Carbon::createFromFormat('d/m/Y', $row['deduction_booking_date'])->format('Y-m-d');
+                }
+
+                $prevMonth = 12;
+                $prevYear = 2025;
+
+                if ($prevMonth < 1) {
+                    $prevMonth = 12;
+                    $prevYear -= 1;
+                }
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                
+                $meterPrevious = Meter::where('ref_room_id', $room->id)->where('month', $prevMonth)->where('year', $prevYear)->first();
+                $meter = Meter::where('ref_room_id', $room->id)->where('month', date('m'))->where('year', date('Y'))->first();
+                // dd($meter);
+                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->latest()->first();
+                $current_month_usage_water = 0;
+                $current_month_usage_electricity = 0;
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                // $electricity_unit = $this->find_meter_by_name($room->name);
+                
+                $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
+                $r_b_room->ref_room_for_rent_id  =  $r_f_r->id;
+                $r_b_room->month  =  12;
+                $r_b_room->year  =  2025;
+                $r_b_room->previous_electricity_unit  =  (int)$row['electricity_meter_start_living'];
+                $r_b_room->electricity_unit  =  $meter->electricity_unit;
+                $r_b_room->electricity_amount  =  $room->ele_baht_per_unit*$current_month_usage_electricity;
+                $r_b_room->previous_water_unit  =  (int)$row['water_meter_start_living'];
+                $r_b_room->water_unit  =  (int)$meter->water_unit;
+                $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_water;
+                
+                    $receipt = new Receipt;
+
+$sequence++;
+
+    $invoiceCode = 'INV'. $year
+                        . str_pad($month, 2, '0', STR_PAD_LEFT)
+                        . str_pad($sequence, 6, '0', STR_PAD_LEFT);
+
+                $r_b_room->invoice_number =  $invoiceCode;
+                $r_b_room->ref_room_id =  $row['ref_room_id'] ?? $request->ref_room_id;
+                $r_b_room->ref_contract_id =  $contract->id;
+                $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
+                $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
+                $r_b_room->ref_user_id =  Auth::id();
+                $r_b_room->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                $pay_list->title  =  "ค่าเช่าห้อง (Room rate) $room->name เดือน 12/2025";
+                $pay_list->price  =  $room->rent+$room->furniture_rental+$room->air_rental;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าน้ำ
+                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน 12 ("; 
+                $pay_list->unit  =  (int)$meter->water_unit;
+                $pay_list->price  =  $room->water_baht_per_unit*(int)$current_month_usage_water;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+
+                $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
+                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน 12 (".(int)$meter->electricity_unit." - ".(int)$row['electricity_meter_start_living']." = ".(int)$meter->electricity_unit-(int)$row['electricity_meter_start_living']." ยูนิต)";
+                $pay_list->unit  =  (int)$meter->electricity_unit;
+                $pay_list->price  =  $room->ele_baht_per_unit*(int)$current_month_usage_electricity;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                RoomHasService::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบค่าบริการห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_service_id){
+                    foreach($request->ref_service_id as $ser){ // for เพื่อสร้าง ค่าบริการห้องใหม่
+                        
+                        $insert = new RoomHasService;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_service_id  =  $ser;
+                        $insert->price  =  $request->service_price[$ser];
+                        $insert->save();
+
+                        $payment_list_title = Service::find($ser)->name;
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->service_price[$ser];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1;
+                        $pay_list->save();
+                    }
+                }
+                RoomHasDiscount::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบส่วนลดห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_discount_id){
+                    foreach($request->ref_discount_id as $dis){ // for เพื่อสร้าง ส่วนลดห้อง ใหม่
+
+                        $insert = new RoomHasDiscount;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_discount_id  =  $dis;
+                        $insert->price  =  $request->discount_price[$dis];
+                        $insert->save();
+
+                        $payment_list_title = Discount::find($dis)->name;
+
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->discount_price[$dis];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1; // 1 = ใบแจ้งหนี้ หรือ ใบเรียกเก็บเงิน
+                        $pay_list->discount  =  1; // 1 = ส่วนลด
+                        $pay_list->save();
+
+                    }
+                }
+                
+                $update_r_1 = RentBill::find($r_b_room->id);
+                $update_r_1->total = $update_r_1->total_amount;
+                $update_r_1->save();
+
+                $update_r_2 = RentBill::find($r_b->id);
+                $update_r_2->total = $update_r_2->total_amount;
+                $update_r_2->save();
+                // return 333;
+
+                $room->status = 2;
+                $room->save();
+
+                if(@$request->payment_channel){
+
+                    $pay['payment_format']  =  1;
+                    $pay['ref_room_id']  =  $room->id;
+                    $pay['ref_rent_bill_id']  =  $r_b->id;
+                    $pay['ref_contract_id']  =  $contract->id;
+                    $pay['ref_renter_id']  =  $request->ref_renter_id;
+                    $pay['amount']  =  $update_r_2->total_amount;
+                    $pay['ref_type_id']  =  2;
+
+                    $merged = array_merge($pay, $request->all());
+                    $this->insert_receipt(new Request($merged));
+
+                }
+                
+            }
+            
+            foreach($request->contract as $row){
+                $pay = [];
+            // return $row;
+                $room = Room::find($row['ref_room_id'] ?? $request->ref_room_id); //save อยู่ข้างล่าง
+                if(@$row['deduction_booking_date']){
+                    $deduction_booking_date = Carbon::createFromFormat('d/m/Y', $row['deduction_booking_date'])->format('Y-m-d');
+                }
+
+                $prevMonth = 01;
+                $prevYear = 2026;
+
+                if ($prevMonth < 1) {
+                    $prevMonth = 12;
+                    $prevYear -= 1;
+                }
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                
+                $meterPrevious = Meter::where('ref_room_id', $room->id)->where('month', $prevMonth)->where('year', $prevYear)->first();
+                $meter = Meter::where('ref_room_id', $room->id)->where('month', date('m'))->where('year', date('Y'))->first();
+                // dd($meter);
+                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->latest()->first();
+                $current_month_usage_water = 0;
+                $current_month_usage_electricity = 0;
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                // $electricity_unit = $this->find_meter_by_name($room->name);
+                
+                $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
+                $r_b_room->ref_room_for_rent_id  =  $r_f_r->id;
+                $r_b_room->month  =  01;
+                $r_b_room->year  =  2026;
+                $r_b_room->previous_electricity_unit  =  (int)$row['electricity_meter_start_living'];
+                $r_b_room->electricity_unit  =  $meter->electricity_unit;
+                $r_b_room->electricity_amount  =  $room->ele_baht_per_unit*$current_month_usage_electricity;
+                $r_b_room->previous_water_unit  =  (int)$row['water_meter_start_living'];
+                $r_b_room->water_unit  =  (int)$meter->water_unit;
+                $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_water;
+                
+                    $receipt = new Receipt;
+
+$sequence++;
+
+    $invoiceCode = 'INV'. $year
+                        . str_pad($month, 2, '0', STR_PAD_LEFT)
+                        . str_pad($sequence, 6, '0', STR_PAD_LEFT);
+
+                $r_b_room->invoice_number =  $invoiceCode;
+                $r_b_room->ref_room_id =  $row['ref_room_id'] ?? $request->ref_room_id;
+                $r_b_room->ref_contract_id =  $contract->id;
+                $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
+                $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
+                $r_b_room->ref_user_id =  Auth::id();
+                $r_b_room->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                $pay_list->title  =  "ค่าเช่าห้อง (Room rate) $room->name เดือน 01/".date('Y');
+                $pay_list->price  =  $room->rent+$room->furniture_rental+$room->air_rental;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าน้ำ
+                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน 01 ("; 
+                $pay_list->unit  =  (int)$meter->water_unit;
+                $pay_list->price  =  $room->water_baht_per_unit*(int)$current_month_usage_water;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+
+                $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
+                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน 01 (".(int)$meter->electricity_unit." - ".(int)$row['electricity_meter_start_living']." = ".(int)$meter->electricity_unit-(int)$row['electricity_meter_start_living']." ยูนิต)";
+                $pay_list->unit  =  (int)$meter->electricity_unit;
+                $pay_list->price  =  $room->ele_baht_per_unit*(int)$current_month_usage_electricity;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                RoomHasService::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบค่าบริการห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_service_id){
+                    foreach($request->ref_service_id as $ser){ // for เพื่อสร้าง ค่าบริการห้องใหม่
+                        
+                        $insert = new RoomHasService;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_service_id  =  $ser;
+                        $insert->price  =  $request->service_price[$ser];
+                        $insert->save();
+
+                        $payment_list_title = Service::find($ser)->name;
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->service_price[$ser];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1;
+                        $pay_list->save();
+                    }
+                }
+                RoomHasDiscount::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->delete(); // ลบส่วนลดห้อง เพื่อ สร้างใหม่
+                if(@$request->ref_discount_id){
+                    foreach($request->ref_discount_id as $dis){ // for เพื่อสร้าง ส่วนลดห้อง ใหม่
+
+                        $insert = new RoomHasDiscount;
+                        $insert->ref_room_id  =  $row['ref_room_id'] ?? $request->ref_room_id;
+                        $insert->ref_discount_id  =  $dis;
+                        $insert->price  =  $request->discount_price[$dis];
+                        $insert->save();
+
+                        $payment_list_title = Discount::find($dis)->name;
+
+                        $pay_list = new PaymentList;
+                        $pay_list->title  =  $payment_list_title;
+                        $pay_list->price  =  $request->discount_price[$dis];
+                        $pay_list->ref_payment_id  =  $r_b_room->id;
+                        $pay_list->document_type  =  1; // 1 = ใบแจ้งหนี้ หรือ ใบเรียกเก็บเงิน
+                        $pay_list->discount  =  1; // 1 = ส่วนลด
+                        $pay_list->save();
+
+                    }
+                }
+                
+                $update_r_1 = RentBill::find($r_b_room->id);
+                $update_r_1->total = $update_r_1->total_amount;
+                $update_r_1->save();
+
+                $update_r_2 = RentBill::find($r_b->id);
+                $update_r_2->total = $update_r_2->total_amount;
+                $update_r_2->save();
+                // return 333;
+
+                $room->status = 2;
+                $room->save();
+
+                if(@$request->payment_channel){
+
+                    $pay['payment_format']  =  1;
+                    $pay['ref_room_id']  =  $room->id;
+                    $pay['ref_rent_bill_id']  =  $r_b->id;
+                    $pay['ref_contract_id']  =  $contract->id;
+                    $pay['ref_renter_id']  =  $request->ref_renter_id;
+                    $pay['amount']  =  $update_r_2->total_amount;
+                    $pay['ref_type_id']  =  2;
+
+                    $merged = array_merge($pay, $request->all());
+                    $this->insert_receipt(new Request($merged));
+
+                }
+                
+            }
+            
+            foreach($request->contract as $row){
+                $pay = [];
+            // return $row;
+                $room = Room::find($row['ref_room_id'] ?? $request->ref_room_id); //save อยู่ข้างล่าง
+                if(@$row['deduction_booking_date']){
+                    $deduction_booking_date = Carbon::createFromFormat('d/m/Y', $row['deduction_booking_date'])->format('Y-m-d');
+                }
+                
+
+                $prevMonth = 02;
+                $prevYear = 2026;
+
+                if ($prevMonth < 1) {
+                    $prevMonth = 12;
+                    $prevYear -= 1;
+                }
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                
+                $meterPrevious = Meter::where('ref_room_id', $room->id)->where('month', $prevMonth)->where('year', $prevYear)->first();
+                $meter = Meter::where('ref_room_id', $room->id)->where('month', date('m'))->where('year', date('Y'))->first();
+                // dd($meter);
+                $r_f_r = RoomForRents::where('ref_room_id', $row['ref_room_id'] ?? $request->ref_room_id)->latest()->first();
+                $current_month_usage_water = 0;
+                $current_month_usage_electricity = 0;
+
+                $prevMonth = str_pad($prevMonth, 2, '0', STR_PAD_LEFT);
+
+                // $electricity_unit = $this->find_meter_by_name($room->name);
+                
+                $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
+                $r_b_room->ref_room_for_rent_id  =  $r_f_r->id;
+                $r_b_room->month  =  02;
+                $r_b_room->year  =  2026;
+                $r_b_room->previous_electricity_unit  =  (int)$row['electricity_meter_start_living'];
+                $r_b_room->electricity_unit  =  $meter->electricity_unit;
+                $r_b_room->electricity_amount  =  $room->ele_baht_per_unit*$current_month_usage_electricity;
+                $r_b_room->previous_water_unit  =  (int)$row['water_meter_start_living'];
+                $r_b_room->water_unit  =  (int)$meter->water_unit;
+                $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_water;
+                
+                    $receipt = new Receipt;
+
+$sequence++;
+
+    $invoiceCode = 'INV'. $year
+                        . str_pad($month, 2, '0', STR_PAD_LEFT)
+                        . str_pad($sequence, 6, '0', STR_PAD_LEFT);
+
+                $r_b_room->invoice_number =  $invoiceCode;
+                $r_b_room->ref_room_id =  $row['ref_room_id'] ?? $request->ref_room_id;
+                $r_b_room->ref_contract_id =  $contract->id;
+                $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
+                $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
+                $r_b_room->ref_user_id =  Auth::id();
+                $r_b_room->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                $pay_list->title  =  "ค่าเช่าห้อง (Room rate) $room->name เดือน ".(date('m'))."/".date('Y');
+                $pay_list->price  =  $room->rent+$room->furniture_rental+$room->air_rental;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าน้ำ
+                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน ".(date('m'))." ("; 
+                $pay_list->unit  =  (int)$meter->water_unit;
+                $pay_list->price  =  $room->water_baht_per_unit*(int)$current_month_usage_water;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+
+                $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
+                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน ".(date('m'))." (".(int)$meter->electricity_unit." - ".(int)$row['electricity_meter_start_living']." = ".(int)$meter->electricity_unit-(int)$row['electricity_meter_start_living']." ยูนิต)";
                 $pay_list->unit  =  (int)$meter->electricity_unit;
                 $pay_list->price  =  $room->ele_baht_per_unit*(int)$current_month_usage_electricity;
                 $pay_list->ref_payment_id  =  $r_b_room->id;

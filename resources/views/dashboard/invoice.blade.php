@@ -41,6 +41,7 @@
                 <th class="text-center">ประเภท</th>
                 {{-- <th class="text-center">สถานะ</th> --}}
                 <th class="text-end">ยอดค้าง</th>
+                <th class="text-end">ทั้งหมด</th>
             </tr>
         </thead>
         <tbody>
@@ -54,30 +55,32 @@
                     $overdue = $billTotal - $receiptTotal;
                     $sum_overdue += $overdue;
                 @endphp
-                <tr>
+                <tr style='cursor: pointer' data-bs-toggle='modal' data-bs-target='#invoice-detail' onclick='view_detail({{$row->id}}, "table")'>
                     <td class="text-center">{{ $key+1 }}</td>
                     <td class="text-center">{{ $monthNames[$row->month].' '.$row->year }}</td>
                     <td class="text-center">{{ $row->invoice_number }}</td>
                     <td class="text-center">{{ $type[$row->ref_type_id] }}</td>
                     {{-- <td class="text-center text-{{ $row->status->color }}">{{ $row->status->name }}</td> --}}
                     <td class="text-end text-danger">{{ number_format($overdue) }}</td>
+                    <td class="text-end">{{ number_format($row->total_amount) }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr class="table-danger">
-                <th colspan="4" class="text-center">รวม</th>
+                <th colspan="4" class="text-center">รวมยอดค้างชำระ</th>
                 <th class="text-end mb-0 fw-bold total-price">
                     {{ number_format($sum_overdue) }}
                 </th>
+                <th class="text-center" colspan="2"></th>
             </tr>
         </tfoot>
     </table>
 </div>
 
 <div class="modal-footer d-flex justify-content-between rounded-0 mt-4">
-    <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $room->id }})"><span
-            class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button>
+    {{-- <button type="button" class="btn btn-label-primary waves-effect" onclick="printPdf({{ $room->id }})"><span
+            class="ti-md ti ti-printer me-2"></span>พิมพ์ใบแจ้งหนี้</button> --}}
 {{-- @foreach ($invoice->receipt as $key => $item_receipt)
                         
     <table class="table table-detail table-bordered">

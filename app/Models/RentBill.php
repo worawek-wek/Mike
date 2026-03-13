@@ -122,8 +122,8 @@ class RentBill extends Model
                     ->where('paid', 0)
                     ->where(function ($query) {
                         $query->where('title', 'NOT LIKE', '%ค่าเช่าห้อง (Room rate)%')
-                                ->where('title', 'NOT LIKE', '%ค่าน้ำ%')
-                                ->where('title', 'NOT LIKE', '%ค่าไฟฟ้า%')
+                                ->where('title', 'NOT LIKE', '%ค่าน้ำ (Water rate)%')
+                                ->where('title', 'NOT LIKE', '%ค่าไฟฟ้า (Electrical rate)%')
                                 ->where('title', 'NOT LIKE', '%ค่าที่จอดรถยนต์%');
                     });
     }
@@ -140,8 +140,8 @@ class RentBill extends Model
                     ->where('document_type', 1)
                     ->where('paid', 0)
                     ->where(function ($query) {
-                        $query->where('title', 'like', '%ค่าน้ำ%')
-                            ->orWhere('title', 'like', '%ค่าไฟฟ้า%');
+                        $query->where('title', 'like', '%ค่าน้ำ (Water rate)%')
+                            ->orWhere('title', 'like', '%ค่าไฟฟ้า (Electrical rate)%');
                     });
     }
     public function payment_parking_fee_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
@@ -174,14 +174,14 @@ class RentBill extends Model
     {
         return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
-                    ->where('title', 'like', '%ค่าน้ำ%');
+                    ->where('title', 'like', '%ค่าน้ำ (Water rate)%');
     }
 
     public function payment_electricity()
     {
         return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
-                    ->where('title', 'like', '%ค่าไฟฟ้า%');
+                    ->where('title', 'like', '%ค่าไฟฟ้า (Electrical rate)%');
     }
     public function getTotalAmountAttribute()
     {
@@ -230,7 +230,7 @@ class RentBill extends Model
         return $this->payment_list
                 ->where('discount', 0)
                 ->filter(function($item) {
-                    return str_contains($item->title, 'ค่าน้ำ');
+                    return str_contains($item->title, 'ค่าน้ำ (Water rate)');
                 })
                 ->sum('price');
     }

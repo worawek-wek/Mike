@@ -53,6 +53,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                 </td>
                 <td class="  dt-checkboxes-cell">
                     {{ $loop->iteration + (($list_data->currentPage() - 1) * $list_data->perPage()) }}
+                </td>
                 <td class="text-center">{{ $row_2->room_name }}</td>
                 <td class="text-center"><span class="text-truncate">{{ $row_2->prefix.' '.$row_2->renter_name }}</span>
                 </td>

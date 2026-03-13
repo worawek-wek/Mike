@@ -171,7 +171,7 @@
                                                         <h6 class="mb-0 fw">จ่ายล่าช้าแบบนัดเวลา</h6>
                                                     </div>
                                                     <div class="user-progress">
-                                                        <h6 class="text-light-success mb-0" style="color: #ffb975;">{{ number_format($summary_month['all_receipt_late_with_appointment']) }} บาท</h6>
+                                                        <h6 class="text-light-success mb-0" style="color: #ffb975 !important;">{{ number_format($summary_month['all_receipt_late_with_appointment']) }} บาท</h6>
                                                     </div>
                                                 </div>
                                             </li>

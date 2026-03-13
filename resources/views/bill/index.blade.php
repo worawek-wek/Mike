@@ -144,14 +144,14 @@
                                                         </h4>
                                                     </div>
                                                     <h5 class="mb-0 d-flex">ยอดในบัญชี
-                                                        <button type="button"
+                                                        {{-- <button type="button"
                                                             class="btn btn-warning btn-sm rounded-2 mx-5 d-write"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#model-clear-balance"
-                                                            onclick="confirmation()">
+                                                            onclick="getFormClearBalance()">
                                                             <i class="ti ti-refresh me-1"></i>
                                                             เคลียร์ยอด
-                                                        </button>
+                                                        </button> --}}
                                                         <button type="button"
                                                             class="btn btn-main btn-sm rounded-2 ms-auto d-write"
                                                             data-bs-toggle="modal"
@@ -284,7 +284,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="window.open('{{$page_url}}/export/excel', '_blank')">
+                                                        onclick="printExcel()">
                                                     <span>
                                                     <i class="ti ti-upload"></i> ดาวน์โหลด Excel</span>
                                                 </button>
@@ -306,7 +306,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="printPdfMany()"
+                                                        onclick="printPdfMany('all')"
                                                         >
                                                     <span>
                                                     <i class="ti ti-file-upload"></i> พิมพ์หลายห้อง</span>
@@ -405,19 +405,19 @@
             </div>
         </div>
     </div>
-    <div class="modal fade modalHeadDecor" id="model-clear-balance" tabindex="-1" aria-hidden="true">
+    {{-- <div class="modal fade modalHeadDecor" id="model-clear-balance" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
                 <div class="modal-header rounded-0">
                     <h5 class="modal-title" id="exampleModalLabel1">เคลียร์ยอด</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="get-form-clear-balance">
                     
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="modal fade modalHeadDecor" id="model-confirmation" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content rounded-0">
@@ -728,9 +728,19 @@
                 }
             });
         }
-        function printPdfMany() {
+        function printPdfMany(id) {
+            let url = '/pdf/invoice/'+id;
+
+            if(id == "all"){
+                let ids = $('.ids_invoice:checked').map((i, el) => el.value).get();
+                if (ids.length === 0){
+                    return Swal.fire('โปรดเลือกรายการใบแจ้งหนี้', '', 'warning');
+                }
+                url = '/pdf/invoice_all/'+ids;
+            }
+
             $.ajax({
-                url: '/pdf/invoice-many/1',
+                url: url,
                 type: 'GET',
                 success: function(html) {
                     const iframe = document.getElementById('print-iframe');
@@ -745,22 +755,9 @@
                         iframe.contentWindow.print();
                     };
                 },
-                error: function (xhr) {
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let messages = '';
-                        $.each(xhr.responseJSON.errors, function (key, value) {
-                            messages += value + '<br>';
-                        });
-
-                        Swal.fire({
-                            title: 'เกิดข้อผิดพลาด',
-                            html: messages,
-                            icon: 'error',
-                        });
-                    } else {
-                        Swal.fire('เกิดข้อผิดพลาด', '', 'error');
-                        console.error('เกิดข้อผิดพลาด:', xhr);
-                    }
+                error: function(xhr) {
+                    alert('เกิดข้อผิดพลาด');
+                    console.error(xhr.responseText);
                 }
             });
         }
@@ -799,6 +796,21 @@
                     }
                 }
             });
+        }
+        function printExcel(){
+
+            searchData = {}; // reset ก่อน
+
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                
+                searchData[inputName] = inputValue;
+            });
+
+            var query = $.param(searchData);
+
+            window.open('{{$page_url}}/export/excel?' + query, '_blank');
         }
         $(document).ready(function() {
             $('input[type="radio"]').click(function() {
@@ -1048,6 +1060,17 @@
             });
             // alert(page);
         }
+        function getFormClearBalance(){ // Modal รอคอนเฟิร์ม
+            $.ajax({
+                type: "GET",
+                url: "{{$page_url}}/get-form-clear-balance",
+                // data: searchData,
+                success: function(data) {
+                    $("#get-form-clear-balance").html(data);
+                }
+            });
+            // alert(page);
+        }
         function confirmation(){ // Modal รอคอนเฟิร์ม
             $.ajax({
                 type: "GET",
@@ -1137,6 +1160,7 @@
                 }
             });
         });
+        
         function changeStatusAllCheck(){
             let ids = [];
             $('.ids_receipt:checked').each(function() {

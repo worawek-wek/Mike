@@ -45,7 +45,7 @@
             <label class="mt-4 text-black" style="font-weight: 500;font-size: large;" for="">
                 รายการชำระเงิน
             </label>
-            <table class="table table-bordered mt-2 table-detail" id="discount-table2"
+            <table class="table table-bordered mt-2 table-detail" id="form-bad-debt-receipt-move-out-discount-table2"
             @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */
                         opacity: 0.6;          /* ให้ดูจางลง */
@@ -65,7 +65,7 @@
                             </td>
                             <td class="text-end gap-1">
                                 <div class="d-flex">
-                                    <input type="number" name="payment_list[price][]" class="form-control me-2 {{ $payment_list_item_4->discount == 1 ? "form-price_increase" : "form-discount-value" ; }} calculate_2" value="{{ $payment_list_item_4->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
+                                    <input type="number" name="payment_list[price][]" class="form-control me-2 {{ $payment_list_item_4->discount == 1 ? "form-price_increase" : "form-discount-value" ; }} calculate_2" value="{{ $payment_list_item_4->price }}" placeholder="จำนวนเงิน" max="" oninput="bad_debt_calculate_2Price()" required>
                                     <input type="hidden" name="payment_list[discount][]" value="{{ $payment_list_item_4->discount }}">
                                     <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
                                 </div>
@@ -77,7 +77,7 @@
                                 <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" @if(@$invoice_rent_room) value="ค่าเช่าห้อง {{ $room->name .' เดือน '.$invoice_rent_room->month.'/'.$invoice_rent_room->year }}" @endif required>
                             </td>
                             <td class="text-end">
-                                <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2" @if(@$invoice_rent_room) value="{{ $invoice_rent_room->total_amount }}" @endif placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" required>
+                                <input type="number" name="payment_list[price][]" class="form-control form-discount-value calculate_2" @if(@$invoice_rent_room) value="{{ $invoice_rent_room->total_amount }}" @endif placeholder="จำนวนเงิน" max="" oninput="bad_debt_calculate_2Price()" required>
                                 <input type="hidden" name="payment_list[discount][]" value="0">
                                 <input type="hidden" name="payment_list[bad_debt_rent_status][]" value="1">
                             </td>
@@ -88,16 +88,12 @@
                 <tfoot>
                     <tr>
                         <th>รวม</th>
-                        <th class="text-end mb-0 fw-bold total-price_2" id="amount_receipt_move_out">
+                        <th class="text-end mb-0 fw-bold bad-debt-total-price_2" id="bad_debt_amount_receipt_move_out">
                             0
                         </th>
                     </tr>
                 </tfoot>
             </table>
-                <div class="col-sm-12">
-                    <label for="renter_remark" class="form-label">หมายเหตุ</label>
-                    <textarea name="remark" class="form-control" id="renter_bad_remark" placeholder="หมายเหตุ">{{ @$invoice->remark }}</textarea>
-                </div>
         <div class="mt-4 text-end col-12"
         @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */
@@ -166,14 +162,14 @@
                             </td>
                             <td class="text-end gap-1">
                                 <div class="d-flex">
-                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2 me-2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน" oninput="calculate_2Price()" required>
+                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2 me-2 ${discountClass}" value="${price}" placeholder="จำนวนเงิน" oninput="bad_debt_calculate_2Price()" required>
                                     <input type="hidden" name="payment_list[discount][]" value="${isDiscount}">
                                     <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
                                 </div>
                             </td>
                         </tr>`;
-                    $('#discount-table2 tbody').append(html);
-                    calculate_2Price();
+                    $('#form-bad-debt-receipt-move-out-discount-table2 tbody').append(html);
+                    bad_debt_calculate_2Price();
                 }
 
                 // กดเพิ่มส่วนลด
@@ -215,17 +211,17 @@
                 // ลบแถวรายการ
                 $(document).on('click', '.btn-remove-row', function () {
                     $(this).closest('tr').remove();
-                    calculate_2Price();
+                    bad_debt_calculate_2Price();
                 });
 
                 // คำนวณราคาเมื่อพิมพ์ค่า
                 $(document).on('input', '.calculate_2', function () {
-                    calculate_2Price();
+                    bad_debt_calculate_2Price();
                 });
 
                 // เรียกคำนวณตอนโหลดหน้า
                 $(document).ready(function () {
-                    calculate_2Price();
+                    bad_debt_calculate_2Price();
                     
                     new TomSelect("#select-renter2", {
                         create: false,      // ไม่ให้พิมพ์เพิ่มเอง
@@ -238,4 +234,28 @@
                     });
 
                 });
+                                    
+                function bad_debt_calculate_2Price() {
+                    let total = 0;
+
+                    $('#form-bad-debt-receipt-move-out-discount-table2 tbody tr').each(function () {
+                    // $('#discount-table2 tbody tr').each(function () {
+                        const priceInput = $(this).find('input[name="payment_list[price][]"]');
+                        const price = parseFloat(priceInput.val());
+
+                        if (!isNaN(price)) {
+                            // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
+                            if (priceInput.hasClass('form-price_increase')) {
+                                total -= price;
+                            } else {
+                                // รายการปกติ บวกเพิ่ม
+                                total += price;
+                            }
+                        }
+                    });
+                    // alert(total);
+                    $('.bad-debt-total-price_2').text(
+                        total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    );
+                }
             </script>

@@ -2,7 +2,7 @@
     <table class="table table-bordered mb-4" id="discount-table2" >
         <thead>
             <tr>
-                <th>รายการ 123</th>
+                <th>รายการ</th>
                 <th width="35%">จำนวนเงิน (บาท)</th>
             </tr>
         </thead>
@@ -12,7 +12,11 @@
                 @continue($payment_list->discount == 1)
                     <tr>
                         <td>
-                            <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="{{ $payment_list->title }}" placeholder="หัวข้อรายการ" readonly>
+                                <input
+                                name="payment_list[title][]"
+                                type="text"
+                                class="form-control payment_list_title"
+                                value="{{ $payment_list->title }}@if (strpos($payment_list->title, 'Water rate') !== false){{(int)$payment_list->unit}}&nbsp; - &nbsp;{{ $invoice->previous_water_unit ?? 0 }} = &nbsp;{{ $payment_list->unit-$invoice->previous_water_unit }}&nbsp; ยูนิต)@endif" placeholder="หัวข้อรายการ" readonly>
                         </td>
                         <td class="text-end">
                             <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>

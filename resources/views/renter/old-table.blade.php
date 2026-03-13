@@ -220,7 +220,15 @@
                         <td class="text-center">{{ $row->phone }}
                         </td>
                         <td class="text-center">
-                            {{@$row->vehicle->car_registration ?? '-'}}
+                            @foreach ($row->vehicles as $vehicles)
+                            @php
+                                if ($vehicles->ref_room_id != $row->room_id){
+                                    continue;
+                                }
+                            @endphp
+                                {{ $vehicles->car_registration." ".$vehicles->detail }}
+                                <br>
+                            @endforeach
                         </td>
                         <td class="text-center">
                             @if(@$row->room_for_rent->room->contract->contract_date)

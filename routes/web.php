@@ -245,8 +245,10 @@ Route::middleware('auth')->group(function() {
     });
     Route::controller(PDFController::class)->group(function() {                    //////////////////////////
         // Route::get('pdf', 'index')->name('dashboard');    //////////////////////////
+        Route::get('pdf/receipt_all/{receipt_id}', 'receipt_all')->name('pdf.receipt');    //////////////////////////
         Route::get('pdf/receipt/{receipt_id}', 'receipt')->name('pdf.receipt');    ////////////////////////// 
         Route::get('pdf/invoice/{invoice_id}', 'invoice')->name('pdf.invoice');    //////////////////////////
+        Route::get('pdf/invoice_all/{invoice_id}', 'invoice_all')->name('pdf.invoice');    //////////////////////////
         Route::get('pdf/invoice/move-out/not-yet-recorded/{invoice_id}', 'move_out_not_yet_recorded')->name('pdf.invoice');    //////////////////////////
         Route::get('pdf/overdue/invoice/{room_id}', 'overdue_invoice')->name('pdf.overdue_invoice');    //////////////////////////
         Route::get('pdf/invoice-many/{invoice_id}', 'invoice_many')->name('pdf.invoice_many');    //////////////////////////
@@ -271,6 +273,7 @@ Route::middleware('auth')->group(function() {
         
         Route::get('room/get-form-add-renter/{room_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
         Route::get('room/get-form-add-renter/{room_id}/{renter_id}', 'get_form_add_renter')->name('get-form-add-renter');    //////////////////////////
+        Route::get('room/get-last-meter/{room_id}', 'get_last_meter')->name('get-get-last-meter');    //////////////////////////
         Route::post('room/delete-reserve/{occupancy_id}', 'delete_reserve')->name('delete-reserve');    //////////////////////////
         Route::get('room/get-deposit', 'get_deposit')->name('get-deposit');    //////////////////////////
         Route::get('room/get-reservation', 'get_reservation')->name('get-reservation');    //////////////////////////
@@ -318,6 +321,7 @@ Route::middleware('auth')->group(function() {
     });
     Route::controller(MeterController::class)->group(function() {                   //////////////////////////
         Route::get('meter', 'index')->name('meter');    //////////////////////////
+        Route::get('meter/unit-rate/{room_id}', 'unit_rate')->name('meter.unit-rate');    //////////////////////////
         Route::get('meter/get-moving-meter-room-count', 'get_moving_meter_room_count')->name('meter.water-get-moving-meter-room-count');    //////////////////////////
         Route::get('meter/water/datatable', 'water_datatable')->name('meter.water-datatable');    //////////////////////////
         Route::get('meter/get-water-meter-unit/{id}', 'get_water_meter_unit')->name('meter.get-water-meter-unit');    //////////////////////////
@@ -371,12 +375,14 @@ Route::middleware('auth')->group(function() {
         Route::get('bill/get-list-payment-by-id', 'get_list_payment_by_id')->name('bill.get-list-payment-by-id');    //////////////////////////
         Route::get('bill/waiting-for-confirmation', 'waiting_for_confirmation')->name('bill.waiting-for-confirmation');    //////////////////////////
         Route::get('bill/confirmation', 'confirmation')->name('bill.confirmation');    //////////////////////////
+        Route::post('bill/clear-balance', 'clear_balance')->name('bill.clear-balance');    //////////////////////////
         Route::get('bill/export/excel', 'export_excel')->name('bill.export-excel');    //////////////////////////
         Route::get('bill/export/excel-summary', 'export_excel_summary')->name('bill.export-excel-summary');    //////////////////////////
         Route::post('bill/incomplete_update/{submit}', 'incomplete_update')->name('bill.incomplete_update');    //////////////////////////
         Route::post('bill/confirm-bill-all', 'confirm_bill_all')->name('bill.confirm-bill-all');    //////////////////////////
         Route::post('bill/payment_bill', 'payment_bill')->name('bill.payment_bill');    //////////////////////////
         Route::get('bill/{id}', 'invoice')->name('bill.invoice');    //////////////////////////
+        Route::get('bill/{id}/{overdue}', 'invoice')->name('bill.invoice-overdue');    //////////////////////////
         Route::post('bill/change_status_bill_receipt', 'change_status_bill_receipt')->name('bill.change-status-bill-receipt');    //////////////////////////
         Route::post('bill/change_status_bill_invoice', 'change_status_bill_invoice')->name('bill.change-status-bill-invoice');    //////////////////////////
         Route::post('bill/change_status_bill/{invoice_id}', 'change_status_bill_invoice')->name('bill.change-status-bill-invoice');    //////////////////////////

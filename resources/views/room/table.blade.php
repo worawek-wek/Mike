@@ -53,10 +53,10 @@ aria-labelledby="pills-home-tab" tabindex="0">
 
                                 @endphp
                         </p>
-                        
-                        @if($row->status == 1 && $row->rent_bill_status != 5)
+                        {{-- -{{$row->rent_bill_status}}- --}}
+                        @if($row->status == 1 && !in_array($row->rent_bill_status,[5,null]))
                             ห้องจอง<span class="text-danger">(ค้างชำระ)</span></td>
-                        @elseif($row->status == 1 && $row->receipt_status_id != 5)
+                        @elseif($row->status == 1 && !in_array($row->receipt_status_id,[5,null]))
                             ห้องจอง<span class="text-warning">(รอคอนเฟิร์มบิล)</span></td>
                         @else
                             {{ $row->status_name }}</td>
@@ -165,6 +165,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                 @endif
             </td>
             <td class="text-center"  {!! $onclick !!}>
+                {{-- ฅ{{$row2->rent_bill_status}}ฅ --}}
                 @if($row2->status == 1 && $row2->rent_bill_status != 5)
                     <span class="badge bg-info" style="font-size: unset;" text-capitalized="">ห้องจอง<span class="text-danger">(ค้างชำระ)</span></span></td>
                 @elseif($row2->status == 1 && $row2->receipt_status_id != 5)

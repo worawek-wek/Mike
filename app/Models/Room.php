@@ -67,6 +67,10 @@ class Room extends Model
     {
         return $this->hasOne('App\Models\RoomForRents', 'occupancy_id', 'occupancy_id');
     }
+    public function room_for_rent_all() // สำหรับ ผู้เช่า ปัจจุบัน
+    {
+        return $this->hasMany('App\Models\RoomForRents', 'occupancy_id', 'occupancy_id');
+    }
     public function room_for_rent_s()
     {
         return $this->hasMany('App\Models\RoomForRents', 'ref_room_id', 'id');
@@ -82,6 +86,10 @@ class Room extends Model
     public function room_has_discount()
     {
         return $this->hasMany('App\Models\RoomHasDiscount', 'ref_room_id', 'id');
+    }
+    public function last_meter()
+    {
+        return $this->hasOne('App\Models\Meter', 'ref_room_id', 'id')->orderBy('year', 'desc')->orderBy('month', 'desc');
     }
     public function meterCurrent()
     {

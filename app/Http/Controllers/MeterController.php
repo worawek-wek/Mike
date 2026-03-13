@@ -73,9 +73,11 @@ class MeterController extends Controller
         // // ตัดอันที่ซ้ำออก
         $check_this_month = Meter::where('year', date('Y'))->where('month', date('m'))->first();
         if(!$check_this_month){
-            $room = Room::get();
+            $room = Room::whereHas('floor.building', function ($query) {
+                                        $query->where('ref_branch_id', session("branch_id"));
+                                    })->get();
             foreach($room as $ro){
-                $meter = Meter::where('ref_room_id', $ro->id)->orderBy('year', 'desc')->orderBy('month', 'desc')->first();	
+                $meter = $ro->last_meter;	
                 if(!$meter){
                     continue;
                 }
@@ -91,6 +93,7 @@ class MeterController extends Controller
                     $insert_m->save();
             }
         }
+        // return 123;
         // $branch = Branch::where('ip_meter','!=','')->get();
 
         // // /////////////////////////////////
@@ -224,6 +227,16 @@ class MeterController extends Controller
         return view('meter/index', $data);
     }
     
+    public function unit_rate($room_id)
+    {
+        $room = Room::select('water_baht_per_unit', 'ele_baht_per_unit')->find($room_id);
+        
+        return response()->json([
+            'status'  => true,
+            'water_baht_per_unit' => $room->water_baht_per_unit,
+            'ele_baht_per_unit' => $room->ele_baht_per_unit
+        ]);
+    }
     public function get_moving_meter_room_count()
     {
         $latestMeter = Meter::select('year', 'month')

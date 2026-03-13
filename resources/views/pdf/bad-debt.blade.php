@@ -79,14 +79,13 @@
             text-align: left;
         }
         .total-table td:nth-child(2) {
-            text-align: left;
+            text-align: center;
             font-weight: bold;
-            border-bottom: 1px solid #000;
         }
         .total-table td:nth-child(3) {
             text-align: right;
-            font-weight: bold;
             border-bottom: 1px solid #000;
+            padding-bottom: 2px;
         }
         .full-width {
             width: 100%;
@@ -146,7 +145,7 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก
+        <div class="header">ใบย้ายออก(ผู้เช่าหนี)
             {{-- (ผู้เช่าหนี) --}}
         </div>
         <table class="table-info">
@@ -275,26 +274,27 @@
 
         <table class="total-table">
             <tr style="vertical-align: top;">
-                <td style="">({{ $amount_thai }})</td>
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
                 @if ($cal > 0)
-                    <td>สรุป เก็บเงินผู้เช่าเพิ่ม</td>
-                    <td style="">
-                        {{ number_format(abs($cal)) }} บาท
+                    <td style="font-size: 12px !important;">สรุป หอพักได้รับเงินประกัน</td>
+                    <td>
+                        <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
+                        <br>
+                        ({{ $amount_thai }})
                     </td>
                 @else
-                    <td>สรุป หนี้สูญ</td>
-                    <td style="">
-                        {{ number_format(abs($cal)) }} บาท
+                    <td style="font-size: 12px !important;">สรุป หนี้สูญ</td>
+                    <td>
+                        <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
+                        <br>
+                        ({{ $amount_thai }})
                     </td>
                 @endif
             </tr>
-        </table>
-        <table>
             <tr>
-                <td width="150px" style="padding-top: 5px;">
-                    <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
-                </td>
-                <td width="80%" style="padding: 0px 40px;">
+                <td colspan="2">
                     <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ @$invoice->receipt[0]->remark }}</span></div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
@@ -313,7 +313,8 @@
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 
-        @if(count($invoice_contract->payment_list) < 6)
+        @if(count($receipt_rent_room_deducted->payment_list ?? [])+count($receipt_bad_debt_deducted->payment_list ?? []) < 6)
+        {{-- @if(count($invoice_contract->payment_list) < 6) --}}
             <hr style="border: 1px dashed #404040;margin:10px 0;">
         @else
             <div style="page-break-before: always;"></div>
@@ -328,7 +329,7 @@
         {{-- //////// สำเนา --}}
         {{-- //////// สำเนา --}}
 
-        <div class="header">ใบย้ายออก
+        <div class="header">ใบย้ายออก(ผู้เช่าหนี)
             {{-- (ผู้เช่าหนี) --}}
         </div>
         <table class="table-info">
@@ -462,29 +463,30 @@
             
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
 {{-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// --}}
-
+        
         <table class="total-table">
             <tr style="vertical-align: top;">
-                <td style="font-size: large;">({{ $amount_thai }})</td>
+                <td style="font-size: large;width: 20%;" rowspan="2">
+                    <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="65%" >
+                </td>
                 @if ($cal > 0)
-                    <td>สรุป เก็บเงินผู้เช่าเพิ่ม</td>
-                    <td style="font-size: large;">
-                        {{ number_format(abs($cal)) }} บาท
+                    <td style="font-size: 12px !important;">สรุป หอพักได้รับเงินประกัน</td>
+                    <td>
+                        <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
+                        <br>
+                        ({{ $amount_thai }})
                     </td>
                 @else
-                    <td>สรุป หนี้สูญ</td>
-                    <td style="font-size: large;">
-                        {{ number_format(abs($cal)) }} บาท
+                    <td style="font-size: 12px !important;">สรุป หนี้สูญ</td>
+                    <td>
+                        <b style="font-size: 12px !important;">{{ number_format(abs($cal)) }} บาท</b>
+                        <br>
+                        ({{ $amount_thai }})
                     </td>
                 @endif
             </tr>
-        </table>
-        <table>
             <tr>
-                <td width="150px" style="padding-top: -45px;">
-                    <img src="/upload/qr-code/{{ $invoice_contract->room_for_rent->room->floor->building->qr_code }}" alt="" width="70%" >
-                </td>
-                <td width="80%" style="padding: 0px 40px;">
+                <td colspan="2">
                     <div class="note">หมายเหตุ(Note): <span style="font-weight: 400;">{{ @$invoice->receipt[0]->remark }}</span></div>
                     <div class="signature" style="margin: auto 15px;">
                         <div class="signature-line">
@@ -497,6 +499,7 @@
                 </td>
             </tr>
         </table>
+
     </div>
 </body>
 </html>
