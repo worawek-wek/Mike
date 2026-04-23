@@ -6,7 +6,7 @@
 <head>
     @include('layout/inc_header')
     <title>Dashboard - CRM | Vuexy - Bootstrap Admin Template</title>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 
 <body>
@@ -401,6 +401,7 @@
     </div>
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     var pageIncomeExpense = "{{ $page_url }}/calculate-income-expense";
     function calculate_income_expense(pages){
@@ -424,11 +425,10 @@
         });
 
     }
-    $('.datepicker').datepicker({
-                        format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                        autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                        todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-                    });
+    flatpickr('.datepicker', {
+        dateFormat: 'd/m/Y',
+        allowInput: true
+    });
     $('#insert_electricity_bill').on('submit', function(event) {
         event.preventDefault(); // ป้องกันการส่งฟอร์มปกติ
         if (!this.checkValidity()) {

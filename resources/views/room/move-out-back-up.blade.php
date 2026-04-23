@@ -6,8 +6,8 @@
 <!-- ก่อน </body> -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
 .no-data-box {
@@ -1128,10 +1128,11 @@
                                                     </div>
                                                 
                                                     <script>
-                                                        $('.datepicker').datepicker({
-                                                            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                                                            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                                                            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+                                                        flatpickr('.datepicker', {
+                                                            dateFormat: 'd/m/Y',
+                                                            allowInput: true,
+                                                            static: true,
+                                                            disableMobile: true,
                                                         });
                                                         function togglePaymentBadDebtFields() {
                                                             // alert(456)

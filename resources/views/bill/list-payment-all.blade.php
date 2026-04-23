@@ -1,5 +1,5 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
-    <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
         <i class="tf-icons ti ti-browser-plus text-main" style="font-size: 25px;vertical-align: baseline;"></i>
         รายการห้อง
     </h5>
@@ -156,6 +156,7 @@
             </div>
         </div>
     </div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
         // setTimeout(() => {
             if({{$total_amount}} > 0){
@@ -164,18 +165,20 @@
                 $('#submit_payment_bill_form_all').prop('disabled', true);
             }
         // }, 2000);
-        $('#payment_date_lhai').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#payment_date_lhai2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        flatpickr('#payment_date_lhai', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true,
+            static: true,
+            disableMobile: true
+        });
+        flatpickr('#payment_date_lhai2', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true,
+            static: true,
+            disableMobile: true
+        });
         $('.reservation_payment_channel_Lhai').on('change', function() {
             const paymentChannelLhai = $('.reservation_payment_channel_Lhai:checked').val();
 

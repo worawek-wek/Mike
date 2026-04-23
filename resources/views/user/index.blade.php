@@ -6,6 +6,7 @@
 <head>
     @include('layout/inc_header')
     <title>Dashboard - CRM | Vuexy - Bootstrap Admin Template</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <style>
 .table th {
@@ -324,6 +325,7 @@
     <iframe id="print-iframe" style="display: none;"></iframe>    
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         var page = "{{$page_url}}/datatable";
         var searchData = {};
@@ -623,10 +625,9 @@
         // window.onload = function() {
         //     $('#addserviceModal').modal('show');
         // };
-        $('#bs-datepicker-format').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        flatpickr('#bs-datepicker-format', {
+            dateFormat: 'd/m/Y',
+            allowInput: true
         });
         $('#select2Position1').select2();
         function printPdfBill() {

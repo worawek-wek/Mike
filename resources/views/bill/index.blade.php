@@ -294,7 +294,7 @@
                                                         tabindex="0" aria-controls="DataTables_Table_0"
                                                         type="button" aria-haspopup="dialog"
                                                         aria-expanded="false"
-                                                        onclick="window.open('{{$page_url}}/export/excel-summary', '_blank')"
+                                                        onclick="printExcelSummary()"
                                                         {{-- onclick="printPdfBill()" --}}
                                                         >
                                                     <span>
@@ -816,6 +816,21 @@
             var query = $.param(searchData);
 
             window.open('{{$page_url}}/export/excel?' + query, '_blank');
+        }
+        function printExcelSummary(){
+
+            searchData = {}; // reset ก่อน
+
+            $('.p_search').each(function() {
+                var inputName = $(this).attr('name');
+                var inputValue = $(this).val();
+                
+                searchData[inputName] = inputValue;
+            });
+
+            var query = $.param(searchData);
+
+            window.open('{{$page_url}}/export/excel-summary?' + query, '_blank');
         }
         $(document).ready(function() {
             $('input[type="radio"]').click(function() {

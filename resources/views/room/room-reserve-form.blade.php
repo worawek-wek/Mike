@@ -12,8 +12,8 @@
   <div class="spinner"></div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- CSS -->
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 
@@ -847,28 +847,7 @@ $(document).ready(function() {
                         sortField: { field: "text", direction: "asc" }
                     });
 
-        setTimeout(() => {
-            // $('#bs-datepicker-format').datepicker({
-            //     format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            //     autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            //     todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            // });
-            $('#bs-datepicker-format2').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-            $('#exampleFormControlInput13').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-            $('#exampleFormControlInput33').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-            });
-        }, 2000);
+        // setTimeout ถูกลบออกเพราะทำให้ datepicker ถูก initialize ซ้ำ 2 ครั้ง
     
         function room_selected() {
             document.getElementById('loadingOverlay').style.display = 'flex';
@@ -1021,36 +1000,15 @@ $(document).ready(function() {
             $('.reservation_payment_channel:checked').trigger('change');
         });
 
-        $('#bs-datepicker-format2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#exampleFormControlInput13').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#exampleFormControlInput33').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#payment_date').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#payment_date2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        const fpConfig = {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+        };
+        flatpickr('#bs-datepicker-format2', fpConfig);
+        flatpickr('#exampleFormControlInput13', fpConfig);
+        flatpickr('#exampleFormControlInput33', fpConfig);
+        flatpickr('#payment_date', fpConfig);
+        flatpickr('#payment_date2', fpConfig);
         
     $(document).ready(function() {
         $('#select2Basic').on('change', function () {

@@ -5,9 +5,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 @foreach ($rent_bill_s as $key => $rent_bill)
 
@@ -148,18 +147,8 @@
 
   <script>
     
-        $('#payment_date_lhai').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#payment_date_lhai2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        flatpickr('#payment_date_lhai', { dateFormat: 'd/m/Y', allowInput: true });
+        flatpickr('#payment_date_lhai2', { dateFormat: 'd/m/Y', allowInput: true });
         // $('#checksplit2').on('change', function () {
         //     if (this.checked) {
         //         $('#divsplit2').show();

@@ -3,8 +3,8 @@
     {{-- ทำสัญญาหลายห้อง --}}
     {{-- ทำสัญญาหลายห้อง --}}
 
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <input type="hidden" name="ref_renter_id" value="{{ $renter->id }}">
     <div class="m-2" style="border: 1px solid #dbdbdb;border-radius: 5px;">
         <h5 class="border-bottom p-2" style="background-color: rgb(255, 248, 237);">
@@ -251,10 +251,11 @@
                 preview.style.display = "none";
             }
         });
-        $('.date_contract_all').datepicker({
-                format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        flatpickr('.date_contract_all', {
+                dateFormat: 'd/m/Y',
+                allowInput: true,
+                static: true,
+                disableMobile: true,
             });
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
             function calculateTotalDeposit() {

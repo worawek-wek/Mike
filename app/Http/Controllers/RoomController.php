@@ -419,10 +419,10 @@ class RoomController extends Controller
                                     ->get();
 
         $data['bill_month'] = RentBill::oldest()->first();
-        $data['month_year_bill'] = Receipt::orderBy('id','desc')
-                                            ->where('ref_room_id', $id)
+        $data['month_year_bill'] = Receipt::where('ref_room_id', $id)
                                             ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year')
-                                            ->groupByRaw('MONTH(created_at), YEAR(created_at)')
+                                            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+                                            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
                                             ->get();
         // $data['bill_month'] = RentBill::leftJoin('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
         //                     ->where('room_for_rents.ref_room_id', $id)

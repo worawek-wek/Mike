@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="modal-header rounded-0">
     <span class="modal-title">
         <span class="h5" style="color: rgb(232, 255, 226);">ห้อง {{ $invoice->room_for_rent->room->name }}</span>
@@ -712,20 +713,19 @@
         </div>
     </form>        
     </div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     
-        $('#transfer_date').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#transfer_date2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        flatpickr('#payment_date', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true
+        });
+        flatpickr('#payment_date2', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true
+        });
 
         
         function paymentChannel(i) {

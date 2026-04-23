@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="modal-content rounded-0">
     <div class="modal-header rounded-0">
         <span class="modal-title">
@@ -227,6 +228,7 @@
 </div>
 </div>
     <script src="/assets/js/cards-actions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     
     $('#edit_user').on('submit', function(event) {
@@ -273,9 +275,8 @@
             });
         });
         
-        $('#bs-datepicker-format2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        flatpickr('#bs-datepicker-format2', {
+            dateFormat: 'd/m/Y',
+            allowInput: true
         });
 </script>

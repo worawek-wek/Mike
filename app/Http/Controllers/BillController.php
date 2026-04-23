@@ -1163,7 +1163,7 @@ $sequence++;
                                 });
         }
             // return 456;
-        if(@$request->ref_status_id != "all"){
+        if(@$request->ref_status_id && $request->ref_status_id != "all"){
             // return 123;
             $results = $results->Where('rent_bills.ref_status_id','LIKE','%'.$request->ref_status_id.'%');
         }
@@ -1176,10 +1176,10 @@ $sequence++;
         if(@$request->room_rent){
             $results = $results->Where('rent_bills.total', $request->room_rent);
         }
-        if(@$request->building != "all"){
+        if(@$request->building && $request->building != "all"){
             $results = $results->Where('room_for_rents.ref_building_id', $request->building);
         }
-        if(@$request->floor != "all"){
+        if(@$request->floor && $request->floor != "all"){
             $results = $results->Where('room_for_rents.ref_floor_id', $request->floor);
         }
         if(@$request->month){

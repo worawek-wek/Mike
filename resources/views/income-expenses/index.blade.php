@@ -73,6 +73,7 @@
 
 <link rel="stylesheet" href="assets/vendor/libs/select2/select2.css" />
 <link rel="stylesheet" href="assets/vendor/libs/bootstrap-select/bootstrap-select.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <body>
     <!-- Layout wrapper -->
@@ -526,6 +527,7 @@
 
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         var page = "{{$page_url}}/datatable";
         var searchData = {};
@@ -716,15 +718,15 @@
             });
         });
         
-        $('#bs-datepicker-format').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        flatpickr('#bs-datepicker-format', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true
         });
-        $('#bs-datepicker-format-2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-            autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-            todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
+        flatpickr('#bs-datepicker-format-2', {
+            dateFormat: 'd/m/Y',
+            defaultDate: 'today',
+            allowInput: true
         });
         $('#selectRoom').select2();
         $('#selectRoomIncome').select2();

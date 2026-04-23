@@ -15,7 +15,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
   /* พื้นหลังทึบ */
@@ -208,7 +209,7 @@
                                                 <i class="tf-icons ti ti-user text-main" style="font-size: 25px;vertical-align: baseline;"></i>
                                                 ข้อมูลส่วนตัว
                                             </h5>
-                                            <script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+
                                             @if (@$check_in)
                                             <input type="hidden" name="room_id" value="{{ $room->id }}">
                                             <div class="row g-3 p-4 pt-1">
@@ -556,11 +557,11 @@
                                                 // });
                                             </script>
                                             <script>
-                                                $('#contract_date').datepicker({
-                                                        format: 'dd/mm/yyyy', // กำหนดรูปแบบวันที่
-                                                        autoclose: true,      // ปิด datepicker เมื่อเลือกวันที่
-                                                        todayHighlight: true  // ไฮไลต์วันที่ปัจจุบัน
-                                                    });
+                                                flatpickr('#contract_date', {
+                                                    dateFormat: 'd/m/Y',
+                                                    allowInput: true,
+                                                    onChange: function() { updateContractDateTo(); }
+                                                });
                                             </script>
                                             {{-- <script>
                                                 $('#edit_asset').on('submit', function(event) {
@@ -654,18 +655,9 @@
 <iframe id="print-iframe" style="display: none;"></iframe>
 <script>
     
-        $('#contract_date').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#contract_date_to').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        const fpOpts = { dateFormat: 'd/m/Y', allowInput: true };
+        flatpickr('#contract_date', { ...fpOpts, onChange: function() { updateContractDateTo(); } });
+        flatpickr('#contract_date_to', fpOpts);
         // $('#exampleFormControlInput33').datepicker({
         //     format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
         //     todayBtn: "linked",   // เพิ่มปุ่มวันนี้

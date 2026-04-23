@@ -7,9 +7,8 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-<link rel="stylesheet" href="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css" />
-
-<script src="assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
     <h5 class="border-bottom p-2 m-0" style="background-color: rgb(255, 248, 237);">
@@ -473,18 +472,9 @@
             $('.total-receipt'+k).val(total);
             $('.total-receipt'+k).html(total);
         }
-        $('#payment_date_lhai').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
-        $('#payment_date_lhai2').datepicker({
-            format: 'dd/mm/yyyy', // กำหนดรูปแบบของวันที่
-            todayBtn: "linked",   // เพิ่มปุ่มวันนี้
-            clearBtn: true,       // เพิ่มปุ่มล้างข้อมูล
-            autoclose: true       // เมื่อเลือกวันที่แล้วจะปิดปฏิทิน
-        })
+        const fpOpts = { dateFormat: 'd/m/Y', allowInput: true, static: true, disableMobile: true };
+        flatpickr('#payment_date_lhai', fpOpts);
+        flatpickr('#payment_date_lhai2', fpOpts);
         $('.reservation_payment_channel_Lhai').on('change', function() {
             const paymentChannelLhai = $('.reservation_payment_channel_Lhai:checked').val();
 
