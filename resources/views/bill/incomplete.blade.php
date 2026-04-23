@@ -290,7 +290,6 @@
 
         function addRemoveEvent(row) {
             row.querySelector('.remove-row').addEventListener('click', function() {
-                alert(456);
                 row.remove();
                 calculatePrice();
             });

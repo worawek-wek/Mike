@@ -25,6 +25,8 @@ use App\Models\Subdistrict;
 use App\Models\Company;
 use App\Models\RentalcontractModel;
 use App\Models\Setting_bill;
+use App\Models\RentBill;
+use App\Models\PaymentList;
 use App\Models\PermissionGroupHasUserBranch;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -681,6 +683,36 @@ class SettingController extends Controller
                             $insert->ref_service_id  =  $id;
                             $insert->price  =  $request->price[$id];
                             $insert->save();
+                        }
+                    }
+
+                  
+                    $currentBill = RentBill::where('ref_room_id', $room_id)
+                        ->where('ref_status_id', 3)
+                        ->where('ref_type_id', 1)
+                        ->where('month', date('m'))
+                        ->where('year', date('Y'))
+                        ->first();
+
+                    if ($currentBill) {
+                      
+                        PaymentList::where('ref_payment_id', $currentBill->id)
+                            ->where('document_type', 1)
+                            ->whereNotNull('ref_service_id')
+                            ->delete();
+
+                     
+                        if (@$request->ref_service_id) {
+                            foreach ($request->ref_service_id as $service_id) {
+                                $service = Service::find($service_id);
+                                $pay_list = new PaymentList;
+                                $pay_list->title          = $service->name;
+                                $pay_list->price          = $request->price[$service_id];
+                                $pay_list->ref_payment_id = $currentBill->id;
+                                $pay_list->document_type  = 1;
+                                $pay_list->ref_service_id = $service_id;
+                                $pay_list->save();
+                            }
                         }
                     }
                 }
