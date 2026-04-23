@@ -841,8 +841,6 @@ class RoomController extends Controller
     // ใบเสร็จย้ายออก
     public function move_out_detail_bad_debt_bill($id)
     {
-        // $invoice = RentBill::where('ref_type_id', 4)->where('ref_room_id', $id)->first();
-        
         $renter = Renter::leftJoin('room_for_rents', 'renters.id', '=', 'room_for_rents.ref_renter_id')
                             ->where('room_for_rents.ref_room_id', $id)
                             ->where('room_for_rents.status', 1)
@@ -850,7 +848,7 @@ class RoomController extends Controller
                             ->get();
 
         $renter_ids = $renter->pluck('room_for_rents_id')->toArray();
-
+        
         $move_invoice_6 = RentBill::with('payment_list')->where('ref_type_id', 6)->where('ref_room_id', $id)->where('ref_room_for_rent_id', $renter_ids)->latest()->first(); // เงินประกัน
 
         $invoice = RentBill::where('ref_type_id', 5)->where('ref_room_id', $id)->whereIn('ref_room_for_rent_id', $renter_ids)->first(); // บิลหนี้สูญ
@@ -860,9 +858,49 @@ class RoomController extends Controller
         // คำนวนยอดสรุปการย้ายออก เริ่ม
         $cal = $move_invoice_6->total_amount; // 1. ยอดเงินประกันคืนลูกค้า
 
-        if(@$invoice){
-            $cal = $cal-($invoice->total_amount ?? 0); // 2. เอามาลบยอดใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
+        if(!$invoice){ // ถ้าไม่มี บิลหนี้สูญ ให้สร้างเลย
+
+            $invoice = new RentBill;
+            $invoice->invoice_number =  $this->generateInvoiceCode();
+            $invoice->ref_room_id =  $id;
+            $invoice->ref_contract_id =  $move_invoice_6->ref_contract_id;
+            $invoice->ref_status_id =  5;
+            $invoice->ref_type_id =  5; // 5 = บิลหนี้สูญ
+            $invoice->ref_user_id =  Auth::id();
+            $invoice->ref_room_for_rent_id  =  $renter_ids[0];
+            $invoice->month  =  date('m');
+            $invoice->year  =  date('Y');
+            $invoice->name  =  $move_invoice_6->room_for_rent->renter->fullName();
+            $invoice->address  =  $move_invoice_6->room_for_rent->renter->fullThaiAddress();
+            $invoice->phone  =  $move_invoice_6->room_for_rent->renter->phone;
+            $invoice->id_card_number  =  $move_invoice_6->room_for_rent->renter->id_card_number;
+            $invoice->remark  =  $move_invoice_6->room_for_rent->renter->remark;
+            $invoice->save();
         }
+            //// เริ่ม เช็คว่ามี บิลค่าเช่า ที่ค้างชำระไหม
+            $invoice_rent_room = RentBill::where('ref_type_id', 1)->where('ref_status_id', 7)->where('ref_room_id', $id)->whereIn('ref_room_for_rent_id', $renter_ids)->first();
+            
+            if(@$invoice_rent_room){
+
+                $pml = PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->where('bad_debt_rent_status', 1)->first();
+                if(!@$pml){
+                    
+                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                    $pay_list->title  =  "ค่าเช่าห้อง ".$invoice->room->name." เดือน $invoice_rent_room->month/$invoice_rent_room->year";
+                    $pay_list->price  =  $invoice_rent_room->total_amount;
+                    $pay_list->ref_payment_id  =  $invoice->id;
+                    $pay_list->document_type  =  1;
+                    $pay_list->bad_debt_rent_status  =  1; // 1 = รายการที่เป็นค่าเช่าค้างชำระ
+                    $pay_list->save();
+
+                    DB::commit();
+                    
+                }
+            }
+            //// เช็คว่ามี บิลค่าเช่า ที่ค้างชำระไหม /// จบ
+
+            $cal = $cal-($invoice->total_amount ?? 0); // 2. เอามาลบยอดใบเสร็จย้ายออก ที่ชำระโดย หักจากเงินประกัน
+
         // if(@$receipt_1){
         //     if($receipt_1->payment_channel == 3){
         //         $cal = $cal-($receipt_1->total_amount ?? 0); // 3. และลบยอดใบเสร็จค่าเช่าห้อง ที่ชำระโดย หักจากเงินประกัน
@@ -884,24 +922,6 @@ class RoomController extends Controller
             $html["bad_debt_bill"] = $this->move_out_form_bad_debt_bill($id)->render();
             return $html;
 
-        }
-        $invoice_rent_room = RentBill::where('ref_type_id', 1)->where('ref_status_id', 7)->where('ref_room_id', $id)->whereIn('ref_room_for_rent_id', $renter_ids)->first();
-        
-        if(@$invoice_rent_room){
-            $pml = PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->where('bad_debt_rent_status', 1)->first();
-            if(!@$pml){
-                
-                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
-                $pay_list->title  =  "ค่าเช่าห้อง ".$invoice->room->name." เดือน $invoice_rent_room->month/$invoice_rent_room->year";
-                $pay_list->price  =  $invoice_rent_room->total_amount;
-                $pay_list->ref_payment_id  =  $invoice->id;
-                $pay_list->document_type  =  1;
-                $pay_list->bad_debt_rent_status  =  1; // 1 = รายการที่เป็นค่าเช่าค้างชำระ
-                $pay_list->save();
-
-                DB::commit();
-                
-            }
         }
 
         $data['invoice'] = $invoice;

@@ -27,7 +27,6 @@
         <tbody>
             @foreach ($invoice->payment_list as $key => $payment_list_item)
                 <tr>
-                    {{-- <td>ค่าเช่าห้อง (Room rate) {{ $invoice->room_for_rent->room->name }} เดือน {{ $invoice->month.'/'.$invoice->year }}</td> --}}
                     <td>
                         {{ $payment_list_item->title }}
                     </td>
