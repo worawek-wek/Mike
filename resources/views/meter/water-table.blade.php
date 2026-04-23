@@ -85,10 +85,10 @@
                         </button> --}}
                     {{-- </div> --}}
                 </td>
-                <td class="text-center text-danger">
+                <td class="text-center">
                     <span
                     @if ($current_month_usage < 0)
-                        class="badge bg-label-danger"
+                        class="badge bg-label-danger text-danger"
                         style="padding: 15px;"
                     @endif
                      id="current_month_usage_water_{{ $row->meters_id }}"
