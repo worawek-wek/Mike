@@ -1919,7 +1919,7 @@ class RoomController extends Controller
             if($request->invoice_id){
 
                 $invoice = RentBill::find($request->invoice_id);
-                PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->delete();
+                PaymentList::where('ref_payment_id', $invoice->id)->where('document_type', 1)->where('bad_debt_rent_status', 0)->delete();
 
             }else{
                 $invoice = new RentBill;
@@ -1940,7 +1940,7 @@ class RoomController extends Controller
                 $invoice->remark  =  $request->remark;
                 $invoice->save();
 
-                foreach($request->payment_list['title'] as $key => $title){
+                foreach($request->payment_list['title'] ?? [] as $key => $title){
                     $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
                     $pay_list->title  =  $title;
                     $pay_list->price  =  $request->payment_list['price'][$key];

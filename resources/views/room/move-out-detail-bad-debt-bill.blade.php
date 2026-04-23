@@ -34,12 +34,9 @@
                     <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
                         @if ($payment_list_item->discount == 1)
                             {{ number_format(0-$payment_list_item->price) }}
-                            <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
                         @else
                             {{ number_format($payment_list_item->price) }}
-                            <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
                         @endif
-                        <input type="hidden" name="payment_list[price][]" class="{{ $payment_list_item->discount == 1 ? "" : "" ; }} calculate_2" value="{{ $payment_list_item->price }}">
                     </td>
                 </tr>
             @endforeach
