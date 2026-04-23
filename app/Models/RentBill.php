@@ -124,8 +124,15 @@ class RentBill extends Model
                         $query->where('title', 'NOT LIKE', '%ค่าเช่าห้อง (Room rate)%')
                                 ->where('title', 'NOT LIKE', '%ค่าน้ำ (Water rate)%')
                                 ->where('title', 'NOT LIKE', '%ค่าไฟฟ้า (Electrical rate)%')
-                                ->where('title', 'NOT LIKE', '%ค่าที่จอดรถยนต์%');
+                                ->where('title', 'NOT LIKE', '%ค่าที่จอด%');
                     });
+    }
+    public function payment_fine() // สำหรับชำระเงิน ดึงแค่ List ค่าปรับ เกินชำระ
+    {
+        return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
+                    ->where('document_type', 1)
+                    ->where('paid', 1)
+                    ->where('title', 'like', '%ค่าปรับ เกินชำระ%');
     }
     public function payment_rent_room_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
     {

@@ -1,4 +1,3 @@
-
     <table class="table table-bordered mb-4" id="discount-table2" >
         <thead>
             <tr>
@@ -26,6 +25,22 @@
                     </tr>
                 @endforeach
             @endforeach
+                @if ($payment_fine_price > 0)
+                    <tr>
+                        <td>
+                                <input
+                                name="payment_list[title][]"
+                                type="text"
+                                class="form-control payment_list_title"
+                                value="{{ $invoice->payment_fine->title }}" placeholder="หัวข้อรายการ" readonly>
+                        </td>
+                        <td class="text-end">
+                            <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $payment_fine_price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>
+                            <input type="hidden" name="payment_list[discount][]" value="0">
+                            <input type="hidden" name="payment_list[id][]" value="{{ $invoice->payment_fine->id }}">
+                        </td>
+                    </tr>
+                @endif
                 @foreach ($invoice['payment_discount_array'] as $key_2 => $payment_discount)
                     <tr style="background-color: rgb(252, 228, 228);">
                         <td>

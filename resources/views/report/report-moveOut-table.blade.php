@@ -337,7 +337,7 @@
                   </div>
                 </div>
                                     @php
-                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - ($row->receipt_move_out->total_amount ?? 0) - ($row->receipt_rent_bill_move_out_deduct_deposit->sum('total_amount') ?? 0);
+                                        $calculate = ($row->deposit_move_out->total_amount ?? 0) - (($row->receipt_move_out->payment_channel ?? null) == 3 ? ($row->receipt_move_out->total_amount ?? 0) : 0) - ($row->receipt_rent_bill_move_out_deduct_deposit->sum('total_amount') ?? 0);
                                     @endphp
                                   <div class="col-sm-11 mt-3">
                                       <h4 class="my-4" align="center">
@@ -348,6 +348,13 @@
                                           <span class="text-success">
                                               เก็บเงินผู้เช่าเพิ่ม
                                           @endif
+                                          {{-- <br>
+                                          {{ $row->deposit_move_out->total_amount ?? 0 }}
+                                          <br>
+                                          {{ $row->receipt_move_out->total_amount ?? 0 }}
+                                          <br>
+                                          {{ $row->receipt_rent_bill_move_out_deduct_deposit->sum('total_amount') ?? 0 }}
+                                          <br> --}}
                                           &nbsp; {{ number_format(abs($calculate)) }}&nbsp; บาท
                                           </span>
                                       </h4>

@@ -227,18 +227,18 @@ class AnalysisController extends Controller
         })->values();
 
         $cepl = [
-                    $water[0] - $total_income[0],
-                    $water[1] - $total_income[1],
-                    $water[2] - $total_income[2],
-                    $water[3] - $total_income[3],
-                    $water[4] - $total_income[4],
-                    $water[5] - $total_income[5],
-                    $water[6] - $total_income[6],
-                    $water[7] - $total_income[7],
-                    $water[8] - $total_income[8],
-                    $water[9] - $total_income[9],
-                    $water[10] - $total_income[10],
-                    $water[11] - $total_income[11]
+                    $total_income[0] - $water[0],
+                    $total_income[1] - $water[1],
+                    $total_income[2] - $water[2],
+                    $total_income[3] - $water[3],
+                    $total_income[4] - $water[4],
+                    $total_income[5] - $water[5],
+                    $total_income[6] - $water[6],
+                    $total_income[7] - $water[7],
+                    $total_income[8] - $water[8],
+                    $total_income[9] - $water[9],
+                    $total_income[10] - $water[10],
+                    $total_income[11] - $water[11]
                 ];
 
         return $cepl;
@@ -431,18 +431,18 @@ class AnalysisController extends Controller
         })->values();
 
         $cepl = [
-                    $electricity[0] - $total_income[0],
-                    $electricity[1] - $total_income[1],
-                    $electricity[2] - $total_income[2],
-                    $electricity[3] - $total_income[3],
-                    $electricity[4] - $total_income[4],
-                    $electricity[5] - $total_income[5],
-                    $electricity[6] - $total_income[6],
-                    $electricity[7] - $total_income[7],
-                    $electricity[8] - $total_income[8],
-                    $electricity[9] - $total_income[9],
-                    $electricity[10] - $total_income[10],
-                    $electricity[11] - $total_income[11]
+                    $total_income[0] - $electricity[0],
+                    $total_income[1] - $electricity[1],
+                    $total_income[2] - $electricity[2],
+                    $total_income[3] - $electricity[3],
+                    $total_income[4] - $electricity[4],
+                    $total_income[5] - $electricity[5],
+                    $total_income[6] - $electricity[6],
+                    $total_income[7] - $electricity[7],
+                    $total_income[8] - $electricity[8],
+                    $total_income[9] - $electricity[9],
+                    $total_income[10] - $electricity[10],
+                    $total_income[11] - $electricity[11]
                 ];
 
         return $cepl;

@@ -19,7 +19,7 @@ aria-labelledby="pills-home-tab" tabindex="0">
                             @if (count($row->receipt ?? []) > 0 & $row->ref_status_id != 5)
                                 <br><span class="text-truncate badge rounded-pill text-black mt-1" style="background-color: white;">จ่ายแล้ว &nbsp;{{ number_format($row->total_paid_including_fine) }} บาท</span>
                                 @if ($row->total_paid_including_fine < $row->total_amount)
-                                    <br><span class="text-truncate badge rounded-pill bg-danger">ค้างจ่าย &nbsp;{{ number_format($row->total_amount - $row->total_paid_including_fine) }}</span>
+                                    <br><span class="text-truncate badge rounded-pill bg-danger">ค้างจ่าย &nbsp;{{ number_format($row->total_amount - $row->receipt->sum(function ($r) { return $r->total_amount; })) }}</span>
                                 @endif
                             @endif
                         </div>
@@ -101,7 +101,7 @@ aria-labelledby="pills-profile-tab" tabindex="0">
                     @if (count($row_2->receipt ?? []) > 0 & $row_2->ref_status_id != 5)
                         <br><span class="text-truncate text-success"> จ่ายแล้ว {{ number_format($row_2->total_paid_including_fine) }}</span>
                         @if ($row_2->total_not_discount_amount < $row_2->total_amount)
-                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount - $row_2->total_not_discount_amount) }}</span>
+                            <br><span class="text-truncate text-danger">ค้างจ่าย {{ number_format($row_2->total_amount - $row_2->receipt->sum(function ($r) { return $r->total_amount; })) }}</span>
                         @endif
                     @endif
                 </td>

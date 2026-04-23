@@ -27,7 +27,15 @@ class MeterController extends Controller
 {
     public function index(Request $request)
     {
-        
+        // $meter = Meter::where('month', date('m'))->where('year', date('Y'))->get();
+        // foreach ($meter as $met) {
+        //     $prev = $met->previousMonthMeter;
+
+        //     if ($met->water_unit == 0 && $prev) {
+        //         Meter::where('id', $met->id)
+        //             ->update(['water_unit' => $prev->water_unit]);
+        //     }
+        // }
         // DB::table('rooms')
         //     ->where('name', 'like', '1%')
         //     ->whereIn('ref_floor_id', [95,96,97,98,99,100,101,102,103])
@@ -71,93 +79,118 @@ class MeterController extends Controller
         // DB::commit();
         // return 123;
         // // ตัดอันที่ซ้ำออก
-        $check_this_month = Meter::where('year', date('Y'))->where('month', date('m'))->first();
-        if(!$check_this_month){
-            $room = Room::whereHas('floor.building', function ($query) {
-                                        $query->where('ref_branch_id', session("branch_id"));
-                                    })->get();
-            foreach($room as $ro){
-                $meter = $ro->last_meter;	
-                if(!$meter){
-                    continue;
-                }
-                if($meter->year == date("Y") && $meter->month == date('m')){
-                    continue;
-                }
-                    $insert_m = new Meter; 					
-                    $insert_m->water_unit  =  $meter->water_unit;
-                    $insert_m->ref_room_id  =  $meter->ref_room_id;
-                    $insert_m->month  =  date('m');
-                    $insert_m->year  =  date('Y');
-                    $insert_m->electricity_unit  =  $meter->electricity_unit;
-                    $insert_m->save();
-            }
-        }
-        // return 123;
-        // $branch = Branch::where('ip_meter','!=','')->get();
 
-        // // /////////////////////////////////
-        // foreach($branch as $bra){
-        //     // return $bra['ip_meter'];
-
-        //     if(session("branch_id") != $bra['id']){
-        //         continue;
-        //     }
-            
-        //     $connection = @fsockopen($bra['ip_meter'], 7953, $errno, $errstr, 10); // 10 คือ timeout
-        //     if (!is_resource($connection)) {
-        //         continue;
-        //     }
-        //     $response = Http::get('http://'.$bra['ip_meter'].':7953/getRealTimeData.aspx'); // เจริญใจ
-
-        //     $xmlString = $response->body();
-            
-        //     // แปลง XML เป็น SimpleXMLElement
-        //     $xmlObject = simplexml_load_string($xmlString);
-
-        //     // แปลง SimpleXMLElement เป็น array ถ้าต้องการ
-        //     $json = json_encode($xmlObject);
-        //     $array = json_decode($json, true);
-
-        //     $electricity = $array['Meters']['Meter']; // ส่งกลับเป็น array
-
-        //     $room = Room::whereHas('floor.building', function ($query) use ($bra) {
-        //                             $query->where('ref_branch_id', $bra['id']);
-        //                         })->get();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // $check_this_month = Meter::where('year', date('Y'))->where('month', date('m'))->first();
+        // if(!$check_this_month){
+        //     $room = Room::whereHas('floor.building', function ($query) {
+        //                                 $query->where('ref_branch_id', session("branch_id"));
+        //                             })->get();
         //     foreach($room as $ro){
-
-        //         // filter ดึง ข้อมูล meter ห้องนี้
-        //         $filtered = array_filter($electricity, function($item) use ($ro) {
-        //                 // if ($ro->name[0] == '1') {
-        //                 //     return $item['@attributes']['GroupName'] = 'A' . substr($ro->name, 1);
-        //                 // } elseif ($ro->name[0] == '2') {
-        //                 //     return $item['@attributes']['GroupName'] = 'B' . substr($ro->name, 1);
-        //                 // }
-        //             return $item['@attributes']['GroupName'] == $ro->name;
-        //         });
-        //         $electricity_unit = 0;
-        //         if (!empty($filtered)) {
-        //             $electricity_unit = reset($filtered)['Value'][0];
+        //         $meter = $ro->last_meter;	
+        //         if(!$meter){
+        //             continue;
         //         }
-        //         // filter ดึง ข้อมูล meter ห้องนี้ จบ
-
-        //         $check = Meter::where('ref_room_id', $ro->id)->where('month', date('m'))->where('year', date('Y'))->first();
-
-        //         if($check){
-        //             $meter = Meter::find($check->id); 					
-        //         }else{
-        //             $meter = new Meter; 					
-        //             $meter->water_unit  =  0;
+        //         if($meter->year == date("Y") && $meter->month == date('m')){
+        //             continue;
         //         }
-        //         $meter->ref_room_id  =  $ro->id;
-        //         $meter->month  =  date('m');
-        //         $meter->year  =  date('Y');
-        //         $meter->electricity_unit  =  $electricity_unit;
-        //         $meter->save();
+        //             $insert_m = new Meter; 					
+        //             $insert_m->water_unit  =  $meter->water_unit;
+        //             $insert_m->ref_room_id  =  $meter->ref_room_id;
+        //             $insert_m->month  =  date('m');
+        //             $insert_m->year  =  date('Y');
+        //             $insert_m->electricity_unit  =  $meter->electricity_unit;
+        //             $insert_m->save();
         //     }
-        //     break;
         // }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // return 123;
+            // $ip_meter = "100.113.164.114";
+            // $connection = @fsockopen($ip_meter, 7953, $errno, $errstr, 10); // 10 คือ timeout
+            // if (!is_resource($connection)) {
+            //     return "Error: $errstr ($errno)";
+            //     // continue;
+            // }
+            // return $response = Http::get('http://'.$ip_meter.':7953/getRealTimeData.aspx'); // เจริญใจ
+
+            // $xmlString = $response->body();
+            
+            // // แปลง XML เป็น SimpleXMLElement
+            // $xmlObject = simplexml_load_string($xmlString);
+
+            // // แปลง SimpleXMLElement เป็น array ถ้าต้องการ
+            // $json = json_encode($xmlObject);
+            // $array = json_decode($json, true);
+
+            // return $electricity = $array['Meters']['Meter']; // ส่งกลับเป็น array
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $branch = Branch::where('ip_meter','!=','')->get();
+
+        // /////////////////////////////////
+        foreach($branch as $bra){
+                // continue;
+            // $bra['ip_meter'];
+
+            // if(session("branch_id") != $bra['id']){
+            //     continue;100.113.164.114
+            // }
+            $connection = @fsockopen($bra['ip_meter'], 7953, $errno, $errstr, 10); // 10 คือ timeout
+            if (!is_resource($connection)) {
+                // return 123;
+                continue;
+            }
+            $response = Http::get('http://'.$bra['ip_meter'].':7953/getRealTimeData.aspx'); // เจริญใจ
+
+            $xmlString = $response->body();
+            
+            // แปลง XML เป็น SimpleXMLElement
+            $xmlObject = simplexml_load_string($xmlString);
+
+            // แปลง SimpleXMLElement เป็น array ถ้าต้องการ
+            $json = json_encode($xmlObject);
+            $array = json_decode($json, true);
+
+            $electricity = $array['Meters']['Meter']; // ส่งกลับเป็น array
+
+            $room = Room::whereHas('floor.building', function ($query) use ($bra) {
+                                    $query->where('ref_branch_id', $bra['id']);
+                                })->get();
+            foreach($room as $ro){
+
+                // filter ดึง ข้อมูล meter ห้องนี้
+                $filtered = array_filter($electricity, function($item) use ($ro) {
+                        // if ($ro->name[0] == '1') {
+                        //     return $item['@attributes']['GroupName'] = 'A' . substr($ro->name, 1);
+                        // } elseif ($ro->name[0] == '2') {
+                        //     return $item['@attributes']['GroupName'] = 'B' . substr($ro->name, 1);
+                        // }
+                    return $item['@attributes']['GroupName'] == $ro->name;
+                });
+                $electricity_unit = 0;
+                if (!empty($filtered)) {
+                    $electricity_unit = reset($filtered)['Value'][0];
+                }
+                // filter ดึง ข้อมูล meter ห้องนี้ จบ
+
+                $check = Meter::where('ref_room_id', $ro->id)->where('month', date('m'))->where('year', date('Y'))->first();
+
+                if($check){
+                    $meter = Meter::find($check->id); 					
+                }else{
+                    $meter = new Meter; 					
+                    $meter->water_unit  =  0;
+                }
+                $meter->ref_room_id  =  $ro->id;
+                $meter->month  =  date('m');
+                $meter->year  =  date('Y');
+                $meter->electricity_unit  =  $electricity_unit;
+                $meter->save();
+            }
+            break;
+        }
         DB::commit();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // // 100.74.37.42
         
         // $meter = [

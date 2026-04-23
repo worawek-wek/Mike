@@ -102,7 +102,7 @@ class SettingController extends Controller
                                 'maximum_fine' => $request->maximum_fine == null?0:$request->maximum_fine,
                                 'start_fine_day' => $request->start_fine_day == null?0:$request->start_fine_day
                             ]);
-            
+            // (new BillController())->get_update_to_current_fine();
             DB::commit();
             return 1;
         } catch (QueryException $err) {
@@ -233,7 +233,8 @@ class SettingController extends Controller
     }
     public function room_rent_datatable(Request $request)
     {
-        $results = Room::leftJoin('floors', 'rooms.ref_floor_id', '=', 'floors.id')
+        $results = Room::orderBy('rooms.name', 'ASC')
+                        ->leftJoin('floors', 'rooms.ref_floor_id', '=', 'floors.id')
                         ->leftJoin('buildings', 'floors.ref_building_id', '=', 'buildings.id')
                         ->whereHas('floor.building', function ($query) {
                             $query->where('ref_branch_id', session("branch_id"));

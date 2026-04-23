@@ -113,15 +113,10 @@
                                             "
                                             @endif
                                             value="{{ (int) $bill_list['price'] }}" placeholder="จำนวนเงิน" max="" oninput="calculatePPrice()">
-                                            {{-- @if ($bill_list['discount'] == 1) --}}
                                                 <input name="payment_list[discount][]" type="hidden" value="{{ $bill_list['discount'] }}">
                                                 <input name="payment_list[id][]" type="hidden" value="{{ $bill_list['id'] }}">
-                                            {{-- @endif --}}
                                         </td>
                                     </tr>
-                                    {{-- @php
-                                        break;
-                                    @endphp --}}
                                 @endforeach
                             @endif
                             </tbody>
@@ -347,34 +342,36 @@
         }
         
         function calculatePPrice() { 
-            const inputs = document.querySelectorAll('.calculateP');  // เลือกทุก input ที่มี class="calculateP"
+            const inputs = document.querySelectorAll('.calculateP');
             let total = 0;
+            const MAX_TOTAL = "{{ $receipt_amount }}";
 
-            inputs.forEach((input, index) => {
-                console.log(`  ➤ HTML:`, input.outerHTML); // <<< ดู HTML element เต็ม
-                // ลบเครื่องหมายจุลภาคจากค่าที่รับมา
-                let value = input.value.replace(/,/g, ''); 
+            inputs.forEach((input) => {
+                let value = parseFloat(input.value.replace(/,/g, '')) || 0;
                 
-                if (value.trim() !== "" && !isNaN(value)) {
-                    // ตรวจสอบว่า input มี class="discount_price" หรือไม่
-                    if (input.classList.contains('discount_price')) {
-                        // ถ้ามี class="discount_price", ลบค่าออกจาก total
-                        total -= parseFloat(value.replace(/[^0-9.-]+/g, ""));
-                    } else {
-                        // ถ้าไม่มี class="discount_price", เพิ่มค่าเข้าไปใน total
-                        if (!isNaN(value) && value.trim() !== "") {
-                            total += parseFloat(value);
-                        }
-                    }
+                if (input.classList.contains('discount_price')) {
+                    total -= value;
+                } else {
+                    total += value;
                 }
-                console.log(value);
             });
-            // console.log(total);
+            
+            // ถ้ายอดเกิน 3000 ให้ปรับค่า input ล่าสุดที่กรอก
+            if (total > MAX_TOTAL) {
+                const lastInput = document.activeElement;
+                if (lastInput && lastInput.classList.contains('calculateP')) {
+                    let currentValue = parseFloat(lastInput.value.replace(/,/g, '')) || 0;
+                    let excess = total - MAX_TOTAL;
+                    let newValue = Math.max(0, currentValue - excess);
+                    lastInput.value = newValue;
+                    total = MAX_TOTAL;
+                    
+                    Swal.fire('ยอดเกินบิล', 'ยอดรวมต้องไม่เกิน ' + MAX_TOTAL.toLocaleString() + ' บาท', 'warning');
+                }
+            }
+            
             $('.total-price').html(total.toLocaleString());
             $('.total-price').val(total);
-
-            // อัปเดตค่า total ใน span#total-price
-            // document.getElementById('total-price').innerText = total.toLocaleString();
         }
         $('#select2RenterContract').select2();
 

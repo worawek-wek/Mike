@@ -192,7 +192,7 @@
                                     </span>
                                 </div>
                                 <div class="card-info">
-                                  <h5 class="mb-0"><span class="text-danger me-2">{{ $row->summary['all_overdue'] }}</span><span>ค้างชำระ</span></h5>
+                                  <h5 class="mb-0"><span class="text-danger me-2">{{ $row->summary['overdueRoomCount'] }}</span><span>ค้างชำระ</span></h5>
                                 </div>
                               </div>
                             </div>

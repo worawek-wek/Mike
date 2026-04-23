@@ -87,36 +87,69 @@
                     </thead>
                     <tbody>
                         @foreach ($invoice->payment_list as $key => $payment_list_item)
-                            <tr>
-                                <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
+                            @if ($payment_list_item->new_list_from_incomplate == 0)
+                                <tr>
+                                    <td class="{{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}" style="display: flex; align-items: center;">
 
-                                    {{ $payment_list_item->title }}
+                                        {{ $payment_list_item->title }}
 
-                                    @if (strpos($payment_list_item->title, 'Water rate') !== false)
-                                        <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
-                                        <input name="water_unit" style="width: 14%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
-                                            type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
-                                            &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
-                                            = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
-                                    @endif
-                                </td>
-                                <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
-                                @if ($key == 1)
-                                    <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
-                                        <span id="text_water_amount">
-                                            {{ number_format($payment_list_item->price) }} 
-                                        </span>
-                                @else
-                                    @if ($payment_list_item->discount == 1)
-                                        {{ number_format(0-$payment_list_item->price) }}
-                                        <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                        @if (strpos($payment_list_item->title, 'Water rate') !== false)
+                                            <input type="hidden" name="payment_list_id" value="{{ $payment_list_item->id }}">
+                                            <input name="water_unit" style="width: 25%;background-color: #d6f7fb;border-color: #00bad1;" @if($permission_bill_edit) readonly @endif
+                                                type="number" class="form-control" id="water_unit" oninput="calculatePrice()" placeholder="จำนวนเงิน" value="{{ (int)$payment_list_item->unit }}" required />
+                                                &nbsp;- &nbsp;{{ $invoice->previous_water_unit ?? 0 }}
+                                                = &nbsp;<span id="calculate_unit">{{ $payment_list_item->unit-$invoice->previous_water_unit }}</span>&nbsp; ยูนิต)
+                                        @endif
+                                    </td>
+                                    <td class="text-end {{$payment_list_item->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                    @if ($key == 1)
+                                        <input type="hidden" class="calculate" name="water_amount" id="water_amount" value="{{ $payment_list_item->price }}">
+                                            <span id="text_water_amount">
+                                                {{ number_format($payment_list_item->price) }} 
+                                            </span>
                                     @else
-                                        {{ number_format($payment_list_item->price) }}
-                                        <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                        @if ($payment_list_item->discount == 1)
+                                            {{ number_format(0-$payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{0-$payment_list_item->price}}">
+                                        @else
+                                            {{ number_format($payment_list_item->price) }}
+                                            <input type="hidden" class="calculate" value="{{$payment_list_item->price}}">
+                                        @endif
                                     @endif
+                                    
+                                    </td>
+                                </tr>
+                            @else
+                                @if ($payment_list_item->discount == 0)
+                                    {{-- รายกการเพิ่ม --}}
+                                    <tr style="background-color: rgb(255 240 225)">
+                                        <td>
+                                            <input name="payment_sd_list[title][]" type="text" class="form-control" value="{{ $payment_list_item->title }}" placeholder="หัวข้อรายการ" required />
+                                        </td>
+                                        <td class="text-end">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <input name="payment_sd_list[price][]" type="number" class="form-control calculate add_expenses_price" value="{{ $payment_list_item->price }}" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
+                                                <input type="hidden" name="payment_sd_list[discount][]" value='0'>
+                                                <button type="button" class="btn btn-danger btn-sm remove-off-row">ลบ</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @else
+                                    {{-- รายกการลบ --}}
+                                    <tr style="background-color: rgb(252 228 228)">
+                                        <td>
+                                            <input name="payment_sd_list[title][]" type="text" class="form-control" value="{{ $payment_list_item->title }}" placeholder="หัวข้อส่วนลด" required />
+                                        </td>
+                                        <td class="text-end">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <input name="payment_sd_list[price][]" type="number" class="form-control calculate discount_price" value="{{ $payment_list_item->price }}" oninput="calculatePrice()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off/>
+                                                <input type="hidden" name="payment_sd_list[discount][]" value='1'>
+                                                <button type="button" class="btn btn-danger btn-sm remove-off-row">ลบ</button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endif
-                                </td>
-                            </tr>
+                            @endif
                         @endforeach
 
                         {{-- <tr>
@@ -257,11 +290,18 @@
 
         function addRemoveEvent(row) {
             row.querySelector('.remove-row').addEventListener('click', function() {
+                alert(456);
                 row.remove();
                 calculatePrice();
             });
         }
+        
+        $(document).on('click', '.remove-off-row', function () {
+            $(this).closest('tr').remove();
 
+            // ถ้ามีการคำนวณใหม่
+            calculatePrice();
+        });
 
         
         function paymentChannel(i) {

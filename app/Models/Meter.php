@@ -26,5 +26,14 @@ class Meter extends Model
             default => '',
         };
     }
-    
+    public function previousMonthMeter()
+    {
+        // คำนวณเดือน/ปี ของเดือนที่แล้ว
+        $prevMonth = $this->month == 1 ? 12 : $this->month - 1;
+        $prevYear = $this->month == 1 ? $this->year - 1 : $this->year;
+
+        return $this->hasOne(Meter::class, 'ref_room_id', 'ref_room_id') // เปลี่ยน key ตามจริง เช่น meter_id หรือ ref_room_id
+            ->where('month', $prevMonth)
+            ->where('year', $prevYear);
+    }
 }

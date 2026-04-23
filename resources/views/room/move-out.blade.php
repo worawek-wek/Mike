@@ -131,7 +131,7 @@
         <thead>
             <tr>
                 <th style="vertical-align: middle;font-weight: 500;">รายการ</th>
-                <th style="vertical-align: middle;font-weight: 500;">
+                <th style="vertical-align: middle;font-weight: 500;" class="text-end">
                     จำนวนเงิน (บาท)
                 </th>
                 <th class="showMoveOut">
@@ -147,7 +147,7 @@
                 <td width="200" class="text-end">
                     {{ number_format($invoice->balance_amount) }}
                 </td>
-                <td width="200">
+                <td width="200" class="showMoveOut">
                     <div class="dropdown">
                         <button class="btn btn-main dropdown-toggle"
                                 data-bs-toggle="dropdown">
@@ -379,9 +379,9 @@
                 <tr>
                     <td width="50%">
                         <span style="color: black; font-weight: 500;">รายละเอียดหัวบิล</span> <br>
-                        {{ $contract->full_name }} <br>
-                        เลขประจำตัวผู้เสียภาษี {{ $contract->id_card_number }} <br>
-                        โทร {{ $contract->phone }}
+                        {{ $receipt_row_1->renter->fullName() }} <br>
+                        เลขประจำตัวผู้เสียภาษี {{ $receipt_row_1->renter->id_card_number }} <br>
+                        โทร {{ $receipt_row_1->renter->phone }}
                     </td>
                     <td style="color: black;">
                                 @php
@@ -1207,15 +1207,20 @@ $(document).on('submit', '.deduct-form', function (e) {
                                             // if(total_amount < 0){
                                             //     return Swal.fire('โปรดเคลียร์ให้ครบก่อน.!', '', 'warning');
                                             // }
+                                            if (document.querySelector('.move_invoice_7')) {
+                                                return Swal.fire('กรุณาเคลียร์บิลค่าเช่าห้อง.!', '', 'warning');
+                                            }
+                                        }else{
+                                            if (document.querySelector('.move_bad_debt_form')) {
+                                            // if (document.querySelector('.move_bad_debt_form') && document.querySelector('.move_invoice_7')) {
+                                                return Swal.fire('กรุณาบันทึกรายการหนี้สูญ.!', '', 'warning');
+                                            }
                                         }
                                             // var check = $('#check-rent-bell').val();
                                             // if(check == 1){
                                             // }
                                             //     return Swal.fire('กรุณาชำระบิลค้างชำระ', '', 'warning');
                                             
-                                            if (document.querySelector('.move_invoice_7')) {
-                                                return Swal.fire('กรุณาเคลียร์บิลค่าเช่าห้อง.!', '', 'warning');
-                                            }
                                         Swal.fire({
                                             title: 'ยืนยันการดำเนินการ?',
                                             text: 'คุณต้องการ ย้ายออก หรือไม่?',

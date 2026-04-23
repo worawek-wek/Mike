@@ -349,7 +349,7 @@
                                             <h4 id="thai-month-label">{{-- แสดงเดือนที่เลือก--}}</h4>
                                         </div>
                                         <div class="col-md-2" style="padding-right: unset !important;">
-                                            <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ date('Y-m') }}" />
+                                            <input onchange='loadData("{{$page_url}}/datatable")' name="month" type="month" class="form-control p_search" id="exampleFormControlInput1" placeholder="" value="{{ session('month') ?? date('Y-m') }}" />
                                         </div>
                                         <div class="col-md-4 text-end" style="padding-right: unset !important;">
                                             <button
@@ -552,6 +552,11 @@
     <!-- / Layout wrapper -->
     @include('layout/inc_js')
     <script>
+
+            setInterval(() => {
+                loadData(page);
+            }, 60000);
+
             new TomSelect("#select2Renter2", {
                             create: false,
                             maxItems: 1,
@@ -822,6 +827,9 @@
         });
         
         function view(id,de){
+
+            loadData(page);
+        
             if(de == 'table'){
                 status_detail_waiting_confirm = 0;
             }else{
@@ -999,7 +1007,7 @@
             ch = id_ch;
         }
         function loadData(pages){
-
+            
             $('.p_search').each(function() {
                 var inputName = $(this).attr('name'); // ดึงชื่อ attribute 'name' ของ input
                 var inputValue = $(this).val(); // ดึงค่า value ของ input

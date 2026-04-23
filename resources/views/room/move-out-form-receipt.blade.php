@@ -19,7 +19,17 @@
                                 <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                             {{-- @endif --}}
                             @foreach ($renter as $rent)
-                                <option value="{{ $rent->id }}" @if (@$invoice->ref_room_for_rent_id == $rent->room_for_rents_id) selected @endif>{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                <option value="{{ $rent->id }}" 
+                                    @if (@$invoice && @$invoice->ref_room_for_rent_id == $rent->room_for_rents_id)
+                                        selected 
+                                    @else
+                                        @if ($loop->first)
+                                            selected
+                                        @endif
+                                    @endif
+                                    >
+                                        {{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}
+                                    </option>
                             @endforeach
                         </select>
                 </div>
@@ -154,8 +164,12 @@
                     background-color: rgb(252 228 228);   
                 }
             </style>
-            <script>
+            @if (!@$invoice)
+                <script>
                     get_room_rental_move_out("{{$renter[0]->id}}");
+                </script>
+            @endif
+            <script>
                 function addRow(title = '', price = '', isDiscount = 0) {
                     // alert(isDiscount);
                     const discountClass = isDiscount ? 'form-price_increase' : 'form-discount-value';

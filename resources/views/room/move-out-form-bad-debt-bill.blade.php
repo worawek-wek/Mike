@@ -2,11 +2,12 @@
     $permission_bill_edit = \App\Models\PermissionGroupHasUserBranch::where('ref_user_id', Auth::id())->where('ref_branch_id', session('branch_id'))->where('ref_permission_id', 32)->where('status', 0)->first();
 @endphp
             @csrf
+            {{-- <input type="hidden" class="move_bad_debt_form" value="1"> --}}
             <input type="hidden" name="invoice_id" value="{{ @$invoice->id }}">
             <input name="ref_room_for_rent_id" type="hidden" value="{{ $invoice->ref_room_for_rent_id ?? $room->room_for_rent_main->id }}">
             <input name="ref_room_id" type="hidden" value="{{ $invoice->ref_room_id ?? $room->id }}">
             <input name="ref_contract_id" type="hidden" value="{{ $invoice->ref_contract_id ?? $room->contract->id }}">
-            <div class="row g-2 pt-1"
+            <div class="row g-2 pt-1 move_bad_debt_form"
             @if($permission_bill_edit)
                 style="pointer-events: none;  /* ปิดคลิก */
                         opacity: 0.6;          /* ให้ดูจางลง */
@@ -17,7 +18,16 @@
                         <select name="ref_renter_id" id="select-renter2" class="select-renter" onchange="get_room_rental_bad_debt(this.value)" required>
                             <option selected disabled hidden value="no">เลือกข้อมูลจากผู้เช่า</option>
                             @foreach ($renter as $rent)
-                                <option value="{{ $rent->id }}" @if (@$invoice->ref_room_for_rent_id == $rent->room_for_rents_id) selected @endif >{{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
+                                <option value="{{ $rent->id }}"
+                                    @if (@$invoice && @$invoice->ref_room_for_rent_id == $rent->room_for_rents_id)
+                                        selected 
+                                    @else
+                                        @if ($loop->first)
+                                            selected
+                                        @endif
+                                    @endif
+                                    >
+                                    {{ $rent->prefix.' '.$rent->name.' '.$rent->surname }}</option>
                             @endforeach
                         </select>
                 </div>
@@ -114,7 +124,7 @@
                 <i class="ti ti-plus"></i> ค่าน้ำ-ค่าไฟฟ้าสุดท้าย</span>
             </button>
             <button
-                    id="add_discount"
+                    id="bad_debt_add_discount"
                     style="padding-right: 14px;padding-left: 14px;"
                     class="btn btn-sm buttons-collection btn-danger waves-effect waves-light me-2"
                     tabindex="0" aria-controls="DataTables_Table_0"
@@ -148,8 +158,12 @@
                     background-color: rgb(252 228 228);   
                 }
             </style>
+            @if (!@$invoice)
+                <script>
+                    get_room_rental_bad_debt("{{$renter[0]->id}}");
+                </script>
+            @endif
             <script>
-
                 function addRow(title = '', price = '', isDiscount = 0) {
                     // alert(isDiscount);
                     const discountClass = isDiscount ? 'form-price_increase' : 'form-discount-value';
@@ -173,7 +187,7 @@
                 }
 
                 // กดเพิ่มส่วนลด
-                $('#add_discount').click(() => addRow('ส่วนลด', '', 1));
+                $('#bad_debt_add_discount').click(() => addRow('ส่วนลด', '', 1));
 
                 // กดเพิ่มรายการปกติ
                 $('#bad_debt_add_expenses').click(() => addRow('', '', 0));

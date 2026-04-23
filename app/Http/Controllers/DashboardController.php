@@ -149,9 +149,9 @@ class DashboardController extends Controller
         $invoiceByMonth = \App\Models\Receipt::whereHas('room.floor.building', function ($query) {
                                                     $query->where('ref_branch_id', session("branch_id"));
                                                 })
-                                                ->whereHas('invoice', function ($query) {
-                                                    $query->where('ref_status_id', 5);
-                                                })
+                                                // ->whereHas('invoice', function ($query) {
+                                                //     $query->where('ref_status_id', 5);
+                                                // })
                                                 ->with('payment_list')
                                                 ->where('ref_type_id', 1)
                                                 ->whereYear('updated_at', $year)

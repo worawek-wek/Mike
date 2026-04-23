@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\BillController;
 use App\Models\Meter;
 use App\Models\IncomeExpenses;
 use App\Models\User;
@@ -51,6 +52,82 @@ class BillController extends Controller
         //                                     $query->where('ref_branch_id', session("branch_id"));
         //                                 })
         //                                 ->get();
+        $rooms = Room::whereDoesntHave('rent_bill', function ($query) {
+                                                $query->where('ref_type_id', 1)
+                                                    ->where('rent_bills.year', date('Y'))
+                                                    ->where('rent_bills.month', date('m'));
+                                            })
+                                            ->where('status', 2)
+                                            ->get();
+                                            
+            $year = Carbon::now()->year;
+            $month = Carbon::now()->month - 1;
+
+            // ดึงเลขล่าสุดครั้งเดียว
+            $latestInvoice = RentBill::where('year', $year)
+                ->where('month', $month)
+                ->lockForUpdate() // 🔒 สำคัญมาก
+                ->latest('id')
+                ->first();
+
+            $sequence = $latestInvoice
+                ? (int) substr($latestInvoice->invoice_number, -6)
+                : 0;
+
+        foreach($rooms as $room){
+                $meter = Meter::where('ref_room_id', $room->id)->where('month', date('m'))->where('year', date('Y'))->first();
+                $current_month_usage_water = $meter->water_unit - $room->rent_bill_rent->water_unit;
+                $current_month_usage_electricity = $meter->electricity_unit - $room->rent_bill_rent->electricity_unit;
+            // rent_bill_rent
+                $r_b_room = new RentBill;  // สร้างบิลค่าเช่าห้อง สำหรับ Test
+                $r_b_room->ref_room_for_rent_id  =  $room->rent_bill_rent->ref_room_for_rent_id;
+                $r_b_room->month  =  date('m');
+                $r_b_room->year  =  date('Y');
+                // $r_b_room->previous_electricity_unit  =  (int)$row['electricity_meter_start_living'];
+                $r_b_room->electricity_unit  =  $meter->electricity_unit;
+                $r_b_room->electricity_amount  =  $room->ele_baht_per_unit*$current_month_usage_water;
+                // $r_b_room->previous_water_unit  =  (int)$row['water_meter_start_living'];
+                $r_b_room->water_unit  =  (int)$meter->water_unit;
+                $r_b_room->water_amount  =  $room->water_baht_per_unit*$current_month_usage_electricity;
+
+$sequence++;
+
+    $invoiceCode = 'INV'. $year
+                        . str_pad($month, 2, '0', STR_PAD_LEFT)
+                        . str_pad($sequence, 6, '0', STR_PAD_LEFT);
+
+                $r_b_room->invoice_number =  $invoiceCode;
+                $r_b_room->ref_room_id =  $room->id;
+                $r_b_room->ref_contract_id =  $room->contract->id;
+                $r_b_room->ref_status_id =  3; // 3 = ไม่สมบูรณ์ / ค้างชำระ
+                $r_b_room->ref_type_id =  1; // 1 = ค่าเช่าห้อง
+                $r_b_room->ref_user_id =  Auth::id();
+                $r_b_room->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                $pay_list->title  =  "ค่าเช่าห้อง (Room rate) $room->name เดือน ".(date('m'))."/".date('Y');
+                $pay_list->price  =  $room->rent+$room->furniture_rental+$room->air_rental;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+                
+                $pay_list = new PaymentList; // สร้างรายการ ค่าน้ำ
+                $pay_list->title  =  "ค่าน้ำ (Water rate) เดือน ".(date('m'))." ("; 
+                $pay_list->unit  =  (int)$meter->water_unit;
+                $pay_list->price  =  $room->water_baht_per_unit*(int)$current_month_usage_water;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+
+                $pay_list = new PaymentList; // สร้างรายการ ค่าไฟ
+                $pay_list->title  =  "ค่าไฟฟ้า (Electrical rate) เดือน ".(date('m'))." (".(int)$meter->electricity_unit." - ".(int)$room->rent_bill_rent->electricity_unit." = ".(int)$meter->electricity_unit-(int)$room->rent_bill_rent->electricity_unit." ยูนิต)";
+                $pay_list->unit  =  (int)$meter->electricity_unit;
+                $pay_list->price  =  $room->ele_baht_per_unit*(int)$current_month_usage_electricity;
+                $pay_list->ref_payment_id  =  $r_b_room->id;
+                $pay_list->document_type  =  1;
+                $pay_list->save();
+        }
+        DB::commit();
         $data['renter'] = Renter::whereHas('room_for_rent', function ($query) {
                                     $query->where('ref_branch_id', session("branch_id"));
                                 })
@@ -61,41 +138,8 @@ class BillController extends Controller
                                 ->whereHas('room_for_rent.room', function ($query) {
                                     $query->where('status', 2);
                                 })->get();
-
-        $invoice = RentBill::where('ref_status_id', '!=', 5)->where('ref_type_id', 1)->with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->get();
-        foreach($invoice as $inv){
-
-                $createdDay = \Carbon\Carbon::parse($inv->created_at)->day;
-                $month_year = date('Y-m', strtotime($inv->created_at));
-
-                // if ($createdDay > $inv->room_for_rent->room->start_fine_day) {
-                //     $month_year = date('Y-m', strtotime('+1 month', strtotime($inv->created_at)));
-                // }
-
-            if (date_create(date('Y-m-d')) >= date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT))  &  $inv->room_for_rent->room->fine_day > 0){
-
-                $title = "ค่าปรับ เกินชำระ ".date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days.' วัน';
-                $price = date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$inv->room_for_rent->room->fine_day;
-                
-                $price = min($price, $inv->room->maximum_fine);
-
-                $fine = PaymentList::where('ref_payment_id', $inv->id)->where('document_type', 1)->where('fine', 1)->first();
-                if($fine){
-                    $pay_list = PaymentList::find($fine->id); // สร้างรายการ ค่าห้อง
-                }else{
-                    $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
-                    $pay_list->ref_payment_id  =  $inv->id;
-                    $pay_list->document_type  =  1;
-                    $pay_list->fine  =  1;
-                }
-                    $pay_list->title  =  $title;
-                    $pay_list->price  =  $price;
-                    $pay_list->save();                    
-            }
-            // return 123;
-        }
-
-        DB::commit();
+        
+        $this->get_update_to_current_fine();
 
         $data['page_url'] = 'bill';
         $data['status_rent_bill'] = StatusRentBill::get();
@@ -105,6 +149,47 @@ class BillController extends Controller
         return view('bill/index', $data);
     }
     
+    public function get_update_to_current_fine(){
+
+        try{
+            $invoice = RentBill::where('ref_status_id', '!=', 5)->where('ref_type_id', 1)->with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->get();
+            foreach($invoice as $inv){
+
+                    $createdDay = \Carbon\Carbon::parse($inv->created_at)->day;
+                    $month_year = date('Y-m', strtotime($inv->created_at));
+
+                    // if ($createdDay > $inv->room_for_rent->room->start_fine_day) {
+                    //     $month_year = date('Y-m', strtotime('+1 month', strtotime($inv->created_at)));
+                    // }
+
+                if (date_create(date('Y-m-d')) >= date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT))  &  $inv->room_for_rent->room->fine_day > 0){
+
+                    $title = "ค่าปรับ เกินชำระ ".date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days.' วัน';
+                    $price = date_diff(date_create($month_year.'-'.str_pad($inv->room_for_rent->room->start_fine_day, 2, '0', STR_PAD_LEFT)), date_create(date('Y-m-d')))->days*$inv->room_for_rent->room->fine_day;
+                    
+                    $price = min($price, $inv->room->maximum_fine);
+
+                    $fine = PaymentList::where('ref_payment_id', $inv->id)->where('document_type', 1)->where('fine', 1)->first();
+                    if($fine){
+                        $pay_list = PaymentList::find($fine->id); // สร้างรายการ ค่าห้อง
+                    }else{
+                        $pay_list = new PaymentList; // สร้างรายการ ค่าห้อง
+                        $pay_list->ref_payment_id  =  $inv->id;
+                        $pay_list->document_type  =  1;
+                        $pay_list->fine  =  1;
+                    }
+                        $pay_list->title  =  $title;
+                        $pay_list->price  =  $price;
+                        $pay_list->save();                    
+                }
+            }
+            DB::commit();
+            return true;
+        } catch (QueryException $err) {
+            DB::rollBack();
+            return false;
+        }
+    }
     public function get_room_for_payment(Request $request) // ดึง ห้อง   // ข้อมูลชำระเงินห้อง ที่ติ๊ก
     {
         // return $request;
@@ -148,10 +233,21 @@ class BillController extends Controller
     
     function get_list_payment_by_id(Request $request) // ดึง ห้อง   // ข้อมูลชำระเงินห้อง ที่ติ๊ก
     {
+        if(!$request->list){
+            return "";
+        }
         $data['list'] = $request->list;
         $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         // return $request->invoice_ids;
-        $data['invoice'] = RentBill::find($request->invoice_id);
+        $invoice = RentBill::find($request->invoice_id);
+        // return $receipt_list = PaymentList::whereHas('receipt', function ($query) use ($invoice) {
+        //                             $query->where('ref_rent_bill_id', $invoice->id);
+        //                         })->where('title', $invoice->payment_fine_array)->where('fine', 1)->where('document_type', 2)->first();
+        $data['payment_fine_price'] = 0;
+        if (in_array('payment_other_array', $request->list) || in_array('payment_list_not_paid', $request->list)) {
+            $data['payment_fine_price'] = $invoice->payment_fine->price ?? 0 - $invoice->receipt->sum(function ($r) { return $r->total_fine_amount; }); // ค่าปรับ RentBill - ค่าปรับ Receipt // หายอดค่าปรับที่เหลือ
+        }
+        $data['invoice'] = $invoice;
         // return 123;
         return view('bill/list-payment-by-id', $data);
         
@@ -237,6 +333,7 @@ class BillController extends Controller
     
     public function datatable(Request $request)
     {
+        $this->get_update_to_current_fine();
         // return RentBill::find(96)->payment_list;
         $results = RentBill::orderBy('rooms.name')
                                 ->join('room_for_rents', 'rent_bills.ref_room_for_rent_id', '=', 'room_for_rents.id')
@@ -275,6 +372,7 @@ class BillController extends Controller
             $results = $results->Where('room_for_rents.ref_floor_id', $request->floor);
         }
         if(@$request->month){
+            session(['month' => $request->month]);
             $results = $results->Where('rent_bills.year', explode('-', $request->month)[0])->Where('rent_bills.month', explode('-', $request->month)[1]);
         }
 
@@ -317,6 +415,7 @@ class BillController extends Controller
     public function incomplete_update(Request $request, $submit = null)
     {
         try{
+            // return $submit;
             $rent_bill = RentBill::find($request->id);
             $rent_bill->water_amount = $request->water_amount;
             $rent_bill->water_unit = $request->water_unit;
@@ -330,6 +429,8 @@ class BillController extends Controller
             
             $total = Room::find($request->ref_room_id)->rent;
 
+            PaymentList::where('ref_payment_id', $rent_bill->id)->where('new_list_from_incomplate', 1)->where('document_type', 1)->delete();
+            
                 if(@$request->payment_sd_list['title']){
                     foreach($request->payment_sd_list['title'] as $key => $payment_sd_list_title){
 
@@ -354,7 +455,13 @@ class BillController extends Controller
             $rent_bill->total = $rent_bill->total_amount;
 
             $rent_bill->save();
-            
+
+            $last_bill = RentBill::where('ref_room_id', $rent_bill->ref_room_id)->orderBy('year', 'DESC')->orderBy('month', 'DESC')->first();
+            if($last_bill->id == $rent_bill->id){
+                $meter = Meter::where('ref_room_id', $rent_bill->ref_room_id)->orderBy('year', 'desc')->orderBy('month', 'desc')->first();
+                $meter->water_unit = $request->water_unit;
+                $meter->save();
+            }
             DB::commit();
             return true;
         } catch (QueryException $err) {
@@ -585,6 +692,7 @@ class BillController extends Controller
             $expenses->label  =  "ใบเสร็จค่าเช่าห้อง";
             $expenses->amount  =  0;
             $expenses->date  =  Carbon::now();
+            $expenses->time  =  date('H:i:s');
             $expenses->ref_room_id  =  $request->ref_room_id;
             $expenses->ref_category_id  =  1;
             $expenses->name  =  $receipt->renter->fullName();
@@ -639,6 +747,7 @@ class BillController extends Controller
         $data['page_url'] = 'bill';
         $invoice = RentBill::with(['receipt.payment_list_not_fine', 'room_for_rent.room.floor.building'])->find($id);
         $receipt = Receipt::where('ref_rent_bill_id', $id)->get();
+        $data['receipt_total_amount'] = $receipt->sum->total_amount ?? 0;
         $fine_invoice = PaymentList::where('ref_payment_id', $id)->where('document_type', 1)->where('fine', 1)->first();
         $data['fine_invoice_price'] = 0;
         if(@$fine_invoice){
