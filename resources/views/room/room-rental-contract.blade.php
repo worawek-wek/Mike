@@ -101,17 +101,6 @@
                 <label for="security_deposit" class="form-label">เงินประกันห้อง(บาท) <span class="text-danger">*</span></label>
                 <input type="number" name="contract[{{$key}}][deposit][0][security_deposit]" class="form-control security-deposit-room" id="security_deposit" placeholder="" value="" required/>
             </div>
-            {{-- <div class="col-sm-6 d-flex align-items-end pb-1">
-                <button
-                    id="add_expenses"
-                    class="btn btn-sm buttons-collection btn-warning waves-effect waves-light me-2"
-                    tabindex="0" aria-controls="DataTables_Table_0"
-                    type="button" aria-haspopup="dialog"
-                    aria-expanded="false">
-                    <span>
-                    <i class="ti ti-plus"></i> เพิ่มรายการเงินประกัน</span>
-                </button>
-            </div> --}}
             <div></div>
 
             <!-- Container where new items will be appended -->
@@ -143,7 +132,7 @@
 
             <div class="col-sm-6">
                 <label for="deduction_booking_amount" class="form-label">ยอดยกจากค่าจองห้อง(บาท)</label>
-                <input type="text" name="contract[{{$key}}][deduction_booking_amount]" class="form-control" id="deduction_booking_amount" placeholder="" value="{{ @$contract->deposit }}" />
+                <input type="text" name="contract[{{$key}}][deduction_booking_amount]" class="form-control reservation-fee" id="deduction_booking_amount" placeholder="" value="{{ @$contract->deposit }}" />
             </div>
             <div class="col-sm-6">
                 <label for="deduction_booking_date_all{{$item->id}}" class="form-label">หักค่าจองห้องเมื่อวันที่</label>
@@ -268,13 +257,20 @@
                     }
                 });
 
+                $('.reservation-fee').each(function () {
+                    let val_bf = parseFloat($(this).val());
+                    if (!isNaN(val_bf)) {
+                        total -= val_bf;
+                    }
+                });
+
                 $('#totalDeposit').html(
                                             total.toLocaleString('en-US')
                                         );
             }
 
             // 🔥 trigger ตอนพิมพ์
-            $(document).on('input', '.security-deposit-room', function () {
+            $(document).on('input', '.security-deposit-room, .reservation-fee', function () {
                 calculateTotalDeposit();
             });
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -350,6 +346,7 @@
         function deleteContractRoom(id){
             if ($('.contractRoom').length > 1) {
                 $(".contractRoomBox"+id).remove();
+                calculateTotalDeposit();
             } else {
                 Swal.fire('ไม่สามารถลบได้', 'การทำสัญญาต้องมีอย่างน้อย 1 ห้อง', 'warning');
             }
