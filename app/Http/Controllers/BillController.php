@@ -222,6 +222,15 @@ $sequence++;
         $invoice_alls = $invoice_alls->where('rent_bills.ref_type_id', 1)
                                         ->select('rent_bills.*')
                                         ->get();
+        foreach($invoice_alls as $invoice_a){
+            $invoice_a->total_installment_payment_price = PaymentList::where('installment_payment', 1)
+                                                        ->where('document_type', 2)
+                                                        ->where('paid', 0)
+                                                        ->whereHas('receipt', function ($q) use ($invoice_a) {
+                                                            $q->where('ref_rent_bill_id', $invoice_a->id);
+                                                        })
+                                                        ->sum('price') ?? 0; // ยอดที่แบ่งจ่ายแล้ว แต่ยังไม่เอาไปลด
+        }
         $data['invoice_alls'] = $invoice_alls; 
         // return 123;
         return view('bill/list-payment-all', $data);

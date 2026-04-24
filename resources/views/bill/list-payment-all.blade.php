@@ -73,11 +73,27 @@
                             </td>
                             <td class="text-end">
                                 <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_2 @if($payment_list->discount == 1) discount_price_2 @endif" value="{{ $payment_list->price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()" readonly>
+                                <input type="hidden" name="insert[{{ $key }}][payment_list][discount][]" value="{{ $payment_list->discount }}">
                                 <input type="hidden" name="insert[{{ $key }}][payment_list][id][]" value="{{ $payment_list->id }}">
                             </td>
                         </tr>
+                        
                     @endforeach
                 @endforeach
+                    {{-- แสดงยอดแบ่งจ่าย ที่ยังไม่ได้เอามาเป็นส่วนลด" --}}
+                    @if ($invoice->total_installment_payment_price > 0)
+                        <tr style="background-color: rgb(252, 228, 228);">
+                            <td>
+                                <input name="insert[{{ $key }}][payment_list][title][]" type="text" class="form-control payment_list_title" value="หักจากยอดแบ่งจ่าย" placeholder="หัวข้อรายการ" readonly>
+                            </td>
+                            <td class="text-end">
+                                <input type="number" name="insert[{{ $key }}][payment_list][price][]" class="form-control calculate_1_room discount_price" value="{{ $invoice->total_installment_payment_price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_1_room_price()" readonly>
+                                <input type="hidden" name="insert[{{ $key }}][payment_list][discount][]" value="1">
+                                <input type="hidden" name="insert[{{ $key }}][payment_list][id][]" value="installment_payment">
+                            </td>
+                        </tr>
+                    @endif
+                    {{-- แสดงยอดแบ่งจ่าย ที่ยังไม่ได้เอามาเป็นส่วนลด" --}}
             </tbody>
             <tfoot>
                 <tr>

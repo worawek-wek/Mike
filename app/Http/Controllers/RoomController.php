@@ -1325,7 +1325,16 @@ class RoomController extends Controller
             $receipt->save();
             
             foreach($request->payment_list['title'] as $key => $payment_list_title){
-                if(@$request->payment_list['id'][$key]){
+                if($request->payment_list['id'][$key] === "installment_payment"){
+                    PaymentList::where('installment_payment', 1)
+                                ->where('document_type', 2)
+                                ->whereHas('receipt', function ($q) use ($request) {
+                                    $q->where('ref_rent_bill_id', $request->ref_rent_bill_id);
+                                })
+                                ->update([
+                                    'paid' => 1
+                                ]);
+                }else{
                     PaymentList::where('id', $request->payment_list['id'][$key])->update(['paid' => 1]);
                 }
 
