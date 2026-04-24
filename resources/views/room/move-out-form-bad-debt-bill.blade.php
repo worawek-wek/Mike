@@ -70,16 +70,27 @@
                 <tbody>
                     @forelse ($invoice?->payment_list ?? [] as $key => $payment_list_item_4)
                         <tr {{ $payment_list_item_4->discount == 1 ? "class=bg-lob" : "" ; }}>
-                            <td>
-                                <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $payment_list_item_4->title }}" required>
-                            </td>
-                            <td class="text-end gap-1">
-                                <div class="d-flex">
-                                    <input type="number" name="payment_list[price][]" class="form-control me-2 {{ $payment_list_item_4->discount == 1 ? "form-price_increase" : "form-discount-value" ; }} calculate_2" value="{{ $payment_list_item_4->price }}" placeholder="จำนวนเงิน" max="" oninput="bad_debt_calculate_2Price()" required>
-                                    <input type="hidden" name="payment_list[discount][]" value="{{ $payment_list_item_4->discount }}">
-                                    <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
-                                </div>
-                            </td>
+                            @if ($payment_list_item_4->bad_debt_rent_status == 1)
+                                <td>
+                                    {{ $payment_list_item_4->title }}
+                                </td>
+                                <td class="text-end {{$payment_list_item_4->discount == 1 ? "text-danger fw-bold" : ""}}">
+                                    {{ number_format($payment_list_item_4->price) }}
+                                    <input type="hidden" class="{{ $payment_list_item_4->discount == 1 ? "form-price_increase" : "form-discount-value" ; }} calculate_2 payment-price" value="{{ $payment_list_item_4->price }}">
+                                </td>
+                            @else
+                                    
+                                <td>
+                                    <input name="payment_list[title][]" type="text" class="form-control payment_list_title" placeholder="หัวข้อรายการ" value="{{ $payment_list_item_4->title }}" required>
+                                </td>
+                                <td class="text-end gap-1">
+                                    <div class="d-flex">
+                                        <input type="number" name="payment_list[price][]" class="form-control me-2 {{ $payment_list_item_4->discount == 1 ? "form-price_increase" : "form-discount-value" ; }} calculate_2 payment-price" value="{{ $payment_list_item_4->price }}" placeholder="จำนวนเงิน" max="" oninput="bad_debt_calculate_2Price()" required>
+                                        <input type="hidden" name="payment_list[discount][]" value="{{ $payment_list_item_4->discount }}">
+                                        <button type="button" class="btn btn-sm btn-danger btn-remove-row">ลบ</button>
+                                    </div>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
@@ -253,21 +264,19 @@
                     let total = 0;
 
                     $('#form-bad-debt-receipt-move-out-discount-table2 tbody tr').each(function () {
-                    // $('#discount-table2 tbody tr').each(function () {
-                        const priceInput = $(this).find('input[name="payment_list[price][]"]');
+
+                        const priceInput = $(this).find('.payment-price'); // ✅ เปลี่ยนตรงนี้
                         const price = parseFloat(priceInput.val());
 
                         if (!isNaN(price)) {
-                            // ถ้ามี class discount-value คือรายการส่วนลด (ลบ)
                             if (priceInput.hasClass('form-price_increase')) {
                                 total -= price;
                             } else {
-                                // รายการปกติ บวกเพิ่ม
                                 total += price;
                             }
                         }
                     });
-                    // alert(total);
+
                     $('.bad-debt-total-price_2').text(
                         total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                     );
