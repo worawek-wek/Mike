@@ -98,6 +98,10 @@ class RentBill extends Model
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1);
     }
+    // public function payment_list_installment()
+    // {
+    //     return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1)->where('installment_payment', 1);
+    // }
     public function payment_list_not_paid() // รายการที่ยังไม่ชำระ
     {
         return $this->hasMany('App\Models\PaymentList', 'ref_payment_id', 'id')->where('document_type', 1)->where('paid', 0);
@@ -131,7 +135,7 @@ class RentBill extends Model
     {
         return $this->hasOne('App\Models\PaymentList', 'ref_payment_id', 'id')
                     ->where('document_type', 1)
-                    ->where('paid', 1)
+                    ->where('paid', 0)
                     ->where('title', 'like', '%ค่าปรับ เกินชำระ%');
     }
     public function payment_rent_room_array() // สำหรับชำระเงิน ดึงแค่ List ที่ยังไม่ชำระ
@@ -201,6 +205,17 @@ class RentBill extends Model
 
         return $total - $discount;
     }
+    // public function getTotalInstallmentPaymentPriceAttribute()
+    // {
+
+    //     $lists = $this->payment_list; // ใช้ attribute ที่ถูกโหลดแล้ว
+
+    //     $total = $lists->where('discount', 0)->sum('price');
+    //     $discount = $lists->where('discount', 1)->sum('price');
+
+
+    //     return $total - $discount;
+    // }
     public function getNotDiscountAttribute()
     {
 

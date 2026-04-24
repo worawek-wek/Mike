@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="m-2 mt-4" style="border: 1px solid #dbdbdb;border-radius: 5px;">
-        <i class="tf-icons ti ti-browser-plus text-main" style="font-size: 25px;vertical-align: baseline;"></i>
-        รายการห้อง
+    <h5 class="m-2">
+        <i class="tf-icons ti ti-browser-plus text-main" style="font-size: 25px;vertical-align: middle;"></i>
+            รายการห้อง
     </h5>
     <div class="px-4">
                 @php

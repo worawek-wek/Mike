@@ -240,11 +240,18 @@ $sequence++;
         $data['bank'] = Bank::where('ref_branch_id', session("branch_id"))->get();
         // return $request->invoice_ids;
         $invoice = RentBill::find($request->invoice_id);
+        $data['total_installment_payment_price'] = PaymentList::where('installment_payment', 1)
+                                                        ->where('document_type', 2)
+                                                        ->where('paid', 0)
+                                                        ->whereHas('receipt', function ($q) use ($request) {
+                                                            $q->where('ref_rent_bill_id', $request->invoice_id);
+                                                        })
+                                                        ->sum('price'); // ยอดที่แบ่งจ่ายแล้ว แต่ยังไม่เอาไปลด
         // return $receipt_list = PaymentList::whereHas('receipt', function ($query) use ($invoice) {
         //                             $query->where('ref_rent_bill_id', $invoice->id);
         //                         })->where('title', $invoice->payment_fine_array)->where('fine', 1)->where('document_type', 2)->first();
         $data['payment_fine_price'] = 0;
-        if (in_array('payment_other_array', $request->list) || in_array('payment_list_not_paid', $request->list)) {
+        if (in_array('payment_other_array', $request->list)) {
             $data['payment_fine_price'] = $invoice->payment_fine->price ?? 0 - $invoice->receipt->sum(function ($r) { return $r->total_fine_amount; }); // ค่าปรับ RentBill - ค่าปรับ Receipt // หายอดค่าปรับที่เหลือ
         }
         $data['invoice'] = $invoice;
@@ -592,8 +599,8 @@ $sequence++;
             
             $total = Room::find($request->ref_room_id)->rent;
 
-            if($request->payment_format == 1){
-                // return $request->payment_sd_list['title'];
+            if($request->payment_format == 1){ // ถ้าติ๊กจ่ายเต็มจำนวน 
+
                 foreach($rent_bill->payment_list as $payment_list){
                     $title = $payment_list->title;
                     if (strpos($payment_list->title, 'Water rate') !== false){
@@ -649,11 +656,9 @@ $sequence++;
                 // $rent_bill->paid_on_checkout  =  $request->paid_on_checkout ?? 0;
                 $rent_bill->ref_status_id = 2;
 
-            }else{
+            }else{  // ถ้าติ๊กแบ่งจ่าย
 
                 foreach($request->payment_list['title'] as $key => $payment_list_title){
-                    
-                    PaymentList::where('id', $request->payment_list['id'][$key])->update(['paid' => 1]);
 
                     $pay_list = new PaymentList;
                     $pay_list->title  =  $payment_list_title;
@@ -661,6 +666,23 @@ $sequence++;
                     $pay_list->ref_payment_id  =  $receipt->id;
                     $pay_list->document_type  =  2;
                     $pay_list->discount  =  $request->payment_list['discount'][$key];
+
+                    if(@$request->payment_list['id'][$key]){
+                        if($request->payment_list['id'][$key] === "installment_payment"){
+                            PaymentList::where('installment_payment', 1)
+                                        ->where('document_type', 2)
+                                        ->whereHas('receipt', function ($q) use ($request) {
+                                            $q->where('ref_rent_bill_id', $request->id);
+                                        })
+                                        ->update([
+                                            'paid' => 1
+                                        ]);
+                        }else{
+                            PaymentList::where('id', $request->payment_list['id'][$key])->update(['paid' => 1]);
+                        }
+                    }else{
+                        $pay_list->installment_payment  =  1;
+                    }
 
                     if ($payment_list_title && str_contains($payment_list_title, 'ค่าปรับ')) {
                         $pay_list->fine  =  1; // รายการนี้เป็นค่าปรับ ค่าปรับนี้จะไม่เอาไปเช็คว่าจ่ายครบไหม

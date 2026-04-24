@@ -284,12 +284,12 @@
 
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input bill-list-payment-checkbox" type="checkbox"
-                                                            value="payment_list_not_paid"
-                                                            id="payment_list_not_paid"
+                                                            value="installment_payment"
+                                                            id="installment_payment"
                                                             checked
                                                             >
-                                                        <label class="form-check-label" for="payment_list_not_paid">
-                                                            เต็มจำนวน
+                                                        <label class="form-check-label" for="installment_payment">
+                                                            ระบุยอด
                                                         </label>
                                                     </div>
 
@@ -368,7 +368,7 @@
                                                                 </td>
                                                                 <td class="text-end">
                                                                     {{ number_format($fine_price) }}
-                                                                    <input type="hidden" name="payment_list[price][]" class="calculate_2"
+                                                                    <input type="hidden" name="payment_list[price][]" class="calculate_1_room"
                                                                     value="{{ $fine_price }}">
                                                                     <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 </td>
@@ -379,7 +379,7 @@
                                                                     <input name="payment_list[title][]" type="text" class="form-control payment_list_title" value="แบ่งจ่ายค่าห้อง {{ $invoice->room_for_rent->room->name }}" placeholder="หัวข้อรายการ">
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_2" value="{{ $invoice->total_amount - $receipt_total_amount-$fine_price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_2Price()">
+                                                                    <input type="number" name="payment_list[price][]" class="form-control calculate_1_room" value="{{ $invoice->total_amount - $receipt_total_amount-$fine_price }}" placeholder="จำนวนเงิน" max="" oninput="calculate_1_room_price()">
                                                                     <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 </td>
                                                             </tr>
@@ -387,7 +387,7 @@
                                                     <tfoot>
                                                         <tr>
                                                             <th>รวม</th>
-                                                            <th class="text-end mb-0 fw-bold total-price_2">
+                                                            <th class="text-end mb-0 fw-bold total_1-room-price">
                                                                 0
                                                             </th>
                                                         </tr>
@@ -421,7 +421,7 @@
                                                 
                                                 <script>
                                                     payPaymentMultipleRentBills();
-                                                    document.getElementById("payment_list_not_paid").addEventListener("change", function () {
+                                                    document.getElementById("installment_payment").addEventListener("change", function () {
                                                         if (this.checked) {
                                                             // ยกเลิกการเลือกอย่างอื่นทั้งหมด
                                                             document.querySelectorAll(".list-payment-check-box").forEach(ch => ch.checked = false);
@@ -433,7 +433,7 @@
                                                     document.querySelectorAll(".list-payment-check-box").forEach(ch => {
                                                         ch.addEventListener("change", function () {
                                                             if (this.checked) {
-                                                                document.getElementById("payment_list_not_paid").checked = false; // ยกเลิก "เต็มจำนวน"
+                                                                document.getElementById("installment_payment").checked = false; // ยกเลิก "เต็มจำนวน"
                                                             }
                                                             payPaymentMultipleRentBills();
                                                         });
@@ -479,7 +479,7 @@
                                                         </td>
                                                         <td class="text-end">
                                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_2 add_expenses2_price" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_1_room add_expenses2_price" oninput="calculate_1_room_price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                                                                 <input type="hidden" name="payment_list[discount][]" value="0">
                                                                 <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
                                                             </div>
@@ -500,7 +500,7 @@
                                                         </td>
                                                         <td class="text-end">
                                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_2 discount_price_2" oninput="calculate_2Price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
+                                                                <input name="payment_list[price][]" type="number" class="form-control calculate_1_room discount_price_2" oninput="calculate_1_room_price()" placeholder="จำนวนเงิน" required style="flex: 1;" autocomplete=off />
                                                                 <input type="hidden" name="payment_list[discount][]" value="1">
                                                                 <button type="button" class="btn btn-danger btn-sm remove-row2">ลบ</button>
                                                             </div>
@@ -514,14 +514,14 @@
                                                 function addRemoveEvent_2(row) {
                                                     row.querySelector('.remove-row2').addEventListener('click', function() {
                                                         row.remove();
-                                                        calculate_2Price();
+                                                        calculate_1_room_price();
                                                     });
                                                 }
                                                 setTimeout(() => {
-                                                    calculate_2Price();
+                                                    calculate_1_room_price();
                                                 }, 1000);
-                                                function calculate_2Price() { 
-                                                    const inputs = document.querySelectorAll('.calculate_2');  // เลือกทุก input ที่มี class="calculate"
+                                                function calculate_1_room_price() { 
+                                                    const inputs = document.querySelectorAll('.calculate_1_room');  // เลือกทุก input ที่มี class="calculate"
                                                     let total = 0;
 
                                                     inputs.forEach(input => {
@@ -541,9 +541,21 @@
                                                             }
                                                         }
                                                     });
-                                                    $('.total-price_2').html(total.toLocaleString());
-                                                    $('.total-price_2').val(total);
+                                                    
+                                                    if(total > 0){ // ถ้ายอดรวมมากกว่า 0 กดปุ่ม ชำระ ได้
+                                                        $('#submit_payment').prop('disabled', false);
+                                                    }else{
+                                                        $('#submit_payment').prop('disabled', true);
+                                                    }
 
+                                                    $('.total_1-room-price').html(total.toLocaleString());
+                                                    $('.total_1-room-price').val(total);
+
+                                                    if(total > 0){
+                                                        $('#submit_payment').prop('disabled', false);
+                                                    }else{
+                                                        $('#submit_payment').prop('disabled', true);
+                                                    }
                                                     // อัปเดตค่า total ใน span#total-price
                                                     // document.getElementById('total-price').innerText = total.toLocaleString();
                                                 }
@@ -556,7 +568,7 @@
                                         </div> --}}
                                 <script>
                                     document.getElementById('checksplit').addEventListener('change', function() {
-                                        // calculate_2Price();
+                                        // calculate_1_room_price();
                                         calculatePrice_2()
                                         document.getElementById('divsplit').style.display = this.checked ? 'block' : 'none';
                                         document.getElementById('totalsplit').style.display = this.checked ? 'block' : 'none';
@@ -636,7 +648,7 @@
                                                 @if (count($invoice->receipt) == 0)
                                                     style="display: none"
                                                 @endif
-                                            >ยอดชำระเงินทั้งหมด&nbsp; <span class="total-price_2">0</span> &nbsp;บาท</b>
+                                            >ยอดชำระเงินทั้งหมด&nbsp; <span class="total_1-room-price">0</span> &nbsp;บาท</b>
                                     </div>
                                 </div>
                             </div>
@@ -732,7 +744,7 @@
             $('#payment_channel').val(i);
         }
         function calculatePrice_2() { 
-            const inputs = document.querySelectorAll('.calculate_2');  // เลือกทุก input ที่มี class="calculate"
+            const inputs = document.querySelectorAll('.calculate_1_room');  // เลือกทุก input ที่มี class="calculate"
             let total = 0;
 
             inputs.forEach(input => {
@@ -757,7 +769,7 @@
             }else{
                 $('#submit_payment').prop('disabled', true);
             }
-            $('.total-price_2').html(total.toLocaleString());
+            $('.total_1-room-price').html(total.toLocaleString());
 
             // อัปเดตค่า total ใน span#total-price
             // document.getElementById('total-price').innerText = total.toLocaleString();
@@ -770,10 +782,9 @@
                 this.reportValidity();
                 return console.log('ฟอร์มไม่ถูกต้อง');
             }
-            // return alert(123);
             Swal.fire({
-                title: 'ยืนยันการดำเนินการ?',
-                text: 'คุณต้องการ บันทึกการเปลี่ยนแปลง หรือไม่?',
+                title: 'ยืนยันการชำระเงิน?',
+                text: 'คุณต้องการ ชำระเงิน หรือไม่?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'ตกลง',
@@ -799,7 +810,7 @@
                                 $('#invoice').modal('hide');
                                 summary();
                                 loadData(page);
-                                Swal.fire('บันทึกเรียบร้อยแล้ว', '', 'success');
+                                Swal.fire('ชำระเงินเรียบร้อยแล้ว', '', 'success');
                             }
                         },
                         error: function (xhr) {
