@@ -203,17 +203,15 @@
                 <span>
                 <i class="ti ti-plus"></i> เพิ่มรายการ</span>
             </button>
+                <button type="submit" class="btn btn-sm btn-warning waves-effect" value="save">
+                    <span class="fa fa-save me-2" style="font-size: large;"></span>บันทึกรายการ</button>
         </div>
         
         <div class="col-sm-11 mt-3">
             <label>หมายเหตุ</label>
             <input type="text" name="remark" class="form-control" placeholder="หมายเหตุ" value="{{ $invoice->remark }}" />
-        </div>
-            <div class="modal-footer rounded-0 justify-content-end my-2 pb-0">
-                <button type="submit" class="btn btn-sm btn-warning waves-effect" value="save">
-                    <span class="fa fa-save me-2" style="font-size: x-large;"></span>บันทึกรายการ</button>
-            </div>
-          </div>
+        {{-- </div>
+          </div> --}}
         </div>
         
     </div>
