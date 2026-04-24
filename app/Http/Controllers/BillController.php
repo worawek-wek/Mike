@@ -1231,7 +1231,7 @@ $sequence++;
         )->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         
         $writer = new WriterXlsx($spreadsheet);
-        $writer->save("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime('-1 month')).".xlsx");
-        return redirect("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime('-1 month')).".xlsx");
+        $writer->save("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime($request->month)).".xlsx");
+        return redirect("upload/export_excel/บิลค่าเช่า-".date('m-Y', strtotime($request->month)).".xlsx");
     }
 }
